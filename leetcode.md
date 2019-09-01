@@ -7190,7 +7190,7 @@ Example:
     dummy -> entry -> entry ->entry -> entry(tail)
 
     entryFinder = { key, {key, value} }
-    
+
 ### Code
 ``` py
 '''
@@ -7285,13 +7285,216 @@ class LRUCache(object):
 # obj.put(key,value)
 ```
 ---
-## ｜ 8/29
+## 4. Median of Two Sorted Arrays｜ 8/30
+There are two sorted arrays nums1 and nums2 of size m and n respectively.
+
+Find the median of the two sorted arrays. The overall run time complexity should be O(log (m+n)).
+
+You may assume nums1 and nums2 cannot be both empty.
+
+Example 1:
+
+nums1 = [1, 3]
+nums2 = [2]
+
+The median is 2.0
+
+Example 2:
+
+nums1 = [1, 2]
+nums2 = [3, 4]
+
+The median is (2 + 3)/2 = 2.5
+
+### Techniques here
+
+![](assets/markdown-img-paste-20190830143926332.png)
+
+>>> word[0:2]  # characters from position 0 (included) to 2 (excluded)
+'Py'
+>>> word[2:5]  # characters from position 2 (included) to 5 (excluded)
+'tho'
+Note how the start is always included, and the end always excluded. This makes sure that s[:i] + s[i:] is always equal to s:
+>>> word[:2]   # character from the beginning to position 2 (excluded)
+'Py'
+>>> word[4:]   # characters from position 4 (included) to the end
+'on'
+>>> word[-2:]  # characters from the second-last (included) to the end
+'on'
+
+ +---+---+---+---+---+---+
+ | P | y | t | h | o | n |
+ +---+---+---+---+---+---+
+ 0   1   2   3   4   5   6
+-6  -5  -4  -3  -2  -1
+
 
 ### 思路
 
+這道題要求兩個已經排好序的數列的中位數。中位數的定義：如果數列有偶數個數，那麼中位數為中間兩個數的平均值；如果數列有奇數個數，那麼中位數為中間的那個數。比如{1，2，3，4，5}的中位數為3。{1，2，3，4，5，6}的中位數為（3+4）/ 2 = 3.5。那麼這題最直接的思路就是將兩個數列合併在一起，然後排序，然後找到中位數就行了。可是這樣最快也要O((m+n)log(m+n))的時間複雜度
+
+首先我們來看如何找到兩個數列的第k小個數，即程序中getKth(A, B , k)函數的實現。用一個例子來說明這個問題：A = {1，3，5，7}；B = {2，4，6，8，9，10}；如果要求第7個小的數，A數列的元素個數為4，B數列的元素個數為6；k/2 = 7/2 = 3，而A中的第3個數A[2]=5；B中的第3個數B[2]=6；而A[2]<B[2]；則A[0]，A[1]，A[2]中必然不可能有第7個小的數。因為A[2]<B[2]，所以比A[2]小的數最多可能為A[0], A[1], B[0], B[1]這四個數，也就是說A[2]最多可能是第5個大的數，由於我們要求的是getKth(A, B, 7)；現在就變成了求getKth(A', B, 4)；即A' = {7}；B不變，求這兩個數列的第4個小的數，因為A[0]，A[1]，A[2]中沒有解，所以我們直接刪掉它們就可以了。
+
+![](assets/markdown-img-paste-20190831094519590.png)
 
 ### Code
 ``` py
+class Solution(object):
+    def findKth(self, A, B, k):
+        lenA = len(A); lenB = len(B)
+        # fixed the B is the larger one
+        if lenA > lenB:   return self.findKth(B, A, k)
 
+        if lenA == 0:     return B[k-1]
+        if k == 1:        return min(A[0], B[0])
+        pa = min(k/2, lenA);    pb = k-pa
+        if A[pa-1] <= B[pb-1]:
+            return self.findKth(A[pa:], B, pb)
+        else:
+            return self.findKth(A, B[pb:], pa)
+
+
+    def findMedianSortedArrays(self, nums1, nums2):
+        """
+        :type nums1: List[int]
+        :type nums2: List[int]
+        :rtype: float
+        """
+        lenA = len(nums1); lenB = len(nums2)
+        if (lenA+lenB) % 2 == 1:
+            return self.findKth(nums1, nums2, (lenA+lenB)/2 +1)
+        else:
+            return (self.findKth(nums1, nums2, (lenA+lenB)/2) + self.findKth(nums1, nums2, (lenA+lenB)/2+1)) * 0.5
+```
+---
+## 5. Longest Palindromic Substring｜ 8/31
+
+### 思路
+中心思想就是用迴圈去找到回文的中心點
+
+並把回文長度分成奇數偶數兩個case去看
+
+Time complexity O(n^n)
+
+最佳解：
+
+馬拉車算法
+
+https://www.cnblogs.com/grandyang/p/4475985.html
+
+### Code
+Naive Solution:
+
+``` py
+class Solution(object):
+    def longestPalindrome(self, s):
+        res = ""
+        """
+        :type s: str
+        :rtype: str
+        """
+        for i in range(len(s)):
+            # check odd case
+            temp = self.checkLR(s, i, i)
+            if len(temp) > len(res):
+                res = temp
+
+            # check even case
+            temp = self.checkLR(s, i, i+1)
+            if len(temp) > len(res):
+                res = temp
+
+        return res
+
+    def checkLR(self, s, l, r):
+        while l >= 0 and r < len(s) and s[l] == s[r]:
+            l -= 1; r += 1
+        return s[l+1 : r]
+
+```
+---
+## 200. Number of Islands｜ 8/31
+Given a 2d grid map of '1's (land) and '0's (water), count the number of islands. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
+
+![](assets/markdown-img-paste-20190831231112890.png)
+
+### 技巧
+
+1. 初始化二維陣列: [[0]* n for i in range m ] -> [[0,0,..n], [0,0,..n]...m]
+
+2. 封裝: dirz = zip([1,0,-1,0], [0,1,0,-1])  -> dirz = [(1,0),(0,1),(-1,0),(0,-1)]
+
+(在pair操作上可以用)
+
+3. 可以直接用 m > k >= 0
+
+### 思路
+Naive solution
+
+ v.s.
+
+clean and clear solution 
+
+### Code
+``` py
+class Solution(object):
+    def numIslands(self, grid):
+        """
+        :type grid: List[List[str]]
+        :rtype: int
+        """
+        ans = 0
+        if not len(grid):   return ans
+
+        m, n = len(grid), len(grid[0])
+        visited = [[False]*n for x in range(m)] # [[False, False, ... n], [False, False, ...n] ... m]
+        for x in range(m):
+            for y in range(n):
+                if grid[x][y] == '1' and not visited[x][y]:
+                    ans += 1
+                    self.bfs(grid, visited, x, y, m, n)
+        return ans
+
+    def bfs(self, grid, visited, x, y, m, n):
+        dirz = zip([1,0,-1,0], [0,1,0,-1]) # the direction it walk
+        queue = [(x,y)]
+        visited[x][y] = True
+
+        while queue:
+            front = queue.pop(0)
+            for p in dirz:  # why not "for p in range(dirz)"
+                # px = p[0]+front[0], py = p[1]+front[1]      Wrong!!
+                np = (front[0]+p[0], front[1]+p[1])
+                if self.isValid(np, m, n) and not visited[np[0]][np[1]] and grid[np[0]][np[1]] == '1':
+                    queue.append(np)
+                    visited[np[0]][np[1]] = True
+
+    def isValid(self, np, m, n):
+        return m > np[0] >= 0 and n > np[1] >= 0
+```
+
+Beautiful code:
+```py
+class Solution(object):
+    def numIslands(self, grid):
+        if not grid:
+            return 0
+
+        count = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == '1':
+                    self.dfs(grid, i, j)
+                    count += 1
+        return count
+
+    def dfs(self, grid, i, j):
+        if i<0 or j<0 or i>=len(grid) or j>=len(grid[0]) or grid[i][j] != '1':
+            return
+        grid[i][j] = '#'
+        self.dfs(grid, i+1, j)
+        self.dfs(grid, i-1, j)
+        self.dfs(grid, i, j+1)
+        self.dfs(grid, i, j-1)
 ```
 ---
