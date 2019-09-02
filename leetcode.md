@@ -7432,6 +7432,15 @@ http://www.runoob.com/python/python-func-zip.html
 
 3. 可以直接用 m > k >= 0
 
+4. Use List as Stack: stack用pop()
+
+5. Use List as Queue: queue用pop(0) -> slower than using deque
+
+5. Use deque as Queue: queue = deque([List])
+  - from collections import deque
+  - queue.append(),   queue.popleft()
+
+
 ### 思路
 Naive solution
 
@@ -7710,13 +7719,303 @@ class Solution(object):
         return [e[1] for e in heap]
 ```
 ---
-## ｜ 8/29
+## 53. Maximum Subarray｜ 9/2
+Given an integer array nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.
+
+Example:
+
+Input: [-2,1,-3,4,-1,2,1,-5,4],
+
+Output: 6
+
+Explanation: [4,-1,2,1] has the largest sum = 6.
+
+Follow up:
+
+If you have figured out the O(n) solution, try coding another solution using the divide and conquer approach, which is more subtle.
+
 
 ### 思路
 
+1, Directly apprach:
+
+Compare this element vs this element + pastMax combination (curSum)
+
+
+2, Divide and Conquer:
+
+Find the maximum subarray in nums[start ~ mid - 1].
+
+Find the maximum subarray in nums[mid + 1 ~ end].
+
+Find the maximum subarray which includes nums[mid];
+
+Return the max of the above three.
+
+Time complexity: We use O(n) operation and leave two T(n/2) problems.
+
+T(n) = 2T(n/2) + O(n) => T(n) = O(nlogn)
 
 ### Code
 ``` py
+class Solution(object):
+    def maxSubArray(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        curSum, res = -(sys.maxint)-1, -(sys.maxint)-1 # Or can set as nums[0]
+        for num in nums:                               # And loop from nums[1] -> in nums[1:]:
+            curSum = max(num+curSum, num)
+            res = max(res, curSum)
 
+        return res
+```
+
+Divide and Conquer Way:
+```py
+class Solution(object):
+    def maxSubArray(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        return self.DandC(0, len(nums)-1, nums)
+
+    def DandC(self, left, right, nums):
+
+        if left >= right:   return nums[left]
+        mid = left + (right-left)/2
+        lmax = self.DandC(left, mid, nums) # find max in left
+        rmax = self.DandC(mid+1, right, nums) # find max in right
+
+        # find max includes nums[mid]
+        mmax, t = nums[mid], nums[mid]
+        for i in range(mid-1, left-1, -1):
+            t += nums[i]
+            mmax = max(mmax, t)
+
+        t = mmax
+        for i in range(mid+1, right+1):
+            t += nums[i]
+            mmax = max(mmax, t)
+
+        return max(lmax, rmax, mmax)
+```
+---
+## 20. Valid Parentheses｜ 9/2
+Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+
+An input string is valid if:
+
+Open brackets must be closed by the same type of brackets.
+
+Open brackets must be closed in the correct order.
+
+Note that an empty string is also considered valid.
+
+![](assets/markdown-img-paste-20190902154615181.png)
+
+### 技巧
+
+直接判斷dictionary裡面有沒有特定key或value:
+
+- if char in dict.key():
+- if char in dict.value():
+
+### 思路
+
+雙Stack法:
+
+先把原輸入推進inStack中，
+
+再從inStack一個個pop出來，
+
+如果pop出的是後標，先放進outStack中，
+
+如果pop出的是前標，去outStack的頂端看是不是對應的前標，
+
+如果不是，就是invalid
+
+如果inStack run
+
+### Code
+
+雙Stack法:
+``` py
+class Solution(object):
+    def isValid(self, s):
+        """
+        :type s: str
+        :rtype: bool
+        """
+        if not s: return True
+        dic = {'{': '}', '[':']', '(':')' }
+
+        inStack = []
+        outStack = []
+        for c in s:
+            inStack.append(c)
+
+        while inStack:
+            out = inStack.pop()
+            if out == '}' or out == ']' or out == ')':
+                outStack.append(out)
+            elif out == '[' or out == '(' or out == '{':
+                if not outStack:    return False
+                elif outStack.pop() != dic[out]: return False
+
+        if not outStack:
+            return True
+        else:
+            return False
+```
+
+大神版：
+```py
+class Solution:
+    # @return a boolean
+    def isValid(self, s):
+        stack = []
+        dict = {"]":"[", "}":"{", ")":"("}
+        for char in s:
+            if char in dict.values():
+                stack.append(char)
+            elif char in dict.keys():
+                if stack == [] or dict[char] != stack.pop():
+                    return False
+            else:
+                return False
+        return stack == []
+```
+
+---
+## 937. Reorder Log Files｜ 9/2
+You have an array of logs.  Each log is a space delimited string of words.
+
+For each log, the first word in each log is an alphanumeric identifier.  Then, either:
+
+Each word after the identifier will consist only of lowercase letters, or;
+Each word after the identifier will consist only of digits.
+We will call these two varieties of logs letter-logs and digit-logs.  It is guaranteed that each log has at least one word after its identifier.
+
+Reorder the logs so that all of the letter-logs come before any digit-log.  The letter-logs are ordered lexicographically ignoring identifier, with the identifier used in case of ties.  The digit-logs should be put in their original order.
+
+Return the final order of the logs.
+
+![](assets/markdown-img-paste-2019090216540629.png)
+### 技巧
+
+1. 客製化sort: list.sort(key=lambda x: {每個在list裡的元素x的排序規則})
+
+2. str.split(): 會依照空格把字串切開，並回傳list格式
+
+3. 思考：sort的順序(如程式碼末端)
+
+### Code
+``` py
+class Solution(object):
+    def reorderLogFiles(self, logs):
+        """
+        :type logs: List[str]
+        :rtype: List[str]
+        """
+        if not logs:    return []
+        letter = []
+        digit = []
+
+        for log in logs:
+            if log.split()[1].isdigit(): # the first str after the identifier
+                digit.append(log)
+            else:
+                letter.append(log)
+
+        # firstly, sort by context, but
+        # if the context is tie, sort by identifier
+
+        # Note: in code, we have to sort by identifier first
+        # Otherwise the outcome would reversely as our think
+        letter.sort(key = lambda x: x.split()[0] )
+        letter.sort(key = lambda x: x.split()[1:])
+
+        return letter+digit
+
+```
+---
+## 238. Product of Array Except Self｜ 9/2
+
+Given an array nums of n integers where n > 1,  return an array output such that output[i] is equal to the product of all the elements of nums except nums[i].
+
+Example:
+
+Input:  [1,2,3,4]
+
+Output: [24,12,8,6]
+
+Note: Please solve it without division and in O(n).
+
+Follow up:
+
+Could you solve it with constant space complexity? (The output array does not count as extra space for the purpose of space complexity analysis.)
+### 思路
+
+__思考如何求出特定的數 A[3]__
+
+對於某一個數字，如果我們知道其前面所有數字的乘積，同時也知道後面所有的數乘積，那麼二者相乘就是我們要的結果，所以我們只要分別創建出這兩個數組即可，分別從數組的兩個方向遍歷就可以分別創建出乘積累積數組。
+
+__如果要求constant space, 表示不能有除了回傳陣列外多餘的陣列__
+
+由於最終的結果都是要乘到結果 res 中，所以可以不用單獨的數組來保存乘積，而是直接累積到結果 res 中，我們先從前面遍歷一遍，將乘積的累積存入結果 res 中，然後從後面開始遍歷，用到一個臨時變量 right，初始化為1，然後每次不斷累積
+
+### Code
+``` py
+"""
+    0 1 2 3 4 5 6 n-1
+
+    A[3] = (A[0]*..A[2]) * (A[4]*...A[n-1])
+               fwd              bwd
+
+"""
+
+class Solution(object):
+    def productExceptSelf(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        n = len(nums)
+        fwd, bwd = [1]*n,[1]*n
+        res = []
+        for i in range(1, n):
+            fwd[i] = fwd[i-1]*nums[i-1]
+
+        for i in range(n-2, -1, -1):
+            bwd[i] = bwd[i+1]*nums[i+1]
+
+        for i in range(n):
+            res.append(bwd[i]*fwd[i])
+        return res
+```
+
+Constant space improve:
+```py
+class Solution(object):
+    def productExceptSelf(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        n = len(nums)
+        res = [1]*n
+
+        for i in range(1, n):
+            res[i] = res[i-1] * nums[i-1]
+
+        afterMult = 1
+        for i in range(n-2, -1, -1):
+            afterMult *= nums[i+1]
+            res[i] *=  afterMult
+
+        return res
 ```
 ---
