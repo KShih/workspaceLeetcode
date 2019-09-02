@@ -7422,9 +7422,13 @@ Given a 2d grid map of '1's (land) and '0's (water), count the number of islands
 
 1. 初始化二維陣列: [[0]* n for i in range m ] -> [[0,0,..n], [0,0,..n]...m]
 
+https://blog.csdn.net/u012814856/article/details/78740043
+
 2. 封裝: dirz = zip([1,0,-1,0], [0,1,0,-1])  -> dirz = [(1,0),(0,1),(-1,0),(0,-1)]
 
 (在pair操作上可以用)
+
+http://www.runoob.com/python/python-func-zip.html
 
 3. 可以直接用 m > k >= 0
 
@@ -7433,7 +7437,7 @@ Naive solution
 
  v.s.
 
-clean and clear solution 
+clean and clear solution
 
 ### Code
 ``` py
@@ -7496,5 +7500,223 @@ class Solution(object):
         self.dfs(grid, i-1, j)
         self.dfs(grid, i, j+1)
         self.dfs(grid, i, j-1)
+```
+---
+## 42. Trapping Rain Water｜ 9/1
+Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it is able to trap after raining.
+
+![](assets/markdown-img-paste-2019090112165990.png)
+
+### 技巧
+
+從後面loop回來 for(i in range(n-1, -1, -1)) -> 從 arr[n-1] ~ arr[0]
+
+### 思路
+
+我們觀察其中的一個位置，單獨考慮這個位置的容量是多少？
+
+這個位置左邊最高的那個邊(含自己)，和右邊最高的那個邊(含自己)，兩者取小的，
+
+然後再減去本身的大小，那麼結果就是這個位置的容量。所以，
+
+（1）從左向右進行掃瞄，獲取每個位置的左邊最高的邊。
+
+（2）從右向左進行掃瞄，獲取每個位置的右邊最高的邊。
+
+（3）再遍歷一邊，計算出每個位置的容量，累加，即結果。
+
+![](assets/markdown-img-paste-20190901121750340.png)
+
+### Code
+``` py
+class Solution(object):
+    def trap(self, height):
+        """
+        :type height: List[int]
+        :rtype: int
+        """
+        if not height: return 0
+
+        res, n = 0, len(height)
+        left_max = [0] * n # the left highest of the point
+        rigt_max = [0] * n # the right hightest of the point
+
+        left_max[0] = height[0] # initialize
+        for i in range (1,n):
+            left_max[i] = max(left_max[i-1], height[i])
+
+        rigt_max[n-1] = height[n-1]
+        for i in range (n-2, -1, -1):
+            rigt_max[i] = max(rigt_max[i+1], height[i])
+
+        for i in range (1,n-1):
+            res += min(left_max[i], rigt_max[i]) - height[i]
+
+        return res
+```
+---
+## 3. Longest Substring Without Repeating Characters｜ 9/1
+Given a string, find the length of the longest substring without repeating characters.
+
+![](assets/markdown-img-paste-2019090113545995.png)
+
+
+### 技巧
+
+判斷字典裡存不存在:  if s[i] in Dic:  Dic[s[i]] += 1
+
+
+### 思路
+
+利用字典紀錄目前此char的最高位置
+
+利用滑動窗口原理，並只maintain tail
+
+當 i (head)持續前進，
+
+如果遇到已經存在的，
+
+把前面吃下來，並且移動tail到 重複字元在字典中的位置+1
+
+有可能會讓字串變小，但我們持續記錄最長字串所以無仿
+
+### Code
+``` py
+class Solution(object):
+    def lengthOfLongestSubstring(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        charPos = {} # maintain the newest position of each char
+        tail, ans = 0, 0
+
+        # tail is the end of current str, i is the head
+        for i in range(len(s)):
+            if s[i] in charPos and tail <= charPos[s[i]]: # avoid move the tail to front
+                tail = charPos[s[i]] + 1
+            else:
+                ans = max(ans, i - tail + 1)
+
+            charPos[s[i]] = i # update the char
+        return ans
+```
+
+運用enumerate改寫版:
+```py
+class Solution(object):
+    def lengthOfLongestSubstring(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        charPos = {} # maintain the newest position of each char
+        tail, ans = 0, 0
+
+        # tail is the end of current str, i is the head
+        for i, c in enumerate(s):
+            if c in charPos and tail <= charPos[c]: # avoid move the tail to front
+                tail = charPos[c] + 1
+            else:
+                ans = max(ans, i - tail + 1)
+
+            charPos[c] = i # update the char
+        return ans
+```
+---
+## 973. K Closest Points to Origin｜ 9/1
+We have a list of points on the plane.  Find the K closest points to the origin (0, 0).
+
+(Here, the distance between two points on a plane is the Euclidean distance.)
+
+You may return the answer in any order.  The answer is guaranteed to be unique (except for the order that it is in.)
+
+![](assets/markdown-img-paste-20190901201943490.png)
+
+### 技巧
+
+終於自己用py寫出一題了！雖然TLE
+
+0. enumerate: 在loop一個iterable的object，導入此函數可以讓你用index去存取
+  - for i, point in enumerate(points):
+  - print i, point => 0, (0,0)     1,(0,1) ...
+  - for i, point in enumerate(points, 1):
+  - print i, point => 1, (0,0)     2,(0,1) ...
+  - 目前想到可用於陣列向後位移k個單位
+  - 在第三題有個示範
+
+1. heapq
+
+2. 把點座標當作是dic的索引: dic[(list[0], list[1])]
+
+3. 最大值: sys.maxint
+
+4. for entry in dict
+
+
+### 思路
+
+實作只取出前K小的數，雖然TLE不過還是可以學習
+
+先取出最小，把最小刪掉，再搜索一次 => O(n!)
+
+
+### Code
+TLE: (75 / 83 test cases passed.)
+``` py
+class Solution(object):
+    def kClosest(self, points, K):
+        """
+        :type points: List[List[int]]
+        :type K: int
+        :rtype: List[List[int]]
+        """
+
+        ans = []
+        dic = {}
+        for point in points:
+            dic[(point[0], point[1])] = point[0]**2 + point[1]**2
+
+        ansout = (-1,-1)
+        for i in range(K):
+            smallest = sys.maxint
+            for entry in dic:
+                if dic[entry] < smallest:
+                    smallest = dic[entry]
+                    ansout = entry
+            ans.append(ansout)
+            del dic[ansout]
+
+        return ans
+```
+
+Heapq 解法
+```py
+from heapq import heappush, heappop
+class Solution(object):
+    def kClosest(self, points, K):
+        """
+        :type points: List[List[int]]
+        :type K: int
+        :rtype: List[List[int]]
+        """
+        heap = []
+        for i, point in enumerate(points):
+            val = point[0]**2 + point[1]**2
+            heappush(heap, (-val, point))
+            if i >= K:
+                heappop(heap)
+
+        return [e[1] for e in heap]
+```
+---
+## ｜ 8/29
+
+### 思路
+
+
+### Code
+``` py
+
 ```
 ---
