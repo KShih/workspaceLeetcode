@@ -7658,7 +7658,7 @@ You may return the answer in any order.  The answer is guaranteed to be unique (
 
 2. 把點座標當作是dic的索引: dic[(list[0], list[1])]
 
-3. 最大值: sys.maxint
+3. 最大值: sys.maxint, 最小值: - (sys.maxint) -1
 
 4. for entry in dict
 
@@ -8017,5 +8017,140 @@ class Solution(object):
             res[i] *=  afterMult
 
         return res
+```
+---
+## 7. Reverse Integer｜ 9/4
+Given a 32-bit signed integer, reverse digits of an integer.
+
+Example 1:
+
+Input: 123
+
+Output: 321
+
+Example 2:
+
+Input: -123
+
+Output: -321
+
+Example 3:
+
+Input: 120
+
+Output: 21
+
+Note:
+Assume we are dealing with an environment which could only store integers within the 32-bit signed integer range: [−231,  231 − 1]. For the purpose of this problem, assume that your function returns 0 when the reversed integer overflows.
+### 思路
+
+
+### Code
+My code beat 96%
+```py
+from collections import deque
+class Solution(object):
+    def reverse(self, x):
+        """
+        :type x: int
+        :rtype: int
+        """
+        res = 0
+        queue = deque()
+        symbol = 1
+        if (x<0):
+            symbol = -1
+            x = -x
+
+        while x != 0:
+            queue.append(x%10)
+            x /= 10
+        while queue:
+            res += queue.popleft() * pow(10, len(queue))
+
+        if (res > pow(2,31) - 1 or res < pow(2,31) * -1):    return 0
+        else: return res*symbol
+```
+
+
+Super smart:
+``` py
+class Solution:
+    # @return an integer
+    def reverse(self, x):
+        result = 0
+
+        if x < 0:
+            symbol = -1
+            x = -x
+        else:
+            symbol = 1
+
+        while x:
+            result = result * 10 + x % 10
+            x /= 10
+
+        return 0 if result > pow(2, 31) else result * symbol
+```
+---
+## 121. Best Time to Buy and Sell Stock｜ 9/4
+Say you have an array for which the ith element is the price of a given stock on day i.
+
+If you were only permitted to complete at most one transaction (i.e., buy one and sell one share of the stock), design an algorithm to find the maximum profit.
+
+Note that you cannot sell a stock before you buy one.
+
+Example 1:
+
+Input: [7,1,5,3,6,4]
+
+Output: 5
+
+Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
+             Not 7-1 = 6, as selling price needs to be larger than buying price.
+
+Example 2:
+
+Input: [7,6,4,3,1]
+
+Output: 0
+
+Explanation: In this case, no transaction is done, i.e. max profit = 0.
+### 思路
+
+
+### Code
+``` py
+class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        """
+        maxprofit, minPrice = 0, float('inf')
+        for price in prices:
+            minPrice = min(minPrice, price)
+            profit = price - minPrice
+            maxprofit = max(maxprofit, profit)
+        return maxprofit
+```
+
+Almost the same
+``` py
+class Solution(object):
+    def maxProfit(self, prices):
+        """
+        :type prices: List[int]
+        :rtype: int
+        """
+        maxprofit, minPrice = 0, float('inf')
+        for price in prices:
+            #minPrice = min(minPrice, price)
+            if price < minPrice:
+                minPrice = price
+            else:
+                profit = price - minPrice
+                maxprofit = max(maxprofit, profit)
+        return maxprofit
 ```
 ---
