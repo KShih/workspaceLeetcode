@@ -7306,7 +7306,7 @@ nums2 = [3, 4]
 
 The median is (2 + 3)/2 = 2.5
 
-### Techniques here
+### 技巧
 
 ![](assets/markdown-img-paste-20190830143926332.png)
 
@@ -7820,8 +7820,8 @@ Note that an empty string is also considered valid.
 
 直接判斷dictionary裡面有沒有特定key或value:
 
-- if char in dict.key():
-- if char in dict.value():
+- if char in dict.keys():
+- if char in dict.values():
 
 ### 思路
 
@@ -8152,5 +8152,169 @@ class Solution(object):
                 profit = price - minPrice
                 maxprofit = max(maxprofit, profit)
         return maxprofit
+```
+---
+## 289. Game of Life｜ 9/6
+According to the Wikipedia's article: "The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970."
+
+Given a board with m by n cells, each cell has an initial state live (1) or dead (0). Each cell interacts with its eight neighbors (horizontal, vertical, diagonal) using the following four rules (taken from the above Wikipedia article):
+
+1. Any live cell with fewer than two live neighbors dies, as if caused by under-population.
+
+2. Any live cell with two or three live neighbors lives on to the next generation.
+
+3. Any live cell with more than three live neighbors dies, as if by over-population..
+
+4. Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+
+Write a function to compute the next state (after one update) of the board given its current state. The next state is created by applying the above rules simultaneously to every cell in the current state, where births and deaths occur simultaneously.
+
+![](assets/markdown-img-paste-20190906163727321.png)
+
+Follow up:
+
+Could you solve it in-place? Remember that the board needs to be updated at the same time: You cannot update some cells first and then use their updated values to update other cells.
+In this question, we represent the board using a 2D array. In principle, the board is infinite, which would cause problems when the active area encroaches the border of the array. How would you address these problems?
+
+### 思路
+"""
+    Original thinking:
+    Use 2D bool array to record change or not
+    can use XOR
+
+    After reading the discussion:
+    We need two other states to tag "Change needed status"
+    Which is live-to-die and die-to live
+    But we should also consider the "states not change"
+    so how can we do that? We use "Mod" to do both in a time
+
+    0: mean died, 1 mean alive
+    So we want the changed board(not Mod yet) to become the result of Mod we want
+    2 % 2 = 0 -> so 2 mean live-to-died
+    3 % 2 = 1 -> so 3 mean died-to-live
+
+"""
+
+### Code
+``` py
+class Solution(object):
+    def gameOfLife(self, board):
+        """
+        :type board: List[List[int]]
+        :rtype: None Do not return anything, modify board in-place instead.
+        """
+        M, N = len(board), len(board[0])
+        dx = [1, 1, 0, -1, -1,  0,  1, -1]
+        dy = [0, 1, 1,  0, -1, -1, -1,  1]
+
+        for m in range(M):
+            for n in range(N):
+                count = 0
+                for i in range(8):
+                    x = m + dx[i]
+                    y = n + dy[i]
+                    # if is alive in cur state(no matter will die or not)
+                    if self.isValid(x,y,M,N) and (board[x][y] == 1 or board[x][y] == 2):
+                        count += 1
+
+                # if is alive, but need to die
+                if (board[m][n] == 1 or board[m][n] == 2) and (count < 2 or count > 3):
+                    board[m][n] = 2
+                # if is died, but need to revive
+                elif (board[m][n] == 0 or board[m][n] == 3) and (count == 3):
+                    board[m][n] = 3
+        # mod back to output
+        for m in range(M):
+            for n in range(N):
+                board[m][n] %= 2
+
+    def isValid(self,x, y, M, N):
+        return 0 <= x < M and 0 <= y < N
+```
+---
+## 49. Group Anagrams｜ 9/7
+Given an array of strings, group anagrams together.
+
+![](assets/markdown-img-paste-20190908000144185.png)
+
+Note:
+
+All inputs will be in lowercase.
+The order of your output does not matter.
+
+### 技巧
+
+sort a string in python: sorted_str = "".join(sorted(str))
+
+sorted("apple") => ['a','e','l','p','p']
+
+"-".join(['a','b','c']) => "a-b-c"
+
+
+### 思路
+"""
+    We want to sort string.
+
+    but python string is unsortable (list is sortable)
+
+    except using built-in func: sorted(),
+
+    however, it will return list of the char after sort,
+
+    sorted("apple") => ['a','e','l','p','p']
+
+    So, we'd use join(), to help us collect them back to string
+
+    "-".join(['a','b','c']) => "a-b-c"
+"""
+
+### Code
+``` py
+class Solution(object):
+    def groupAnagrams(self, strs):
+        """
+        :type strs: List[str]
+        :rtype: List[List[str]]
+        """
+        _map = {}
+        ret = []
+        for _str in strs:
+            key = "".join(sorted(_str))
+
+            if key in _map.keys():
+                _map[key].append(_str)
+            else:
+                _map[key] = [_str]  # if want to use 'append' should initial first
+
+        #return [entry for entry in _map.values()]  # Can use the code below
+        return _map.values()
+```
+
+Use defaultdic to assign initial status
+``` py
+class Solution(object):
+    def groupAnagrams(self, strs):
+        from collections import defaultdict
+        """
+        :type strs: List[str]
+        :rtype: List[List[str]]
+        """
+        ret = defaultdict(list)
+
+        for _str in strs:
+            key = "".join(sorted(_str))
+            ret[key].append(_str)
+
+        return ret.values()
+```
+---
+## ｜ 8/29
+
+### 思路
+
+
+### Code
+``` py
+
 ```
 ---
