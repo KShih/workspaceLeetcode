@@ -8308,13 +8308,68 @@ class Solution(object):
         return ret.values()
 ```
 ---
-## ｜ 8/29
+## 336. Palindrome Pairs｜ 9/9
+Given a list of unique words, find all pairs of distinct indices (i, j) in the given list, so that the concatenation of the two words, i.e. words[i] + words[j] is a palindrome.
+
+![](assets/markdown-img-paste-20190909134847447.png)
+
+### 技巧
+
+1. 反轉字串: rev_str = str[::-1]
+2. 切割字串:
+  - n = len("apple")
+  - str[:2] = "ap", str[2:] = "ple"
+  - str[:n] = "apple", str[n:] = ""   -> 看起來會overflow但不會. cuz there is a empty char 在字串最後面
+3. 少用指定搜尋dic.keys()，會TLE
+  - 直接用: if reverse != word and __reverse in dic__:
 
 ### 思路
+![](assets/markdown-img-paste-20190909134045216.png)
 
+The basic idea is to check each word for prefixes (and suffixes) that are themselves palindromes. If you find a prefix that is a valid palindrome, then the suffix reversed can be paired with the word in order to make a palindrome. It's better explained with an example.
+
+words = ["bot", "t", "to"]
+Starting with the string "bot". We start checking all prefixes. If "", "b", "bo", "bot" are themselves palindromes. The empty string and "b" are palindromes. We work with the corresponding suffixes ("bot", "ot") and check to see if their reverses ("tob", "to") are present in our initial word list. If so (like the word to"to"), we have found a valid pairing where the reversed suffix can be prepended to the current word in order to form "to" + "bot" = "tobot".
+
+You can do the same thing by checking all suffixes to see if they are palindromes. If so, then finding all reversed prefixes will give you the words that can be appended to the current word to form a palindrome.
+
+The process is then repeated for every word in the list. Note that when considering suffixes, we explicitly leave out the empty string to avoid counting duplicates. That is, if a palindrome can be created by appending an entire other word to the current word, then we will already consider such a palindrome when considering the empty string as prefix for the other word.
 
 ### Code
 ``` py
+class Solution(object):
+    def palindromePairs(self, words):
+        """
+        :type words: List[str]
+        :rtype: List[List[int]]
+        """
 
+        dic = { }
+        ret = []
+        for i, word in enumerate(words): #簡寫成 dic = {word: i for i, word in enumerate(words)}
+            dic[word] = i
+
+        for i, word in enumerate(words):
+            n = len(word)
+            for j in range(n+1):
+                pre = word[:j] # the current prefix
+                suf = word[j:] # the current suffix
+
+                # fix the prefix, find reverse(sufix)
+                if self.is_palind(pre):
+                    reverse = suf[::-1]
+                    if reverse != word and reverse in dic:
+                        ret.append([dic[reverse], i])
+
+                # fix the sufix, find reverse(prefix)
+                if self.is_palind(suf) and j != n:  # duplicate find the whole word
+                    reverse = pre[::-1]
+                    if reverse != word and reverse in dic:
+                        ret.append([i, dic[reverse]])
+
+        return ret
+
+    def is_palind(self,string):
+        return string == string[::-1] # reverse the string
 ```
 ---
