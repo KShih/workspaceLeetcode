@@ -7276,15 +7276,9 @@ class LRUCache(object):
             self.tail.next = entry
             entry.prev = self.tail
             self.tail = entry
-
-
-
-# Your LRUCache object will be instantiated and called as such:
-# obj = LRUCache(capacity)
-# param_1 = obj.get(key)
-# obj.put(key,value)
 ```
 ---
+
 ## 4. Median of Two Sorted Arrays｜ 8/30
 There are two sorted arrays nums1 and nums2 of size m and n respectively.
 
@@ -8371,5 +8365,150 @@ class Solution(object):
 
     def is_palind(self,string):
         return string == string[::-1] # reverse the string
+```
+---
+## 11. Container With Most Water｜ 9/10
+Given n non-negative integers a1, a2, ..., an , where each represents a point at coordinate (i, ai). n vertical lines are drawn such that the two endpoints of line i is at (i, ai) and (i, 0). Find two lines, which together with x-axis forms a container, such that the container contains the most water.
+
+Note: You may not slant the container and n is at least 2.
+
+![](assets/markdown-img-paste-20190910105030855.png)
+### 思路
+
+Since we know area = length * min (height_a, height_b), to maximize the area we want to maximize both height and length.
+
+Width: We set two pointers, which are initialized as 0 and len(height) - 1 to get the max width.
+
+Height: We move the left pointer and right pointer respectively to search for the next higher height.
+
+有兩種最大值要找的時候，
+先固定一種(寬度最大)，
+然後一步一步向內縮，
+同時持續搜尋最大值
+### Code
+``` py
+class Solution(object):
+    def maxArea(self, height):
+        """
+        :type height: List[int]
+        :rtype: int
+        """
+        j = len(height) - 1
+        i = 0
+        res = 0
+        while i < j:
+            res = max(res, min(height[i],height[j]) * (j-i))
+            if height[i] < height[j]:
+                i+=1
+            else:
+                j-=1
+
+        return res
+```
+---
+## 10. Regular Expression Matching (HARD)｜ 8/29
+Given an input string (s) and a pattern (p), implement regular expression matching with support for '.' and '*'.
+
+'.' Matches any single character.
+
+'*' Matches zero or more of the preceding element.
+
+The matching should cover the entire input string (not partial).
+
+Note:
+
+s could be empty and contains only lowercase letters a-z.
+
+p could be empty and contains only lowercase letters a-z, and characters like . or * .
+
+![](assets/markdown-img-paste-20190910114324984.png)
+![](assets/markdown-img-paste-20190910114345215.png)
+
+### 思路
+DP
+
+### Code
+``` py
+
+```
+---
+## ***[Start to LinkedIn High Freq]***
+---
+## 380. Insert Delete GetRandom O(1)｜ 9/10
+Design a data structure that supports all following operations in average O(1) time.
+
+insert(val): Inserts an item val to the set if not already present.
+
+remove(val): Removes an item val from the set if present.
+
+getRandom: Returns a random element from current set of elements. Each element must have the same probability of being returned.
+![](assets/markdown-img-paste-20190910231138287.png)
+
+### 技巧
+
+1. 字典的set(), get() 都是O(1)
+2. 如何刪除一個list只用O(1)複雜度？
+  - 多用一個字典紀錄List element的位置
+  - 刪除時先找出target的位置
+  - 將target位置的值換成List最後一位的值
+  - 更新字典中最後一位值的位置, (成原位置的值)
+  - Pop list + del 字典的entry
+### 思路
+
+### Code
+``` py
+# Your RandomizedSet object will be instantiated and called as such:
+# obj = RandomizedSet()
+# param_1 = obj.insert(val)
+# param_2 = obj.remove(val)
+# param_3 = obj.getRandom()
+class RandomizedSet(object):
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.num = [] # the list of the number
+        self.pos = {} # the position of each number in the list
+
+
+    def insert(self, val):
+        """
+        Inserts a value to the set. Returns true if the set did not already contain the specified element.
+        :type val: int
+        :rtype: bool
+        """
+        if val not in self.pos:
+            self.num.append(val)
+            self.pos[val] = len(self.num) -1
+            return True
+        return False
+
+
+    def remove(self, val):
+        """
+        Removes a value from the set. Returns true if the set contained the specified element.
+        :type val: int
+        :rtype: bool
+        """
+        if val in self.pos:
+            idx = self.pos[val] # get the target index
+            last = self.num[-1]     # get the last number in the list
+            self.num[idx] = last # replace the target with last number
+            self.pos[last] = idx # update the position with it's new home
+
+            self.num.pop()  # pop the last elem(which has already moved to new house)
+            del self.pos[val]
+            return True
+        return False
+
+
+    def getRandom(self):
+        """
+        Get a random element from the set.
+        :rtype: int
+        """
+        import random
+        return random.choice(self.num)
 ```
 ---
