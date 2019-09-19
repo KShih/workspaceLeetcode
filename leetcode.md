@@ -8512,3 +8512,62 @@ class RandomizedSet(object):
         return random.choice(self.num)
 ```
 ---
+## 324. Wiggle Sort II｜ 9/18
+Given an unsorted array nums, reorder it such that nums[0] < nums[1] > nums[2] < nums[3]....
+
+![](assets/markdown-img-paste-20190918123325160.png)
+### 技巧
+- 切片(Slice): arr[start:end:inc/dec], 由inc/dec決定方向
+  - e.g. nums = [1,2,3,4,5]
+    - print(nums)             # 12345
+    - print(nums[::2])        # 135
+    - print(nums[1::2])       # 24
+    - print(nums[mid::-1])    # 321
+    - print(nums[:mid:-1])    # 54
+  - 關於不指定的部分
+    - decrease的狀況
+      - 在end不指定, 就是指最前端
+      - 在start不指定, 就是指最末端
+    - increase的狀況
+      - 在end不指定, 就是指最末端
+      - 在start不指定, 就是指最前端
+
+- ///////
+
+- 這行：nums[::2], nums[1::2] = nums[mid::-1], nums[:mid:-1]
+- 不等於這兩行, why?
+- nums[::2] = nums[mid::-1]
+- nums[1::2] = nums[:mid:-1]
+- 因為當你執行完第一行時，nums裡的值已經被改變了！
+
+### 思路
+我們可以先給數組排序，然後在做調整。調整的方法是找到數組的中間的數，相當於把有序數組從中間分成兩部分，然後從前半段的末尾取一個，在從後半的末尾去一個，這樣保證了第一個數小於第二個數，然後從前半段取倒數第二個，從後半段取倒數第二個，這保證了第二個數大於第三個數，且第三個數小於第四個數，以此類推直至都取完
+![](assets/markdown-img-paste-20190918123358508.png)
+
+follow-up: T = O(n) -> 不能sort，解法有點複雜...
+### Code
+``` py
+"""
+Discuss how to find our mid point:
+
+odd num: 5:  1 2 3 4 5
+  odd digit:2   mid at idx= 2 -> 5,4
+  even digit:3                -> 3,2,1
+
+even num: 4: 1 2 3 4
+  odd digit:  2  mid at idx=1 -> 4,3
+  even didgit:2               -> 2,1
+"""
+class Solution(object):
+    def wiggleSort(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: None Do not return anything, modify nums in-place instead.
+        """
+        mid = (len(nums)+1) / 2 -1 # 4/2=2, 5/2=2 -> floor(5/2)
+        nums.sort()
+        nums[::2], nums[1::2] = nums[mid::-1], nums[:mid:-1]
+
+
+```
+---
