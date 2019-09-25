@@ -8457,11 +8457,13 @@ getRandom: Returns a random element from current set of elements. Each element m
 
 ### Code
 ``` py
-# Your RandomizedSet object will be instantiated and called as such:
-# obj = RandomizedSet()
-# param_1 = obj.insert(val)
-# param_2 = obj.remove(val)
-# param_3 = obj.getRandom()
+"""
+ Your RandomizedSet object will be instantiated and called as such:
+ obj = RandomizedSet()
+ param_1 = obj.insert(val)
+ param_2 = obj.remove(val)
+ param_3 = obj.getRandom()
+"""
 class RandomizedSet(object):
 
     def __init__(self):
@@ -8568,6 +8570,611 @@ class Solution(object):
         nums.sort()
         nums[::2], nums[1::2] = nums[mid::-1], nums[:mid:-1]
 
+
+```
+---
+## ***[Start to Twitter High Freq]***
+---
+## Twitter. New Office Design｜ 9/19
+![](assets/markdown-img-paste-2019091916190286.png)
+給兩個int陣列分別代表位置 及 高度
+
+pos[1, 10], hight[1, 5]
+
+我們的任務是要在所有填空中回傳最高的填空高度,
+
+填空： 1跟10中間有2~9的空可以填
+
+限制：每個位置的高度，不能超過左右兩邊1
+
+pos'[1,2,3,4,5,6,7,8,9,10]
+
+hig'[1,2,3,4,5,6,7,7,6,5]
+
+回傳 7
+
+[](https://leetcode.com/discuss/interview-question/373110/Twitter-or-OA-2019-or-New-Office-Design)
+### 思路
+- Naive:
+  - 用一個HashMap對應pos跟hight
+  - 計算出每個位置, 回傳最高的
+
+- O(n)解法, (假設pos有排序過)
+  - The idea is to calculate maxHeight, given two heights and empty slots between them. Two cases :
+    - [1] If both heights are same then meet in middle.
+    - [2] If they are not same then
+        - [2.A] check if we can make it same by advancing smaller height further and then go back to step [1].
+        - [2.B] we cannot make it same , then its simply small height + empty slots.
+### Code
+``` c
+int calculateHeight( int dist, int height1, int height2 )
+{
+    int  minH = min( height1, height2);
+    int  maxH = max( height1, height2 );
+
+    if( dist == 0 ) return 0;
+    if( dist == 1 ) return minH + 1;
+
+    // if both heights are same then meet in middle
+    if(minH == maxH )
+    {
+        int add = ( dist%2 == 0 ) ? dist/2 : dist/2+1;
+        return minH + add;
+    }
+
+    // See if we can make the height same
+    int delta = maxH-minH;
+    if( delta < dist )
+    {
+        dist -= delta;
+        minH += delta;
+        int add = ( dist%2 == 0 ) ? dist/2 : dist/2+1;
+        return minH+add;
+    }
+
+    // for all cases where delta >= dist
+    return minH+dist;    
+}
+
+int getMaxHeight( const vector<int>& positions, const vector<int>& heights )
+{
+    if( positions.empty() || heights.empty() || positions.size() != heights.size() )
+    {
+        return 0;
+    }
+
+    int result = 0;
+    for(int i=1; i<positions.size(); ++i )
+    {
+        int currMax = calculateHeight( positions[i]-positions[i-1]-1, heights[i], heights[i-1] );
+        result = max( result, currMax);
+    }
+    return result;
+}
+
+int main() {
+    cout << getMaxHeight({1,10}, {1,5}) << endl;
+    cout << getMaxHeight({1,3,7},{4,3,3}) << endl;
+    cout << getMaxHeight({1,2,4,7},{4,5,7,11}) << endl;
+}
+```
+
+``` py
+
+```
+---
+## Twitter. Efficient Job Processing Service｜ 8/29
+![](assets/markdown-img-paste-2019092000013652.png)
+
+01背包問題的變形
+[](https://leetcode.com/discuss/interview-question/374446/Twitter-or-OA-2019-or-Efficient-Job-Processing-Service)
+### 思路
+
+
+### Code
+``` py
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+
+
+#
+# Complete the 'maximumTotalWeight' function below.
+#
+# The function is expected to return an INTEGER.
+# The function accepts following parameters:
+#  1. INTEGER_ARRAY weights
+#  2. INTEGER_ARRAY tasks
+#  3. INTEGER p
+#
+
+def maximumTotalWeight(weights, tasks, p):
+    p = p
+    l = len(weights)
+    tasks = [2*i for i in tasks]
+    K = [[0 for i in range(p+1)] for j in range(l+1)]
+    for i in range(l+1):
+        for j in range(p+1):
+            if i == 0 or j == 0:
+                K[i][j] = 0
+            elif weights[i-1] <= j:
+                K[i][j] = max(tasks[i-1]+K[i-1][j-weights[i-1]], K[i-1][j])
+            else:
+                K[i][j] = K[i-1][j]
+    j = p
+    s = 0
+    result = K[l][p]
+    for i in range(l, 0, -1):
+        if result <= 0:
+            break
+        if result == K[i-1][j]:
+            continue
+        else:
+            s += weights[i-1]
+            print(weights[i-1], tasks[i-1])
+            result -= tasks[i-1]
+            j -= weights[i-1]
+    return s
+
+
+if __name__ == '__main__':
+```
+---
+## Twitter. Game Events｜ 9/20
+![](assets/markdown-img-paste-20190920100131507.png)
+### 思路
+常規表示式的字串處理....
+
+[](https://docs.python.org/2/library/re.html)
+
+先創造一個output字串陣列
+
+針對其中一個事件
+
+用常規表示式加入規則 -> split_event
+
+過濾出可以排序的參數 -> record
+
+把record加入game_details_list然後繼續加入其他事件
+
+依據給訂規則排序 game_details_list 並回傳正確順序的list[]
+
+### Code
+``` py
+import re
+
+
+def getEventsOrder(team1, team2, events1, events2):
+    # Write your code here
+    football = list()
+    football.append({"team": team1, "event": events1})
+    football.append({"team": team2, "event": events2})
+
+    game_details_list = list()
+    original_event = list()
+    event_priority = ['G', 'Y', 'R', 'S']
+
+    for f in football:
+        for event in f["event"]:
+            original_event.append(f["team"]+" "+event)
+
+            # split events string to get details
+            pattern = re.compile("([a-zA-Z\s]*)(\d+)[+]?(\d*).([G,Y,R,S])([a-zA-Z\s]*)")
+            split_event = pattern.search(event)
+
+            # create a list of format ["team name", "player name", "time", "extra time", "event", "second player name"]
+            record = list()
+            record.append(f["team"])  # team name
+            if split_event:
+                record.append(split_event.group(1).strip())  # player name
+                record.append(int(split_event.group(2).strip()))  # time
+                record.append(int(split_event.group(3).strip()) if len(split_event.group(3).strip()) > 0 else 0)  # extra time
+                record.append(event_priority.index(split_event.group(4).strip()))  # event
+                record.append(split_event.group(5).strip())  # second player
+            game_details_list.append(record)
+
+    # sorting the list to return index position of the sorted list
+    new_num_index_sorted = (sorted(range(len(game_details_list)),
+                                   key=lambda k: (
+                                       game_details_list[k][2],  # time
+                                       game_details_list[k][3],  # extra time
+                                       game_details_list[k][4],  # event
+                                       game_details_list[k][0],  # team name
+                                       game_details_list[k][1],  # player name
+                                       game_details_list[k][5])))
+
+    # based on the index position, fetching result from original event list and appending in answer
+    answer = list()
+    for i in new_num_index_sorted:
+        answer.append(original_event[i])
+    return answer
+
+
+if __name__ == '__main__':
+    team1 = "EDC"
+    events1 = ['Name1 12 G', 'FirstName LastName 43 Y']
+    team2 = "CDE"
+    events2 = ['Name3 45+1 S SubName', 'Name4 46 G']
+    getEventsOrder(team1, team2, events1, events2)
+```
+---
+## Twitter. Unique Twitter User Id Set｜ 9/20
+![](assets/markdown-img-paste-20190920172703911.png)
+
+### 技巧
+
+直接用 collections 裡的函數 Counter() 當作字典
+
+### 思路
+
+更正idTable裡的數之後，
+
+要把舊的減少，新增加的增加
+
+### Code
+``` py
+from collections import Counter
+
+def getUniqueUserIdSum(arr):
+    idTable = Counter(arr)
+    lowestNum = 1
+    returnSum = 0
+    for i in arr:
+        if idTable[i] > 1:
+            lowestNum = i + 1
+            while idTable[lowestNum] > 0:
+                lowestNum += 1
+            idTable[lowestNum] += 1
+            idTable[i] -= 1
+            returnSum += lowestNum
+        else:
+            returnSum += i
+    return returnSum
+
+
+if __name__ == '__main__':
+    print(getUniqueUserIdSum([3,2,1,2,7]))
+    print(getUniqueUserIdSum([1,1,1,1,1]))
+    print(getUniqueUserIdSum([1,2,3,4,5]))
+    print(getUniqueUserIdSum([1,100,1,1]))
+    print(getUniqueUserIdSum([12,11,12,11]))
+```
+---
+## Twitter. Partitioning array｜ 9/20
+![](assets/markdown-img-paste-2019092018081437.png)
+### 思路
+
+ 1. make sure numbers.length is divisible by k
+ 2. no element appears more than numbers.length/k times
+
+### Code
+``` py
+from collections import Counter
+
+def solve(k, nums):
+    if k == 0 or len(nums) == 0:
+        return "YES"
+    if len(nums)%k != 0:
+        return "NO"
+    counter = Counter(nums)
+    for entry in counter:
+        if counter[entry] > len(nums)/k:
+            return "NO"
+    return "YES"
+
+
+if __name__ == '__main__':
+    print(solve(2,[1,2,3,4]))
+    print(solve(2,[1,2,3,3]))
+    print(solve(3,[1,2,3,4]))
+    print(solve(3,[3,3,3,6,6,6,9,9,9]))
+    print(solve(1,[]))
+    print(solve(1,[1]))
+    print(solve(2,[1,2]))
+```
+---
+## Twitter. Autoscale Policy｜ 9/21
+![](assets/markdown-img-paste-20190921101447616.png)
+
+[](https://leetcode.com/discuss/interview-question/376019/Twitter-or-OA-2019-or-Autoscale-Policy)
+
+### 技巧
+
+- String format：
+  - Python3
+    - print(f'{i}-th second, utility is {A[i]}, instance number before action is {ans}')
+  - Python2
+    - print('{}-th second, utility is {}, instance number before action is {}'.format(i, A[i], ans))
+
+### 思路
+
+蠻簡單的問題
+
+### Code
+``` py
+def autoScale(ins, A):
+    lim_l, lim_h, th_l, th_h, idle = 1, int(1e8), 25, 60, 10
+    i, n, ans = 0, len(A), ins
+    while i < n:
+        #print(f'{i}-th second, utility is {A[i]}, instance number before action is {ans}')
+        print('{}-th second, utility is {}, instance number before action is {}'.format(i, A[i], ans))
+        if A[i] < th_l and ans > lim_l:
+            ans, i = (ans + 1) // 2, i + idle
+        elif A[i] > th_h and ans <= lim_h:
+            ans, i = ans * 2, i + idle
+        i += 1
+    return ans
+
+ins, A = 1, [5, 10, 80]
+print(autoScale(ins, A))
+```
+---
+## Twitter. Authentication Tokens｜ 9/21
+![](assets/markdown-img-paste-20190921105511869.png)
+
+[](https://leetcode.com/discuss/interview-question/378237/Twitter-or-OA-2019-or-Authentication-Tokens)
+### 技巧
+
+- Count-up 特定條件：
+  - count = sum(1 for i in values.values() if i >= time)
+
+### 思路
+
+簡單題
+
+### Code
+``` py
+def numberOfTokens(expiryLimit, commands):
+    # Write your code here
+    values = dict()
+    time = 0
+
+    for c in commands:
+        #  extraction values
+        action = c[0]
+        token_id = c[1]
+        time = c[2]
+
+        #  set token
+        if action == 0:
+            values[token_id] = expiryLimit + time
+
+        #  reset token
+        elif action == 1:
+            # check if token exists
+            if token_id in values.keys():
+                expiry_time = values.get(token_id)
+                if expiry_time >= time:
+                    # ??? why use this ???
+                    #values[token_id] = values.get(token_id) + expiryLimit - (expiry_time - time)
+                    # instead of this
+                    values[token_id] = time + expiryLimit
+
+    # counting values alive after reading all the values
+    count = sum(1 for i in values.values() if i >= time)
+    return count
+```
+---
+## 532. K-diff Pairs in an Array｜ 9/21
+Given an array of integers and an integer k, you need to find the number of unique k-diff pairs in the array. Here a k-diff pair is defined as an integer pair (i, j), where i and j are both numbers in the array and their absolute difference is k.
+
+![](assets/markdown-img-paste-20190921115108602.png)
+### 思路
+```py
+"""
+k > 0 -> subtract elem in key -> dic[find(elem+k)] > 0 ? count+1:count
+    [3,1,4,1,5], k=2
+        '1': 2
+        '3': 1
+        '4': 1
+        '5': 1
+
+
+k = 0 -> return duplicate elem count/2
+    [1,1,2,2,2,3,3,3] -> 3: (1,1), (2,2), (3,3)
+    [1,1,1,1,1] -> 1: (1,1)
+
+edge:
+    nums = [] or [1]
+    k < 0
+"""
+```
+### Code
+``` py
+from collections import Counter
+class Solution(object):
+    def findPairs(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: int
+        """
+        if nums is None or len(nums) == 0 or len(nums) == 1 or k < 0 :
+            return 0
+        dicNum = Counter(nums)
+        ret = 0
+        if k == 0:
+            for key in dicNum:
+                if dicNum[key] >= 2:
+                    ret += 1
+            return ret
+        else:
+            for key in dicNum:
+                if dicNum[key+k] > 0:
+                    ret += 1
+            return ret
+```
+---
+## Twitter. Buying Show Tickets｜ 9/21
+![](assets/markdown-img-paste-20190921115348365.png)
+![](assets/markdown-img-paste-20190921115417727.png)
+### 思路
+
+Everyone before Alex will purchase the same amount as Alex or smaller, if their tickets number is smaller.
+
+Everyone after Alex will purchase the amount than Alex or smaller if their number is smaller.
+
+### Code
+``` py
+
+def waitingTime(tickets, p):
+    if p > len(tickets) or p < 0:
+        return -1
+    total = tickets[p]
+    for i in range(len(tickets)):
+        # ppl in front of p
+        if i < p:
+            if tickets[i] < tickets[p]:
+                total += tickets[i]
+            else:
+                total += tickets[p]
+        # ppl behind p
+        elif i > p:
+            if tickets[i] < tickets[p]:
+                total += tickets[i]
+            else:
+                total += tickets[p] - 1
+
+    return total
+
+if __name__ == '__main__':
+    a = waitingTime([2,6,3,4,5],0)
+    print(a)
+    a = waitingTime([2,6,3,4,5],1)
+    print(a)
+    a = waitingTime([2,6,3,4,5],2)
+    print(a)
+    a = waitingTime([2,6,3,4,5],3)
+    print(a)
+    a = waitingTime([2,6,3,4,5],4)
+    print(a)
+
+    a = waitingTime([5,5,2,3],0)
+    print(a)
+    a = waitingTime([5,5,2,3],1)
+    print(a)
+    a = waitingTime([5,5,2,3],2)
+    print(a)
+    a = waitingTime([5,5,2,3],3)
+    print(a)
+```
+---
+## Twitter. Weird Faculty｜ 9/22
+![](assets/markdown-img-paste-20190922163528925.png)
+
+### 思路
+
+- 一開始想說用二元搜尋，但發現有更簡單，但關鍵是要把0改成-1
+- 解法：
+  - 把0改成-1
+  - 先把分界點設在index 0, left = 0, right = sum(v)
+  - 向右移動分界點, 直到 left > right
+### Code
+``` py
+def weirdFaculty(v):
+  n = len(v)
+  # Convert all the zeros to -1 as the zero gives us the negative score of -1
+
+  for i in range(n):
+    if not v[i]:
+      v[i] = -1
+
+   # Find the total sum
+
+  rightSum = sum(v)
+  leftSum = 0
+
+  # Find the point where left sum is greater than the right sum
+  for i in range(n):
+    if leftSum > rightSum:
+      return i
+    leftSum += v[i]
+    rightSum -= v[i]
+  return n
+```
+---
+## Akuna Capital OA｜ 9/23
+選擇題:
+
+![](assets/markdown-img-paste-20190923201109492.png)
+![](assets/markdown-img-paste-20190923200222455.png)
+
+程式題:
+
+![](assets/markdown-img-paste-20190923201442878.png)
+
+BADF005D
+
+DF005D to Decimal = 14614741
+
+1+4+6+1+4+7+4+1 = 28
+
+28 to Hex = 1C
+
+1C == BA ? invalid: valid
+
+### 思路
+
+
+### Code
+``` py
+"""
+Input: BADF005D
+
+DF005D to Decimal = 14614741
+
+1+4+6+1+4+7+4+1 = 28
+
+28 to Hex = 1C
+
+1C == BA ? invalid: valid
+
+"""
+
+def isValid(line):
+    if (line == "" or len(line) != 8):
+        return False
+    first2 = line[:2]
+    last6 = line[2:]
+    intLast6 = int(last6, 16) # Hex to int
+    print intLast6
+
+    sum = 0
+    while intLast6 > 0:
+        if intLast6 < 10:
+            sum += intLast6
+            break
+        sum += intLast6 % 10
+        intLast6 //= 10
+
+    print sum
+    first2 = ("0x" + first2).upper()
+    last6 = (hex(sum)).upper()
+
+    print ("first2: {}", first2)
+    print ("last6: {}", last6)
+    print ("-------------")
+    return first2 == last6
+
+if __name__ == "__main__":
+    print(isValid("BADF00D5"))
+    print(isValid("1CC0FfEE"))
+    print(isValid("F10235FF"))
+
+```
+---
+## ｜ 8/29
+
+### 思路
+
+
+### Code
+``` py
 
 ```
 ---
