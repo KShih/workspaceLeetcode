@@ -9168,13 +9168,86 @@ if __name__ == "__main__":
 
 ```
 ---
-## ｜ 8/29
+## Twitter. Activate Fountain｜ 9/25
+![](assets/markdown-img-paste-20190925232502249.png)
+### 技巧
+- 兩次sort的先後順序: **先sort 盡量達成的條件, 再sort 必須達成的**
+- 宣告二維list: **waterArea = [[0,0] for _ in range(n)]**
 
 ### 思路
 
+* After observation of fountain range we can see if we find a fountain that covers max garden then we only add another fountain when previous fountain
+* don't cover till this garden point.
+* Means;
+* Fountain A (x,y)
+* and Fountain B (z,m)
+* <p>
+* if(x<=z and y>=m) then x,y already covering garden till point B
+* <p>
+* But if Fountain C ( q,r)
+* <p>
+* if(y < r ) then our fountain (x,y) is not covering till this point, Hence we need to increase its range by making (x,r)
+* We don't need to worry about the x to change, since whatever the case, our minimum value in left is always 1, which is start of the garden.
+*
+* Complexity: O(n*log(n)) / O(n)
+*  1 2 3 4 5  6
+* [2,1,2,1,2,4] n = 6
+*
+* [(1,3),(1,3),(1,5),(3,5),(3,6), (2,6)]
+*
+* [(1,5),(1,3),(1,3),(2,6),(3,6),(3,5)] l = 1 and r = 5; i=0 F=1
+* [(1,5),(1,3),(1,3),(2,6),(3,6),(3,5)] l = 1 and r = 5; i=1 {(1,3) is in (1,5)}
+* [(1,5),(1,3),(1,3),(2,6),(3,6),(3,5)] l = 1 and r = 5; i=2 {(1,3) is in (1,5)}
+* [(1,5),(1,3),(1,3),(2,6),(3,6),(3,5)] l = 1 and r = 6; i=3 {(2,6) is not in (1,5)} F = 2
+* [(1,5),(1,3),(1,3),(2,6),(3,6),(3,5)] l = 1 and r = 6; i=4 {(3,6) is in (1,6)}
+* [(1,5),(1,3),(1,3),(2,6),(3,6),(3,5)] l = 1 and r = 6; i=5 {(3,5) is in (1,6)}
 
 ### Code
 ``` py
+def activateFountains(fountain):
+    n = len(fountain)
+    waterArea = [[0,0] for _ in range(n)]
+
+    # calculate the most left and right this fountain can be
+    for i in range(1,n+1):
+        waterArea[i-1][0] = max(i - fountain[i-1], 1) # left-most of waterArea
+        waterArea[i-1][1] = min(i+ fountain[i-1], n) # right-most of waterArea
+
+    # two condition,
+    # 1. try to have most right
+    # 2. must have included the least one, cuz we will not update our left then
+    # so we should let our 'must do', become the last sort
+    waterArea.sort(key = lambda x: x[1],reverse = True)
+    waterArea.sort(key = lambda x: x[0])
+
+    # turn on the 'least left' but also with 'max right'
+    minLeft = waterArea[0][0]
+    maxRight= waterArea[0][1]
+    neededFountain = 1  # cuz we turn it on, we should count from 1
+
+    for i in range(1,n):
+        thisLeft = waterArea[i][0]
+        thisRight= waterArea[i][1]
+        if thisLeft <= minLeft and thisRight >= maxRight:
+            continue
+        else:
+            if thisRight > maxRight:
+                maxRight = thisRight
+                neededFountain += 1
+
+    return neededFountain
+
+if __name__ == '__main__':
+    print(activateFountains([0,0,0,3,0,0,2,0,0]), 2)
+    print(activateFountains([2,1,2,1,2,4]), 2)
+    print(activateFountains([3,0,2,0,1,0]), 2)
+    print(activateFountains([3,0,1,0,1,0]), 2)
+    print(activateFountains([3,0,1,0,0,1]), 2)
+    print(activateFountains([2,0,2,0,1,0]), 2)
+    print(activateFountains([2,0,0,0,0]), 3)
+    print(activateFountains([0,0,0,0,0]), 5)
+    print(activateFountains([1,2,1]), 1)
+    print(activateFountains([0,1,0]), 1)
 
 ```
 ---
