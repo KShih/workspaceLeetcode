@@ -9251,3 +9251,46 @@ if __name__ == '__main__':
 
 ```
 ---
+## 739. Daily Temperatures｜ 9/26
+Given a list of daily temperatures T, return a list such that, for each day in the input, tells you how many days you would have to wait until a warmer temperature. If there is no future day for which this is possible, put 0 instead.
+
+For example, given the list of temperatures T = [73, 74, 75, 71, 69, 72, 76, 73], your output should be [1, 1, 4, 2, 1, 1, 0, 0].
+
+Note: The length of temperatures will be in the range [1, 30000]. Each temperature will be an integer in the range [30, 100].
+
+### 技巧
+- Stack in python:
+    - push: stack.insert(0,elem)
+    - pop: stack.pop(0)
+    - top: stack[0]
+
+### 思路
+
+用到了遞減stack，
+
+把元素擺在裡面，直到遇到比他大的，
+
+再一次讓裡面比較小的全部出去
+
+情境：大哥進監獄，把門打開讓小弟全部出去，再自己進去
+
+### Code
+``` py
+def findWarmday(temperature):
+    nextWarmday = [0 for _ in range(len(temperature))]
+    stack = [] # stack for looking for next warmer day
+
+    for i in range(len(temperature)):
+        print stack
+        while len(stack)!= 0 and temperature[i] > temperature[stack[0]]:
+            print("tem[i] > tem[top]", temperature[i], temperature[stack[0]])
+            top = stack.pop(0)
+            nextWarmday[top] = i - top
+        stack.insert(0,i)
+
+    return nextWarmday
+
+if __name__ == "__main__":
+    print(findWarmday([73, 74, 75, 71, 69, 72, 76, 73]), [1, 1, 4, 2, 1, 1, 0, 0])
+```
+---
