@@ -7362,7 +7362,9 @@ class Solution(object):
 ```
 ---
 ## 5. Longest Palindromic Substring｜ 8/31
+Given a string s, find the longest palindromic substring in s. You may assume that the maximum length of s is 1000.
 
+![](assets/markdown-img-paste-20191003093051775.png)
 ### 思路
 中心思想就是用迴圈去找到回文的中心點
 
@@ -9292,5 +9294,484 @@ def findWarmday(temperature):
 
 if __name__ == "__main__":
     print(findWarmday([73, 74, 75, 71, 69, 72, 76, 73]), [1, 1, 4, 2, 1, 1, 0, 0])
+```
+---
+## 780. Reaching Point｜ 9/27
+
+### 思路
+
+直接看是否是整數倍就可了
+
+用反推的做
+
+目標是(3,5) 前一個狀態是 (3,2)
+
+再前一個狀態是(1,2)
+
+可以用減法，但是取餘數更威猛
+
+2 % 5 = 2
+
+5 % 2 = 1
+
+if x < y 我們去縮小y
+
+if x > y 我們去縮小x
+
+用mod，我們可以一個式子就做完兩件事！
+
+### Code
+TLE:
+``` py
+def ReachingPoint(sx, sy, tx, ty):
+    if sx > tx or sy > ty:
+         return False
+    if sx == tx and sy == ty:
+         return True
+
+    if (ReachingPoint(sx+sy, sy, tx, ty)):
+        return True
+    else:
+        return ReachingPoint(sx, sx+sy, tx, ty)
+```
+
+Smart - Recursive:
+```py
+def ReachingPoint(sx, sy, tx, ty):
+    if sx > tx or sy > ty:
+        return False
+    if sx == tx and (ty-sy) % sx == 0:
+        return True
+    if sy == ty and (tx-sx) % sy == 0:
+        return True
+
+    return ReachingPoint(sx, sy, tx%ty, ty%tx)
+```
+
+Smart - Iterative:
+```py
+def ReachingPoint(sx, sy, tx, ty):
+    if sx > tx and sy > ty:
+        return False
+    while (tx >= sx && ty >= sy):
+        if (tx > ty):
+            tx %= ty
+        else:
+            ty %= tx
+    if tx == sx: return (ty-sy) % sx == 0
+    if ty == sy: return (tx-sx) % sy == 0
+    return False;
+```
+---
+## 547. Friend Circles｜ 10/2   //TODO Union Find解法
+There are N students in a class. Some of them are friends, while some are not. Their friendship is transitive in nature. For example, if A is a direct friend of B, and B is a direct friend of C, then A is an indirect friend of C. And we defined a friend circle is a group of students who are direct or indirect friends.
+
+Given a N*N matrix M representing the friend relationship between students in the class. If M[i][j] = 1, then the ith and jth students are direct friends with each other, otherwise not. And you have to output the total number of friend circles among all the students.
+
+![](assets/markdown-img-paste-20191003000354876.png)
+
+### 思路
+
+盲點：誤以為這題有n*n個人，其實只有n個人
+
+對於某個人，遍歷其好友，然後再遍歷其好友的好友，那麼就能把屬於同一個朋友圈的人都遍歷一遍，同時標記出已經遍歷過的人，然後累積朋友圈的個數，再去對於沒有遍歷到的人在找其朋友圈的人，這樣就能求出個數。
+
+還沒有學習並查集(Union Find)解法
+### Code
+Recursive:
+會超過遞迴限制
+``` py
+
+class Solution(object):
+    def findCircleNum(self, M):
+        """
+        :type M: List[List[int]]
+        :rtype: int
+        """
+        n = len(M)
+        visited = [False for _ in range(n)]
+        count = 0
+        for i in range(n):
+            if visited[i] == True:  
+                continue
+            self.dfs(M, visited, i)
+            count += 1
+        return count
+
+    def dfs(self, M, visited, k):
+        visited[k] = True
+        for i in range(len(M)):
+            if M[i][k] != 1 and visited[k] == True:
+                continue
+            self.dfs(M, visited, i)
+
+```
+
+Recursive:
+不會超過遞迴限制！！
+```py
+class Solution(object):
+    def findCircleNum(self, M):
+        """
+        :type M: List[List[int]]
+        :rtype: int
+        """
+        def dfs(node):
+            visited.add(node)
+            for friend in xrange(len(M)):
+                if M[node][friend] and friend not in visited:
+                    dfs(friend)
+
+        circle = 0
+        visited = set()
+        for node in xrange(len(M)):
+            if node not in visited:
+                dfs(node)
+                circle += 1
+        return circle
+```
+
+Iterative:
+用queue來做，思路差不多
+```c
+class Solution {
+public:
+    int findCircleNum(vector<vector<int>>& M) {
+        int n = M.size(), res = 0;
+        vector<bool> visited(n, false);
+        queue<int> q;
+        for (int i = 0; i < n; ++i) {
+            if (visited[i]) continue;
+            q.push(i);
+            while (!q.empty()) {
+                int t = q.front(); q.pop();
+                visited[t] = true;
+                for (int j = 0; j < n; ++j) {
+                    if (!M[t][j] || visited[j]) continue;
+                    q.push(j);
+                }
+            }
+            ++res;
+        }
+        return res;
+    }
+};
+```
+
+---
+## 256. Paint House｜ 10/3
+There are a row of n houses, each house can be painted with one of the three colors: red, blue or green. The cost of painting each house with a certain color is different. You have to paint all the houses such that no two adjacent houses have the same color.
+
+The cost of painting each house with a certain color is represented by a n x 3 cost matrix. For example, costs[0][0] is the cost of painting house 0 with color red; costs[1][2] is the cost of painting house 1 with color green, and so on... Find the minimum cost to paint all houses.
+
+Note:
+All costs are positive integers.
+
+![](assets/markdown-img-paste-20191003005529133.png)
+
+### 思路
+
+這道題說有n個房子，每個房子可以用紅綠藍三種顏色刷，每個房子的用每種顏色刷的花費都不同，限制條件是相鄰的房子不能用相同的顏色來刷，現在讓我們求刷完所有的房子的最低花費是多少。這題跟House Robber II和House Robber很類似，不過那題不是每個房子都搶，相鄰的房子不搶，而這道題是每個房子都刷，相鄰的房子不能刷同一種顏色。而Paint Fence那道題主要考察我們有多少種刷法，這幾道題很類似，但都不一樣，需要我們分別區分。但是它們的解題思想都一樣，需要用動態規劃Dynamic Programming來做，這道題我們需要維護一個二維的動態數組dp，其中dp[i][j]表示刷到第i+1房子用顏色j的最小花費，遞推式為:
+
+dp[i][j] = dp[i][j] + min(dp[i - 1][(j + 1) % 3], dp[i - 1][(j + 2) % 3])；
+
+**這個也比較好理解，如果當前的房子要用紅色刷，那麼上一個房子只能用綠色或藍色來刷，那麼我們要求刷到當前房子，且當前房子用紅色刷的最小花費就等於當前房子用紅色刷的錢加上刷到上一個房子用綠色和刷到上一個房子用藍色的較小值，這樣當我們算到最後一個房子時，我們只要取出三個累計花費的最小值即可**
+
+### Code
+``` py
+class Solution(object):
+    def minCost(self, costs):
+        """
+        :type costs: List[List[int]]
+        :rtype: int
+        """
+        if len(costs) == 0 or len(costs[0]) == 0:
+            return 0
+        dp = costs
+        n = len(costs)
+        for i in range(1,n):
+            for j in range(3):
+                dp[i][j] += min(dp[i-1][(j+1)%3], dp[i-1][(j+2)%3])
+
+        return min(dp[n-1][0],min(dp[n-1][1],dp[n-1][2]))
+```
+---
+## Twitter. Parking Dilemma｜ 10/3
+![](assets/markdown-img-paste-20191003010711580.png)
+
+有n台車分別停在a, b, c, d四個位置，給定一個目標k台車必須可以被屋頂遮住，
+
+求最小的k
+
+### 思路
+
+先排序，再用滑動視窗解
+
+### Code
+``` py
+def carParkingRoof(cars, k):
+    result = float("inf")
+
+    n = len(cars)
+    # Sorting the array.
+    cars.sort()
+
+    # Find minimum value among
+    # all K size subarray.
+    for i in range(n - k + 1):
+        result = int(min(result, cars[i + k - 1] - cars[i] + 1))
+    return result
+```
+---
+## 647. Palindromic Substrings｜10/2
+
+Given a string, your task is to count how many palindromic substrings in this string.
+
+The substrings with different start indexes or end indexes are counted as different substrings even they consist of same characters.
+
+![](assets/markdown-img-paste-20191003094712419.png)
+### 思路
+
+以前找回文的方式：找到中心點後，
+
+l指針向左, r指針向右，找尋其他可能的解
+
+並且奇數回文、偶數回文都要考慮
+
+### Code
+``` py
+class Solution:
+    def countSubstrings(self, s: str) -> int:
+        if len(s) <= 1:
+            return len(s)
+
+        count = 0
+        def checkLR(s, l, r):
+            count = 0
+            while l >= 0 and r < len(s) and s[l] == s[r]:
+                count += 1
+                l -= 1; r += 1
+            return count
+
+        for i in range(len(s)):
+
+            # odd case
+            count += checkLR(s,i,i)
+
+            # even case
+            count += checkLR(s,i,i+1)
+
+        return count
+```
+
+---
+## Twitter. SubPalindrome｜ 10/3
+
+給個字串
+
+回傳他所有的回文子字串，且不能重複
+
+
+### 技巧
+
+- 自動檢查有沒有重複：set()
+    - set.add()
+
+### 思路
+
+與前一提的基本回文找法一樣，並且使用set()去完成
+
+### Code
+``` py
+class Solution:
+    def countSubstrings(self, s: str) -> int:
+        if len(s) <= 1:
+            return len(s)
+
+        ret = set()
+        def checkLR(s, l, r, ret):
+            count = 0
+            while l >= 0 and r < len(s) and s[l] == s[r]:
+                count += 1
+                l -= 1; r += 1
+                ret.add(s[l+1:r])
+
+        for i in range(len(s)):
+
+            # odd case
+            checkLR(s,i,i,ret)
+
+            # even case
+            checkLR(s,i,i+1,ret)
+
+        return ret
+
+if __name__ == "__main__":
+    s = Solution()
+    print(s.countSubstrings("aabaa"))
+    print(s.countSubstrings("aabbaa"))
+```
+
+---
+## Twitter. Restocking the warehouse｜ 10/3
+![](assets/markdown-img-paste-20191003151256140.png)
+### 思路
+
+easy 就不做了
+
+---
+## Twitter. Balanced Sales Array｜ 10/3
+
+### 思路
+easy 也不做
+
+---
+
+## Twitter. University Careerfair｜ 10/3
+![](assets/markdown-img-paste-20191003154810349.png)
+
+### 技巧
+
+- 把兩個相關的元素綁在一起: zip(list1, list2); in our case: (arrival, duration)
+- 兩次sort: key=lambda p: (p[0]+p[1], p[1])
+    - sort的結果會是按照p[0]+p[1]去排，如果相同，再用p[1]去牌 <- 這個做法比拆開來做直觀！要學！
+    - 回想：兩次sort的先後順序性 -> 次要條件先做, 主要條件後做
+        - 所以要拆開來寫的話：
+            - key=lambda p: (p[1])
+            - key=lambda p: (p[0]+p[1])
+
+### 思路
+
+我在意的是：
+
+你們什麼時候離開？早離開的先排入
+
+如果同時離開？duration短的先排入
+
+![](assets/markdown-img-paste-2019100316092365.png)
+
+### Code
+``` py
+def universityCareerFair(arrival, duration):
+    aux = sorted(
+        list(zip(arrival, duration)),       # bind same index in two list into a pair
+        key=lambda p: (p[0]+p[1], p[1])     # sort by 1. leave time 2. duration time
+    )
+    print(aux)
+    ans, end = 0, -float('inf')
+    for arr, dur in aux:
+        if arr >= end:
+            ans = ans + 1
+            end = arr + dur # 更新時間
+    return ans
+
+
+print(universityCareerFair([1, 3, 3, 5, 7], [2, 2, 1, 2, 1])) # 4
+print(universityCareerFair([1, 2], [7, 3])) # 1
+print(universityCareerFair([1, 3, 4, 6], [4, 3, 3, 2])) # 2
+print(universityCareerFair([1, 2,3,4,5], [3,1,1,1,1])) # 4
+```
+---
+## ｜ 8/29
+Two words are anagrams of one another if their letters can be rearranged to form the other word.
+
+In this challenge, you will be given a string. You must split it into two contiguous substrings, then determine the minimum number of characters to change to make the two substrings into anagrams of one another.
+
+For example, given the string 'abccde', you would break it into two parts: 'abc' and 'cde'. Note that all letters have been used, the substrings are contiguous and their lengths are equal. Now you can change 'a' and 'b' in the first substring to 'd' and 'e' to have 'dec' and 'cde' which are anagrams. Two changes were necessary.
+
+Function Description
+
+Complete the anagram function in the editor below. It should return the minimum number of characters to change to make the words anagrams, or  if it's not possible.
+
+anagram has the following parameter(s):
+
+s: a string
+Input Format
+
+The first line will contain an integer, , the number of test cases.
+Each test case will contain a string  which will be concatenation of both the strings described above in the problem.
+The given string will contain only characters in the range ascii[a-z].
+
+Constraints
+
+
+ consists only of characters in the range ascii[a-z].
+Output Format
+
+For each test case, print an integer representing the minimum number of changes required to make an anagram. Print  if it is not possible.
+### 思路
+
+統計成字典後就是分養樂多的概念：
+
+你一瓶我一瓶，更快的做法是
+
+所以我們不需要在意可以分成兩邊的養樂多，
+
+我們只要在意那些"多出來的"，也就是奇數的
+
+=> sum( each%2 ) / 2
+
+結果我沒有搞清楚題目的意思，題目是說要連續的字串.......
+
+我的作法是全部搞再一起 ==
+
+![](assets/markdown-img-paste-20191003230337167.png)
+
+### 技巧
+
+- Convert a string to a list obj:
+    - li = list(str)
+- Access Dictionary by index:
+    - Counter.most_common()[index]
+- 存取字典裡不確定的存不存在的方法:
+    - Counter.get(char, 0)
+    - 回傳Counter[char], 如果不存在的話回傳0
+
+
+### Code
+字元位置可以調換的：
+``` py
+from collections import Counter
+
+def anagram(input):
+    if len(input)%2 != 0:
+        return -1
+
+    li = list(input)
+    dic = Counter(li)
+    count = 0
+    for i in range(len(dic)):
+        count += (dic.most_common()[i][1]) % 2
+    return count//2
+
+
+
+if __name__ == '__main__':
+#    print(anagram("aaabbbcc"))#1
+    print(anagram("aaaabbbccd"))#1
+    print(anagram("xaxbbbxx"))#1
+    print(anagram("xxxbba"))#1
+    print(anagram("aaabbb")) #1
+    print(anagram("mnop")) #2
+    print(anagram("ab")) #1
+    print(anagram("xyyx")) #0
+
+```
+
+字元位置固定的：(符合提議的)
+```py
+def anagram2(input):
+    s = input
+    l = len(s)
+    if l % 2 == 1:
+        return -1
+    else:
+        count = 0
+        s1, s2 = Counter(s[:l//2]), Counter(s[l//2:])
+        for char in s2:
+            current = s2[char] - s1.get(char,0)
+            if current > 0:
+                count += current
+        print(count)
 ```
 ---
