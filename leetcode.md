@@ -9523,7 +9523,7 @@ def carParkingRoof(cars, k):
     return result
 ```
 ---
-## 647. Palindromic Substrings｜10/2
+## 647. Palindromic Substrings｜10/3
 
 Given a string, your task is to count how many palindromic substrings in this string.
 
@@ -9672,7 +9672,7 @@ print(universityCareerFair([1, 3, 4, 6], [4, 3, 3, 2])) # 2
 print(universityCareerFair([1, 2,3,4,5], [3,1,1,1,1])) # 4
 ```
 ---
-## ｜ 8/29
+## Twitter_Anagram｜ 10/3
 Two words are anagrams of one another if their letters can be rearranged to form the other word.
 
 In this challenge, you will be given a string. You must split it into two contiguous substrings, then determine the minimum number of characters to change to make the two substrings into anagrams of one another.
@@ -9773,5 +9773,82 @@ def anagram2(input):
             if current > 0:
                 count += current
         print(count)
+```
+---
+## Flatiron_RenamePhoto｜ 10/5
+輸入：一個超長字符串，包含換行，每行的格式一致為 name + city + date time
+
+輸出：group by city，sort by date time，圖片重新命名為：city+index (按city groupby+時間順序 的第幾個）+ 後綴（.png / .jpg)
+           其中，index的格式要 在前面適量的加0. 比如說 這個City一共有10張照片，那麼index為1-9的 分別應該為 01, 02, ... 09
+           按input順序 輸出重新命名的名字（合為一個大string輸出）
+### 思路
+
+1. 用正規表示式切割出元素
+2. 依據地點、時間去排序
+3. 加入到key為地點的字典中
+4. 重新組裝字串
+    - 需要處理補0的部分
+    - 假設101，表示這個地點的index需要用到三位去存
+    - 1-9 補兩個0, 10-99補一個0, >100 不用補
+    - 用兩個counter，一個是總位數，另一個是index i，總位數 - i//10，就可以知道這個index需要補多少零
+
+### 技巧
+
+1. 正則表達式其實不複雜，不要搞得太複雜！
+    - patter = re.compile("你要的pattern")
+        - pattern 其實不難，就像是我例子中的那樣
+    - split_pic = pattern.search(str)
+    - 根據你pattern中的()次序找出你要的東西
+        - 第一個括號的東西在: split_pic.group(1)
+
+
+### Code
+``` py
+import re
+def rename(input):
+    # Jeff_Taichung_20190804.jpg
+    pattern = re.compile("([a-zA-z]+)_([a-zA-z]+)_([\d]+).(.+)")
+    detailList = list()
+    for pic in li:
+        #pic = re.sub('[^a-zA-Z0-9 \n\.]', ' ', pic) # pic = Jeff Taichung 20190804.jpg
+        split_pic = pattern.search(pic)
+        picDetail = list()
+        if split_pic:
+            picDetail.append(split_pic.group(2)) # Location
+            picDetail.append(split_pic.group(3)) # Time
+            picDetail.append(split_pic.group(1)) # Name
+            picDetail.append(split_pic.group(4)) # format
+        detailList.append(picDetail)
+
+    sortedDetailList = sorted(detailList, key=lambda k: (k[0],k[1]))
+
+    locDic = dict()
+    for entry in sortedDetailList:
+        if entry[0] in locDic.keys():
+            locDic[entry[0]].append(entry)
+        else:
+            locDic[entry[0]] = []
+            locDic[entry[0]].append(entry)
+
+    out = []
+    for location in locDic:
+        zero_counter = 0
+        locCounter = len(locDic[location])
+        while locCounter > 0:
+            locCounter //= 10
+            zero_counter += 1
+        pic_counter = 0
+
+        for pic in locDic[location]:
+            pic_counter += 1
+            num_zero = zero_counter - pic_counter//10
+            str_zero = "0" * num_zero
+            out.append(pic[0]+"_"+str_zero+str(pic_counter)+"_"+pic[2]+"."+pic[3])
+    print(out)
+
+if __name__ == "__main__":
+    input = "Jeff_Taichung_20190804.jpg Ian_Taipei_20190801.jpg Eason_Taichung_20190802.png"
+    # output: ['Taichung_01_Eason.png', 'Taichung_02_Jeff.jpg', 'Taipei_01_Ian.jpg']
+    rename(input)
 ```
 ---

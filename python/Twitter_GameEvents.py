@@ -18,7 +18,7 @@ def getEventsOrder(team1, team2, events1, events2):
             # split events string to get details
             pattern = re.compile("([a-zA-Z\s]*)(\d+)[+]?(\d*).([G,Y,R,S])([a-zA-Z\s]*)")
             split_event = pattern.search(event)
-
+            #print(split_event.group(1))
             # create a list of format ["team name", "player name", "time", "extra time", "event", "second player name"] for sorting
             record = list()
             record.append(f["team"])  # team name
@@ -29,6 +29,8 @@ def getEventsOrder(team1, team2, events1, events2):
                 record.append(event_priority.index(split_event.group(4).strip()))  # event
                 record.append(split_event.group(5).strip())  # second player
             game_details_list.append(record)
+
+
 
     # sorting the list to return index position of the sorted list
     new_num_index_sorted = (sorted(range(len(game_details_list)),
