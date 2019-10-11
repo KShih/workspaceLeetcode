@@ -95,9 +95,13 @@ A solution set is:
 ]
 ### 思路
 排列問題走dfs，『狀態需紀錄』(只能向後看)
+
 組合問題需考慮重複數字不同順序(也須向前看)
+
 因為數字可重複，在擴張時要將自己也考慮進可能值中
+
 在dfs迴圈當中，可用預處理直接結束該輪(不用push再pop)
+
 與#17不同點，#17是直接取代該值(push&pop一起做)，而此題有push因此在走到底後要pop
 
 ### Code
@@ -129,11 +133,27 @@ private:
             comb.pop_back();
         }
     }
-
-
 };
 ```
 
+``` py
+class Solution:
+    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:
+        def dfs(targ, ans, index):
+            if targ < 0:
+                return
+            if targ == 0:
+                res.append(ans)
+                return
+
+            for i in range(index, len(candidates)):
+                dfs(targ-candidates[i], ans+[candidates[i]], i)
+
+        res = []
+        dfs(target, [], 0)
+
+        return res
+```
 
 ---
 
@@ -8675,15 +8695,6 @@ int main() {
 
 ### Code
 ``` py
-#!/bin/python3
-
-import math
-import os
-import random
-import re
-import sys
-
-
 
 #
 # Complete the 'maximumTotalWeight' function below.
@@ -8694,7 +8705,6 @@ import sys
 #  2. INTEGER_ARRAY tasks
 #  3. INTEGER p
 #
-
 def maximumTotalWeight(weights, tasks, p):
     p = p
     l = len(weights)
@@ -9747,7 +9757,7 @@ def anagram(input):
 
 
 if __name__ == '__main__':
-#    print(anagram("aaabbbcc"))#1
+
     print(anagram("aaaabbbccd"))#1
     print(anagram("xaxbbbxx"))#1
     print(anagram("xxxbba"))#1
@@ -9774,6 +9784,8 @@ def anagram2(input):
                 count += current
         print(count)
 ```
+
+
 ---
 ## Flatiron_RenamePhoto｜ 10/5
 輸入：一個超長字符串，包含換行，每行的格式一致為 name + city + date time
@@ -9850,5 +9862,285 @@ if __name__ == "__main__":
     input = "Jeff_Taichung_20190804.jpg Ian_Taipei_20190801.jpg Eason_Taichung_20190802.png"
     # output: ['Taichung_01_Eason.png', 'Taichung_02_Jeff.jpg', 'Taipei_01_Ian.jpg']
     rename(input)
+```
+---
+## 399. Evaluate Division(*****)｜ 10/7
+Equations are given in the format A / B = k, where A and B are variables represented as strings, and k is a real number (floating point number). Given some queries, return the answers. If the answer does not exist, return -1.0.
+
+Example:
+
+Given a / b = 2.0, b / c = 3.0.
+
+queries are: a / c = ?, b / a = ?, a / e = ?, a / a = ?, x / x = ? .
+
+return [6.0, 0.5, -1.0, 1.0, -1.0 ].
+
+The input is: vector<pair<string, string>> equations, vector<double>& values, vector<pair<string, string>> queries , where equations.size() == values.size(), and the values are positive. This represents the equations. Return vector<double>.
+
+![](assets/markdown-img-paste-20191008011643858.png)
+
+### 思路
+
+This code could be more concise.
+
+Put every number into a two-layer dictionary to record it's multiply.
+
+For each query pair, check whether they're in the dictionary or not.
+
+If both exist => solution must exist.
+
+Record the multiply and the number we've visited already, keep seeking the dictionary until find out the solution.
+
+For example:
+
+equation = [["a","e"],["b","e"]], value = [4,3], query = [["a", "b"]]
+
+Construct a dictionary = {"a": {"a":1, "e":4}, "b": {"b":1, "e":3}, "e": {"a": 1/4, "b": 1/3} }
+
+Follow the path: dct["a"] => dct["e"] => dct["b"], we have query [["a", "b"]] = 4 x 1/3 = 4/3
+
+### Code
+``` py
+class Solution:
+    def calcEquation(self, equations: List[List[str]], values: List[float], queries: List[List[str]]) -> List[float]:
+
+        def dfs(a, b, visited):
+            if b in mem[a]:
+                return mem[a][b]
+            for c in mem[a].keys():
+                if c not in visited:
+                    v = dfs(c, b, visited + [c])
+                    if v != -1.0:
+                        return mem[a][c] * v
+            return -1.0
+        mem = collections.defaultdict(dict)
+        for i, pair in enumerate(equations):
+            a, b, v = pair[0], pair[1], values[i]
+            mem[a][b], mem[b][a] = v, 1/v
+            mem[a][a], mem[b][b] = 1.0, 1.0
+        return [dfs(q[0], q[1], []) if mem[q[0]] and mem[q[1]] else -1.0 for q in queries]
+```
+
+```py
+class Solution(object):
+    def calcEquation(self, equations, values, query):
+    	def seeker(a, b, path=[]):
+    		# seek the result of a/b
+    		if a not in dct.keys() or b not in dct.keys():      # No solution
+    			return 0
+    		if b in dct[a]:                       # This is it!
+    			return dct[a][b]
+    		else:                                 # Keep looking for solution
+    			tmp = []
+    			for c in dct[a].keys():
+    				if c not in path and (seeker(c, b, path+[c])):
+    					return dct[a][c]*(seeker(c, b, path+[c]))
+
+        dct = {}                              # Put every number into the dict
+        for i in xrange(len(equations)):
+        	nums = equations[i]
+        	div = float(values[i])
+        	if nums[0] in dct.keys():
+        		dct[nums[0]][nums[1]] = div
+        	else:
+        		dct[nums[0]] = {nums[0]:1, nums[1]:div}
+        	if nums[1] in dct.keys():
+        		dct[nums[1]][nums[0]] = 1.0/div
+        	else:
+        		dct[nums[1]] = {nums[1]:1, nums[0]:1.0/div}
+
+        res = []
+        for pair in query:                    # seek the solution
+        	if seeker(pair[0], pair[1]):
+        		res += seeker(pair[0], pair[1]),
+        	else:
+        		res += -1,
+
+        return [float(n) for n in res]
+```
+---
+## 695. Max Area of Island｜ 10/8
+Given a non-empty 2D array grid of 0's and 1's, an island is a group of 1's (representing land) connected 4-directionally (horizontal or vertical.) You may assume all four edges of the grid are surrounded by water.
+
+Find the maximum area of an island in the given 2D array. (If there is no island, the maximum area is 0.)
+
+![](assets/markdown-img-paste-2019100821503529.png)
+### 思路
+
+就是遍歷
+
+注意可以用同個矩陣去省去visited的空間
+
+### Code
+``` py
+class Solution:
+    def maxAreaOfIsland(self, grid: List[List[int]]) -> int:
+        def findIsland(i, j, count):
+            if grid[i][j] != 1:
+                return count
+            else:
+                count += 1
+                grid[i][j] *= -1
+                for k in range(4):
+                    if 0 <= i+dx[k] < col and 0 <= j+dy[k] < row:
+                        count = findIsland(i+dx[k], j+dy[k], count)
+                return count
+
+
+        if len(grid) == 0 or len(grid[0]) == 0:
+            return 0
+        dx = [1,-1,0,0]
+        dy = [0,0,1,-1]
+        row, col = len(grid[0]), len(grid)
+
+        maxCount = 0
+        for i in range(col):
+            for j in range(row):
+                if grid[i][j] == 1:
+                    maxCount = max(maxCount, findIsland(i,j,0))
+        return maxCount
+
+```
+
+Iterative:
+```py
+class Solution:
+    def maxAreaOfIsland(self, grid: List[List[int]]) -> int:
+
+        def bfs(i, j, count):
+            queue = [(i,j)]
+            grid[i][j] = 0
+            while queue:
+                i, j = queue.pop(0)
+                count += 1
+                for dx, dy in ((0,1), (1,0), (0,-1), (-1, 0)):
+                    nx, ny = i+dx, j+dy
+                    if 0 <= nx < len(grid) and 0 <= ny < len(grid[0]) and grid[nx][ny] == 1:
+                        grid[nx][ny] = 0
+                        queue.append((nx,ny))
+            return count
+
+
+        res = 0
+        for i in range(len(grid)):
+            for j in range(len(grid[0])):
+                if grid[i][j] == 1:
+                    res = max(res, bfs(i,j, 0))
+        return res
+```
+
+
+短小精幹....
+```py
+def maxAreaOfIsland(self, grid):
+    m, n = len(grid), len(grid[0])
+
+    def dfs(i, j):
+        if 0 <= i < m and 0 <= j < n and grid[i][j]:
+            grid[i][j] = 0
+            return 1 + dfs(i - 1, j) + dfs(i, j + 1) + dfs(i + 1, j) + dfs(i, j - 1)
+        return 0
+
+    areas = [dfs(i, j) for i in range(m) for j in range(n) if grid[i][j]]
+    return max(areas) if areas else 0
+```
+---
+
+## ***[Start Wayfair pre-OA]***
+
+---
+## 840. Magic Squares In Grid｜ 10/9
+A 3 x 3 magic square is a 3 x 3 grid filled with distinct numbers from 1 to 9 such that each row, column, and both diagonals all have the same sum.
+
+Given an grid of integers, how many 3 x 3 "magic square" subgrids are there?  (Each subgrid is contiguous).
+
+![](assets/markdown-img-paste-20191009094530340.png)
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def numMagicSquaresInside(self, grid: List[List[int]]) -> int:
+        def isValid(i,j):
+            exist = set()
+            # see if k is only from 1~9 and appear once
+            for x in range(i,i+3):
+                for y in range(j,j+3):
+                    k = grid[x][y]
+                    if k < 1 or k > 9 or k in exist:
+                        return False
+                    exist.add(k)
+
+            if (15 != grid[i][j] + grid[i][j + 1] + grid[i][j + 2]): return False;
+            if (15 != grid[i + 1][j] + grid[i + 1][j + 1] + grid[i + 1][j + 2]): return False;
+            if (15 != grid[i + 2][j] + grid[i + 2][j + 1] + grid[i + 2][j + 2]): return False;
+            if (15 != grid[i][j] + grid[i + 1][j] + grid[i + 2][j]): return False;
+            if (15 != grid[i][j + 1] + grid[i + 1][j + 1] + grid[i + 2][j + 1]): return False;
+            if (15 != grid[i][j + 2] + grid[i + 1][j + 2] + grid[i + 2][j + 2]): return False;
+            if (15 != grid[i][j] + grid[i + 1][j + 1] + grid[i + 2][j + 2]): return False;
+            if (15 != grid[i + 2][j] + grid[i + 1][j + 1] + grid[i][j + 2]): return False;
+            return True;
+
+
+        count = 0
+        m, n = len(grid), len(grid[0])
+        for i in range(m-2):
+            for j in range(n-2):
+                if grid[i+1][j+1] == 5 and isValid(i,j):
+                    count += 1
+
+        return count
+```
+---
+## 443. String Compression｜ 10/11
+Given an array of characters, compress it in-place.
+
+The length after compression must always be smaller than or equal to the original array.
+
+Every element of the array should be a character (not int) of length 1.
+
+After you are done modifying the input array in-place, return the new length of the array.
+
+
+Follow up:
+Could you solve it using only O(1) extra space?
+
+![](assets/markdown-img-paste-20191011005016175.png)
+![](assets/markdown-img-paste-20191011005026370.png)
+### 思路
+
+[a,b,b,b]
+
+[a,b,b]
+
+[a,b]
+
+[a,b,3]
+
+### Code
+``` py
+class Solution(object):
+    def compress(self, chars):
+        if len(chars) == 0 or len(chars) == 1:
+            return len(chars)
+
+        i = 0
+        while i < len(chars)-1:
+            count = 1
+            while i < len(chars)-1 and chars[i] == chars[i+1]:
+                count += 1
+                del chars[i]
+
+            if count > 1:
+                count = str(count)
+                n = len(count)
+                for j in range(n):
+                    chars.insert(i+1+j, count[j]) #insert the number after the letter
+                i += n+1
+            else:
+                i += 1 # directly move on
+
+        return len(chars)
 ```
 ---
