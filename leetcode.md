@@ -10144,3 +10144,167 @@ class Solution(object):
         return len(chars)
 ```
 ---
+## Flatiron. CityNetwork｜ 10/11
+
+給一個城市與城市連結的關係：
+
+[9,1,4,9,0,4,8,9,0,1]
+
+index 為A城市，value為B城市
+
+可以解讀成：0跟9相連、1跟1相連、2跟4相連....
+
+定義首都為，city[i] = i
+
+return 一個distance array
+
+index為與首都的距離，value為距離首都此距離的城市個數
+
+input:   [9, 1, 4, 9, 0, 4, 8, 9, 0, 1]
+output:  [1, 1, 3, 2, 3, 0, 0, 0, 0]
+
+### 思路
+
+用queue去解
+
+### Code
+``` py
+from collections import deque
+def network(city):
+    res = [0] * (len(city) -1)
+    q = deque()
+    for i in range(len(city)):
+        if city[i] == i:
+            q.append(i)
+            res[0] = 1
+
+    dis = 1
+    while dis < len(city)-2:
+        # 設定這次的目標城市(首都)
+        num = []
+        while q:
+            num = num + [q.pop()]
+
+        # 找出與此目標相連的城市(9)
+        count = 0
+        for i in range(len(num)):
+            for j in range(len(city)):
+                if city[j] == num[i] and j != num[i]:
+                    count += 1 # 計算這個距離的城市個數
+                    q.append(j) # 設定下一輪的目標 (9)
+
+        res[dis] = count
+        dis += 1
+    return res
+
+
+
+if __name__ == "__main__":
+    print(network([9,1,4,9,0,4,8,9,0,1]))
+
+```
+---
+## 215. Kth Largest Element in an Array｜ 10/11
+Find the kth largest element in an unsorted array. Note that it is the kth largest element in the sorted order, not the kth distinct element.
+
+![](assets/markdown-img-paste-20191011162457145.png)
+### 技巧
+- heap: import heapq
+    - heapq.heapify(nums)
+    - list = heapq.nlargest(k, list)
+
+### Code
+``` py
+import heapq
+class Solution:
+    def findKthLargest(self, nums: List[int], k: int) -> int:
+        heapq.heapify(nums)
+        return heapq.nlargest(k, nums)[-1]
+```
+---
+## Wayfair. Upsidedown the '6' and '9'｜ 10/11
+![](assets/markdown-img-paste-20191011165552149.png)
+
+## 技巧
+python 不能支援string assignment
+- astr[i] = "9"    <- Wrong
+    - astr = astr[:i] + "9" + astr[i+1:]    <- Correct!
+
+### 思路
+把第一個遇到的6換成9就可以了
+
+### Code
+``` py
+def upsidedown(A):
+    astr = str(A)
+    for i in range(len((astr))):
+        if astr[i] == "6":
+            astr = astr[:i] + '9' + astr[i+1:]
+            return int(astr)
+    return A
+
+
+if __name__ == '__main__':
+    print(upsidedown(99666)) # 99966
+    print(upsidedown(696)) # 996
+    print(upsidedown(699999999999999999)) # 99999999999999
+
+```
+---
+## Wayfair. Binary to zero｜ 10/11
+![](assets/markdown-img-paste-20191011203840955.png)
+
+### 思路
+
+第一個想法是轉成整數在弄成零，
+
+但仔細觀察之後發現可以使用向右移的觀念。
+
+遇到1的時候要先減一才能右移，零則可以直接移動。
+
+最後一個leading 1只需要減一不需要右移
+
+但要注意leading 1左邊的零是沒意義的所以要判斷掉
+
+### Code
+``` py
+from collections import Counter
+def steps(binary):
+    lead = 0
+    for i in range(len(binary)):
+        if binary[i] == "1":
+            lead = i
+            break
+        if i == len(binary)-1: # input = 00000
+            return 0
+
+    li = list(binary[lead:])
+    dic = Counter(li)
+    return dic['1']*2 + dic['0'] - 1
+
+
+if __name__ == "__main__":
+    print(steps("010100"))
+
+```
+---
+## 1189. Maximum Number of Balloons｜ 10/11
+Given a string text, you want to use the characters of text to form as many instances of the word "balloon" as possible.
+
+You can use each character in text at most once. Return the maximum number of instances that can be formed.
+
+![](assets/markdown-img-paste-20191011210133481.png)
+### 思路
+
+
+### Code
+``` py
+from collections import Counter
+class Solution:
+    def maxNumberOfBalloons(self, text: str) -> int:
+        dic = Counter(list(text))
+        single = min(min(dic['b'], dic['a']), dic['n'])
+        double = min(dic['l'], dic['o'])
+        return min(single, double//2)
+```
+---
