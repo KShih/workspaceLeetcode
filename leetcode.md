@@ -6471,6 +6471,19 @@ For example, the following two linked lists:
 ![](assets/markdown-img-paste-20190821173004950.png)
 ![](assets/markdown-img-paste-20190821173019905.png)
 ![](assets/markdown-img-paste-20190821173038184.png)
+
+### 技巧
+
+兩個list不一樣是要讓其中一個先走的做法：
+
+```py
+for i in range(longerlist.length):
+    if i >= longerlist.length - shorterlist.length:
+        # comparison here
+    else:
+        longerlist = longerlist.next
+```
+
 ### 思路
 
 讓兩個節點從同樣剩餘長度的節點再開始比較即可
@@ -6518,6 +6531,52 @@ public:
         return count;
     }
 };
+```
+Python
+``` py
+# Definition for singly-linked list.
+# class ListNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+class Solution(object):
+    def getIntersectionNode(self, headA, headB):
+        """
+        :type head1, head1: ListNode
+        :rtype: ListNode
+        """
+        lengthA = self.getlength(headA)
+        lengthB = self.getlength(headB)
+
+        if lengthA >= lengthB:
+            return self.getInteraction(headA, headB, lengthA, lengthB)
+        else:
+            return self.getInteraction(headB, headA, lengthB, lengthA)
+
+
+    def getInteraction(self, longer, shorter, longl, shortl):
+        for i in range(longl):
+            if i >= longl-shortl:
+                if not longer or not shorter:
+                    return None
+                if longer == shorter:
+                    return longer
+                else:
+                    longer = longer.next
+                    shorter= shorter.next
+            else:
+                longer = longer.next
+        return None
+
+
+
+    def getlength(self, node):
+        count = 0
+        while node:
+            count += 1
+            node = node.next
+        return count
 ```
 ---
 ## 116. Populating Next Right Pointers in Each Node｜ 8/24
@@ -10306,5 +10365,608 @@ class Solution:
         single = min(min(dic['b'], dic['a']), dic['n'])
         double = min(dic['l'], dic['o'])
         return min(single, double//2)
+```
+---
+## 347. Top K Frequent Elements(Heap用法經典題)｜ 10/12
+Given a non-empty array of integers, return the k most frequent elements.
+
+![](assets/markdown-img-paste-20191012110213208.png)
+
+### 技巧
+
+- 一行建立 字典的頻率跟數字的pair
+    - mydic = [(freq, num) for num, freq in Counter(nums).items()]
+- heapq.heappushpop()
+- 遞減排序 sorted(arr, key=lambda k:{}, reverse=True)
+- Counter(arr).most_common(k)
+    - heapq.nlargest(k, arr)
+
+### 思路
+
+
+### Code
+
+真的練習到heap! 不使用sort, O(n)
+``` py
+from collections import Counter
+import heapq
+
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        mydic = [(freq, num) for num, freq in Counter(nums).items()]
+        heap = []
+        for entry in mydic:
+            # always keep the most common k in heap by keeping the size of the heap
+            if len(heap) >= k:
+                heapq.heappushpop(heap, entry)
+            else:
+                heapq.heappush(heap, entry)
+        res = [heap[i][1] for i in range(len(heap)) ]
+        return res
+```
+
+O(nlogn)
+``` py
+from collections import Counter
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        dict = Counter(nums)
+        pair = []
+        for entry in dict:
+            pair.append([entry, dict[entry]])
+
+        sortPair = sorted(pair, key=lambda n:n[1], reverse=True)
+        res = []
+        for i in range(k):
+            res.append(sortPair[i][0])
+        return res
+
+```
+
+O(nlogn)
+```py
+class Solution(object):
+    def topKFrequent(self, nums, k):
+        return [item[0] for item in collections.Counter(nums).most_common(k)]
+```
+---
+## 239. Sliding Window Maximum(Deque經典題)｜ 10/12
+Given an array nums, there is a sliding window of size k which is moving from the very left of the array to the very right. You can only see the k numbers in the window. Each time the sliding window moves right by one position. Return the max sliding window.
+![](assets/markdown-img-paste-20191012153637731.png)
+
+Note:
+You may assume k is always valid, 1 ≤ k ≤ input array's size for non-empty array.
+
+Follow up:
+Could you solve it in linear time?
+
+Hint:
+
+How about using a data structure such as deque (double-ended queue)?
+
+The queue size need not be the same as the window’s size.
+
+Remove redundant elements and the queue should store only elements that need to be considered.
+### 思路
+![](assets/markdown-img-paste-2019101215353966.png)
+
+### Code
+``` py
+from collections import deque
+class Solution:
+    def maxSlidingWindow(self, nums, k):
+        orderQueue = deque() # ordered index by importance
+        res = []
+
+        for i in range(len(nums)):
+
+            # keep the importance ordered
+            while orderQueue and nums[orderQueue[-1]] <= nums[i]:
+                orderQueue.pop()
+
+            # append the item
+            orderQueue += [i]
+
+            # keep the window size
+            if i - orderQueue[0] >= k:
+                orderQueue.popleft()
+
+            # append the ans in to return list,
+            # don't do this when still initialize the deque
+            if i+1 >= k:
+                res.append(nums[orderQueue[0]])
+
+        return res
+```
+---
+## Roblox. List Max｜ 10/14
+![](assets/markdown-img-paste-20191014103154100.png)
+### 思路
+
+![](assets/markdown-img-paste-20191014103255389.png)
+
+### Code
+Naive:
+``` py
+def arrayManipulation(n, queries):
+    arr = [0]*n
+    for i in queries:
+        for j in range(i[0], i[1] + 1):
+            arr[j - 1] += i[2]
+    return max(arr)
+```
+
+Best Solution:
+``` py
+def arrayManipulation(n, queries):
+    arr = [0]*n
+    for i in queries:
+        arr[i[0] - 1] += i[2]
+        if i[1] != len(arr):
+            arr[i[1]] -= i[2]
+    maxval= 0
+    itt =0
+    print(arr)
+    for q in arr:
+        itt += q
+        if itt > maxval:
+            maxval = itt
+    return maxval
+```
+---
+## Roblox. MostCommonSubstring｜ 10/14
+
+### 技巧
+
+- SubString in python: str[start, start+length]
+- Counts of distinct char in str: len(set(str))
+- Most Frequent var in dic: Counter().most_common(1)
+
+### 思路
+
+
+### Code
+``` py
+from collections import Counter
+
+def MostCommonSubstring(str1, nl, xl, xu):
+    dic = Counter()
+    n = len(str1)
+    for i in range(n):
+        # i: start pos of substr
+        if nl < n-i:
+            maxB = xl
+        else:
+            maxB = n-1
+
+        # j: length of substring
+        for j in range(nl,maxB+1):
+            if i+j <= n:
+                substring = str1[i:i+j]
+                distinctCount = len(set(substring))
+
+                if len(substring) >= nl and len(substring) <= xl and distinctCount <= xu:
+                    if substring in dic.keys():
+                        dic[substring] += 1
+                    else:
+                        dic[substring] = 1
+    print(dic)
+    return dic.most_common(1)[0][1]
+
+
+if __name__ == "__main__":
+    print(MostCommonSubstring("abcde", 2, 4, 3))
+    print(MostCommonSubstring("abcde", 2, 4, 26))
+    print(MostCommonSubstring("ababab", 2, 3, 4))
+
+```
+---
+## Roblox. Maximum Substring｜ 10/14
+For this challenge, a substring is defined as any contiguous group of one or more characters of a string. For example, the unique substrings of 'baca' are [b,ba,bac,baca,a,ac,aca,c,ca]. The list in alphabetical order is [a,ac,aca,b,ba,bac,baca,c,ca]. In this case, the maximum substring alphabetically is 'ca'. Given a string, determine its maximum substring.
+
+### 思路
+
+直接找出所有最大的char的位置
+
+加進去candidate list
+
+再排序一次
+
+### Code
+``` py
+def maxSubstring(s):
+    mxChar = sorted(s, reverse=True)[0]
+    cand = []
+    for i in range(len(s)):
+        if s[i] == mxChar:
+            cand.append(s[i:])
+    return(sorted(cand, reverse=True)[0])
+
+if __name__ == "__main__":
+    maxSubstring("cacbcbcb")
+    maxSubstring("baca")
+
+```
+---
+## Roblox. Segment｜ 10/14
+
+1. 給一個數組arr和一個數x，‍‌‍‍‍‌‍‍‍‍‍‌‌‌‍‍‍‌‍找出所有長度為x的subarray的最小值，返回這些最小值中的最大值
+    1. arr = [8,2,4,3]
+    2. x = 2
+    3. 那麼subarray就是[8,2]和[2,4]和[4,3]，對應的最小值是2, 2, 3，那麼返回值就是3
+
+### 思路
+### Code
+``` py
+def segment(arr, x):
+    cand = []
+    for i in range(len(arr)-x+1):
+        cand.append(arr[i:i+x])
+
+    minCand = []
+    for can in cand:
+        minCand.append(min(can))
+    return max(minCand)
+
+if __name__ == "__main__":
+    print(segment([8,2,4,3],2))
+
+```
+---
+## Roblox. Repeated Word｜ 10/14
+
+找一句話裡第一個重複單詞， 比如 "We work hard because hard work pays", 返回hard，因為是第一個repeated words。這個是case sensitive的
+### 思路
+### Code
+``` py
+def RepeatedWord(str):
+    dic = dict()
+    li = str.split(" ")
+    for l in li:
+        if l not in dic.keys():
+            dic[l] = l
+        else:
+            return l
+
+if __name__ == "__main__":
+    print(RepeatedWord("We work hard because hard work pays")) # hard
+    print(RepeatedWord("We work Hard because hard work pays")) # ward
+
+```
+---
+## Break Palindrome｜ 10/14
+
+給一個palidrome 問怎麼變可以讓palidrome變成非palidrome 並且lexicoorder最小
+
+### 技巧
+
+- increment char: ch = chr(ord(str[i]) + 1)
+- 確認是否是回文：
+    - isPalind(str): return str == str[::-1]
+
+### 思路
+- 更改第一個字元即可，但還是多做了一些防無限迴圈的處理
+### Code
+``` py
+def breakPalind(str):
+    i = 0
+    while isPalind(str):
+        ch = chr(ord(str[i]) + 1)
+        str = ch + str[1:]
+        if not isPalind(str):
+            return str
+        elif ch == 'z':
+            i += 1
+            if i >= len(str):
+                return "Unable to find the way to Break Palind"
+
+def isPalind(str):
+    return str == str[::-1]
+
+if __name__ == "__main__":
+    print(breakPalind("aabbaa"))
+    print(breakPalind("aabaa"))
+
+```
+---
+## Roblox. Prefix to Postfix Conversion｜ 10/14
+
+Prefix : An expression is called the prefix expression if the operator appears in the expression before the operands. Simply of the form (operator operand1 operand2).
+Example : *+AB-CD (Infix : (A+B) * (C-D) )
+
+Postfix: An expression is called the postfix expression if the operator appears in the expression after the operands. Simply of the form (operand1 operand2 operator).
+Example : AB+CD-* (Infix : (A+B * (C-D) )
+
+Given a Prefix expression, convert it into a Postfix expression.
+
+### 思路
+
+不用先轉成Infix，效率比較好
+
+- Algorithm for Prefix to Postfix:
+    - Read the Prefix expression in reverse order (from right to left)
+    - If the symbol is an operand, then push it onto the Stack
+    - If the symbol is an operator, then pop two operands from the Stack
+    - Create a string by concatenating the two operands and the operator after them.
+        - string = operand1 + operand2 + operator
+    - And push the resultant string back to Stack
+    - Repeat the above steps until end of Prefix expression.
+
+### Code
+``` py
+def prefix2postfix(str):
+    stack = []
+    operator = ['+', '-', '*', '/']
+    for i in range(len(str)-1, -1, -1):
+        if str[i] in operator:
+            if stack:
+                operand1 = stack.pop()
+            else:
+                print("cannot get op1");break
+            if stack:
+                operand2 = stack.pop()
+            else:
+                print("cannot get op2");break
+
+            stack.append(operand1+operand2+str[i])
+        else:
+            stack.append(str[i])
+    if len(stack) == 1:
+        return stack[0]
+    else:
+        print("stack size error")
+
+
+if __name__ == '__main__':
+    print(prefix2postfix("*+AB-CD")) # AB+CD-*
+    print(prefix2postfix("*-A/BC-/AKL")) # ABC/-AK/L-*
+
+```
+---
+## Roblox. Postfix to Prefix｜ 10/14
+follow-up
+### 思路
+![](assets/markdown-img-paste-2019101416270868.png)
+### Code
+``` py
+def postfix2prefix(str):
+    stack = []
+    operator = ['+', '-', '*', '/']
+    for i in range(len(str)):
+        if str[i] in operator:
+            if stack:
+                operand1 = stack.pop()
+            else:
+                print("cannot get op1");break
+            if stack:
+                operand2 = stack.pop()
+            else:
+                print("cannot get op2");break
+
+            stack.append(str[i] + operand2 + operand1)
+        else:
+            stack.append(str[i])
+    if len(stack) == 1:
+        return stack[0]
+    else:
+        print("stack size error")
+
+if __name__ == '__main__':
+    print(postfix2prefix("AB+CD-*")) #*+AB-CD
+    print(postfix2prefix("ABC/-AK/L-*")) # *-A/BC-/AKL
+
+```
+---
+## Pre/Post fix to Infix｜ 10/14
+### 思路
+### Code
+``` py
+def prefix2infix(str):
+    stack = []
+    operator = ['+', '-', '*', '/']
+    for i in range(len(str)-1,-1,-1):
+        if str[i] in operator:
+            if stack:
+                operand1 = stack.pop()
+            else:
+                print("cannot get op1");break
+            if stack:
+                operand2 = stack.pop()
+            else:
+                print("cannot get op2");break
+
+            stack.append(operand1 + str[i] + operand2)
+        else:
+            stack.append(str[i])
+    if len(stack) == 1:
+        return stack[0]
+    else:
+        print("stack size error")
+
+
+def postfix2infix(str):
+    stack = []
+    operator = ['+', '-', '*', '/']
+    for i in range(len(str)):
+        if str[i] in operator:
+            if stack:
+                operand1 = stack.pop()
+            else:
+                print("cannot get op1");break
+            if stack:
+                operand2 = stack.pop()
+            else:
+                print("cannot get op2");break
+
+            stack.append(operand2 + str[i] + operand1)
+        else:
+            stack.append(str[i])
+    if len(stack) == 1:
+        return stack[0]
+    else:
+        print("stack size error")
+
+if __name__ == '__main__':
+    print(prefix2infix("*+AB-CD")) #((A+B)*(C-D))
+    print(postfix2infix("AB+CD-*")) #((A+B)*(C-D))
+
+```
+---
+## 總結Pre/Post/In Fix 轉換
+
+- Prefix: *+AB-CD
+- Postfix: AB+CD-*
+- Infix: A+B * C-D
+
+### 共同點:
+    - 都可用stack實現
+    - 遇到運算子就推進stack
+    - 遇到運算元就Pop兩個運算子出來{做點事}，再推回去stack
+
+### 不同點:
+    - 從哪個方向讀起:
+        - 從有運算子的方向讀
+    - 合併運算子及運算元(做點事):
+        - 轉Infix:
+            - pre2in:
+                - op1 + op + op2
+            - pos2in:
+                - op2 + op + op1
+        - Pre/Post直接轉換:
+            - pre2post:
+                - op1 + op2 + op
+            - post2pre:
+                - op2 + op1 + op
+        - 小節:
+            - **不要死記，看著結果順序去思考**:
+                - **哪個會先推進stack**
+                - **輸出又應該是要長怎樣**
+---
+## Roblox. Number of subarrays w/ m odd numbers｜ 10/14
+Given an array of n elements and an integer m, we need to write a program to find the number of contiguous subarrays in the array which contains exactly m odd numbers.
+
+![](assets/markdown-img-paste-20191014190107912.png)
+
+### 技巧
+
+- inline condition assign(Ternary Operator):
+    - total_so_far = m==0 ? 0: 1
+    - => total_so_far = 0 if m == 0 else 1
+
+### 思路
+- Two pointer 去列舉所有可能解的base
+    - 再從base去列舉所有可能解
+- start只有遇到超過m個odd的時候需要移動
+
+![](assets/markdown-img-paste-20191014190951485.png)
+
+- another solution: https://www.geeksforgeeks.org/number-subarrays-m-odd-numbers/
+
+### Code
+``` py
+def getSubarrayCount(a, m):
+    start,end = 0, 0
+    cnt = 0 # cnt for odd m
+    total = 0
+    while end < len(a):
+
+        if a[end] % 2 != 0:
+            cnt += 1
+        end += 1
+        while cnt > m:
+            if a[start] % 2 != 0:
+                cnt -= 1
+            start += 1
+        #print("start = ", start);print("end = ", end);print("array: ", a[start:end]);print("----")
+        if cnt == m:
+            #print("in coming!")
+            total += getSubcount(a, start, end, m)
+            #print(total);print("----")
+    return total
+
+def getSubcount(a, start, end, m):
+    total_so_far = 0 if m == 0 else 1
+    while start<end and a[start] %2 == 0:
+        total_so_far += 1
+        start += 1
+    return total_so_far
+
+if __name__ == '__main__':
+    print(getSubarrayCount([2,5,6,9], 2))
+    print(getSubarrayCount([2,2,5,6,9,2,11], 2))
+
+```
+---
+## Roblox. Distinct Pairs｜ 10/14
+![](assets/markdown-img-paste-20191014213330537.png)
+
+## 技巧
+- get the index of specific item in list:
+    - list.index(item,{start}, {end})
+
+### 思路
+### Code
+``` py
+def distinctpair(arr, k):
+    res = set()
+    for elem in arr:
+        if elem > k:
+            continue
+        if k - elem in arr:
+            if k - elem > elem:
+                res.add((elem, k - elem))
+            else:
+                res.add((k - elem, elem))
+    return len(res)
+
+
+if __name__ == '__main__':
+    print(distinctpair([5,7,9,13,11,6,6,3,3],12))
+
+```
+---
+## Roblox. Social Network｜ 10/14
+![](assets/markdown-img-paste-2019101422052794.png)
+
+### 技巧
+
+- 不要輕易用int當作key，先轉成str
+- 如果要用二維list
+    - 先初始化: dic[size] = []
+    - 再append: dic[size].append([i])
+
+### 思路
+
+### Code
+``` py
+def socialnetwork(arr):
+    dic = dict()
+    out = []
+    for i in range(len(arr)):
+        size = str(arr[i])
+        if size in dic.keys():
+            # 如果該group已滿，重新創一個group
+            if len(dic[size][-1]) >= arr[i]:
+                dic[size].append([i])
+            else:
+                dic[size][-1].append(i)
+        else:
+            dic[size] = [] # 二維list初始化
+            dic[size].append([i])
+
+        # 如果group已滿，加入輸出list中
+        if len(dic[size][-1]) >= arr[i]:
+            out.append(dic[size][-1])
+
+    print(sorted(out))
+
+
+if __name__ == '__main__':
+    socialnetwork([2,1,1,2,1]) # 0 3 /n 1 /n 2 /n 4
+    print("----")
+    socialnetwork([3,3,3,3,3,1,3]) # 0 1 2 /n 3 4 6 /n 5
+    print("----")
+    socialnetwork([2,2,1,2,2]) # 0 1 /n 3 4 /n 2
+
 ```
 ---
