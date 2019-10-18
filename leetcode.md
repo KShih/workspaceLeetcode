@@ -1384,13 +1384,13 @@ Explanation:
 ((2*(3-4))*5) = -10
 (2*((3-4)*5)) = -10
 (((2*3)-4)*5) = 10
-
+**
 
 ### 思路
 ![](assets/markdown-img-paste-2019062923384111.png)
 
 ### Code
-``` c++
+``` c
 class Solution {
 public:
     vector<int> diffWaysToCompute(string input) {
@@ -6534,11 +6534,6 @@ public:
 ```
 Python
 ``` py
-# Definition for singly-linked list.
-# class ListNode(object):
-#     def __init__(self, x):
-#         self.val = x
-#         self.next = None
 
 class Solution(object):
     def getIntersectionNode(self, headA, headB):
@@ -10967,6 +10962,206 @@ if __name__ == '__main__':
     socialnetwork([3,3,3,3,3,1,3]) # 0 1 2 /n 3 4 6 /n 5
     print("----")
     socialnetwork([2,2,1,2,2]) # 0 1 /n 3 4 /n 2
+
+```
+---
+## Google. Largest Subarray Length K｜ 10/17
+![](assets/markdown-img-paste-20191017155639668.png)
+
+follow-up: 如果數組可以重複
+### 思路
+
+不能重複就是找前k個的最大值，並以他為起點向後推k個回傳
+
+如果數字可以重複就只能土法煉鋼幹
+
+### Code
+``` py
+# https://leetcode.com/discuss/interview-question/352459/
+# if every elem in A is distinct
+# if there is duplicate
+
+def largest_subarray_nodup(A, k):
+    n = len(A)
+    if n == 0 or k <= 0 or k > n:
+        return {}
+    if k == n:
+        return A
+    cand = A[:n-k+2]
+    start = A.index(max(cand))
+    end = start + k
+    print(A[start:start+k])
+
+def largest_subarray_wtdup(A, k):
+    n = len(A)
+    if n == 0 or k <= 0 or k > n:
+        return {}
+    if k == n:
+        return A
+    idx, max, = -1, 0
+    i = 0
+    while i <= n-k:
+        if A[i] > max:
+            max, idx = A[i], i
+        elif A[i] == max:
+            # comparing the rest, see if there is bigger elem in subarr start from A[i]
+            newidx = i
+            oldidx = idx
+            while newidx < i+k:
+                if A[newidx] > A[oldidx]:
+                    idx = i
+                    break
+                newidx, oldidx = newidx+1, oldidx+1
+        i += 1
+    print(A[idx:idx+k])
+
+
+if __name__ == '__main__':
+    largest_subarray_nodup([1,4,3,2,5,1], 4) # [4,3,2,5]
+    largest_subarray_wtdup([1, 4, 3, 2, 1, 4, 5, 6, 7],4) # [4,5,6,7]
+    largest_subarray_wtdup([8,7,6,5,4,3,2,1],4) # [8,7,6,5]
+    largest_subarray_wtdup([1,1,1,1,1,1,1],4)
+
+```
+---
+## Google. Maximum Time｜ 10/17
+![](assets/markdown-img-paste-20191018005952639.png)
+### 思路
+
+
+### Code
+``` py
+def maximum_time(time):
+    if time[0] == "2" or time[1] <= "3" or (time[0] == "?" and time[1] == "?"):
+        ret = "23:59"
+    else:
+        ret = "19:59"
+    for i in range(len(time)):
+        if time[i] != "?":
+            ret = ret[:i] + time[i] + ret[i+1:]
+    print ret
+
+if __name__ == '__main__':
+    maximum_time("23:5?");# 23:59
+    maximum_time("2?:22");# 23:22
+    maximum_time("0?:??");# 09:59
+    maximum_time("1?:??");# 19:59
+    maximum_time("?4:??");# 14:59
+    maximum_time("?3:??");# 23:59!
+    maximum_time("??:??");# 23:59
+    maximum_time("?4:5?"); #14:59
+    maximum_time("?4:??"); #14:59
+    maximum_time("23:5?"); #23:59
+    maximum_time("2?:22"); #23:22
+    maximum_time("0?:??"); #09:59
+    maximum_time("1?:??"); #19:59
+    maximum_time("?4:0?"); #14:09
+    maximum_time("?9:4?"); #19:49
+
+```
+---
+#### **Review Tree**
+---
+## 96. Unique Binary Search Trees｜ 10/18
+Given n, how many structurally unique BST's (binary search trees) that store values 1 ... n?
+
+![](assets/markdown-img-paste-20191018103446639.png)
+
+### 思路
+The problem is to get the number of unique structurally BST that stores 1...n.
+
+If n = 1, there is only one BST.
+
+If n > 1, each r for 1 <= r <= n can be root. Then the problem is divided into two subproblems
+
+How many structurally unique BST's that store values 1 ... r-1? (subproblem overlap)
+
+How many structurally unique BST's that store values r+1 ... n?
+
+The answer is the same as How many structurally unique BST's that store values 1 ... n-r (subproblem overlap) because values in tree don't matter.
+
+If we define
+result[i] as number of unique structurally BST that stores 1...i
+
+then,
+result[i] = sum(result[r-1]* result[i-r]) for `1 <= r <= n`
+
+base case result[0] = 1 which represents an empty tree
+
+### Code
+``` py
+class Solution(object):
+    def numTrees(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        if n == 1:  return 1
+        state = [0] * (n+1) # we want state[n] as the answer, so initial to N+1
+
+        state[0] = 1 # initial
+        for i in range(1, n+1):
+            for r in range(1, i+1):
+                state[i] += state[r-1] * state[i-r]
+
+        return state[n]
+```
+---
+## 105. Construct Binary Tree from Preorder and Inorder Traversal｜ 10/18
+Given preorder and inorder traversal of a tree, construct the binary tree.
+
+Note:
+You may assume that duplicates do not exist in the tree.
+
+For example, given
+
+preorder = [3,9,20,15,7]
+
+inorder = [9,3,15,20,7]
+
+![](assets/markdown-img-paste-20191018122437209.png)
+### 思路
+
+解題方向：
+
+找出root, 找出左右子樹
+
+1. preorder的頭一定是root
+2. inorder中root以左是左子樹, 以右是右子數
+
+![](assets/markdown-img-paste-20191018122929410.png)
+![](assets/markdown-img-paste-20191018123017508.png)
+注意:
+
+在找preorder的頭的時候用pop(0), 用[0]遇到空子樹就會gg
+
+傳入inorder的時候也要跳過root (+1)
+
+### Code
+``` py
+class Solution(object):
+    def buildTree(self, preorder, inorder):
+        """
+        :type preorder: List[int]
+        :type inorder: List[int]
+        :rtype: TreeNode
+        """
+        if preorder and inorder:
+            root_idx_in_inorder = inorder.index(preorder.pop(0)) # 如果用preorder[0] 在遇到空子樹時會出錯
+            root = TreeNode(inorder[root_idx_in_inorder])
+
+            root.left = self.buildTree(preorder[:root_idx_in_inorder], inorder[:root_idx_in_inorder])
+            root.right = self.buildTree(preorder[root_idx_in_inorder:], inorder[root_idx_in_inorder+1:])
+            return root
+```
+---
+## ｜ 8/29
+
+### 思路
+
+
+### Code
+``` py
 
 ```
 ---
