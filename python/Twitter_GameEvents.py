@@ -31,7 +31,7 @@ def getEventsOrder(team1, team2, events1, events2):
             game_details_list.append(record)
 
 
-
+    print(game_details_list)
     # sorting the list to return index position of the sorted list
     new_num_index_sorted = (sorted(range(len(game_details_list)),
                                    key=lambda k: (

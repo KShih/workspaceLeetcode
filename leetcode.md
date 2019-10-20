@@ -4560,6 +4560,15 @@ Reverse a singly linked list.
 ![](assets/markdown-img-paste-20190813130546783.png)
 
 ### 思路
+
+二刷：
+
+Python's recursive is much easier!
+
+Iterative是必須在這個loop更新此節點跟下個節點
+
+Recursive的話只需要交換位置就可以了！
+
 Recursive is much harder to imagine with.
 1. Keep asking the next node to give me the reverse to myself.
 2. If bump into the situation which no one answer it, he will start to return himself.
@@ -4600,6 +4609,30 @@ public:
         return newHead;
     }
 };
+```
+
+```py
+def reverseList(self, head: ListNode) -> ListNode:
+    # 1->2->3->4->5
+    newHead = None
+    while head:
+        temp = head.next # record 2
+        head.next = newHead # 1->NULL
+        newHead = head # newHead = 1 (the next's parent)
+        head = temp # head = 2
+    return newHead
+```
+``` py
+def recur_reverseList(self, head, prev):
+    if not head:
+        return prev
+
+    nex = head.next
+    head.next = prev
+    return recur_reverseList(nex, head)
+
+if __name__ == '__main__':
+    recur_reverseList(head, None)
 ```
 ---
 ## 141. Linked List Cycle｜ 7/4
@@ -9016,9 +9049,6 @@ def numberOfTokens(expiryLimit, commands):
             if token_id in values.keys():
                 expiry_time = values.get(token_id)
                 if expiry_time >= time:
-                    # ??? why use this ???
-                    #values[token_id] = values.get(token_id) + expiryLimit - (expiry_time - time)
-                    # instead of this
                     values[token_id] = time + expiryLimit
 
     # counting values alive after reading all the values
@@ -11155,13 +11185,274 @@ class Solution(object):
             return root
 ```
 ---
-## ｜ 8/29
+## Google. Compare Strings｜ 10/19 // TODO: More Testcase NEEDED
+![](assets/markdown-img-paste-20191019030356827.png)
 
 ### 思路
 
+同個概念三種寫法
+1. 徒法煉鋼
+2. 漂亮解法
+3. cache優化法
+
+### Code
+
+徒法煉鋼法:
+``` py
+def compare_string(A, B):
+
+    freq_count_of_A = [0] * 11 # count of freq 1~10
+    res = []
+    cache = [0] * 11 # cache for sum of first i value in freq_count_of_A
+    A = A.split(",")
+    for str in A:
+        count = get_smallest_count(str)
+        freq_count_of_A[count] += 1
+
+    B = B.split(",")
+    for str in B:
+        count = get_smallest_count(str)
+
+        if cache[count] == 0:
+            sum = 0
+            for i in range(1,count):
+                sum += freq_count_of_A[i]
+            cache[count] = sum
+        else:
+            sum = cache[count]
+
+        res.append(sum)
+    return res
+
+def get_smallest_count(str):
+    str = sorted(str)
+    i, count = 1, 1
+    while i < len(str) and str[i] == str[i-1]:
+        count, i = count+1, i+1
+
+    return count
+
+if __name__ == '__main__':
+    print(compare_string("abcd,aabc,bd", "aaa,aa"))
+
+```
+
+漂亮的解法
+``` py
+def solve(A, B):
+    wordsA = A.split(",")
+    wordsB = B.split(",")
+    freqCounter = [0] * 11
+
+    for w in wordsA:
+        minFreq = w.count(min(w))
+        freqCounter[minFreq] += 1
+
+    toReturn = []
+    for w in wordsB:
+        minFreq = w.count(min(w))
+        toReturn.append(sum(freqCounter[:minFreq]))
+
+    return toReturn
+```
+
+漂亮的解法+cache優化
+``` py
+def better_compare_string(A, B):
+    A, B = A.split(","), B.split(",")
+    freq_count_of_A, cache = [0] * 11, [0] * 11   # count of freq 1~10, cache for sum of first i value in freq array
+    ret = []
+
+    for str in A:
+        min_freq = str.count(min(str))
+        freq_count_of_A[min_freq] += 1
+
+    for str in B:
+        min_freq = str.count(min(str))
+        if cache[min_freq] == 0:
+            sum_f = sum(freq_count_of_A[:min_freq])
+            ret.append(sum_f)
+            cache[min_freq] = sum_f
+        else:
+            ret.append(cache[min_freq])
+
+    return ret
+
+```
+---
+## Google. Sum Of Leaves｜ 10/19 // TODO: Moris Traversal!
+
+sum of leaf nodes of a binary tree
+先寫出recursive DFS，然後問了iterative解法。寫出之後又問兩個解法的space complexity並要求寫出O(1) space解法。卡了一會兒，時間不夠了，在提示（給出helper function signature）下寫出pseudocode
+
+### 思路
+
+Follow-up: 查查Morris traversal，差不多就是那個思路，traverse下去的時候要把left改成parent
+
+### Code
+Recursive:
+``` py
+def add_leaves(root):
+    if not root:
+        return 0
+    if not root.left and not root.right:
+        return root.val
+    return add_leaves(root.left) + add_leaves(root.right)
+
+
+if not root:   
+    return 0
+return add_leaves(root)
+```
+
+Iterative:
+``` py
+def iter_add_leaves(root):
+    stack = []
+    stack.append(root)
+    val = 0
+    while stack:
+        top = stack.pop()
+        if not top.left and not top.right:
+            val += top.val
+
+        if top.left:
+            stack.append(top.left)
+        if top.right:
+            stack.append(top.right)
+    return val
+```
+---
+## 404. Sum of Left Leaves｜ 10/19
+Find the sum of all left leaves in a given binary tree.
+
+![](assets/markdown-img-paste-20191019140502700.png)
+
+### 思路
+
+Recursive: 用一個flag去標示是否為左子樹
+
+Iterative: 查看這個節點的未來狀態
+
+### Code
+Recursive:
+``` py
+def sumOfLeftLeaves(self, root: TreeNode) -> int:
+    def add_left_leaves(root, isLeft):
+        if not root:
+            return 0
+        if not root.left and not root.right and isLeft:
+            #print(root.val)
+            if isLeft:
+                return root.val
+            else:
+                return 0
+
+        return add_left_leaves(root.left, True) + add_left_leaves(root.right, False)
+
+    if not root:   return 0
+    val = 0
+    return add_left_leaves(root.left, True) + add_left_leaves(root.right, False)
+```
+
+Iterative:
+``` py
+def iter_add_left_leaves(root):
+    stack = []
+    stack.append(root)
+    val = 0
+    while stack:
+        top = stack.pop()
+        if top.left:
+            stack.append(top.left)
+            if not top.left.left and not top.left.right:
+                val += top.left.val
+
+        if top.right:
+            stack.append(top.right)
+    return val
+```
+---
+## Google. Sum of Sliding Window｜ 10/19
+
+Follow-up: Max of Sliding window
+
+詳情請見 Leetcode 239
+
+### 技巧
+
+記得也要把slice所造成的時間複雜度算進去！
+
+```py
+for i in range(len(nums)-k+1):
+    res.append(sum(nums[i:i+k]))
+```
+
+### Code
+Nearly brute force:
+**竟然是O(n^2)!!**
+因為slice的複雜度是O(k)
+``` py
+def sumSlidingWindow(self, nums, k):
+    res = []
+    for i in range(len(nums)-k+1):
+        res.append(sum(nums[i:i+k]))
+    print(res)
+```
+
+Better way (prefix sum):
+``` py
+def sumSlidingWindow2(self, nums, k):
+    curSum = sum(nums[:k])
+    res = [curSum]
+    stack = [i for i in nums[:k]]
+    print(stack)
+    for i in range(k,len(nums)):
+        num = stack.pop(0)
+        curSum = curSum - num + nums[i]
+        res.append(curSum)
+        stack.append(nums[i])
+    print(res)
+```
+---
+## Google. Delete Alternate Linked List｜ 10/19 // TODO: 為什麼可以直接return head，明明沒有修改
+
+刪除節點與節點中間的
+
+https://www.geeksforgeeks.org/delete-alternate-nodes-of-a-linked-list/
+
+
+### 思路
+
+Keep track of previous of the node to be deleted.
 
 ### Code
 ``` py
+def delAlternate(self,head):
+    # given 1->2->3->4->5, return 1->3->5
+    # given 1->2->3->4 return 1->3
+    prev = head
+    node = head.next # the node is the one to be deleted
+    while prev and node:
+        prev.next = node.next
+        # free(node)
+        prev = prev.next
+        if prev:
+            node = prev.next
+    return head
+```
 
+``` py
+def recur_delAlternate(self, head):
+    if not head:
+        return
+    node = head.next
+
+    if not node:
+        return
+    head.next = node.next
+    # free node
+    self.recur_delAlternate(head.next)
+    return head
 ```
 ---
