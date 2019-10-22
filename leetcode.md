@@ -4612,6 +4612,7 @@ public:
 ```
 
 ```py
+# Solved: CAN YOU DO IT WITHOUT RETURN A NEWHEAD, RETURN THE ORIGINAL HEAD?
 def reverseList(self, head: ListNode) -> ListNode:
     # 1->2->3->4->5
     newHead = None
@@ -4629,8 +4630,19 @@ def recur_reverseList(self, head, prev):
 
     nex = head.next
     head.next = prev
-    return recur_reverseList(nex, head)
+    return recur_reverseList(nex, head) # Solved: CAN I WRITE IT DIFFERENTLY? Only if you pass the thing you want to maintain into recursive func
 
+    # OR Write it as:
+    head = self.recur_reverseList(nex, head)
+    print("started to return:", head.val)
+    return head
+    """
+        started to return: 5
+        started to return: 5
+        started to return: 5
+        started to return: 5
+        started to return: 5
+    """
 if __name__ == '__main__':
     recur_reverseList(head, None)
 ```
@@ -11188,6 +11200,14 @@ class Solution(object):
 ## Google. Compare Strings｜ 10/19 // TODO: More Testcase NEEDED
 ![](assets/markdown-img-paste-20191019030356827.png)
 
+### 技巧
+
+- 字串計算某字母出現的次數:
+    - str.count()
+- 回傳此字串中最小的字母
+    - min(str)
+
+
 ### 思路
 
 同個概念三種寫法
@@ -11341,7 +11361,7 @@ def sumOfLeftLeaves(self, root: TreeNode) -> int:
     def add_left_leaves(root, isLeft):
         if not root:
             return 0
-        if not root.left and not root.right and isLeft:
+        if not root.left and not root.right:
             #print(root.val)
             if isLeft:
                 return root.val
@@ -11415,7 +11435,7 @@ def sumSlidingWindow2(self, nums, k):
     print(res)
 ```
 ---
-## Google. Delete Alternate Linked List｜ 10/19 // TODO: 為什麼可以直接return head，明明沒有修改
+## Google. Delete Alternate Linked List｜ 10/19 // Solved: 為什麼可以直接return head，明明沒有修改
 
 刪除節點與節點中間的
 
@@ -11425,6 +11445,8 @@ https://www.geeksforgeeks.org/delete-alternate-nodes-of-a-linked-list/
 ### 思路
 
 Keep track of previous of the node to be deleted.
+
+**當你在修改prev.next的時候就等於在修改head.next**
 
 ### Code
 ``` py
@@ -11454,5 +11476,196 @@ def recur_delAlternate(self, head):
     # free node
     self.recur_delAlternate(head.next)
     return head
+```
+---
+## Google. Locate Repeated 3 times or more word｜ 10/20
+
+給一個string: abbbcccc, 標記出 連續重複三次或以上的 字母的初始位置和其實位置;
+
+input: abbbcccc, output: [(1, 3), (4, 7)]
+
+**follow-up**: 給出 一個 string 例如 hellllloooo, 求是否能通過remove 重複的字符得到 一個valid english word (assume we have all the english words)
+
+### 思路
+
+valid english word可以用trie解
+
+https://www.geeksforgeeks.org/trie-insert-and-search/
+
+所有的合法單詞先構建一個Trie, 通過第一問的function可以獲得重複字母的區間, 區間內的所有字符均可以滿足 **取或者不取**, 其它區間內為必須取, 然後用dfs找到是否有取完後tag為true的位置
+
+### Code
+``` py
+def repeated3ormore(str):
+    ret, i = [], 1
+    while i < len(str):
+        if str[i] == str[i-1]:
+            start = i-1
+            count = 1
+            while i < len(str) and str[i] == str[i-1]:
+                count, i = count+1, i+1
+            end = i-1
+            if count >= 3:
+                ret.append((start, end))
+        else:
+            i += 1
+    return ret
+
+if __name__ == '__main__':
+    print(repeated3ormore("abbbcccc"))
+    print(repeated3ormore("a"))
+    print(repeated3ormore("bbb"))
+    print(repeated3ormore("abbccccbccc"))
+    print(repeated3ormore(""))
+```
+
+follow-up, Sample code:
+``` py
+def dfs(self, s, lis, dic):
+    self.dic = dic
+    s = list(s)
+    def recur(s, lis):
+        if ''.join(s) in dic:
+            return True
+        if lis == []:
+            return False
+        start, end = lis.pop()
+        for i in range(start, end):
+            s.pop(start)
+            if recur(s, lis):
+                return True
+        return False
+
+    return recur(s, lis)
+
+if __name__ == '__main__':
+    lis = repeated3ormore("heelllloo")
+    dic = {"hello"}
+    dfs("heelllloo", lis, dic)
+```
+---
+## 167. Two Sum II - Input array is sorted｜ 10/21
+Given an array of integers that is already sorted in ascending order, find two numbers such that they add up to a specific target number.
+
+The function twoSum should return indices of the two numbers such that they add up to the target, where index1 must be less than index2.
+
+Note:
+
+Your returned answers (both index1 and index2) are not zero-based.
+
+You may assume that each input would have exactly one solution and you may not use the same element twice.
+
+Example:
+
+Input: numbers = [2,7,11,15], target = 9
+
+Output: [1,2]
+
+Explanation: The sum of 2 and 7 is 9. Therefore index1 = 1, index2 = 2.
+### 思路
+
+
+### Code
+``` py
+def twoSum(self, numbers: List[int], target: int) -> List[int]:
+    n = len(numbers)
+    start, end = 0, n-1
+    while end > start:
+        if numbers[end] + numbers[start] > target:
+            end -= 1
+        elif numbers[end] + numbers[start] < target:
+            start += 1
+        else:
+            return [start+1, end+1]
+    return [-1,-1]
+```
+---
+## 19. Remove Nth Node From End of List｜ 10/21
+Given a linked list, remove the n-th node from the end of list and return its head.
+
+Example:
+
+Given linked list: 1->2->3->4->5, and n = 2.
+
+After removing the second node from the end, the linked list becomes 1->2->3->5.
+
+Note:
+
+Given n will always be valid.
+
+Follow up:
+
+Could you do this in one pass?
+### 思路
+
+只要會刪除到頭節點，
+
+永遠要用一個duminode指著頭節點，
+
+回傳就回傳duminode.next
+
+須考慮這些測資：
+
+[1] 1
+
+[1,2] 2
+
+[1,2,3] 3
+
+**follow-up:**
+
+one-path的方法是先讓快指針走了n步
+
+在開始同時讓快慢指針同時前進
+
+當快指針走到底時，慢指針會剛好指導倒數第n個 linklist[-n]
+
+再將此節點刪除即可
+
+一樣需要用到dummy的觀念
+
+### Code
+``` py
+class Solution:
+    def removeNthFromEnd(self, head: ListNode, n: int) -> ListNode:
+        if not head: return head
+
+        size = self.listsize(head)
+        target = size - n
+
+        dum = ListNode(-1) # 只要會刪除到頭節點，就要用一個duminode指向頭節點
+        dum.next = head
+        prev = dum
+        while head:
+            if target != 0:
+                prev = head # move prev
+                head = head.next # move cur node
+            else:
+                prev.next = head.next # delete
+                break
+            target -= 1
+        return dum.next
+
+    def listsize(self, head):
+        count = 0
+        while head:
+            count += 1
+            head = head.next
+        return count
+```
+
+one-path:
+``` py
+def removeNthFromEnd(self, head, n):
+    dummy = ListNode(0)
+    dummy.next = head
+    fast = slow = dummy
+    for _ in xrange(n):
+        fast = fast.next
+    while fast and fast.next:
+        fast = fast.next
+        slow = slow.next
+    slow.next = slow.next.next
+    return dummy.next
 ```
 ---

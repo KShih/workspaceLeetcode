@@ -59,3 +59,5 @@ if __name__ == '__main__':
     print(compare_string("abcd,aabc,bd", "aaa,aa"))
     print(better_compare_string("abcd,aabc,bd", "aaa,aa"))
     print(better_compare_string("bacd,baac,bd", "aaa,aa"))
+    print(better_compare_string("bacd,baac,bd", "aaa,aa"))
+    print(better_compare_string("bbcd,baac,bd", "aaa,aa"))
