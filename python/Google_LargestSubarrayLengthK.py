@@ -8,7 +8,7 @@ def largest_subarray_nodup(A, k):
         return {}
     if k == n:
         return A
-    cand = A[:n-k+2]
+    cand = A[:n-k+1]
     start = A.index(max(cand))
     end = start + k
     print(A[start:start+k])

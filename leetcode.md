@@ -11580,6 +11580,25 @@ def twoSum(self, numbers: List[int], target: int) -> List[int]:
     return [-1,-1]
 ```
 ---
+## Remove the end node from list｜ 10/23
+
+### 思路
+
+
+### Code
+``` py
+def removeEnd(self,head):
+    if not head or not head.next:    return None
+    prev = ListNode(-1)
+    prev.next = head
+    while head and head.next:
+        if not head.next.next:
+            head.next = None
+        else:
+            head = head.next
+    return prev.next
+```
+---
 ## 19. Remove Nth Node From End of List｜ 10/21
 Given a linked list, remove the n-th node from the end of list and return its head.
 
@@ -11624,6 +11643,12 @@ one-path的方法是先讓快指針走了n步
 
 一樣需要用到dummy的觀念
 
+**follow-up-up**
+
+不使用dumy node.....
+
+等於要自己想一個方式處理刪除頭節點的情況
+
 ### Code
 ``` py
 class Solution:
@@ -11667,5 +11692,206 @@ def removeNthFromEnd(self, head, n):
         slow = slow.next
     slow.next = slow.next.next
     return dummy.next
+```
+
+one-path + space(1)
+``` py
+class Solution(object):
+    def removeNthFromEnd(self, head, n):
+        fast, slow = head, head
+        for i in range(n):
+            fast = fast.next
+
+        if not fast: # deal with head deleting
+            return slow.next
+
+        while fast.next:
+            fast = fast.next
+            slow = slow.next
+
+        slow.next = slow.next.next
+
+        return head
+```
+---
+## 24. Swap Nodes in Pairs｜ 10/22 // TODO: Figure out recursive way
+Given a linked list, swap every two adjacent nodes and return its head.
+
+You may not modify the values in the list's nodes, only nodes itself may be changed.
+
+Example:
+
+Given 1->2->3->4, you should return the list as 2->1->4->3.
+### 思路
+
+Linked list 修改的總結
+
+1. 先寫出有幾個步驟要做(有幾條link)
+2. 考慮哪條link先做(找等號左邊的(被賦值的)，沒有出現在右邊(副職給別人))
+
+![](assets/markdown-img-paste-20191022141555861.png)
+
+![](assets/markdown-img-paste-20191022143256289.png)
+
+### Code
+Iterative
+``` py
+class Solution:
+    def swapPairs(self, head: ListNode) -> ListNode:
+        dum = ListNode(0)
+        dum.next = head
+        prev = dum
+        while prev.next and prev.next.next:
+            first = prev.next
+            second = prev.next.next
+            prev.next = second
+            first.next = second.next
+            second.next = first
+
+            prev = prev.next.next
+        return dum.next
+```
+
+Recursive
+``` py
+def swapPairs(self, head):
+    if not head or not head.next:
+        return head
+    second = head.next
+    head.next = self.swapPairs(second.next)
+    second.next = head
+    return second
+```
+---
+## 30. Substring with Concatenation of All Words｜ 10/22
+You are given a string, s, and a list of words, words, that are all of the same length. Find all starting indices of substring(s) in s that is a concatenation of each word in words exactly once and without any intervening characters.
+
+![](assets/markdown-img-paste-20191023092713198.png)
+
+### 思路
+
+由i挑選起點, 一次比對一個單詞長度, 每次移動一個單詞
+
+計算總共需要的單詞長度 n
+
+如果j迴圈執行完時，count的長度 等於n
+
+表示這個區間的所有字都符合所需的字
+
+### Code
+``` py
+from collections import Counter
+class Solution:
+    def findSubstring(self, s: str, words: List[str]) -> List[int]:
+        if not words:   return []
+        leng = len(words[0])
+        n = len(words)
+        words_dic = Counter(words)
+        res = []
+        print(len(s) - leng*n)
+        for i in range(len(s) - leng*n + 1):
+            str_map = dict()
+            count = 0
+            for j in range(n): # 字典裡有幾個單詞
+                word = s[i+ j*leng : i+j*leng + leng] # 一次比對一個單詞長度, 每次移動一個單詞
+                if word not in words_dic:
+                    break
+                else:
+                    if word not in str_map:
+                        str_map[word] = 1
+                    else:
+                        str_map[word] += 1
+
+                    if str_map[word] > words_dic[word]:
+                        break
+                count += 1
+            if count == n: # find all word
+                res.append(i)
+        return res
+```
+---
+## 25. Reverse Nodes in k-Group｜ 10/23 // TODO: re-understanding, 好難...
+
+Given a linked list, reverse the nodes of a linked list k at a time and return its modified list.
+
+k is a positive integer and is less than or equal to the length of the linked list. If the number of nodes is not a multiple of k then left-out nodes in the end should remain as it is.
+
+Example:
+
+Given this linked list: 1->2->3->4->5
+
+For k = 2, you should return: 2->1->4->3->5
+
+For k = 3, you should return: 3->2->1->4->5
+
+Note:
+
+Only constant extra memory is allowed.
+
+You may not alter the values in the list's nodes, only nodes itself may be changed.
+### 思路
+
+- 如何寫Reverse LinkedList的Template:
+    - 找線索, 最後一行通常是移動目標
+        - 比如說這題 cur 為下一次循環的判斷
+            - cur = last.next <- 永久成立
+    - 那麼第一行的開頭就是last.next
+    - 後面的推演就如同:
+        - while z
+            - temp = x (x為第三個節點)
+            - x = y
+            - y = z
+            - z = temp
+
+### Code
+``` py
+class Solution:
+    def reverseKGroup(self, head: ListNode, k: int) -> ListNode:
+        if not head:    return head
+        dum = ListNode(-1); dum.next = head
+        pre, cur = dum, head
+        i = 0
+        while cur:
+            i += 1
+            if i % k == 0:
+                pre = self.reverseOneGroup(pre, cur.next)
+                cur = pre.next
+            else:
+                cur = cur.next
+        return dum.next
+
+    def reverseOneGroup(self, pre, nxt):
+        last = pre.next
+        cur = last.next
+
+        while cur != nxt:
+            last.next = cur.next # cannot use temp here, cuz we have to maintain the start point of reversing
+            cur.next = pre.next
+            pre.next = cur
+            cur = last.next
+
+        return last
+```
+---
+## 237. Delete Node in a Linked List｜ 10/23
+Write a function to delete a node (except the tail) in a singly linked list, given only access to that node.
+
+Given linked list -- head = [4,5,1,9], which looks like following:
+
+![](assets/markdown-img-paste-20191023120054982.png)
+
+### 思路
+
+沒有給head, 只給你刪除的節點叫你做操作
+
+那就是把他的值覆蓋掉
+
+並且也把他的next給覆蓋掉
+
+### Code
+``` py
+def deleteNode(self, node):
+    node.val = node.next.val
+    node.next = node.next.next
 ```
 ---
