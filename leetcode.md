@@ -8640,13 +8640,24 @@ Given an unsorted array nums, reorder it such that nums[0] < nums[1] > nums[2] <
 
 ![](assets/markdown-img-paste-20190918123325160.png)
 ### 技巧
-- 切片(Slice): arr[start:end:inc/dec], 由inc/dec決定方向
-  - e.g. nums = [1,2,3,4,5]
-    - print(nums)             # 12345
-    - print(nums[::2])        # 135
-    - print(nums[1::2])       # 24
-    - print(nums[mid::-1])    # 321
-    - print(nums[:mid:-1])    # 54
+- 切片(Slice): arr[start:end:inc/dec], **由inc/dec決定方向**
+    - e.g. nums = [1,2,3,4,5]
+    - Step是正數
+        - print(nums)             # 12345
+        - print(nums[::2])        # 135
+        - print(nums[1::2])       # 24
+    - Step是負數
+        - counts from the end of the array instead of the beginning. So:
+            - a[-2:]   # last two items in the array
+            - a[:-2]   # everything except the last two items
+            - Similarly, step may be a negative number:
+
+            - a[::-1]    # all items in the array, reversed
+            - a[1::-1]   # the first two items, reversed
+            - a[:-3:-1]  # the last two items, reversed
+            - a[-3::-1]  # everything except the last two items, reversed
+            - print(nums[2::-1])    # 321
+            - print(nums[:2:-1])    # 54
   - 關於不指定的部分
     - decrease的狀況
       - 在end不指定, 就是指最前端
@@ -11733,7 +11744,56 @@ Linked list 修改的總結
 
 ![](assets/markdown-img-paste-20191022143256289.png)
 
+
+**Iterative 到 Recursive其實沒有這麼難！**
+
+iterative的方法理解之後，
+
+轉成recursive其實只是把要更新的值傳進function裡，
+
+比如說這題，Iterative更新的方式是透過 py pre = pre.next.next
+
+那要改成Recursive時只需要把這個步驟傳進Recursive function裡！
+
+-> self.recurSwap(pre.next.next)，其他code都可以不變！！
+
+
 ### Code
+
+Recursive
+``` py
+class Solution(object):
+    def swapPairs(self, head):
+        dum = ListNode(-1)
+        dum.next = head
+        pre = dum
+        #self.iterSwap(pre)
+        self.recurSwap(pre)
+        return dum.next
+
+    def recurSwap(self, pre):
+        if not pre:
+            return
+        if pre.next and pre.next.next:
+            first = pre.next
+            second = pre.next.next
+
+            pre.next = second
+            first.next = second.next
+            second.next = first
+            self.recurSwap(pre.next.next)
+
+    def iterSwap(self, pre):
+        while pre.next and pre.next.next:
+            first = pre.next
+            second = pre.next.next
+
+            pre.next = second
+            first.next = second.next
+            second.next = first
+            pre = pre.next.next
+```
+
 Iterative
 ``` py
 class Solution:
@@ -11750,17 +11810,6 @@ class Solution:
 
             prev = prev.next.next
         return dum.next
-```
-
-Recursive
-``` py
-def swapPairs(self, head):
-    if not head or not head.next:
-        return head
-    second = head.next
-    head.next = self.swapPairs(second.next)
-    second.next = head
-    return second
 ```
 ---
 ## 30. Substring with Concatenation of All Words｜ 10/22
@@ -11893,5 +11942,288 @@ Given linked list -- head = [4,5,1,9], which looks like following:
 def deleteNode(self, node):
     node.val = node.next.val
     node.next = node.next.next
+```
+---
+## 92. Reverse Linked List II｜ 10/27
+
+Reverse a linked list from position m to n. Do it in one-pass.
+
+Note: 1 ≤ m ≤ n ≤ length of list.
+
+Example:
+
+Input: 1->2->3->4->5->NULL, m = 2, n = 4
+
+Output: 1->4->3->2->5->NULL
+
+### 思路
+
+reverse的寫法與上題一樣
+
+但注意停止點應該要用second，
+
+如果用first做停止點, second有機會是Null然後Null.next就爆了
+
+### Code
+``` py
+class Solution:
+    def reverseBetween(self, head: ListNode, m: int, n: int) -> ListNode:
+        dum = ListNode(-1)
+        dum.next = head
+        pre = dum
+        k = n-m
+        while pre.next:
+            m -= 1
+            if m == 0:
+                end = pre.next
+                for _ in range(k+1): # Set the stop point to second
+                    end = end.next
+                pre = self.reverse(pre,end)
+                break
+            else:
+                pre = pre.next
+        return dum.next
+
+    def reverse(self,pre,end):
+        first = pre.next
+        second = first.next
+
+        while second != end:
+            first.next = second.next
+            second.next = pre.next
+            pre.next = second
+            second = first.next
+        return second
+```
+---
+## 339. Nested List Weight Sum｜ 10/27
+Given a nested list of integers, return the sum of all integers in the list weighted by their depth.
+
+Each element is either an integer, or a list -- whose elements may also be integers or other lists.
+
+Example 1:
+
+Input: [[1,1],2,[1,1]]
+
+Output: 10
+Explanation: Four 1's at depth 2, one 2 at depth 1.
+
+Example 2:
+
+Input: [1,[4,[6]]]
+
+Output: 27
+
+Explanation: One 1 at depth 1, one 4 at depth 2, and one 6 at depth 3; 1 + 4*2 + 6*3 = 27.
+
+### 技巧
+
+- in Recursive Part:
+    - 注意呼叫遞迴時的sum值要傳現值還是傳0
+- in Iterative Part:
+    - 兩個有關聯的東西可以使用Tuple
+        - 此例: sublist 跟 Depth深度
+
+### 思路
+
+Recursive就是很Naive的思路
+
+Iterative:
+
+概念上就是使用tuple+stack
+
+同一層的元素擁有同樣的深度
+
+所以用Tuple把他們包在一起
+
+### Code
+Recursive:
+``` py
+class Solution:
+    def depthSum(self, nestedList: List[NestedInteger]) -> int:
+        def dfs(sublist, depth, sum1):
+            for ei in sublist:
+                if ei.isInteger():
+                    sum1 += depth*ei.getInteger()
+                else:
+                    sum1 = dfs(ei.getList(), depth+1, sum1)
+            return sum1
+
+        sum1 = 0 # [[1,1],2,[1,1]]
+        for ei in nestedList: #[1,1]
+            if ei.isInteger():
+                sum1 += ei.getInteger()
+            else:
+                sum1 += dfs(ei.getList(), 2, 0)
+        return sum1
+```
+
+Iterative:
+``` py
+class Solution:
+    def depthSum(self, nestedList: List[NestedInteger]) -> int:
+        stack = []
+        res = 0
+        for ei in nestedList:
+            stack.append((ei, 1)) # first layer
+
+        while stack:
+            top, depth = stack.pop()
+            if top.isInteger():
+                res += top.getInteger() * depth
+            else:
+                for ei in top.getList():
+                    stack.append((ei, depth+1))
+        return res
+```
+---
+## 70. Climbing Stairs｜ 10/28
+You are climbing a stair case. It takes n steps to reach to the top.
+
+Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+
+Note: Given n will be a positive integer.
+
+Example 1:
+
+Input: 2
+
+Output: 2
+
+Explanation: There are two ways to climb to the top.
+
+1. 1 step + 1 step
+
+2. 2 steps
+
+
+Example 2:
+
+Input: 3
+
+Output: 3
+
+Explanation: There are three ways to climb to the top.
+
+1. 1 step + 1 step + 1 step
+
+2. 1 step + 2 steps
+
+3. 2 steps + 1 step
+
+
+### 技巧
+
+- 導入python 內建的cache:
+    - from functools import lru_cache
+    - @lru_cache(None)
+        - ![](assets/markdown-img-paste-20191028162218315.png)
+
+
+### 思路
+
+1. **Top Down** Brute Force, Recursive
+找規律, 並記錄
+
+4 = G(3) + G(2)
+
+先知道了4，再從4開始往下拆解
+
+![](assets/markdown-img-paste-20191028160240389.png)
+
+2. **Bottom Up** DP
+dp[i] = dp[i-1] + dp[i-2]
+
+不管n是多少，從底下往上建上去
+
+
+### Code
+Brute-force Recursive:
+``` py
+class Solution:
+    def climbStairs(self, n: int) -> int:
+        def recur(n):
+            if str(n) in dic.keys():
+                return dic[str(n)]
+            one_step = recur(n-1)
+            dic[str(n-1)] = one_step
+
+            two_step = recur(n-2)
+            dic[str(n-2)] = two_step
+
+            return one_step+two_step
+
+        dic = dict()
+        dic["1"] = 1
+        dic["2"] = 2
+        print(dic)
+        return recur(n)
+```
+```py
+def dp_way(self,n):
+    if n == 1:
+        return 1
+    dp = [0] * n
+    dp[0], dp[1] = 1, 2
+
+    for i in range(2, n):
+        dp[i] = dp[i-1] + dp[i-2]
+
+    return dp[n-1]
+```
+---
+## 91. Decode Ways｜ 10/28
+A message containing letters from A-Z is being encoded to numbers using the following mapping:
+
+'A' -> 1
+
+'B' -> 2
+
+...
+
+'Z' -> 26
+
+Given a non-empty string containing only digits, determine the total number of ways to decode it.
+
+Example 1:
+
+Input: "12"
+Output: 2
+
+Explanation: It could be decoded as "AB" (1 2) or "L" (12).
+
+Example 2:
+
+Input: "226"
+
+Output: 3
+
+Explanation: It could be decoded as "BZ" (2 26), "VF" (22 6), or "BBF" (2 2 6).
+### 思路
+
+這道題要求解碼方法，跟之前那道 Climbing Stairs 非常的相似，但是還有一些其他的限制條件，比如說一位數時不能為0，兩位數不能大於 26，其十位上的數也不能為0，除去這些限制條件，跟爬梯子基本沒啥區別
+
+dp[i] 表示s中前i個字符組成的子串的解碼方法的個數，長度比輸入數組長多多1，並將 dp[0] 初始化為1
+
+所以0是個很特殊的存在，若當前位置是0，那麼一定無法單獨拆分出來，即不能加上 dp[i-1]，就只能看否跟前一個數字組成大於等於 10 且小於等於 26 的數，能的話可以加上 dp[i-2]，否則就只能保持為0了
+
+### Code
+``` py
+class Solution:
+    def numDecodings(self, s: str) -> int:
+        if s[0] == "0": return 0
+        dp = [0] * (len(s)+1) # 因為是站在後面往前看, 所以要多一個空間
+        dp[0] = 1
+
+        # 站在下一位往前看 所以才會 i-1, 其實意思就是個位數
+        for i in range(1,len(s)+1):
+            if s[i-1] != "0": # 步伐一步, 個位數為零不能單拆, 但扔然有機會組成10 or 20 
+                dp[i] += dp[i-1]
+
+            # 加上十位數之後 range必須在10~26之間
+            if i > 1 and "10" <= s[i-2:i] and s[i-2:i] <= "26":
+                dp[i] += dp[i-2]
+
+        return dp[-1]
 ```
 ---
