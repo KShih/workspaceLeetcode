@@ -298,6 +298,36 @@ Output:
 ### 思路
 不必設終止條件，純粹dfs走訪就能解
 ### Code
+
+```py
+"""
+ret = [[1,2,3],[1,2],[1,3],[1]]
+
+cand, idx = [1], 1
+    cand, idx = [1,2], 2
+        cand, idx = [1,2,3], 3
+    cand, idx = [1,3], 3
+
+
+"""
+
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        ret = []
+        ret.append([])
+        def recur(cand, idx):
+            if idx == len(nums):
+                return cand
+            for i in range(idx, len(nums)):
+                ret.append(recur(cand+[nums[i]], i+1))
+            return cand
+
+        for i in range(len(nums)):
+            ret.append(recur([nums[i]],i+1))
+        return ret
+```
+
+
 ``` c++
 class Solution {
 public:
@@ -352,6 +382,22 @@ Output:
 求子集合還是單存dfs走訪且不用設限制，
 處理重複元素的處理，在pop_back後檢查下個元素重複的可能性
 ### Code
+
+```py
+class Solution:
+    def subsetsWithDup(self, nums: List[int]) -> List[List[int]]:
+        ret = []
+        self.dfs(sorted(nums), ret, [], 0)
+        return ret
+
+    def dfs(self,nums, ret, cand, idx):
+        ret.append(cand)
+        for i in range(idx,len(nums)):
+            if i > idx and nums[i] == nums[i-1]:
+                continue
+            self.dfs(nums,ret, cand+[nums[i]], i+1)
+```
+
 ``` c++
 class Solution {
 public:
@@ -3676,7 +3722,7 @@ public:
 ```
 
 ---
-## (?)108. Convert Sorted Array to Binary Search Tree｜ 6/12
+## 108. Convert Sorted Array to Binary Search Tree｜ 6/12
 Given an array where elements are sorted in ascending order, convert it to a height balanced BST.
 For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of every node never differ by more than 1.
 ![108](assets/markdown-img-paste-20190613213706352.png)
@@ -3686,6 +3732,42 @@ So if we pick the center of a sequential number, we can get a height-balanced tr
 And recursively use this strategy to the left tree and the right one.
 
 ### Code
+Naive:
+```py
+class Solution:
+    def sortedArrayToBST(self, nums: List[int]) -> TreeNode:
+        return self.recur(nums)
+
+    def recur(self, leaves):
+        if len(leaves) == 0:
+            return None
+
+        l, r = 0, len(leaves)-1
+        mid = l + (r-l)//2
+        root = TreeNode(leaves[mid])
+        root.left = self.recur(leaves[:mid])
+        root.right = self.recur(leaves[mid+1:])
+
+        return root
+```
+
+Save Space and Increase Time:
+```py
+class Solution:
+    def sortedArrayToBST(self, nums: List[int]) -> TreeNode:
+        def recur(l, r):
+            if l > r:
+                return None
+
+            mid = l + (r-l)//2
+            root = TreeNode(nums[mid])
+            root.left = recur(l, mid-1)
+            root.right = recur(mid+1, r)
+
+            return root
+
+        return recur(0, len(nums)-1)
+```
 ``` c
 class Solution {
 public:
@@ -3823,6 +3905,10 @@ if you set r to len(nums), then you use while __l < r__. when l == r, the search
 if you set r to len(nums)-1(inclusive), then you should use while __l <= r__. when l > r, the search space becomes empty.
 because eventually you need the while loop to be terminated with an empty range.
 
+### Conclusion Update
+1. Always use right = len(nums) -1, because you may want to access arr[right]!
+   1. So you have to use left <= right in termination.
+2. Always use < or <=, and always put the arr[mid] in the left.
 
 ---
 ## 704. Binary Search｜ 6/15
@@ -3869,6 +3955,21 @@ Use while-loop is okay here no need the recursion
 
 
 ### Code
+```py
+class Solution:
+def searchInsert(self, nums: List[int], target: int) -> int:
+    left, right = 0, len(nums)-1
+
+    while left <= right:
+        mid = left + (right-left)//2
+
+        if nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+
+    return left
+```
 ``` c
 class Solution {
 public:
@@ -3897,6 +3998,24 @@ Your algorithm's runtime complexity must be in the order of O(log n).
 
 If the target is not found in the array, return [-1, -1].
 ![34](assets/markdown-img-paste-20190615152011129.png)
+
+### 二刷思路更新
+
+其實不需要像下面思考的這麼困難
+
+原本的做法:
+
+先用binary search找到target的前一個節點 -> right
+
+那right+1就是第一個等於target的點
+
+**注意: 如果right+1有可能會越界, 就這個需要檢查而已**
+
+在用另一個binary seach找到大於target的節點 -> left
+
+那left-1就是最後一個等於target的點
+
+
 ### 思路
 This question asks us to find the head and the end of the sequential target
 We can solve this by two ways
@@ -3948,6 +4067,80 @@ instead of calculating mid as mid = i+(j-i)/2, we now do: i + (j-i+1)/2
     Therefore, i + (j-i+1)/2 , __biased towards the right__
 
 ### Code
+Two binary search
+```py
+class Solution:
+  def searchRange(self, nums: List[int], target: int) -> List[int]:
+
+      if len(nums) == 0:
+          return [-1,-1]
+
+      # find the start of the target
+      # = find the one less than target then plus one. That is the start
+      left, right = 0, len(nums)-1
+
+      while left <= right:
+          mid = left + (right-left)//2
+          if nums[mid] < target:
+              left = mid + 1
+          else:
+              right = mid - 1
+
+      start = right+1
+      if start >= len(nums) or nums[start] != target:
+          return [-1,-1] # can't find
+
+
+      # Use another binary search to find the first different int from the num[start]
+
+      left, right = start, len(nums) -1
+
+      while left <= right:
+          mid = left + (right-left) //2
+          if nums[mid] == target:
+              left = mid + 1
+          else:
+              right = mid - 1
+      return [start, left-1]
+
+```
+
+Binary search + Iterating find
+```py
+class Solution:
+    def searchRange(self, nums: List[int], target: int) -> List[int]:
+
+        if len(nums) == 0:
+            return [-1,-1]
+
+        # find the start of the target
+        # = find the one less than target then plus one. That is the start
+        left, right = 0, len(nums)-1
+
+        while left <= right:
+            mid = left + (right-left)//2
+            if nums[mid] < target:
+                left = mid + 1
+            else:
+                right = mid - 1
+
+        start = right+1
+        end = start
+        if start >= len(nums) or nums[start] != target:
+            return [-1,-1] # can't find
+
+        # iterating to find the position of the end of the target
+
+        for i in range(start+1, len(nums)):
+            if nums[i] != nums[start]:
+                break
+            else:
+                end = i
+
+        return [start, end]
+```
+
+
 ``` c
 class Solution {
 public:
@@ -4033,9 +4226,38 @@ we can find out:
  if the middle of the array if smaller than the rightest element
  then the right of the array is ascending order; otherwise the left is ascending order.
  therefore we can find if the target is in the ascending area,
+ combining these two conditions, we can finally said that
  to decide whether the target is in the left or the right side of the array.
 
 ### Code
+```py
+class Solution:
+    def search(self, nums: List[int], target: int) -> int:
+        # first target: find the searching region
+        l, r = 0, len(nums)-1
+
+        while l <= r:
+            mid = l + (r-l)//2
+            if nums[mid] == target:
+                return mid
+
+            # to certain it is ascending order
+            elif nums[mid] < nums[r]:
+                # TODO: Why we need the right bound?
+                # Because we have to be certain the target do exist in this range!
+                if nums[mid] < target <= nums[r]: # 5 6 7 8 9 1 3, 1
+                    l = mid+1
+                else:
+                    r = mid-1 # the case that target is not in ascending order side
+            else:
+                if nums[mid] > target and target >= nums[l]:
+                    r = mid-1
+                else:
+                    l = mid+1
+        return -1
+
+
+```
 ``` c
 class Solution {
 public:
@@ -4083,6 +4305,32 @@ then our approach work same well here.
 Specifically, we eliminate all of the rightest duplicate item.
 
 ### Code
+```py
+class Solution:
+    def search(self, nums: List[int], target: int) -> bool:
+        l, r = 0, len(nums)-1
+
+        while l <= r:
+            mid = l + (r-l)//2
+            if nums[mid] == target:
+                return True
+
+            elif nums[mid] < nums[r]:
+                # right is ascending
+                if nums[mid] < target <= nums[r]:
+                    l = mid + 1
+                else:
+                    r = mid - 1
+            elif nums[mid] > nums[r]:
+                # left is ascending
+                if nums[l] <= target < nums[mid]:
+                    r = mid - 1
+                else:
+                    l = mid + 1
+            else: # nums[mid] == nums[r]
+                r -= 1
+        return False
+```
 ``` c
 class Solution {
 public:
@@ -12217,7 +12465,7 @@ class Solution:
 
         # 站在下一位往前看 所以才會 i-1, 其實意思就是個位數
         for i in range(1,len(s)+1):
-            if s[i-1] != "0": # 步伐一步, 個位數為零不能單拆, 但扔然有機會組成10 or 20 
+            if s[i-1] != "0": # 步伐一步, 個位數為零不能單拆, 但扔然有機會組成10 or 20
                 dp[i] += dp[i-1]
 
             # 加上十位數之後 range必須在10~26之間
