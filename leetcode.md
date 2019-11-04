@@ -5379,6 +5379,20 @@ Do not allocate extra space for another array, you must do this by modifying the
  no matter what the last two element is the same or not
 
 ### Code
+```py
+class Solution:
+    def removeDuplicates(self, nums: List[int]) -> int:
+        if (len(nums) < 2):
+            return len(nums)
+        cur, nex = 0, 1
+        while nex != len(nums):
+            if nums[cur] != nums[nex]:
+                nums[cur+1] = nums[nex]
+                cur += 1
+            else:
+                nex += 1
+        return cur+1
+```
 ``` c
 class Solution {
 public:
@@ -12473,5 +12487,90 @@ class Solution:
                 dp[i] += dp[i-2]
 
         return dp[-1]
+```
+---
+## 202. Happy Number｜ 11/3
+(Easy)
+Write an algorithm to determine if a number is "happy".
+
+A happy number is a number defined by the following process: Starting with any positive integer, replace the number by the sum of the squares of its digits, and repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a cycle which does not include 1. Those numbers for which this process ends in 1 are happy numbers.
+
+![](assets/markdown-img-paste-20191103095208438.png)
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def isHappy(self, n: int) -> bool:
+        def add(num):
+            str_num = str(num)
+            total = 0
+            if str_num not in dic:
+                dic[str_num] = 1
+
+                for c in str_num:
+                    total += int(c)*int(c)
+
+                if total == 1:
+                    return 0
+                return total
+            else:
+                return -1
+
+        dic = dict()
+        status = n
+        while status > 0:
+            status = add(status)
+
+        if status == 0:
+            return True
+        else:
+            return False
+```
+---
+## 80. Remove Duplicates from Sorted Array II｜ 11/3
+
+Given a sorted array nums, remove the duplicates in-place such that duplicates appeared at most twice and return the new length.
+
+Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.
+
+![](assets/markdown-img-paste-20191103233809159.png)
+
+![](assets/markdown-img-paste-20191103233825424.png)
+
+### 思路
+
+TODO: Debug this code
+
+and pass back to the origin
+
+### Code
+``` py
+"""
+[1,1,2,2,2,3,3]
+
+[1,1,2,2,3,3,3]
+
+"""
+class Solution:
+    def removeDuplicates(self, nums: List[int]) -> int:
+        if (len(nums) < 2):
+
+            return len(nums)
+        cur, nex = 0, 1
+        counter = 0
+        while nex != len(nums):
+            if nums[cur] == nums[nex]:
+                if counter == 0:
+                    counter += 1
+                    cur += 1
+            else:
+                nums[cur+1] = nums[nex]
+                cur += 1
+                counter = 0
+            nex += 1
+
+        return cur+1
 ```
 ---
