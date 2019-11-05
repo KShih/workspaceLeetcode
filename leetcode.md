@@ -12541,9 +12541,7 @@ Do not allocate extra space for another array, you must do this by modifying the
 
 ### 思路
 
-TODO: Debug this code
-
-and pass back to the origin
+把何時狀態該如何轉換要想清楚再開始作答！
 
 ### Code
 ``` py
@@ -12554,7 +12552,7 @@ and pass back to the origin
 
 """
 class Solution:
-    def removeDuplicates(self, nums: List[int]) -> int:
+    def removeDuplicates(self, nums):
         if (len(nums) < 2):
 
             return len(nums)
@@ -12564,13 +12562,79 @@ class Solution:
             if nums[cur] == nums[nex]:
                 if counter == 0:
                     counter += 1
+                    nums[cur+1] = nums[nex]
                     cur += 1
             else:
-                nums[cur+1] = nums[nex]
+                nums[cur + 1] = nums[nex]
                 cur += 1
                 counter = 0
             nex += 1
 
         return cur+1
+```
+---
+## 394. Decode String｜ 11/4
+
+Given an encoded string, return its decoded string.
+
+The encoding rule is: k[encoded_string], where the encoded_string inside the square brackets is being repeated exactly k times. Note that k is guaranteed to be a positive integer.
+
+You may assume that the input string is always valid; No extra white spaces, square brackets are well-formed, etc.
+
+Furthermore, you may assume that the original data does not contain any digits and that digits are only for those repeat numbers, k. For example, there won't be input like 3a or 2[4].
+
+Examples:
+
+s = "3[a]2[bc]", return "aaabcbc".
+
+s = "3[a2[c]]", return "accaccacc".
+
+s = "2[abc]3[cd]ef", return "abcabccdcdcdef".
+
+### 思路
+
+DEBUG THIS
+
+### Code
+``` py
+class Solution:
+    def decodeString(self, s: str) -> str:
+        int_stack, char_stack = [], []
+        int_hold, char_hold = 0, ""
+        reading_char = False
+
+        for c in s:
+            print(char_stack)
+            if c == "[":
+                int_stack.append(int_hold)
+                int_hold = 0
+                if reading_char:
+                    char_stack.append(char_hold)
+                    char_hold = ""
+                    reading_char = False
+                else:
+                    reading_char = True
+
+            elif c == "]":
+
+                top_int = int_stack.pop()
+
+                temp_str = char_hold * top_int
+                if char_stack:
+                    top_char = char_stack.pop()
+                    temp_str = top_char + temp_str
+                    char_hold = temp_str # TODO: DEBUG
+                char_stack.append(temp_str)
+                reading_char = False
+                
+            elif c.isdigit():
+                int_hold = int_hold*10 + int(c)
+            else:
+                char_hold += c
+
+        if len(int_stack) == 0 and len(char_stack) == 1:
+            return char_stack.pop()
+        else:
+            return "WA"
 ```
 ---
