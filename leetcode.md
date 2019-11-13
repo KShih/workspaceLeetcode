@@ -988,7 +988,7 @@ public:
                         if (wordSet.count(newWord) && newWord != word) {
                             q.push(newWord);
                             wordSet.erase(newWord); // 用過的元素必須要清掉，否則會陷入無限迴圈
-                        }   
+                        }
                     }
                 }
             }
@@ -1310,9 +1310,9 @@ private:
     }
 
     bool expand(vector<vector<int>>& A, int i, int j, int cl){
-        if (i<0 || j<0 || i>= A.size() || j>= A[0].size())  
+        if (i<0 || j<0 || i>= A.size() || j>= A[0].size())
             return false;
-        if (A[i][j] == 0)    
+        if (A[i][j] == 0)
             A[i][j] = cl+1;
         return A[i][j] == 1;
     }
@@ -1361,7 +1361,7 @@ public:
             visited[i] = false;
         }
         return false;
-    }      
+    }
 };
 ```
 
@@ -2077,7 +2077,7 @@ Iterative
 class Solution {
 public:
     int maxDepth(TreeNode* root) {
-        if(!root)   
+        if(!root)
             return 0;
         int res = 0;
         // We need to consider all the node in the layer, hence BFS
@@ -2089,9 +2089,9 @@ public:
             for (int i=0, n=queue.size(); i<n; ++i){
         //  for (int i=0, i<queue.size(); ++i)  errors happen cuz the inc of queue.size()
         //  for (int i=queue.size(); i>0; i--)  THIS would be the safetest
-                TreeNode* t = queue.front();   
+                TreeNode* t = queue.front();
                 queue.pop();
-                if(t->left)  
+                if(t->left)
                     queue.push(t->left);
                 if(t->right)
                     queue.push(t->right);
@@ -2830,7 +2830,7 @@ public:
         if(!root)   return 0;
         int res = getDeep(root->left) + getDeep(root->right); // assume the longest path
         // but the answer not limited to path the root
-        return max(res, max(diameterOfBinaryTree(root->left), diameterOfBinaryTree(root->right)));     
+        return max(res, max(diameterOfBinaryTree(root->left), diameterOfBinaryTree(root->right)));
     }
     int getDeep(TreeNode* node){
         if(!node)   return 0;
@@ -3067,7 +3067,7 @@ public:
         stack.push(root);
         while(!stack.empty()){
             TreeNode* p = stack.top(); stack.pop();
-            if (!p->left && !p->right)  
+            if (!p->left && !p->right)
                 sum += p->val;
             if (p->right){
                 p->right->val += p->val*10;
@@ -4394,7 +4394,7 @@ public:
             int mid = left + (right-left)/2;
             if (mid+1 < n && nums[mid] > nums[mid+1]){ // nums[mid+1] is always larger than num[mids] except the reverting point
                 return nums[mid+1];
-            }  
+            }
             else if (nums[mid] > nums[right]) { // the min falls on right
                 left = mid + 1;
             }
@@ -4431,7 +4431,7 @@ public:
             int mid = left + (right-left)/2;
             if (mid+1 < n && nums[mid] > nums[mid+1]){ // nums[mid+1] is always larger than num[mids] except the reverting point
                 return nums[mid+1];
-            }  
+            }
             else if (nums[mid] > nums[right]) { // the min falls on right
                 left = mid + 1;
             }
@@ -6032,7 +6032,7 @@ public:
         // deal with ten number
         res = t > 19 ? v2[t/10] + (d ? " " + v1[d] : "")  : v1[t];
         // put hundred number up
-        if (h > 0)  
+        if (h > 0)
             res = v1[h] + " Hundred" + (t ? " "+ res : "");
         return res;
     }
@@ -6197,7 +6197,7 @@ class Solution {
           m1.pop_back();
           m2.erase(m2.begin());
           if(m1!=m2) return false;
-        }         
+        }
         return true;
       }
    };
@@ -6365,7 +6365,7 @@ The sliding window strategy to solve:
   The counter to make sure our window contain the string t: cnt
   The current left bound: left
   The current right bound: i
-*/  
+*/
 class Solution {
 public:
     string minWindow(string s, string t) {
@@ -7196,7 +7196,7 @@ public:
     void recursive(string num, int target, long laststep, long curnum, string out, vector<string>& res){
 
         if (num.size() == 0 && curnum == target){
-            res.push_back(out);  
+            res.push_back(out);
             return;
         }
         // use substring to walk through each number combination from input
@@ -9027,7 +9027,7 @@ int calculateHeight( int dist, int height1, int height2 )
     }
 
     // for all cases where delta >= dist
-    return minH+dist;    
+    return minH+dist;
 }
 
 int getMaxHeight( const vector<int>& positions, const vector<int>& heights )
@@ -9771,7 +9771,7 @@ class Solution(object):
         visited = [False for _ in range(n)]
         count = 0
         for i in range(n):
-            if visited[i] == True:  
+            if visited[i] == True:
                 continue
             self.dfs(M, visited, i)
             count += 1
@@ -11593,7 +11593,7 @@ def add_leaves(root):
     return add_leaves(root.left) + add_leaves(root.right)
 
 
-if not root:   
+if not root:
     return 0
 return add_leaves(root)
 ```
@@ -12626,7 +12626,7 @@ class Solution:
                     char_hold = temp_str # TODO: DEBUG
                 char_stack.append(temp_str)
                 reading_char = False
-                
+
             elif c.isdigit():
                 int_hold = int_hold*10 + int(c)
             else:
@@ -12636,5 +12636,91 @@ class Solution:
             return char_stack.pop()
         else:
             return "WA"
+```
+---
+## Mathwork.Custom Sorted Array｜ 11/12
+
+Given an unsorted array,
+
+Output an array which let all even number before odd number
+
+And return the min move
+
+https://www.geeksforgeeks.org/segregate-even-and-odd-numbers/
+
+### 思路
+
+
+### Code
+``` py
+"""
+Given an unsorted array,
+Output an array which let all even number before odd number
+And return the min move
+
+https://www.geeksforgeeks.org/segregate-even-and-odd-numbers/
+
+"""
+
+def even_before_odd(arr):
+    print("original",arr)
+    l, r = 0, len(arr)-1
+    count = 0
+
+    while l < r:
+
+        while arr[l] % 2 == 0 and l < r:
+            l += 1
+
+        while arr[r] % 2 != 0 and l < r:
+            r -= 1
+
+        if r != l:
+            count += 1
+            arr[l], arr[r] = arr[r], arr[l]
+
+    print(arr)
+    print(count)
+    print("---")
+
+if __name__ == '__main__':
+    even_before_odd([1,2,3]) # 1
+    even_before_odd([1,2,3,4]) # 1
+    even_before_odd([1,3,5]) # 0
+    even_before_odd([1,3]) # 0
+    even_before_odd([1]) # 0
+    even_before_odd([2,4]) # 0
+    even_before_odd([2,4,1,3]) # 0
+    even_before_odd([]) # 0
+    even_before_odd([2,4,1,3,6,8,10]) # 2
+
+```
+---
+## 1130. Minimum Cost Tree From Leaf Values｜ 11/13
+
+Given an array arr of positive integers, consider all binary trees such that:
+
+Each node has either 0 or 2 children;
+The values of arr correspond to the values of each leaf in an in-order traversal of the tree.  (Recall that a node is a leaf if and only if it has 0 children.)
+The value of each non-leaf node is equal to the product of the largest leaf value in its left and right subtree respectively.
+Among all possible binary trees considered, return the smallest possible sum of the values of each non-leaf node.  It is guaranteed this sum fits into a 32-bit integer.
+
+![](assets/markdown-img-paste-20191113005827775.png)
+### 思路
+
+最小兩數相乘會有最小結果
+### Code
+``` py
+class Solution:
+    def mctFromLeafValues(self, arr: List[int]) -> int:
+        res = 0
+        while len(arr) > 1:
+            min_idx = arr.index(min(arr))
+            if 0 < min_idx < len(arr)-1:
+                res += min(arr[min_idx-1], arr[min_idx+1]) * arr[min_idx]
+            else:
+                res += arr[1 if min_idx == 0 else min_idx-1] * arr[min_idx]
+            arr.pop(min_idx)
+        return res
 ```
 ---
