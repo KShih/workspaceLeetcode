@@ -242,6 +242,14 @@ Output:
   [1,4],
 ]
 
+### 技巧
+
+如果要append一個list進另一個list: outer.append(inner[:])
+
+不加的話會是以位址的方式append
+
+那麼後續再對於這個inner的操作pop(), 都會影響原本的outer_list
+
 ### 思路
 
 排列組合問題老樣子走dfs
@@ -249,6 +257,27 @@ Output:
 因為沒有重複數字，向後看時不必討論是否出現重複解
 
 ### Code
+```py
+class Solution:
+    def combine(self, n: int, k: int):
+        if n <= 0 or k <= 0:
+            return [[]]
+        def find_comb(idx, comb):
+            if len(comb) == k:
+                ret.append(comb[:])
+                return
+
+            for i in range(idx, n + 1):
+                comb.append(i)
+                find_comb(i + 1, comb)
+                comb.pop()
+
+        ret = []
+        for i in range(1, n + 1):
+            find_comb(i+1, [i])
+
+        return ret
+```
 ``` c++
 class Solution {
 public:
@@ -1171,8 +1200,67 @@ There are at least one 0 in the given matrix.
 The cells are adjacent in only four directions: up, down, left and right.
 ### 思路
 1. 比較直覺的方式：使用BFS去尋找最短路徑
-2.
+2. 透過已知去拜訪未知, 從0的觀點去看1
+    - 用queue將已知的距離記錄起來
+        - 先將0記錄起來, 距離為0
+        - 將拜訪過的距離放入queue中, 以供後續使用
+    - 並且記錄為拜訪過
 ### Code
+bfs
+```py
+class Solution:
+    def updateMatrix(self, matrix: List[List[int]]) -> List[List[int]]:
+        r_b, c_b = len(matrix), len(matrix[0])
+        queue, visited = [], set()
+        for i in range(r_b):
+            for j in range(c_b):
+                if matrix[i][j] == 0:
+                    queue.append((i,j))
+                    visited.add((i,j))
+
+        for row, col in queue:
+            distance = matrix[row][col] + 1
+
+            for dx, dy in [(1,0), (-1,0), (0,1), (0,-1)]:
+                n_x, n_y = row + dx, col + dy # take a look at its neighborhood
+
+                # not in visited means is 1 and not visit before
+                if 0 <= n_x < r_b and 0 <= n_y < c_b and (n_x, n_y) not in visited:
+                    matrix[n_x][n_y] = distance
+                    queue.append((n_x, n_y)) # keep the record of already calculated distance
+                    visited.add((n_x, n_y))
+        return matrix
+
+```
+
+
+dfs TLE
+```py
+class Solution:
+    def updateMatrix(self, matrix: List[List[int]]) -> List[List[int]]:
+        direction = [(0,1), (1,0), (0,-1), (-1,0)]
+        def distance(i, j, count, min_dis):
+            if matrix[i][j] == 0:
+                return count
+
+            for k in range(len(direction)):
+                x, y = i+direction[k][0], j+direction[k][1]
+                if 0 <= x < r and 0 <= y < c:
+                    if count + 1 < min_dis:
+                        min_dis = min(min_dis, distance(x, y, count+1, min_dis))
+
+            return min_dis
+
+
+        r, c = len(matrix), len(matrix[0])
+        for i in range(r):
+            for j in range(c):
+                if matrix[i][j] == 1:
+                    matrix[i][j] = distance(i,j, 0, 201)
+
+        return matrix
+```
+
 用BFS找最短路徑
 ``` c++
 class Solution {
@@ -12706,6 +12794,17 @@ The value of each non-leaf node is equal to the product of the largest leaf valu
 Among all possible binary trees considered, return the smallest possible sum of the values of each non-leaf node.  It is guaranteed this sum fits into a 32-bit integer.
 
 ![](assets/markdown-img-paste-20191113005827775.png)
+
+### 技巧
+
+透過index去操作list，
+
+如果牽涉到移除該陣列元素時會很好用！
+
+取得陣列中最小元素：arr.index(min(arr))
+
+操作完後pop掉：arr.pop(idx)
+
 ### 思路
 
 最小兩數相乘會有最小結果
@@ -12722,5 +12821,22 @@ class Solution:
                 res += arr[1 if min_idx == 0 else min_idx-1] * arr[min_idx]
             arr.pop(min_idx)
         return res
+```
+---
+## Mathwork. Max Value Among Shortest Distance in a Matrix｜ 11/13
+
+Given a grid with w as width, h as height.
+Each cell of the grid represents a potential building lot and we will be adding "n" buildings inside this grid.
+The goal is for the furthest of all lots to be as near as possible to a building.
+Given an input n, which is the number of buildings to be placed in the lot,
+determine the building placement to minimize the distance of the most distant empty lot is from the building.
+
+![](assets/markdown-img-paste-20191113121246425.png)
+### 思路
+
+
+### Code
+``` py
+
 ```
 ---
