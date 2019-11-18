@@ -12877,3 +12877,40 @@ determine the building placement to minimize the distance of the most distant em
 
 ```
 ---
+## 300. Longest Increasing Subsequence｜ 11/14
+Given an unsorted array of integers, find the length of longest increasing subsequence.
+
+Example:
+
+Input: [10,9,2,5,3,7,101,18]
+
+Output: 4
+
+Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
+
+Note:
+
+There may be more than one LIS combination, it is only necessary for you to return the length.
+Your algorithm should run in O(n2) complexity.
+Follow up: Could you improve it to O(n log n) time complexity?
+### 思路
+
+新的結果會需要依賴舊的, 用dp array把previous status 紀錄起來
+
+![](assets/markdown-img-paste-20191114105414926.png)
+
+### Code
+``` py
+def lengthOfLIS(self, nums: List[int]) -> int:
+    dp = [1] * len(nums)
+    res = 0
+    for i in range(len(nums)):
+        for j in range(0, i):
+            if nums[j] < nums[i]:
+                dp[i] = max(dp[i], dp[j] + 1)
+
+        res = max(res,dp[i])
+
+    return res
+```
+---
