@@ -12914,3 +12914,103 @@ def lengthOfLIS(self, nums: List[int]) -> int:
     return res
 ```
 ---
+
+# Trie
+
+---
+## 208. Implement Trie (Prefix Tree)｜ 11/17
+Implement a trie with insert, search, and startsWith methods.
+
+Example:
+
+Trie trie = new Trie();
+
+trie.insert("apple");
+
+trie.search("apple");   // returns true
+
+trie.search("app");     // returns false
+
+trie.startsWith("app"); // returns true
+
+trie.insert("app");
+
+trie.search("app");     // returns true
+
+Note:
+
+You may assume that all inputs are consist of lowercase letters a-z.
+All inputs are guaranteed to be non-empty strings.
+### 思路
+
+Trie 實作:
+
+- 根節點為空
+- 每個子結點都包含一個字典裝 (char: TrieNode)
+- 每個子結點也包含一個isWord(), 來顯示是否已經形成一個單字
+
+### Code
+``` py
+class Trie:
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.root = TrieNode()
+
+
+    def insert(self, word: str) -> None:
+        """
+        Inserts a word into the trie.
+        """
+        cur = self.root
+        for c in word:
+            if c not in cur.dic.keys():
+                cur.dic[c] = TrieNode()
+            cur = cur.dic[c]
+        cur.isWord = True
+
+
+    def search(self, word: str) -> bool:
+        """
+        Returns if the word is in the trie.
+        """
+        cur = self.root
+        for c in word:
+            if c not in cur.dic.keys():
+                return False
+            cur = cur.dic[c]
+        if cur.isWord:
+            return True
+        else:
+            return False
+
+
+    def startsWith(self, prefix: str) -> bool:
+        """
+        Returns if there is any word in the trie that starts with the given prefix.
+        """
+        cur = self.root
+        for c in prefix:
+            if c not in cur.dic.keys():
+                return False
+            cur = cur.dic[c]
+        return True
+
+
+class TrieNode():
+
+    def __init__(self):
+        self.dic = dict()
+        self.isWord = False
+"""
+Your Trie object will be instantiated and called as such:
+obj = Trie()
+obj.insert(word)
+param_2 = obj.search(word)
+param_3 = obj.startsWith(prefix)
+"""
+
+```
+---
