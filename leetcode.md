@@ -4984,8 +4984,10 @@ public:
 };
 ```
 
-```py
-# Solved: CAN YOU DO IT WITHOUT RETURN A NEWHEAD, RETURN THE ORIGINAL HEAD?
+``` py
+"""
+Solved: CAN YOU DO IT WITHOUT RETURN A NEWHEAD, RETURN THE ORIGINAL HEAD?
+"""
 def reverseList(self, head: ListNode) -> ListNode:
     # 1->2->3->4->5
     newHead = None
@@ -9192,16 +9194,15 @@ int main() {
 
 ### Code
 ``` py
+"""
+Complete the 'maximumTotalWeight' function below.
 
-#
-# Complete the 'maximumTotalWeight' function below.
-#
-# The function is expected to return an INTEGER.
-# The function accepts following parameters:
-#  1. INTEGER_ARRAY weights
-#  2. INTEGER_ARRAY tasks
-#  3. INTEGER p
-#
+The function is expected to return an INTEGER.
+The function accepts following parameters:
+ 1. INTEGER_ARRAY weights
+ 2. INTEGER_ARRAY tasks
+ 3. INTEGER p
+"""
 def maximumTotalWeight(weights, tasks, p):
     p = p
     l = len(weights)
@@ -11416,10 +11417,13 @@ follow-up: 如果數組可以重複
 如果數字可以重複就只能土法煉鋼幹
 
 ### Code
+
 ``` py
-# https://leetcode.com/discuss/interview-question/352459/
-# if every elem in A is distinct
-# if there is duplicate
+"""
+https://leetcode.com/discuss/interview-question/352459/
+if every elem in A is distinct
+if there is duplicate
+"""
 
 def largest_subarray_nodup(A, k):
     n = len(A)
@@ -12915,7 +12919,7 @@ def lengthOfLIS(self, nums: List[int]) -> int:
 ```
 ---
 
-# Trie
+## ***Trie***
 
 ---
 ## 208. Implement Trie (Prefix Tree)｜ 11/17
