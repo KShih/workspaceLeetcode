@@ -1760,6 +1760,25 @@ while(p||!stack.empty()){
 
 空間複雜度更低的方法：Morris Traversal(不使用stack全部使用pointer)
 ### Code
+```py
+class Solution:
+    def inorderTraversal(self, root: TreeNode) -> List[int]:
+        stack = []
+        res = []
+        p = root
+
+        while p or stack:
+            if p:
+                stack.append(p)
+                p = p.left
+            else:
+                top = stack.pop()
+                res.append(top.val)
+                p = top.right
+
+        return res
+
+```
 ``` c++
 /**
  * Definition for a binary tree node.
@@ -1869,6 +1888,24 @@ post traversal order: left->right->root
 ![](assets/markdown-img-paste-20190629234237723.png)
 
 ### Code
+
+```py
+class Solution:
+    def preorderTraversal(self, root: TreeNode) -> List[int]:
+        stack = []
+        res = []
+        p = root
+
+        while p or stack:
+            if p:
+                stack.append(p)
+                res.append(p.val)
+                p = p.left
+            else:
+                top = stack.pop()
+                p = top.right
+        return res
+```
 ``` c++
 /**
  * Definition for a binary tree node.
