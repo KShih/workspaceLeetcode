@@ -13018,3 +13018,79 @@ param_3 = obj.startsWith(prefix)
 
 ```
 ---
+## 212. Word Search II｜ 11/18
+
+### 技巧
+
+- 在board裏搜尋出所有字串, 使用next()來取值:
+```py
+    m, n = len(board), len(board[0])
+    for i in range(m):
+        #print(board[i].index("a"))
+        a = (j for j, n in enumerate(board[i]) if n == "a")
+        while a:
+            print(next(a)) #
+```
+### 思路
+
+如果在board中搜尋字串複雜度太高
+
+使用Trie + 反向思考來解
+
+遍歷board裡的所有char 及其鄰居(dfs)
+
+來試圖在Trie中匹配word
+
+使用visited來記錄訪問過的位置及其代表的文字
+
+當搜尋到isEnd()時把走過的字join起來後放進return set()中
+
+### Code
+``` py
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        cur = self.root
+
+        for c in word:
+            if c not in cur.children:
+                cur.children[c] = TrieNode()
+            cur = cur.children[c]
+        cur.isEnd = True
+
+class TrieNode:
+    def __init__(self):
+        self.children = dict()
+        self.isEnd = False
+
+class Solution:
+    def findWords(self, board: List[List[str]], words: List[str]) -> List[str]:
+
+        trie = Trie()
+        for word in words:
+            trie.insert(word)
+
+        found = set()
+        for r in range(len(board)):
+            for c in range(len(board[0])):
+                self.traverse(trie.root, r, c, found, dict(), board)
+        return found
+
+
+    def traverse(self, trie_node, r, c, found, visited, board):
+        if trie_node.isEnd:
+            found.add(''.join(visited.values()))
+
+        if r < 0 or r >= len(board) or c < 0 or c >= len(board[0]) or (board[r][c] not in trie_node.children) or (r,c) in visited:
+            return
+
+        visited[(r,c)] = board[r][c]
+        self.traverse(trie_node.children[board[r][c]], r+1 , c , found, visited, board)
+        self.traverse(trie_node.children[board[r][c]], r-1 , c , found, visited, board)
+        self.traverse(trie_node.children[board[r][c]], r , c+1 , found, visited, board)
+        self.traverse(trie_node.children[board[r][c]], r , c-1 , found, visited, board)
+        del visited[(r,c)]
+```
+---
