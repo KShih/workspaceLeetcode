@@ -13094,3 +13094,49 @@ class Solution:
         del visited[(r,c)]
 ```
 ---
+## 16. 3Sum Closest｜ 11/20
+
+Given an array nums of n integers and an integer target, find three integers in nums such that the sum is closest to target. Return the sum of the three integers. You may assume that each input would have exactly one solution.
+
+Example:
+
+Given array nums = [-1, 2, 1, -4], and target = 1.
+
+The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
+
+### 思路
+
+跟3Sum一樣的解法
+
+但這題不一定有正確的答案, 只求最接近的
+
+因此需要另一個diff來幫助我們更新當前的closest
+
+還需要一個if來判斷當下該移動left還是移動right
+
+條件就是“下一個可能解會怎麼出現"
+
+### Code
+``` py
+class Solution:
+    def threeSumClosest(self, nums: List[int], target: int) -> int:
+        nums = sorted(nums)
+        closest = nums[0] + nums[1] + nums[2]
+        diff = abs(target - closest)
+
+        for i in range(len(nums) -2):
+            l, r = i + 1, len(nums)-1
+
+            while l < r:
+                new_sum = nums[i] + nums[l] + nums[r]
+                new_diff = abs(target - new_sum)
+                if new_diff < diff:
+                    closest, diff = new_sum, new_diff
+
+                if new_sum < target:
+                    l += 1
+                else:
+                    r -= 1
+        return closest
+```
+---
