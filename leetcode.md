@@ -13140,3 +13140,100 @@ class Solution:
         return closest
 ```
 ---
+## 18. 4Sum｜ 11/20
+
+Given an array nums of n integers and an integer target, are there elements a, b, c, and d in nums such that a + b + c + d = target? Find all unique quadruplets in the array which gives the sum of target.
+
+Note:
+
+The solution set must not contain duplicate quadruplets.
+
+Example:
+
+![](assets/markdown-img-paste-20191120170849866.png)
+
+### 思路
+基本上就是3Sum的延伸, 多一層for而已
+
+難度在於該如何跳過重複
+
+排序後要是起點一樣, 搜尋結果就會是一樣的, 因此可以在兩處加上檢查
+
+檢查的概念是, 在第二次循環時, 起點不能跟上一次一樣
+
+1. 在for(i)底下
+    - 簡單用i>0就可以
+2. 在for(j)底下
+    - 不能使用j>0!! 在[0,0,0,0]這個測資會fail
+    - 要使用j>i+1, 這個概念才是j的第二次循環
+
+然而這兩個檢查點還不夠,
+
+在while循環l跟r時還是可能會出現此l/r跟上個l/r是一樣的
+
+因此在 total == target 條件底下還要放個跳過重複的循環
+
+Tricky task case:
+
+[-1,0,-5,-2,-2,-4,0,1,-2], t = -9
+
+[0,0,0,0], t = 0
+
+### Code
+``` py
+class Solution:
+    def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
+        res = []
+        nums = sorted(nums)
+        for i in range(len(nums)-3):
+            if i > 0 and nums[i] == nums[i-1]: continue
+            for j in range(i+1, len(nums)-2):
+                if j > i+1 and nums[j] == nums[j-1]: continue
+
+                l, r = j+1, len(nums)-1
+
+                while l < r:
+                    total = nums[l] + nums[r] + nums[i] + nums[j]
+                    if total == target:
+                        comb = [nums[l]] + [nums[r]] + [nums[i]] + [nums[j]]
+                        res.append(comb)
+                        while l < r and nums[l] == nums[l+1]:   l+=1    # TODO: Tricky!!
+                        while l < r and nums[r] == nums[r-1]:   r-=1
+                        l += 1
+                        r -= 1
+                    elif total < target:
+                        l += 1
+                    else:
+                        r -= 1
+        return res
+```
+
+N-Sum Extendable Solution
+``` py
+def fourSum(self, nums, target):
+    def findNsum(nums, target, N, result, results):
+        if len(nums) < N or N < 2 or target < nums[0]*N or target > nums[-1]*N:  # early termination
+            return
+        if N == 2: # two pointers solve sorted 2-sum problem
+            l,r = 0,len(nums)-1
+            while l < r:
+                s = nums[l] + nums[r]
+                if s == target:
+                    results.append(result + [nums[l], nums[r]])
+                    l += 1
+                    while l < r and nums[l] == nums[l-1]:
+                        l += 1
+                elif s < target:
+                    l += 1
+                else:
+                    r -= 1
+        else: # recursively reduce N
+            for i in range(len(nums)-N+1):
+                if i == 0 or (i > 0 and nums[i-1] != nums[i]):
+                    findNsum(nums[i+1:], target-nums[i], N-1, result+[nums[i]], results)
+
+    results = []
+    findNsum(sorted(nums), target, 4, [], results)
+    return results
+```
+---
