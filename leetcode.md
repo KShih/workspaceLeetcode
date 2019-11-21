@@ -13429,3 +13429,89 @@ class Solution:
         return True
 ```
 ---
+## 37. Sudoku Solver｜ 11/21
+
+解一個數獨
+
+保證有一解
+
+### 思路
+
+TODO: Debug The "ref" in isValid()
+
+iter 時也要return, 這樣才能把所有狀態串在一起
+
+把每個空格帶入數字, 並且視為一個狀態
+
+在遞迴這個狀態之前先去檢查是否Valid, 不Valid直接帶入下個數字
+
+成功走到終點的狀態會全部return True
+
+如果這個狀態在未來的某條路斷了,
+
+要把這個狀態還原成".",
+
+這樣其他狀態的人才能判斷他是".", 並修改他
+
+isValid() 也是一個厲害的寫法 記得看看
+
+### Code
+``` py
+class Solution:
+    def solveSudoku(self, board: List[List[str]]) -> None:
+        """
+        Do not return anything, modify board in-place instead.
+        """
+        self.recur(0, 0, board)
+
+    # iter through column order(left2right, up2down)
+    def recur(self, r, c, board):
+        # Meet Line10, no longer need to validate
+        if r == 9:
+            return True
+        # Meet row end, next line iter
+        if c >= 9:
+            return self.recur(r+1, 0, board)
+        # Not ".", keep iter
+        if board[r][c] != ".":
+            return self.recur(r, c+1, board)
+
+        # Is ".", Assign 1~9, validate, then iter
+        for i in range(1, 10):
+            if not self.isValid(r, c, i, board):    continue
+
+            board[r][c] = str(i)
+
+            if self.recur(r,c+1,board):
+                return True
+            # If invalid clean-up and Assign another num
+            board[r][c] = "."
+        return False
+
+    def isValid(self, r, c, val, board):
+        val = str(val)
+        # row
+        for i in range(9):
+            if board[r][i] == val:
+                return False
+
+        # column
+        for i in range(9):
+            if board[i][c] == val:
+                return False
+        # 3*3 box
+        # Use left corner as reference point
+        # Decide where is the section by mod
+
+        #ref = (r%3, c%3)
+        row = r - r % 3
+        col = c - c % 3
+        for i in range(3):
+            for j in range(3):
+                #if board[i+3*ref[0]][j+3*ref[1]] == val:
+                if board[i+row][j+col] == val:
+                     return False
+        return True
+
+```
+---
