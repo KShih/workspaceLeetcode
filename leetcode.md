@@ -13237,3 +13237,65 @@ def fourSum(self, nums, target):
     return results
 ```
 ---
+## 31. Next Permutation｜ 11/21
+
+Implement next permutation, which rearranges numbers into the lexicographically next greater permutation of numbers.
+
+If such arrangement is not possible, it must rearrange it as the lowest possible order (ie, sorted in ascending order).
+
+The replacement must be in-place and use only constant extra memory.
+
+Here are some examples. Inputs are in the left-hand column and its corresponding outputs are in the right-hand column.
+
+1,2,3 → 1,3,2
+
+3,2,1 → 1,2,3
+
+1,1,5 → 1,5,1
+
+### 思路
+
+這道題讓我們求下一個排列順序，由題目中給的例子可以看出來，如果給定數組是降序，則說明是全排列的最後一種情況，則下一個排列就是最初始情況，可以參見之前的博客 Permutations。再來看下面一個例子，有如下的一個數組
+
+1　　2　　7　　4　　3　　1
+
+下一個排列為：
+
+1　　3　　1　　2　　4　　7
+
+那麼是如何得到的呢，我們通過觀察原數組可以發現，如果從末尾往前看，數字逐漸變大，到了2時才減小的，然後再從後往前找第一個比2大的數字，是3，那麼我們交換2和3，再把此時3後面的所有數字轉置一下即可，步驟如下：
+
+1　　*2*　　7　　4　　3　　1
+
+1　　*2*　　7　　4　　*3*　　1
+
+1　　*3*　　7　　4　　*2*　　1
+
+1　　3　　*1*　　*2*　　*4*　　*7*
+### Code
+``` py
+class Solution:
+    def nextPermutation(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        for i in range(len(nums)-1, -1, -1):
+            if i == 0:
+                mid = len(nums) // 2
+                for j in range(mid):
+                    nums[j], nums[-(j+1)] = nums[-(j+1)], nums[j]
+            if i >= 0 and nums[i] > nums[i-1]:
+                # Step1. Swapping
+                for j in range(len(nums)-1, i-1, -1):
+                    if nums[j] > nums[i-1]:
+                        nums[i-1], nums[j] = nums[j], nums[i-1]
+                        break
+                # Step2. Reordering after swapping
+                swap_times = (len(nums) - i +1) //2
+                for j in range(swap_times):
+                    nums[i+j], nums[-(j+1)] = nums[-(j+1)], nums[i+j]
+
+                # Step3. Break
+                break
+```
+---
