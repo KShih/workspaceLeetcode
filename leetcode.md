@@ -13299,3 +13299,71 @@ class Solution:
                 break
 ```
 ---
+## 32. Longest Valid Parentheses｜ 11/21
+Given a string containing just the characters '(' and ')', find the length of the longest valid (well-formed) parentheses substring.
+
+Example 1:
+
+Input: "(()"
+
+Output: 2
+
+Explanation: The longest valid parentheses substring is "()"
+
+Example 2:
+
+Input: ")()())"
+
+Output: 4
+
+Explanation: The longest valid parentheses substring is "()()"
+### 思路
+
+是要求"連續合法的括號組合的最長"
+
+反過來思考: 何時被中斷
+
+1. 多餘的左瓜
+    - 沒有右瓜可以配對, 在stack中剩下了
+2. 多餘的右瓜
+    - 沒有左瓜可以配對
+
+那麼標記出多餘的位置就很重要, 因此stack裡放左瓜的index
+
+標記完之後遍歷index_list, 求出最大的連續合法
+
+### Code
+``` py
+class Solution:
+    def longestValidParentheses(self, s: str) -> int:
+        stack = []
+        idx_list = [0] * len(s)
+        for i,p in enumerate(s):
+            if p == '(':
+                stack.append(i)
+            elif p == ')':
+                if stack:
+                    valid_idx = stack.pop() # matching w/ '('
+                    idx_list[valid_idx] = 1 # mark that pos w/ 1
+                else:
+                    idx_list[i] = -1 # mark as invalid, redundant ')'
+
+        # mark as invalid, redundant '('
+        while stack:
+            invalid_idx = stack.pop()
+            idx_list[invalid_idx] = -1
+
+        counter_list = [0] # initialize inorder to call max()
+        counter = 0
+        for idx in idx_list:
+            if idx < 0:
+                counter_list.append(counter) # append current max
+                counter = 0 # reset the continuous count
+            else:
+                if idx == 1:
+                    counter += 1
+
+        counter_list.append(counter) # append the rest val in counter
+        return max(counter_list)*2
+```
+---
