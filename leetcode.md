@@ -13367,3 +13367,65 @@ class Solution:
         return max(counter_list)*2
 ```
 ---
+## 36. Valid Sudoku(合法數獨)｜ 11/21
+Determine if a 9x9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
+
+Each row must contain the digits 1-9 without repetition.
+
+Each column must contain the digits 1-9 without repetition.
+
+Each of the 9 3x3 sub-boxes of the grid must contain the digits 1-9 without repetition.
+
+![](assets/markdown-img-paste-20191121152126445.png)
+
+![](assets/markdown-img-paste-20191121152148905.png)
+
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def isValidSudoku(self, board: List[List[str]]) -> bool:
+        if len(board) != 9 or len(board[0]) != 9:   return False
+
+        # Sub-box check
+        # Define Center
+        center = [(1,1), (1,4), (1,7), (4,1), (4,4), (4,7), (7,1), (7,4), (7,7)]
+        # Define Location
+        direction = [(0,0), (0,1), (1,0), (0,-1), (-1,0), (1,1), (-1,-1), (1,-1), (-1,1)]
+        # Check all Center with direction
+        for c in center:
+            visited = []
+            for d in direction:
+                x = c[0] + d[0]
+                y = c[1] + d[1]
+                if board[x][y] == ".":
+                    continue
+                if board[x][y] in visited:
+                    return False
+                else:
+                    visited.append(board[x][y])
+        # Row check
+        for r in range(9):
+            visited = []
+            for c in range(9):
+                if board[r][c] == ".":
+                    continue
+                if board[r][c] in visited:
+                    return False
+                else:
+                    visited.append(board[r][c])
+        # Column check
+        for c in range(9):
+            visited = []
+            for r in range(9):
+                if board[r][c] == ".":
+                    continue
+                if board[r][c] in visited:
+                    return False
+                else:
+                    visited.append(board[r][c])
+        return True
+```
+---
