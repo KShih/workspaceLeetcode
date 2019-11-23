@@ -13653,3 +13653,59 @@ class Solution:
 
 ```
 ---
+## 48. Rotate Image｜ 11/23
+
+You are given an n x n 2D matrix representing an image.
+
+Rotate the image by 90 degrees (clockwise).
+
+Note:
+
+You have to rotate the image in-place, which means you have to modify the input 2D matrix directly. DO NOT allocate another 2D matrix and do the rotation.
+
+Example 1:
+
+![](assets/markdown-img-paste-20191123132512109.png)
+
+### 思路
+
+先將矩陣逆時針轉
+
+再180度翻轉
+
+### Code
+``` py
+class Solution:
+    def rotate(self, matrix: List[List[int]]) -> None:
+        """
+        Step1:        Step2:
+              1 4 7         7 4 1
+              2 5 8         8 5 2
+              3 6 9         9 6 3
+        """
+        for i in range(len(matrix)):
+            for j in range(i+1, len(matrix[0])):
+                matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+
+        for i in range(len(matrix)):
+            matrix[i] = matrix[i][::-1]
+
+```
+
+可將下面的for與上面的合併, 因為搞完第一層之後第一層的元素在下面不會用到了
+因此可以直接翻轉
+```py
+class Solution:
+    def rotate(self, matrix: List[List[int]]) -> None:
+        """
+        i=0:
+              7 4 1
+              2 5 8
+              3 6 9
+        """
+        for i in range(len(matrix)):
+            for j in range(i+1, len(matrix[0])):
+                matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+            matrix[i] = matrix[i][::-1]
+```
+---
