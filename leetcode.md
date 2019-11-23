@@ -13515,3 +13515,141 @@ class Solution:
 
 ```
 ---
+## 43. Multiply Strings｜ 11/23
+
+Given two non-negative integers num1 and num2 represented as strings, return the product of num1 and num2, also represented as a string.
+
+Example 1:
+
+Input: num1 = "2", num2 = "3"
+
+Output: "6"
+
+Example 2:
+
+Input: num1 = "123", num2 = "456"
+
+Output: "56088"
+
+Note:
+
+The length of both num1 and num2 is < 110.
+
+Both num1 and num2 contain only digits 0-9.
+
+Both num1 and num2 do not contain any leading zero, except the number 0 itself.
+
+You must not use any built-in BigInteger library or convert the inputs to integer directly.
+
+
+### 技巧
+
+- map(func, list):
+    - 功能: 將list(or other iterable)的元素帶入func運算
+    - 回傳: 回傳一個map object, 需用一個container去承接
+    - 應用: output_list = list(map(func, input_list))
+    - 應用2: 將list中所有的int轉為str list
+        - product = list(map(str, product[ptr:]))
+
+### 思路
+
+這種運算方式可以用於高位數的運算, 也不會overflow!!!
+
+性質: num1*num2 的位數不會超過len(num1)+len(num2)
+
+如註釋所示 把本來一行的sub_mult 拆成len(num2)行
+
+然後再將pos_num1向左位移一位
+
+簡潔漂亮! 牛逼!
+
+### Code
+Elegant Solution
+```py
+class Solution:
+    def multiply(self, num1: str, num2: str) -> str:
+        """
+        num2:   1 2 3
+        num1: x 6 7 8
+              --------
+                  2 4
+                1 6
+                8
+             (n1_pos--)
+                2 1
+              1 4
+              7
+        """
+        product = [0] * (len(num1)+len(num2))
+        n1_pos = len(product) - 1
+
+        for n1 in num1[::-1]:
+            n2_pos = n1_pos
+            for n2 in num2[::-1]:
+                product[n2_pos] += int(n1) * int(n2) # ability to add the carry bit w/out store it
+                product[n2_pos - 1] += product[n2_pos]//10 # carry bit
+                product[n2_pos] %= 10 # digit
+                n2_pos -= 1 # move from 3 -> 2
+            n1_pos -=1
+
+        # remove leading 0
+        ptr = 0
+        while ptr < len(product)-1 and product[ptr] == 0: # keep at least 1 zero for num1 or num2 = 0
+            ptr += 1
+
+        product = list(map(str, product[ptr:])) # map() return a map object, need a container to catch it
+        return "".join(product)
+
+```
+
+Naive Elementary school math product
+``` py
+class Solution:
+    def multiply(self, num1: str, num2: str) -> str:
+        if num1 == "0" or num2 == "0":
+            return "0"
+        sub_mult_list = list()
+        num1 = list(num1)[::-1]
+        num2 = list(num2)[::-1]
+        for i, d1 in enumerate(num1):
+            sub_mult = []
+            carry = 0
+            for d2 in num2:
+                mul = int(d2) * int(d1) + carry
+                digit = mul%10
+                carry = mul//10
+                sub_mult.insert(0, str(digit))
+            if carry != 0:
+                sub_mult.insert(0, str(carry))
+
+            # append 0
+            for _ in range(i):
+                sub_mult.append("0")
+            sub_mult_list.append(sub_mult[:])
+
+        # make every sub_mult in sub_mult_list have same digit
+        max_lenth = len(sub_mult_list[-1])
+        for sub_mult in sub_mult_list:
+                while len(sub_mult) != max_lenth:
+                    sub_mult.insert(0,"0")
+
+        # add up all of the submult in submultlist
+        ret = []
+        carry = 0
+        for k in range(max_lenth-1, -1, -1):
+            add = 0
+            add += carry
+            for i in range(len(sub_mult_list)):
+                add += int(sub_mult_list[i][k])
+            digit = add%10
+            ret.insert(0,str(digit))
+
+            carry = add//10
+
+        if carry != 0:
+            ret.insert(0,str(carry))
+
+        return "".join(ret)
+
+```
+---
