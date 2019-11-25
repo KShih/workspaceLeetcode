@@ -13765,3 +13765,93 @@ class Solution:
         return ret
 ```
 ---
+## 61. Rotate List｜ 11/24
+
+Given a linked list, rotate the list to the right by k places, where k is non-negative.
+
+Example 1:
+
+Input: 1->2->3->4->5->NULL, k = 2
+
+Output: 4->5->1->2->3->NULL
+
+Explanation:
+
+rotate 1 steps to the right: 5->1->2->3->4->NULL
+
+rotate 2 steps to the right: 4->5->1->2->3->NULL
+
+Example 2:
+
+Input: 0->1->2->NULL, k = 4
+
+Output: 2->0->1->NULL
+
+Explanation:
+
+rotate 1 steps to the right: 2->0->1->NULL
+
+rotate 2 steps to the right: 1->2->0->NULL
+
+rotate 3 steps to the right: 0->1->2->NULL
+
+rotate 4 steps to the right: 2->0->1->NULL
+
+### 思路
+
+暴力法肯定超時,
+
+又發現會有規律, 所以一定用得到mod,
+
+用mod就得找這個list的長度,
+
+這裡使用一個trick把頭尾接起來.
+
+剩下的就是要找該在何處斷開.
+
+由實驗反推推倒式:
+
+1->2->3->4->5
+
+time 為該斷開的點
+
+k = 2, time = 2
+
+k = 1, time = 3
+
+我們要在前一個點斷開,
+
+所以時機點為( length - k % length ) - 1
+### Code
+``` py
+class Solution:
+    def rotateRight(self, head: ListNode, k: int) -> ListNode:
+        if k == 0 or not head:
+            return head
+
+        length = self.get_list_length(head)
+        time = length - k % (length) - 1
+
+        self.connect_tail2head(head)
+
+        for i in range(time):
+            head = head.next
+        newHead = head.next
+        head.next = None
+
+        return newHead
+
+    def connect_tail2head(self, head):
+        dum = head
+        while head.next:
+            head = head.next
+        head.next = dum
+
+    def get_list_length(self, head):
+        count = 0
+        while head:
+            count += 1
+            head = head.next
+        return count
+```
+---
