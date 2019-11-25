@@ -13669,6 +13669,8 @@ Example 1:
 
 ### 思路
 
+![](assets/markdown-img-paste-20191124214418985.png)
+
 先將矩陣逆時針轉
 
 再180度翻轉
@@ -13707,5 +13709,59 @@ class Solution:
             for j in range(i+1, len(matrix[0])):
                 matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
             matrix[i] = matrix[i][::-1]
+```
+---
+## 59. Spiral Matrix II｜ 11/24
+Given a positive integer n, generate a square matrix filled with elements from 1 to n2 in spiral order.
+
+Example:
+
+Input: 3
+
+Output:
+
+[
+
+ [ 1, 2, 3 ],
+
+ [ 8, 9, 4 ],
+
+ [ 7, 6, 5 ]
+
+]
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def generateMatrix(self, n: int) -> List[List[int]]:
+        ret = [[0] * n for _ in range(n)]
+
+        left, up, right, down, num = 0, 0, n-1, n-1, 1
+
+        while left <= right and up <= down:
+
+            for i in range(left, right+1):
+                ret[up][i] = num
+                num += 1
+            up += 1
+
+            for i in range(up, down+1):
+                ret[i][right] = num
+                num += 1
+            right -= 1
+
+            for i in range(right, left-1, -1):
+                ret[down][i] = num
+                num += 1
+            down -= 1
+
+            for i in range(down, up-1, -1):
+                ret[i][left] = num
+                num += 1
+            left += 1
+
+        return ret
 ```
 ---
