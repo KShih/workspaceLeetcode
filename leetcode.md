@@ -13929,3 +13929,48 @@ class Solution:
         return dp[-1][-1]
 ```
 ---
+## 64. Minimum Path Sum｜ 11/25
+
+Given a m x n grid filled with non-negative numbers, find a path from top left to bottom right which minimizes the sum of all numbers along its path.
+
+Note: You can only move either down or right at any point in time.
+
+Example:
+
+![](assets/markdown-img-paste-20191125231504996.png)
+### 思路
+
+DP 思維:
+
+初始化邊界
+
+再寫dp推導式, 也就是把所有能知道的數字填上陣列
+
+像這題，能一路走到右 或 一路走到底, 就是已知, 須先初始化
+
+### Code
+``` py
+class Solution:
+    def minPathSum(self, grid: List[List[int]]) -> int:
+        if not grid:
+            return 0
+        m, n = len(grid), len(grid[0])
+
+        dp = [[0 for _ in range(n)] for _ in range(m)]
+
+        dp[0][0] = grid[0][0]
+
+        for i in range(1, m):
+            dp[i][0] = dp[i-1][0] + grid[i][0]
+
+        for j in range(1, n):
+            dp[0][j] = dp[0][j-1] + grid[0][j]
+
+
+        for i in range(1, len(grid)):
+            for j in range(1, len(grid[0])):
+                dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i][j]
+
+        return dp[-1][-1]
+```
+---
