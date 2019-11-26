@@ -13886,3 +13886,46 @@ class Solution:
         return dp[-1][-1]
 ```
 ---
+## 63. Unique Paths II｜ 11/25
+A robot is located at the top-left corner of a m x n grid (marked 'Start' in the diagram below).
+
+The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below).
+
+Now consider if some obstacles are added to the grids. How many unique paths would there be?
+
+![](assets/markdown-img-paste-20191125215627498.png)
+
+### 思路
+![](assets/markdown-img-paste-20191125215653830.png)
+
+由於我們已經沒有辦法保證直走右或直走下，一定會只有一種解法(有可能出現障礙)
+
+因此所有陣列數值只能初始化為0
+
+意思就是沒有辦法初始化邊界，(邊界在這題也必須重新計算)
+
+因此我們必須將起點往右下移動一個位置即(1,1)，所以陣列得多增加一個空間
+
+
+### Code
+``` py
+class Solution:
+    def uniquePathsWithObstacles(self, obstacleGrid: List[List[int]]) -> int:
+        m, n = len(obstacleGrid), len(obstacleGrid[0])
+        if m == 0 or n == 0 or obstacleGrid[0][0] == 1:
+            return 0
+
+        dp = [ [0] * (n+1) ] * (m+1)
+
+        for i in range(1, m+1):
+            for j in range(1, n+1):
+                if i == 1 and j == 1:
+                    dp[i][j] = 1
+                if obstacleGrid[i-1][j-1] == 1:
+                    dp[i][j] = 0
+                else:
+                    dp[i][j] = dp[i-1][j] + dp[i][j-1]
+
+        return dp[-1][-1]
+```
+---
