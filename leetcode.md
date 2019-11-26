@@ -14018,3 +14018,56 @@ class Solution:
             return digits
 ```
 ---
+## 71. Simplify Path｜ 11/26
+Given an absolute path for a file (Unix-style), simplify it. Or in other words, convert it to the canonical path.
+
+In a UNIX-style file system, a period . refers to the current directory. Furthermore, a double period .. moves the directory up a level. For more information, see: Absolute path vs relative path in Linux/Unix
+
+Note that the returned canonical path must always begin with a slash /, and there must be only a single slash / between two directory names. The last directory name (if it exists) must not end with a trailing /. Also, the canonical path must be the shortest string representing the absolute path.
+
+![](assets/markdown-img-paste-20191126113719148.png)
+
+![](assets/markdown-img-paste-20191126113729858.png)
+
+### 技巧
+
+- join():
+    - "<split_pattern>".join(<Iterable>)
+    - 將後面的<Iterable>用split_pattern分開
+    - e.g.:
+        - "-".join(['1','2','3','4'])
+            - "1-2-3-4"
+        - "".join(['1','2','3','4'])
+            - "1234"
+
+### 思路
+
+使用 split('/'), 把每個item分隔出來
+
+只取我們在意的, folder 及 ..
+
+/folderA/../ 也就等於什麼都沒做, 因此可以把這個概念實踐:
+
+1. 遇到folder就放進stack
+
+2. 遇到 "..", 就把剛放進去的pop出 -> (什麼都沒做)
+
+最後加上leading "/", 及使用"/” 分隔還在stack裡的元素即可
+
+### Code
+``` py
+class Solution:
+    def simplifyPath(self, path: str) -> str:
+        stack = []
+        for item in path.split('/'):
+            # all we care is folder and ..
+            # if "..", delete(pop) the last item push into stack
+            if item not in ["", ".", ".."]:
+                stack.append(item)
+
+            if item == ".." and stack:
+                stack.pop()
+        return "/" + "/".join(stack)
+
+```
+---
