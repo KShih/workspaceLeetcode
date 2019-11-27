@@ -14071,3 +14071,70 @@ class Solution:
 
 ```
 ---
+## 72. Edit Distance｜ 11/26
+
+Given two words word1 and word2, find the minimum number of operations required to convert word1 to word2.
+
+You have the following 3 operations permitted on a word:
+
+1. Insert a character
+2. Delete a character
+3. Replace a character
+
+![](assets/markdown-img-paste-20191126143734747.png)
+
+### 思路
+
+![](assets/markdown-img-paste-20191126143852861.png)
+
+這道題讓求從一個字符串轉變到另一個字符串需要的變換步驟，共有三種變換方式，插入一個字符，刪除一個字符，和替換一個字符。題目乍眼一看並不難，但是實際上卻暗藏玄機，對於兩個字符串的比較，一般都會考慮一下用 HashMap 統計字符出現的頻率，但是在這道題卻不可以這麼做，因為字符串的順序很重要。還有一種比較常見的錯誤，就是想當然的認為對於長度不同的兩個字符串，長度的差值都是要用插入操作，然後再對應每位字符，不同的地方用修改操作，但是其實這樣可能會多用操作，因為刪除操作有時同時可以達到修改的效果。比如題目中的例子1，當把 horse 變為 rorse 之後，之後只要刪除第二個r，跟最後一個e，就可以變為 ros。實際上只要三步就完成了，因為刪除了某個字母后，原來左右不相連的字母現在就連一起了，有可能剛好組成了需要的字符串。所以在比較的時候，要嘗試三種操作，因為誰也不知道當前的操作會對後面產生什麼樣的影響。對於當前比較的兩個字符 word1[i] 和 word2[j]，若二者相同，一切好說，直接跳到下一個位置。若不相同，有三種處理方法，首先是直接插入一個 word2[j]，那麼 word2[j] 位置的字符就跳過了，接著比較 word1[i] 和 word2[j+1] 即可。第二個種方法是刪除，即將 word1[i] 字符直接刪掉，接著比較 word1[i+1] 和 word2[j] 即可。第三種則是將 word1[i] 修改為 word2[j]，接著比較 word1[i+1] 和 word[j+1] 即可。分析到這裡，就可以直接寫出遞歸的代碼，但是很可惜會 Time Limited Exceed，所以必須要優化時間複雜度，需要去掉大量的重複計算，這裡使用記憶數組 memo 來保存計算過的狀態，從而可以通過 OJ，注意這裡的 insertCnt，deleteCnt，replaceCnt 僅僅是表示當前對應的位置分別採用了插入，刪除，和替換操作，整體返回的最小距離，後面位置的還是會調用遞歸返回最小的
+
+![](assets/markdown-img-paste-20191126143637466.png)
+
+
+### Code
+TLE解法, Intuitive?
+``` py
+class Solution:
+    def minDistance(self, word1: str, word2: str) -> int:
+
+        m = len(word1)
+        n = len(word2)
+
+        if word1 == "":     return n
+        if word2 == "":     return m
+
+        if word1[0] == word2[0]:
+            return self.minDistance(word1[1:], word2[1:])
+
+        else:
+            return 1 + min(self.minDistance(word1, word2[1:]),
+                           self.minDistance(word1[1:], word2),
+                           self.minDistance(word1[1:], word2[1:]))
+```
+從Recursive轉換過來的DP, 參考圖
+```python
+class Solution:
+    def minDistance(self, word1: str, word2: str) -> int:
+        m = len(word1)
+        n = len(word2)
+
+        # Initialize
+        dp = [[0 for _ in range(n+1)] for _ in range(m+1)]
+        dp[0][0] = 0
+
+        for j in range (1,n+1):         dp[0][j] = j
+
+        for i in range (1, m+1):        dp[i][0] = i
+
+        # DP
+        for i in range(1, m+1):
+            for j in range(1, n+1):
+                if word1[i-1] == word2[j-1]:
+                    dp[i][j] = dp[i-1][j-1]
+                else:
+                    dp[i][j] = 1 + min(dp[i-1][j-1], dp[i][j-1], dp[i-1][j])
+
+        return dp[-1][-1]
+```
+---
