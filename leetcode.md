@@ -14179,3 +14179,92 @@ class Solution:
         return matrix
 ```
 ---
+## 1087. Brace Expansion｜ 12/1
+A string S represents a list of words.
+
+Each letter in the word has 1 or more options.  If there is one option, the letter is represented as is.  If there is more than one option, then curly braces delimit the options.  For example, "{a,b,c}" represents options ["a", "b", "c"].
+
+For example, "{a,b,c}d{e,f}" represents the list ["ade", "adf", "bde", "bdf", "cde", "cdf"].
+
+Return all words that can be formed in this manner, in lexicographical order.
+
+![](assets/markdown-img-paste-20191201114236794.png)
+### 思路
+Naive:
+1. Make "{a,b}c{d,e}f" -> [[a,b],[c],[d,e],[f]]
+2. DFS to find solution
+3. Fail at "abcdefghijklmnopqrstuvw" testcase
+
+Wonderful Solution:
+Using helper function to:
+1. fetch out the elem in braces,
+2. split out the string before braces
+3. split out the string after braces
+
+And recursively bind them in main function until no braces, e.g.:
+1. ac{d,e}f
+    1. acdf -> return ["acdf"]
+    2. acef -> return ["acef"]
+2. bc{d,e}f
+
+
+### Code
+Wonderful Solution:
+```py
+# from functools import lru_cache
+class Solution:
+    def expand(self, S: str) -> List[str]:
+        #self.helper.cache_clear()
+        if '{' not in S:
+            return [S]
+        else:
+            a, opts, b = self.helper(S)
+
+            res = []
+            for o in opts:
+                res += self.expand(a+o+b)
+            return res
+
+    #@lru_cache(maxsize=None)
+    def helper(self, s):
+        i, j = s.index('{'), s.index('}')
+        return s[:i], sorted(s[i+1:j].split(',')), s[j+1:]
+```
+
+Naive beat 6%:
+``` py
+class Solution:
+    def expand(self, S: str) -> List[str]:
+        def find_comb(outer, inner, comb):
+            while len(comb) == n:
+                ret.add("".join(comb[:]))
+                return
+            for i in range(outer, len(src)):
+                for j in range(inner, len(src[i])):
+                    comb.append(src[i][j])
+                    find_comb(i+1, 0, comb)
+                    comb.pop()
+        if '{' not in S:
+            return [S]
+        src, ret = [], set()
+        i = 0
+        while i < len(S):
+            if S[i] == "{":
+                br = []
+                i += 1
+                while S[i] != '}':
+                    if S[i] == ',':
+                        i += 1
+                        continue
+                    br.append(S[i])
+                    i += 1
+                src.append(br)
+            elif S[i] != "}" and S[i] != ",":
+                src.append([S[i]])
+            i += 1
+
+        n = len(src)
+        find_comb(0, 0, [])
+        return sorted(ret)
+```
+---
