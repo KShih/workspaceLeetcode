@@ -14138,3 +14138,44 @@ class Solution:
         return dp[-1][-1]
 ```
 ---
+## 73. Set Matrix Zeroes｜ 11/27
+Given a m x n matrix, if an element is 0, set its entire row and column to 0. Do it in-place.
+
+![](assets/markdown-img-paste-20191127132705334.png)
+
+### 思路
+
+空間複雜度 mn 的做法: 創一個等同大小的array,並一個一個assign值
+
+空間複雜度 m+n的做法: 各創一個與行、列相同的array, 並只個別紀錄哪行哪列有出現0
+
+
+
+### Code
+``` py
+class Solution:
+    def setZeroes(self, matrix: List[List[int]]) -> None:
+        """
+        Do not return anything, modify matrix in-place instead.
+        """
+        m, n = len(matrix), len(matrix[0])
+        row = [] #3
+        col = [] #4
+
+        for i in range(m):
+            for j in range(n):
+                if matrix[i][j] == 0:
+                    row.append(i)
+                    col.append(j)
+
+        for zero_index in row:
+            for j in range(n):
+                matrix[zero_index][j] = 0
+
+        for zero_index in col:
+            for i in range(m):
+                matrix[i][zero_index] = 0
+
+        return matrix
+```
+---
