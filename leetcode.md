@@ -14419,3 +14419,89 @@ class Solution:
         head.next = self.deleteDuplicates(head.next) # 用這樣串起來的！
         return head
 ```
+---
+## 84. Largest Rectangle in Histogram｜ 12/2
+Given n non-negative integers representing the histogram's bar height where the width of each bar is 1, find the area of largest rectangle in the histogram.
+
+![](assets/markdown-img-paste-20191202155614474.png)
+
+### 技巧
+
+mono-stack, increase-stack/decrease-stack:
+- 自私的新元素會為了自己把所有造成破壞單調性的元素給踢除
+- 解決問題的核心就在處理這塊，當前數字如果破壞了單調性，就會觸發處理棧頂元素的操作，而觸發數字有時候是解決問題的一部分
+- 線性的時間複雜度是其最大的優勢，每個數字只進棧並處理一次
+- 使用: 對於玩數組的題，如果相互之間關聯很大，那麼就可以考慮考慮單調棧能否解題。
+    - 如: 使用local max來協助解題的題型
+- 模板(以遞增stack舉例):
+    - 常常會使用dummy elem協助解, 如此題
+```py
+def Solution(nums):
+    for i in range(nums):
+        while stack and heights[stack[-1]] > heights[i]: # trigger of process
+            a = stack.pop()
+            self.process()
+        stack.append(i)
+
+def process():
+    # do sth
+```
+
+[Grandyang總結](https://www.cnblogs.com/grandyang/p/8887985.html)
+
+
+### 思路
+1. find Local max
+
+每找到一個局部峰值（只要當前的數字大於後面的一個數字，那麼當前數字就看作一個局部峰值，跟前面的數字大小無關），然後向前遍歷所有的值，算出共同的矩形面積，每次對比保留最大值。這裡再說下為啥要從局部峰值處理，看題目中的例子，局部峰值為 2，6，3，我們只需在這些局部峰值出進行處理，為啥不用在非局部峰值處統計呢，這是因為非局部峰值處的情況，後面的局部峰值都可以包括，比如1和5，由於局部峰值6是高於1和5的，所有1和5能組成的矩形，到6這裡都能組成，並且還可以加上6本身的一部分組成更大的矩形，那麼就不用費力氣去再統計一個1和5處能組成的矩形了。
+
+2. 用mono-stack
+那麼既然需要用單調棧來做，首先要考慮到底用遞增棧，還是用遞減棧來做。我們想啊，遞增棧是維護遞增的順序，當遇到小於棧頂元素的數就開始處理，而遞減棧正好相反，維護遞減的順序，當遇到大於棧頂元素的數開始處理。那麼根據這道題的特點，我們需要按從高板子到低板子的順序處理，先處理最高的板子，寬度為1，然後再處理旁邊矮一些的板子，此時長度為2，因為之前的高板子可組成矮板子的矩形 ，因此我們需要一個遞增棧，當遇到大的數字直接進棧，而當遇到小於棧頂元素的數字時，就要取出棧頂元素進行處理了，那取出的順序就是從高板子到矮板子了，於是乎遇到的較小的數字只是一個觸發，表示現在需要開始計算矩形面積了，為了使得最後一塊板子也被處理，這裡用了個小 trick，在高度數組最後面加上一個0，這樣原先的最後一個板子也可以被處理了。
+
+### Code
+find local max:
+``` py
+class Solution:
+    def largestRectangleArea(self, heights: List[int]) -> int:
+        # find local max: larger than the next elem
+        # don't need to consider the previous elem, because you walk from there
+        res = 0
+        for i in range(len(heights)):
+            if i+1 < len(heights) and heights[i] <= heights[i+1]:
+                continue # Use continue here, because we need to consider the last elem as potential local Max
+
+            minH = heights[i]
+            for j in range(i, -1, -1):
+                minH = min(minH, heights[j])
+                area = minH * (i-j+1)
+                res = max(res, area)
+        return res
+```
+
+Using mono-stack(increased stack):
+```py
+class Solution:
+    def largestRectangleArea(self, heights: List[int]) -> int:
+        # find local max: larger than the next elem
+        # don't need to consider the previous elem, because you walk from there
+
+        res = 0
+        # trick: need to consider the last elem, push 0 (dummy) to the last
+        # Also push -1 in stack to indicate the last elem in heights(dummy), heights[-1] = 0
+        stack = [-1]
+        heights.append(0)
+
+        for i in range(len(heights)):
+            while stack and heights[stack[-1]] > heights[i]:
+                h = heights[stack.pop()]
+                res = self.process(res, h, i, stack[-1])
+
+            stack.append(i)
+        return res
+
+    def process(self, res, height, i, j):
+        res = max(res, height * (i-j-1))
+        return res
+
+```
+---
