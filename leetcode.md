@@ -14338,3 +14338,84 @@ class Solution:
                 cur += 1
 ```
 ---
+## 82. Remove Duplicates from Sorted List II｜ 12/2
+Given a sorted linked list, delete all nodes that have duplicate numbers, leaving only distinct numbers from the original list.
+
+Example 1:
+
+Input: 1->2->3->3->4->4->5
+
+Output: 1->2->5
+
+Example 2:
+
+Input: 1->1->1->2->3
+
+Output: 2->3
+
+### 思路
+Iterative:
+
+必須站在前一個節點往後看(並記錄這個節點為cur)
+
+如果下兩個節點為一樣時, 進入刪除mode
+
+使用while一直尋找到不同處
+
+並把那個紀錄的cur與不同處連上
+
+最後iterate prev, 就完成了
+
+Recursive:
+(no need the dummy node)
+我們也可以使用遞歸來做，首先判空，如果 head 為空，直接返回。
+
+然後判斷，若 head 之後的結點存在，且值相等，那麼先進行一個 while 循環，跳過後面所有值相等的結點，到最後一個值相等的點停下。
+
+比如對於例子2來說，head 停在第三個結點1處，
+
+然後對**後面一個結點調用遞歸函數**，即結點2，
+
+這樣做的好處是，返回的值就完全把所有的結點1都刪掉了。
+
+若 head 之後的結點值不同，
+
+那麼還是對 head 之後的結點調用遞歸函數，
+
+將返回值連到 head 的後面，這樣 head 結點還是保留下來了，因為值不同嘛，最後返回 head 即可
+
+### Code
+Iterative:
+``` py
+class Solution:
+    def deleteDuplicates(self, head: ListNode) -> ListNode:
+        dum = ListNode(-1)
+        dum.next = head
+        prev = dum
+        while prev.next and prev.next.next:
+            cur = prev
+            if prev.next.val == prev.next.next.val:
+                while prev.next.next and prev.next.val == prev.next.next.val:
+                    prev = prev.next
+                cur.next = prev.next.next
+                prev = cur
+            else:
+                prev = prev.next
+        return dum.next
+```
+
+Recursive:
+```py
+class Solution:
+    def deleteDuplicates(self, head: ListNode) -> ListNode:
+        if not head:
+            return head
+
+        if head.next and head.val == head.next.val:
+            while head.next and head.val == head.next.val:
+                head = head.next
+            return self.deleteDuplicates(head.next)
+
+        head.next = self.deleteDuplicates(head.next) # 用這樣串起來的！
+        return head
+```
