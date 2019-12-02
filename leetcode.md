@@ -14268,3 +14268,73 @@ class Solution:
         return sorted(ret)
 ```
 ---
+## 75. Sort Colors｜ 12/1
+Given an array with n objects colored red, white or blue, sort them in-place so that objects of the same color are adjacent, with the colors in the order red, white and blue.
+
+Here, we will use the integers 0, 1, and 2 to represent the color red, white, and blue respectively.
+
+Note: You are not suppose to use the library's sort function for this problem.
+
+Example:
+
+Input: [2,0,2,1,1,0]
+
+Output: [0,0,1,1,2,2]
+
+Follow up:
+
+A rather straight forward solution is a two-pass algorithm using counting sort.
+First, iterate the array counting number of 0's, 1's, and 2's, then overwrite array with total number of 0's, then 1's and followed by 2's.
+Could you come up with a one-pass algorithm using only constant space?
+### 思路
+
+如果要one path, 只能使用雙指針來搞
+
+關鍵就是0一定在左, 2一定在右
+
+所以可以使用兩個指針來記錄目前的最左跟最右在哪邊
+
+遇到2就塞到目前的最右, 反之遇到0
+
+注意while的check必須使用right而不是len(nums)
+
+否則會把已經確定位置的2又換到錯的位置
+
+### Code
+``` py
+class Solution:
+    def sortColors(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        # One Path:
+        # self.sortColorsOptimap(nums)
+
+        # Two Path:
+        num_count_with_index = [0 for i in range(3)]
+        for num in nums:
+            num_count_with_index[num] += 1
+
+        cur = 0
+        for val, count in enumerate(num_count_with_index):
+            for i in range(count):
+                nums[cur+i] = val
+            cur += count
+
+    def sortColorsOptimap(self, nums):
+        # One Path
+        left, right = 0, len(nums)-1
+
+        cur = 0
+        while cur <= right: # Notice! Shouldn't use len(nums)
+            if nums[cur] == 0:
+                nums[cur], nums[left] = nums[left], nums[cur]
+                cur += 1
+                left += 1
+            elif nums[cur] == 2:
+                nums[cur], nums[right] = nums[right], nums[cur]
+                right -= 1
+            else:
+                cur += 1
+```
+---
