@@ -14505,3 +14505,112 @@ class Solution:
 
 ```
 ---
+## 86. Partition List｜ 12/3
+
+Given a linked list and a value x, partition it such that **all nodes less than x** come before **nodes greater than or equal to x**.
+
+You should preserve the original relative order of the nodes in each of the two partitions.
+
+Example:
+
+Input: head = 1->4->3->2->5->2, x = 3
+Output: 1->2->2->4->3->5
+
+這道題要求我們劃分鏈表，把所有小於給定值的節點都移到前面，大於該值的節點順序不變，相當於一個局部排序的問題。那麼可以想到的一種解法是首先找到第一個大於或等於給定值的節點，用題目中給的例子來說就是先找到4，然後再找小於3的值
+
+### 技巧
+
+在操作list時,
+
+如果head的位置matter的話,
+
+盡量使用cursor去操作list(以面誤動到head了)
+
+像是方法中使用cur, new_cur去操作
+
+而dum, new_dum永遠維持不變
+
+### 思路
+分割時,可以真的分割如1. 或者new一個新list來代表分割後的結果
+
+1. 直接斷點法: (複雜)
+
+斷點斷在第一個大於x的點,
+
+分成:前半部(break_p), 後半部(new_head)
+
+並將所有後半部mis-positioned的點放到break_p之後
+
+2. (Better) 直接new一個新的list法:
+
+直接在走訪時操作, 連接到新的list後面
+
+走訪完後, 把兩個list連在一起
+
+### Code
+新list法:
+``` py
+class Solution:
+    def partition(self, head: ListNode, x: int) -> ListNode:
+        dum, new_dum = ListNode(-1), ListNode(-1)
+        dum.next = head
+
+        # Assign the cursor to do the operation
+        # => dum, new_dum never move!!
+        cur, new_cur = dum, new_dum
+
+        while cur.next:
+            if cur.next.val < x:
+                new_cur.next = cur.next
+                cur.next = cur.next.next
+
+                # move the new_dum cursor
+                new_cur = new_cur.next
+            else:
+                cur = cur.next
+
+        # Connect two list together, Note: still use the cursor to do the op
+        new_cur.next = dum.next
+        return new_dum.next
+
+```
+
+斷點法:
+``` py
+class Solution:
+    def partition(self, head: ListNode, x: int) -> ListNode:
+        dum = ListNode(-1)
+        dum.next = head
+        prev = dum
+        break_p, new_head = None, None
+
+        # find the breaking point, and break the list into two
+        while prev.next:
+            if prev.next.val >= x:
+                break_p = prev
+                new_head = prev.next
+                break
+            else:
+                prev = prev.next
+        self.arrange(break_p, new_head, x)
+        return dum.next
+
+    def arrange(self,break_p, new_head, x):
+        # link the misposition node in new_head list to break_p
+        while new_head:
+            if new_head.next and new_head.next.val < x:
+                # keep the status
+                b_next = break_p.next
+                n_next = new_head.next.next
+
+                # link that node to break_p
+                break_p.next = new_head.next
+                break_p.next.next = b_next
+                break_p = break_p.next # don't forget to move forward the break_p ptr!!
+
+                # fill the removed position
+                new_head.next = n_next
+            else:
+                new_head = new_head.next
+```
+---
