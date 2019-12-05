@@ -14825,3 +14825,92 @@ def isInterleave4(self, s1, s2, s3):
     return False
 ```
 ---
+## 103. Binary Tree Zigzag Level Order Traversal｜ 12/5
+Given a binary tree, return the zigzag level order traversal of its nodes' values. (ie, from left to right, then right to left for the next level and alternate between).
+
+For example:
+Given binary tree [3,9,20,null,null,15,7],
+
+    3
+   / \
+  9  20
+    /  \
+   15   7
+
+return its zigzag level order traversal as:
+[
+  [3],
+  [20,9],
+  [15,7]
+]
+
+### 技巧
+
+**層走訪:創空間+層參數**
+
+### 思路
+
+正確的level order走訪:
+
+在push queue的時候多push level的參數,
+
+並用level來決定是否要new一個新的room給this level
+
+### Code
+``` py
+class Solution:
+    def zigzagLevelOrder(self, root: TreeNode) -> List[List[int]]:
+        if not root:
+            return []
+        flag, queue, res = 0, [], []
+
+        queue.append(root);
+        res.append([root.val])
+
+        while queue:
+            flag += 1 # flag to reverse the level_val
+            level, level_val = [], []
+            while queue: # to confine in this level
+                top = queue.pop(0)
+                if top.left:
+                    level.append(top.left)
+                if top.right:
+                    level.append(top.right)
+
+            while level: # repush into the queue for next level
+                top = level.pop(0)
+                level_val.append(top.val)
+                queue.append(top)
+
+            if flag%2 != 0:
+                level_val = level_val[::-1]
+
+            if len(level_val) != 0:
+                res.append(level_val)
+        return res
+```
+
+level order精簡版:
+```py
+class Solution:
+    def zigzagLevelOrder(self, root: TreeNode) -> List[List[int]]:
+        queue, res = [], []
+
+        queue.append((root, 0));
+
+        while queue:
+            top, level = queue.pop(0)
+
+            if top:
+                if len(res) < level+1: # new a room for this level
+                    res.append([])
+
+                if level % 2 == 0:
+                    res[level].append(top.val)
+                else:
+                    res[level].insert(0,top.val)
+                queue.append((top.left, level+1))
+                queue.append((top.right, level+1))
+        return res
+```
+---
