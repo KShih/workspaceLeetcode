@@ -14664,3 +14664,55 @@ class Solution(object):
         return max_a
 ```
 ---
+## 88. Merge Sorted Array｜ 12/5
+Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.
+
+Note:
+
+The number of elements initialized in nums1 and nums2 are m and n respectively.
+
+You may assume that nums1 has enough space (size that is greater or equal to m + n) to hold additional elements from nums2.
+
+Example:
+
+Input:
+
+nums1 = [1,2,3,0,0,0], m = 3
+
+nums2 = [2,5,6],       n = 3
+
+Output: [1,2,2,3,5,6]
+### 思路
+
+因為最終size是固定的,
+
+因此從後往前比, 大的就放在最後面
+
+
+### Code
+``` py
+class Solution(object):
+    def merge(self, nums1, m, nums2, n):
+        while m > 0 and n > 0:
+            if nums2[n-1] > nums1[m-1]:
+                nums1[m+n-1] = nums2[n-1]
+                n -= 1
+            else:
+                nums1[m+n-1] = nums1[m-1]
+                m -= 1
+        if n > 0:
+            nums1[:n] = nums2[:n]
+```
+精簡版, 加上要更新要把nums2放到nums1後的條件
+```py
+class Solution(object):
+    def merge(self, nums1, m, nums2, n):
+        while n > 0:
+            if m <= 0 or nums2[n-1] > nums1[m-1]:
+                nums1[m+n-1] = nums2[n-1]
+                n -= 1
+            else:
+                nums1[m+n-1] = nums1[m-1]
+                m -= 1
+```
+---
