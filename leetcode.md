@@ -14716,3 +14716,112 @@ class Solution(object):
                 m -= 1
 ```
 ---
+## 97. Interleaving String｜ 12/5
+Given s1, s2, s3, find whether s3 is formed by the interleaving of s1 and s2.
+
+Example 1:
+
+Input: s1 = "aabcc", s2 = "dbbca", s3 = "aadbbcbcac"
+
+Output: true
+
+Example 2:
+
+Input: s1 = "aabcc", s2 = "dbbca", s3 = "aadbbbaccc"
+
+Output: false
+
+### 學習
+
+1. Recursive 思路漏洞:
+
+第一次的寫法:
+```py
+if m > 0 and s1[0] == s3[0]:
+    return self.isInterleave(s1[1:], s2, s3[1:])
+if n > 0 and s1[0] == s3[0]:
+    return self.isInterleave(s1, s2[1:], s3[1:])
+```
+
+並考慮這個case:
+```
+s1 = aabbc
+s2 = abbbc
+s3 = abbbc
+```
+這種方式會造成s1與s3匹配過後發現沒有路了return False
+
+然後就一直return False回上層導致s2與s3沒有機會嘗試到
+
+2. 在用地迴時思考有沒有任何可能可以記錄重複的步驟以至於能優化，
+
+像這題就是以紀錄兩個字串剩餘的長度來達成跳過重複
+
+### 思路
+
+就是遞迴逐一比對, 注意recursive的思路, 以及如何優化遞迴
+
+### Code
+在大數據時會TLE
+``` py
+class Solution:
+    def isInterleave(self, s1: str, s2: str, s3: str) -> bool:
+        m, n, mn = len(s1), len(s2), len(s3)
+        if m + n != mn:
+            return False
+        if m == 0 and n == 0 and mn == 0:
+            return True
+
+        if m > 0 and s1[0] == s3[0]:
+            if self.isInterleave(s1[1:], s2, s3[1:]):
+                return True
+        if n > 0 and s2[0] == s3[0]:
+            if self.isInterleave(s1, s2[1:], s3[1:]):
+                return True
+        return False
+```
+
+優化, cache紀錄path
+``` py
+class Solution:
+    def __init__(self):
+        self.visited = set()
+
+    def isInterleave(self, s1: str, s2: str, s3: str) -> bool:
+        m, n, mn = len(s1), len(s2), len(s3)
+        if m + n != mn:
+            return False
+        if m == 0 and n == 0 and mn == 0:
+            return True
+
+        if m > 0 and s1[0] == s3[0]:
+            if (m-1, n) not in self.visited:
+                self.visited.add((m-1, n))
+                if self.isInterleave(s1[1:], s2, s3[1:]):
+                    return True
+        if n > 0 and s2[0] == s3[0]:
+            if (m, n-1) not in self.visited:
+                self.visited.add((m, n-1))
+                if self.isInterleave(s1, s2[1:], s3[1:]):
+                    return True
+        return False
+```
+
+不使用遞迴, 用stack:
+```py
+def isInterleave4(self, s1, s2, s3):
+    r, c, l= len(s1), len(s2), len(s3)
+    if r+c != l:
+        return False
+    stack, visited = [(0, 0)], set((0, 0))
+    while stack:
+        x, y = stack.pop()
+        if x+y == l:
+            return True
+        if x+1 <= r and s1[x] == s3[x+y] and (x+1, y) not in visited:
+            stack.append((x+1, y)); visited.add((x+1, y))
+        if y+1 <= c and s2[y] == s3[x+y] and (x, y+1) not in visited:
+            stack.append((x, y+1)); visited.add((x, y+1))
+    return False
+```
+---
