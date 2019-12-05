@@ -14495,7 +14495,9 @@ class Solution:
             while stack and heights[stack[-1]] > heights[i]:
                 h = heights[stack.pop()]
                 res = self.process(res, h, i, stack[-1])
-
+                # h = heights[stack.pop()]
+                # w = i - stack[-1] - 1  # stack[-1] is the height before the one just pop()
+                # max_a = max(max_a, h*w)
             stack.append(i)
         return res
 
@@ -14612,5 +14614,53 @@ class Solution:
                 new_head.next = n_next
             else:
                 new_head = new_head.next
+```
+---
+## 85. Maximal Rectangle｜ 12/4
+Given a 2D binary matrix filled with 0's and 1's, find the largest rectangle containing only 1's and return its area.
+
+Example:
+
+![](assets/markdown-img-paste-20191204172118447.png)
+### 思路
+之前找histogram 長方形最大值的延伸版
+
+轉換方法是把每一行看作新的一層, 並往上累加高度
+
+累加高度的方法是：
+對於每一個點，如果是 ‘0’，則賦0，如果是 ‘1’，就賦之前的 height 值加上1
+
+### Code
+``` py
+class Solution(object):
+    def maximalRectangle(self, matrix):
+        """
+        :type matrix: List[List[str]]
+        :rtype: int
+        """
+        if not matrix:   return 0
+        row, col = len(matrix), len(matrix[0])
+        res, heights = 0, [0 for _ in range(col)]
+
+        for i in range(row):
+            for j in range(col):
+                heights[j] = (1+heights[j]) if matrix[i][j] != '0' else 0
+            res = max(res, self.largestRectangleArea(heights))
+        return res
+
+    def largestRectangleArea(self, heights):
+        # [3, 1, 3, 2, 2]
+        heights = list(map(int, heights))
+        max_a = 0
+        stack = [-1]
+        heights.append(0)
+        for i in range(len(heights)):
+            if heights[i] < heights[stack[-1]]:
+                while stack and heights[i] < heights[stack[-1]]:
+                    h = heights[stack.pop()]
+                    w = i - stack[-1] - 1
+                    max_a = max(max_a, h*w)
+            stack.append(i)
+        return max_a
 ```
 ---
