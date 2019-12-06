@@ -14914,3 +14914,85 @@ class Solution:
         return res
 ```
 ---
+## 106. Construct Binary Tree from Inorder and Postorder Traversal｜ 12/6
+Given inorder and postorder traversal of a tree, construct the binary tree.
+
+Note:
+You may assume that duplicates do not exist in the tree.
+
+For example, given
+
+![](assets/markdown-img-paste-20191206114138219.png)
+
+### 思路
+
+- 建樹大前提, 是否能從規則中找到root的位置？
+    - 先序: root為第一個元素
+    - 後序: root為最後個元素
+- 把root位置訂出來後就可以透過中序來拉出左右子樹
+- 再來使用左右子樹在中序中的**個數**來把後序也切割成對應的後序
+- 遞迴解
+
+![](assets/markdown-img-paste-2019120611462847.png)
+
+### Code
+``` py
+class Solution:
+    def buildTree(self, inorder: List[int], postorder: List[int]) -> TreeNode:
+        if not inorder or not postorder:
+            return None
+        root = ListNode(postorder[-1])
+        idx = inorder.index(root.val)
+        left_post = postorder[:idx]
+        right_post = postorder[idx:-1]
+        root.left = self.buildTree(inorder[:idx], left_post)
+        root.right = self.buildTree(inorder[idx+1:], right_post)
+        return root
+```
+
+也可以直接把最後的pop掉
+```py
+class Solution:
+    def buildTree(self, inorder: List[int], postorder: List[int]) -> TreeNode:
+        if not inorder or not postorder:
+            return None
+        root = ListNode(postorder.pop())
+        idx = inorder.index(root.val)
+        left_post = postorder[:idx]
+        right_post = postorder[idx:]
+        root.left = self.buildTree(inorder[:idx], left_post)
+        root.right = self.buildTree(inorder[idx+1:], right_post)
+        return root
+```
+Iterative: Hard to understand
+![](assets/markdown-img-paste-20191206120510811.png)
+```py
+class Solution:
+    def buildTree(self, inorder: List[int], postorder: List[int]) -> TreeNode:
+        if not postorder:
+            return None
+
+        H = {val:idx for idx, val in enumerate(inorder)}
+        stack = []
+        root = None
+        for node_val in reversed(postorder):
+            node = TreeNode(node_val)
+            if not stack:
+                # only occurs for the postorder[-1], which is the root
+                root = node
+                stack.append(node)
+            else:
+                parent = stack[-1]
+                if H[node.val] > H[prev.val]:
+                    # right subtree of the previous node
+                    parent.right = node
+                else:
+                    # left subtree of the previous node
+                    while stack and H[node.val] < H[stack[-1].val]:
+                        parent = stack.pop()
+                    parent.left = node
+                stack.append(node)
+
+        return root
+```
+---
