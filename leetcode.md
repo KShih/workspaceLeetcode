@@ -14996,3 +14996,106 @@ class Solution:
         return root
 ```
 ---
+## 109. Convert Sorted List to Binary Search Tree｜ 12/6
+Given a singly linked list where elements are sorted in ascending order, convert it to a height balanced BST.
+
+For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of every node never differ by more than 1.
+
+Example:
+
+![](assets/markdown-img-paste-20191206174914527.png)
+
+### 技巧
+
+- 找list的中點使用快慢指針
+
+### 思路
+
+- 使用快慢指針來找到List的中點, 即root
+- 並分成左list及右List繼續遞迴
+
+### Code
+``` py
+class Solution:
+    def sortedListToBST(self, head: ListNode) -> TreeNode:
+        if not head:
+            return None
+        left, right, root_val = self.partList(head)
+
+        root = TreeNode(root_val)
+        root.left = self.sortedListToBST(left)
+        root.right = self.sortedListToBST(right)
+        return root
+
+    # Part the list into: [Left List][root.val][Right List]
+    def partList(self, head):
+        if not head:
+            return None, None, None
+        elif not head.next:
+            return None, None, head.val
+
+        # To record the previous node of slow/center, in order to exclude center point in left list
+        dum = ListNode(-1)
+        dum.next = head
+
+        # Center point(root) would be slow
+        slow, fast = head, head
+        while fast and fast.next:
+            dum = dum.next
+            slow = slow.next
+            fast = fast.next.next
+
+        root_val = slow.val
+        right = slow.next
+
+        dum.next = None # Exclude center point of left list
+        left = head
+        return left, right, root_val
+```
+
+用 pre 改寫slow前一個節點
+```py
+    def partList(self, head):
+        if not head:
+            return None, None, None
+        elif not head.next:
+            return None, None, head.val
+
+        # Don't need to use dum to record the pre of slow
+        pre, slow, fast = None, head, head
+        while fast and fast.next:
+            pre = slow # This line
+            slow = slow.next
+            fast = fast.next.next
+
+        root_val = slow.val
+        right = slow.next
+
+        pre.next = None # This Line
+        left = head
+        return left, right, root_val
+```
+
+精簡寫法:
+``` py
+# recursively
+def sortedListToBST(self, head):
+    if not head:
+        return
+    if not head.next:
+        return TreeNode(head.val)
+
+    slow, fast = head, head.next.next
+    while fast and fast.next:
+        fast = fast.next.next
+        slow = slow.next
+    # tmp points to root
+    tmp = slow.next
+    # cut down the left child
+    slow.next = None
+    root = TreeNode(tmp.val)
+    root.left = self.sortedListToBST(head)
+    root.right = self.sortedListToBST(tmp.next)
+    return root
+```
+---
