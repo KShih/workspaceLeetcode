@@ -15099,3 +15099,77 @@ def sortedListToBST(self, head):
     return root
 ```
 ---
+## 114. Flatten Binary Tree to Linked List｜ 12/8
+Given a binary tree, flatten it to a linked list in-place.
+
+For example, given the following tree:
+
+![](assets/markdown-img-paste-20191208191633112.png)
+### 思路
+
+Naive Solution:
+
+先使用pre-order traversal 走過一遍樹
+
+再將root重新產生，依序連上pre_traversal的list,
+
+left為None, right為list的第一個
+
+Replace in place solution:
+
+先檢測其左子結點是否存在，如存在則將根節點和其右子節點斷開，將左子結點及其後面所有結構一起連到原右子節點的位置，把原右子節點連到元左子結點最後面的右子節點之後。
+
+![](assets/markdown-img-paste-20191208195502219.png)
+
+### Code
+``` py
+class Solution:
+    def flatten(self, root: TreeNode) -> None:
+        """
+        Do not return anything, modify root in-place instead.
+        """
+        if not root: return None
+        pre_list = []
+        pre_list = self.pre_trav(root, pre_list)
+
+        root.left = None
+        root.right = self.build_new_tree(pre_list[1:])
+
+    def pre_trav(self, root, pre_list):
+        stack = []
+        p = root
+        while p or stack:
+            if p:
+                pre_list.append(p.val)
+                stack.append(p)
+                p = p.left
+            else:
+                top = stack.pop()
+                p = top.right
+        return pre_list
+
+    def build_new_tree(self, pre_list):
+        if not pre_list:
+            return
+        root = TreeNode(pre_list[0])
+        root.left = None
+        root.right = self.build_new_tree(pre_list[1:])
+        return root
+```
+Without creating new list:
+```py
+class Solution:
+    def flatten(self, root: TreeNode) -> None:
+        while root:
+            if root.left:
+                node = root.left
+                # find the point to connected with old right
+                while node.right:
+                    node = node.right
+
+                node.right = root.right
+                root.right = root.left
+                root.left = None
+            root = root.right
+```
+---
