@@ -15173,3 +15173,84 @@ class Solution:
             root = root.right
 ```
 ---
+## 115. Distinct Subsequences｜ 12/9
+Given a string S and a string T, count the number of distinct subsequences of S which equals T.
+
+A subsequence of a string is a new string which is formed from the original string by deleting some (can be none) of the characters without disturbing the relative positions of the remaining characters. (ie, "ACE" is a subsequence of "ABCDE" while "AEC" is not).
+
+![](assets/markdown-img-paste-2019120917400379.png)
+
+### 思路
+
+TODO: Find the way to cached so that will not TLE and WA
+
+Potential Solution:
+https://leetcode.com/problems/distinct-subsequences/discuss/147637/DP-Recursion-%2B-Memoization
+
+### Code
+TLE (51/63 test pass):
+``` py
+class Solution:
+    def __init__(self):
+        self.count = 0
+
+    def numDistinct(self, s: str, t: str) -> int:
+        self.isSub(s, t)
+        return self.count
+
+    def isSub(self, s, t):
+        if not t:
+            return True
+        if not s:
+            return False
+
+        if s[0] == t[0]:
+            if self.isSub(s[1:], t[1:]): # use this char
+                self.count += 1
+            if self.isSub(s[1:], t): # not use this char
+                self.count += 1
+        else:
+            if self.isSub(s[1:], t): # not use this char
+                self.count += 1
+
+        return False
+```
+
+Cached but WA:
+```py
+class Solution:
+    def __init__(self):
+        self.count = 0
+        self.path = set()
+
+    def numDistinct(self, s: str, t: str) -> int:
+        self.isSub(s, t)
+        return self.count
+
+    def isSub(self, s, t):
+        if not t:
+            return True
+        if not s:
+            return False
+        i, j = len(s), len(t)
+
+        if s[0] == t[0]:
+            if (i-1,j-1) not in self.path:
+                self.path.add((i-1,j-1))
+                if self.isSub(s[1:], t[1:]): # use this char
+                    self.count += 1
+
+            if (i-1,j) not in self.path:
+                self.path.add((i-1,j))
+                if self.isSub(s[1:], t): # not use this char
+                    self.count += 1
+
+        else:
+            if (i-1, j) not in self.path:
+                self.path.add((i-1,j))
+                if self.isSub(s[1:], t): # not use this char
+                    self.count += 1
+
+        return False
+```
+---
