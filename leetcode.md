@@ -15326,3 +15326,76 @@ class Solution:
         return ret
 ```
 ---
+## 120. Triangle｜ 1/26
+
+Given a triangle, find the minimum path sum from top to bottom. Each step you may move to adjacent numbers on the row below.
+
+For example, given the following triangle
+
+[
+     [2],
+    [3,4],
+   [6,5,7],
+  [4,1,8,3]
+]
+The minimum path sum from top to bottom is 11 (i.e., 2 + 3 + 5 + 1 = 11).
+
+Note:
+
+Bonus point if you are able to do this using only O(n) extra space, where n is the total number of rows in the triangle.
+
+### 思路
+
+題目的例子容易引導你到陷阱的方向，greedy無法解這題 即:
+
+第二層是[3,4], 第三層是[9998, 9999, 1], 那在選擇第二層的時候要選4而不是3
+
+因此必須使用DP來解這題
+
+- Top Down:
+
+遇到這層的邊界時直接加上上一層的邊界元素，否則加上上一層的左右元素，即轉移式
+
+f[i][j] += min(f[i-1][j-1], f[i-1][j])
+
+
+- Bottom UP:
+
+待理解
+
+
+### Code
+DP Top down
+``` py
+"""
+    f[i][j] += min(f[i-1][j-1], f[i-1][j])
+"""
+class Solution:
+    def minimumTotal(self, triangle: List[List[int]]) -> int:
+        for i in range(1, len(triangle)):
+            for j in range(len(triangle[i])):
+                if j == 0:
+                    triangle[i][j] += triangle[i-1][j]
+                elif j == len(triangle[i])-1:
+                    triangle[i][j] += triangle[i-1][j-1]
+                else:
+                    triangle[i][j] += min(triangle[i-1][j], triangle[i-1][j-1])
+        return min(triangle[-1])
+```
+
+DP Bottom up:
+```c
+class Solution {
+public:
+    int minimumTotal(vector<vector<int>>& triangle) {
+        vector<int> dp(triangle.back());
+        for (int i = (int)triangle.size() - 2; i >= 0; --i) {
+            for (int j = 0; j <= i; ++j) {
+                dp[j] = min(dp[j], dp[j + 1]) + triangle[i][j];
+            }
+        }
+        return dp[0];
+    }
+};
+```
+---
