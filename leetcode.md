@@ -15254,3 +15254,53 @@ class Solution:
         return False
 ```
 ---
+## 118. Pascal's Triangle｜ 1/26
+![](assets/markdown-img-paste-20200126105025658.png)
+
+In Pascal's triangle, each number is the sum of the two numbers directly above it.
+
+Example:
+
+Input: 5
+Output:
+[
+     [1],
+    [1,1],
+   [1,2,1],
+  [1,3,3,1],
+ [1,4,6,4,1]
+]
+
+### 思路
+找規律
+
+### Code
+Naive版:
+``` py
+class Solution:
+    def generate(self, numRows: int) -> List[List[int]]:
+        if numRows <= 0:
+            return []
+        ret = [[1]]
+        for i in range(1,numRows):
+            comb = []
+            for j in range(-1, len(ret[i-1])):
+                if j == -1 or j == len(ret[i-1])-1:
+                    comb.append(1)
+                else:
+                    comb.append(ret[i-1][j] + ret[i-1][j+1])
+            ret.append(comb)
+        return ret
+```
+
+精簡版
+```py
+class Solution:
+    def generate(self, numRows: int) -> List[List[int]]:
+        res = [[1 for _ in range(i+1)] for i in range(numRows)]
+        for i in range(2, len(res)):
+            for j in range(1, len(res[i-1])):
+                res[i][j] = res[i-1][j-1] + res[i-1][j]
+        return res
+```
+---
