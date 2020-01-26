@@ -15304,3 +15304,25 @@ class Solution:
         return res
 ```
 ---
+## 119. Pascal's Triangle II｜ 1/26
+![](assets/markdown-img-paste-20200126160430325.png)
+
+### 思路
+只維護上一層的數組
+### Code
+Naive:
+``` py
+class Solution:
+    def getRow(self, rowIndex: int) -> List[int]:
+        ret = [1]
+        for i in range(1, rowIndex+1):
+            new_ret = []
+            for j in range(-1, i):
+                if j == -1 or j == i-1:
+                    new_ret.append(1)
+                else:
+                    new_ret.append(ret[j] + ret[j+1])
+            ret = new_ret
+        return ret
+```
+---
