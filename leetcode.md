@@ -1,7 +1,7 @@
 Leetcode note
 ===
 1. [Backtrack problem 演算法整理](https://leetcode.com/problems/subsets/discuss/27281/A-general-approach-to-backtracking-questions-in-Java-(Subsets-Permutations-Combination-Sum-Palindrome-Partitioning))
-2. 動態規劃(DP)講解：https://www.jianshu.com/p/a7741619dd58
+2. 動態規劃(DP)講解：https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/solution/yi-ge-tong-yong-fang-fa-tuan-mie-6-dao-gu-piao-wen/
 4. 未解題目：
 - 943, 996, 37, 212(used tree), 126(disgust), 675, 131(DP), 93(DP), 282(Hard), 968, 979, 99(Morris Traversal螺紋二叉樹),
 - Binary Search: { 981(BS), 378(Binary Search Solution), 668(same as 378), 778, 174, 875, 719, 786, 4 }
@@ -15444,5 +15444,71 @@ class Solution:
             if prices[i] > prices[i-1]:
                 profit += (prices[i] - prices[i-1])
         return profit
+```
+---
+## 123. Best Time to Buy and Sell Stock III｜ 1/28
+Say you have an array for which the ith element is the price of a given stock on day i.
+
+Design an algorithm to find the maximum profit. You may complete at most two transactions.
+
+Note: You may not engage in multiple transactions at the same time (i.e., you must sell the stock before you buy again).
+
+Example 1:
+
+Input: [3,3,5,0,0,3,1,4]
+Output: 6
+Explanation: Buy on day 4 (price = 0) and sell on day 6 (price = 3), profit = 3-0 = 3.
+             Then buy on day 7 (price = 1) and sell on day 8 (price = 4), profit = 4-1 = 3.
+Example 2:
+
+Input: [1,2,3,4,5]
+Output: 4
+Explanation: Buy on day 1 (price = 1) and sell on day 5 (price = 5), profit = 5-1 = 4.
+             Note that you cannot buy on day 1, buy on day 2 and sell them later, as you are
+             engaging multiple transactions at the same time. You must sell before buying again.
+Example 3:
+
+Input: [7,6,4,3,1]
+Output: 0
+Explanation: In this case, no transaction is done, i.e. max profit = 0.
+
+
+
+### 思路
+DP(Dynamic Programming) 標準思路: https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/solution/yi-ge-tong-yong-fang-fa-tuan-mie-6-dao-gu-piao-wen/
+
+筆記整理:
+![](assets/markdown-img-paste-20200128181418860.png)
+![](assets/markdown-img-paste-20200128181455844.png)
+
+實際操作:
+![](assets/markdown-img-paste-20200128181330698.png)
+
+### Code
+``` py
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        if len(prices) == 0:
+            return 0
+        max_day, max_trans = len(prices), 2
+
+        # initialize
+        dp = [[[-(sys.maxsize) for buy in range(2)] for trans in range(max_trans+1)] for _ in range(max_day)]
+        for day in range(max_day):
+            dp[day][0][0] = 0
+            dp[day][0][1] = 0
+
+        for day in range(max_day):
+            for trans in range(1, 3):
+                if day-1 == -1:
+                    #                 = max(dp[-1][k][0], dp[-1][k][1] + prices[day]) = max(0, -undefined)
+                    dp[day][trans][0] = 0
+                    #                 = max(dp[-1][k][1], dp[-1][k][0] - prices[day]) = max(-undefined, 0 -prices[day])
+                    dp[day][trans][1] = - prices[day]
+                    continue
+                dp[day][trans][0] = max(dp[day-1][trans][0], dp[day-1][trans][1] + prices[day])
+                dp[day][trans][1] = max(dp[day-1][trans][1], dp[day-1][trans-1][0] - prices[day])
+
+        return dp[max_day-1][max_trans][0]
 ```
 ---
