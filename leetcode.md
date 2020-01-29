@@ -15512,3 +15512,110 @@ class Solution:
         return dp[max_day-1][max_trans][0]
 ```
 ---
+## 139. Word Break｜ 1/29
+Given a non-empty string s and a dictionary wordDict containing a list of non-empty words, determine if s can be segmented into a space-separated sequence of one or more dictionary words.
+
+Note:
+
+The same word in the dictionary may be reused multiple times in the segmentation.
+You may assume the dictionary does not contain duplicate words.
+
+Example 1:
+
+Input: s = "leetcode", wordDict = ["leet", "code"]
+Output: true
+Explanation: Return true because "leetcode" can be segmented as "leet code".
+
+
+Example 2:
+
+Input: s = "applepenapple", wordDict = ["apple", "pen"]
+Output: true
+Explanation: Return true because "applepenapple" can be segmented as "apple pen apple".
+             Note that you are allowed to reuse a dictionary word.
+
+Example 3:
+
+Input: s = "catsandog", wordDict = ["cats", "dog", "sand", "and", "cat"]
+Output: false
+### 思路
+
+Recursive法:
+
+使用startwith來確定前半已可從字典中拼出, 並且遞迴後半
+
+若後半也可以從遞迴拼出, 則此串即為valid
+
+過程可用cached dict來記錄以這個字串開頭的, 是否會有結果
+
+DP 法:
+
+相同的概念, 但以兩個for迴圈遍歷所有可能
+
+![](assets/markdown-img-paste-20200129180122745.png)
+
+### Code
+
+TLE, 且無法cached的方法
+``` py
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        return self.recur(s, wordDict, 1)
+
+    def recur(self, totalstr, wordDict, n):
+        if not totalstr:
+            return True
+
+        if n > len(totalstr):
+            return False
+
+        if totalstr[:n] not in wordDict:
+            return self.recur(totalstr, wordDict, n+1)
+        else:
+            if self.recur(totalstr[n:], wordDict, 1):
+                return True
+            else:
+                return self.recur(totalstr, wordDict, n+1)
+```
+
+用for遍歷所有word in Dictionary, 而不是使用遞迴的方式
+cached的目的不是判斷true, 而是判斷false來剪枝
+``` py
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        cached = {}
+        return self.recur(s, wordDict, cached)
+
+    def recur(self, totalstr, wordDict, cached):
+        if not totalstr:
+            return True
+
+        if totalstr in cached:
+            return cached[totalstr]
+
+        for w in wordDict:
+            if totalstr.startswith(w):
+                if self.recur(totalstr[len(w):], wordDict, cached):
+                    cached[totalstr] = True
+                    return True
+
+        cached[totalstr] = False
+        return False
+```
+
+DP solution, recommended
+``` py
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        # dp[i] means s[0:i] is in wordDict. Find dp[n+1]
+        dp = [False for _ in range(len(s)+1)]
+        dp[0] = True
+
+        for end in range(len(s)+1):
+            for start in range(end):
+                if dp[start] and s[start:end] in wordDict:
+                    dp[end] = True
+                    break
+        return dp[-1]
+```
+---
