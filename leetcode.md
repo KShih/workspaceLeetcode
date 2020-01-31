@@ -15624,3 +15624,59 @@ class Solution:
         return dp[-1]
 ```
 ---
+## 540. Single Element in a Sorted Array｜ 1/31
+You are given a sorted array consisting of only integers where every element appears exactly twice, except for one element which appears exactly once. Find this single element that appears only once.
+
+Example 1:
+
+Input: [1,1,2,3,3,4,4,8,8]
+Output: 2
+Example 2:
+
+Input: [3,3,7,7,10,11,11]
+Output: 10
+### 思路
+
+因為這題要求要O(log n)，那肯定是用binary search解
+
+在討論case的時候需要討論mid的位置是偶數還是基數 (當初在解的時候沒有想到)
+
+在宣告left right邊界的時候需想到答案可能會出現在極右, 那right就必須是right-1
+
+還有mid本身就是exception的情框(如果外層if是使用nums[mid]會好處理一點)
+
+
+### Code
+O(log n)
+``` py
+"""
+112334488
+112233488
+112234455
+
+11223448899
+11224455899
+
+
+"""
+class Solution:
+    def singleNonDuplicate(self, nums: List[int]) -> int:
+        l, r = 0, len(nums)-1
+
+        while r > l: # equal or not?
+            mid = l+(r-l)//2
+            if mid % 2 == 0:
+                if nums[mid-1] == nums[mid]:
+                    r = mid-2 # 112
+                elif nums[mid+1] != nums[mid]: # !mid+1 and !mid-1
+                    return nums[mid]
+                else:
+                    l = mid+2
+            else:
+                if nums[mid+1] == nums[mid]:
+                    r = mid-1 # 11223
+                else:
+                    l = mid+1
+        return nums[r]
+```
+---
