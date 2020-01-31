@@ -15354,18 +15354,28 @@ Bonus point if you are able to do this using only O(n) extra space, where n is t
 
 - Top Down:
 
-遇到這層的邊界時直接加上上一層的邊界元素，否則加上上一層的左右元素，即轉移式
+遇到這層的邊界時直接加上上一層的邊界元素，
+
+否則加上上一層的左右元素，即轉移式
 
 f[i][j] += min(f[i-1][j-1], f[i-1][j])
 
 
-- Bottom UP:
+- Bottom-up: 不修改原數組的Space O(n):
 
-待理解
+倒過來想的方法:
+
+ 在Top down時，可能從上層走到下層的路徑是: 上層元素idx and 上層元素idx+1
+
+ 並隨著iteration的推進，有效的最小值會越來越靠近前面
+
+ ![](assets/markdown-img-paste-20200131005355184.png)
+
+ (最後一行DP的 -4是invalid)
 
 
 ### Code
-DP Top down
+DP Top down, Space O(1)但修改了原數組
 ``` py
 """
     f[i][j] += min(f[i-1][j-1], f[i-1][j])
@@ -15383,20 +15393,15 @@ class Solution:
         return min(triangle[-1])
 ```
 
-DP Bottom up:
-```c
-class Solution {
-public:
-    int minimumTotal(vector<vector<int>>& triangle) {
-        vector<int> dp(triangle.back());
-        for (int i = (int)triangle.size() - 2; i >= 0; --i) {
-            for (int j = 0; j <= i; ++j) {
-                dp[j] = min(dp[j], dp[j + 1]) + triangle[i][j];
-            }
-        }
-        return dp[0];
-    }
-};
+DP Bottom-up, Space O(n):
+```py
+class Solution:
+    def minimumTotal(self, triangle: List[List[int]]) -> int:
+        dp = triangle[-1] # copy the last row and update it
+        for i in range(len(triangle)-2, -1, -1): # loop from last two row
+            for j in range(len(triangle[i])):
+                dp[j] = min(dp[j], dp[j+1]) + triangle[i][j]
+        return dp[0]
 ```
 ---
 ## 122. Best Time to Buy and Sell Stock II｜ 1/27
