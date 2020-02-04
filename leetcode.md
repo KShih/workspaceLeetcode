@@ -15680,3 +15680,115 @@ class Solution:
         return nums[r]
 ```
 ---
+## 130. Surrounded Regions｜ 2/3
+Given a 2D board containing 'X' and 'O' (the letter O), capture all regions surrounded by 'X'.
+
+A region is captured by flipping all 'O's into 'X's in that surrounded region.
+
+![](assets/markdown-img-paste-20200203234826313.png)
+
+### 技巧
+
+判斷區間:
+
+`if (r in [0, len(board)-1] or c in [0, len(board[0])-1])`
+
+### 思路
+
+在Explanation中找到了靈感
+
+如果不看explanation的話思路應該是:
+
+問自己什麼情況下Ｏ要保留，就是跟邊界有聯通的要保留
+
+那就可以從邊界去掃描，針對邊界是O的在對他進行DFS
+
+先把所有他連結的標記成$，最後在遍歷一遍陣列，
+
+將還是O的變為X，將是$變成O，完成。
+
+BFS的解法大同小異，初步將邊界中的O丟入queue中，
+
+將符合條件的更改標記，最後在遍歷，把標記的改回，完成。
+
+
+### Code
+DFS
+``` py
+class Solution:
+    def solve(self, board: List[List[str]]) -> None:
+        """
+        Do not return anything, modify board in-place instead.
+        """
+        if not board:
+            return
+        m, n = len(board), len(board[0])
+
+        # scan top
+        for j in range(n):
+            if board[0][j] == "O":
+                self.dfs(board, 0, j)
+
+        # scan right
+        for i in range(m):
+            if board[i][n-1] == "O":
+                self.dfs(board, i, n-1)
+
+        # scan bottom
+        for j in range(n):
+            if board[m-1][j] == "O":
+                self.dfs(board, m-1, j)
+
+        # scan left
+        for i in range(m):
+            if board[i][0] == "O":
+                self.dfs(board, i, 0)
+
+        # walk through
+        for i in range(m):
+            for j in range(n):
+                if board[i][j] == "O":
+                    board[i][j] = "X"
+                elif board[i][j] == "$":
+                    board[i][j] = "O"
+
+    def dfs(self, board, i, j):
+        if board[i][j] == "O":
+            board[i][j] = "$"
+
+        if i-1 > 0 and board[i-1][j] == "O":
+            self.dfs(board, i-1, j)
+
+        if j-1 > 0 and board[i][j-1] == "O":
+            self.dfs(board, i, j-1)
+
+        if i+1 < len(board) and board[i+1][j] == "O":
+            self.dfs(board, i+1, j)
+
+        if j+1 < len(board[0]) and board[i][j+1] == "O":
+            self.dfs(board, i, j+1)
+```
+
+BFS:
+```py
+def solve(self, board):
+    queue = collections.deque([])
+    for r in xrange(len(board)):
+        for c in xrange(len(board[0])):
+            if (r in [0, len(board)-1] or c in [0, len(board[0])-1]) and board[r][c] == "O":
+                queue.append((r, c))
+    while queue:
+        r, c = queue.popleft()
+        if 0<=r<len(board) and 0<=c<len(board[0]) and board[r][c] == "O":
+            board[r][c] = "$"
+            queue.append((r-1, c)); queue.append((r+1, c))
+            queue.append((r, c-1)); queue.append((r, c+1))
+
+    for r in xrange(len(board)):
+        for c in xrange(len(board[0])):
+            if board[r][c] == "O":
+                board[r][c] = "X"
+            elif board[r][c] == "$":
+                board[r][c] = "O"
+```
+---
