@@ -15792,3 +15792,148 @@ def solve(self, board):
                 board[r][c] = "O"
 ```
 ---
+## 140. Word Break II(Solution 2 缺優化)｜ 2/5
+Given a non-empty string s and a dictionary wordDict containing a list of non-empty words, add spaces in s to construct a sentence where each word is a valid dictionary word. Return all such possible sentences.
+
+Note:
+
+The same word in the dictionary may be reused multiple times in the segmentation.
+You may assume the dictionary does not contain duplicate words.
+Example 1:
+
+Input:
+s = "catsanddog"
+
+wordDict = ["cat", "cats", "and", "sand", "dog"]
+
+Output:
+[
+  "cats and dog",
+  "cat sand dog"
+]
+Example 2:
+
+Input:
+s = "pineapplepenapple"
+
+wordDict = ["apple", "pen", "applepen", "pine", "pineapple"]
+
+Output:
+[
+  "pine apple pen apple",
+  "pineapple pen apple",
+  "pine applepen apple"
+]
+Explanation: Note that you are allowed to reuse a dictionary word.
+Example 3:
+
+Input:
+s = "catsandog"
+
+wordDict = ["cats", "dog", "sand", "and", "cat"]
+
+Output:
+[]
+### 思路
+
+找組合的題，十之八九使用遞迴解，並且可以使用cache來優化。
+
+TLE 那個解法也挺好，比較容易想到，仍缺cache優化法。
+
+先把題目簡化成字串 "dogcat", {"dog", "cat"}
+
+我們會先比對dog再比對cat，要是發現結束了，就將單字組拼起來
+
+所以我們必須用一個文字標示結束($)
+
+拼起來的部份是：此單字 + 空格(如果組合單字中的單字不是$) + 組合單字
+
+並遞迴式回傳回去
+
+以題目例子來看:  s = "catsanddog", wordDict = ["cat", "cats", "and", "sand", "dog"]
+
+走到字串最後時 cur_comb = {"$"}，並進入for迴圈，最後res = {dog} 結束，並回傳到上一層
+
+此層當前單字為sand，cur_comb = {"$"} ，將其組合得到res = {sand dog}回傳，
+
+以此類推直到res = {cat sand dog}，此時繼續匹配下一個單字"cats"，並繼續剛剛的步驟直到最上層走完所有字典裡的字
+
+### Code
+``` py
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> List[str]:
+        return self.find_break(s, wordDict, {})
+
+    def find_break(self, s, wordDict, mem):
+        if s in mem:
+            return mem[s]
+        if s == "":
+            return "$"
+
+        res = []
+        for word in wordDict:
+            if not s.startswith(word):
+                continue
+
+            cur_comb = self.find_break(s[len(word):], wordDict, mem)
+
+            for voc in cur_comb:
+                res.append(word + (" " if voc != "$" else "") + (voc if voc != "$" else ""))
+
+        mem[s] = res
+        return res
+```
+
+TLE, but easy
+Easy Understand Solution
+``` py
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> List[str]:
+        res = []
+        self.find_res(s, wordDict, '', res)
+        return res
+
+    def find_res(self, s, wordDict, path, res):
+        if not s:
+            res.append(path[:-1]) # excluding the last space
+            return
+
+        for i in range(1, len(s)+1):
+            if s[:i] in wordDict:
+                self.find_res(s[i:], wordDict, path + s[:i] + ' ', res)
+        return
+```
+
+以wordBreak1 作為剪枝，still TLE
+```py
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> List[str]:
+        res = []
+        self.find_res(s, wordDict, '', res)
+        return res
+
+    def find_res(self, s, wordDict, path, res):
+        if self.check_s:
+            if not s:
+                res.append(path[:-1]) # excluding the last space
+                return
+
+            for i in range(1, len(s)+1):
+                if s[:i] in wordDict:
+                    self.find_res(s[i:], wordDict, path + s[:i] + ' ', res)
+            return
+
+    # Same as wordBreak1
+    def check_s(self, s, wordDict):
+        # dp[i]: s[0:i] is in wordDict, find dp[n+1]
+        dp = [False for _ in range(len(s)+1)]
+        dp[0] = True
+
+        for end in range(len(s)+1):
+            for start in range(end):
+                if dp[start] and s[start:end] in wordDict:
+                    dp[end] = True
+                    break
+        return dp[-1]
+```
+---
