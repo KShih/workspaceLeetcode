@@ -15991,7 +15991,7 @@ class Solution:
         return
 ```
 
-Memorization but still TLE (Maybe because still recursive thought return value directly):
+Memorization but still very slow (Maybe because still recursive thought return value directly):
 ```py
 class Solution:
     def knightProbability(self, N: int, K: int, r: int, c: int) -> float:
@@ -16008,8 +16008,8 @@ class Solution:
         sm = 0
         for dir in ((1,2), (1,-2), (-1,2), (-1,-2), (2,1), (2,-1), (-2,1), (-2,-1)):
             if 0 <= r+dir[0] < n and 0 <= c+dir[1] < n:
-                mem[(k, r+dir[0], c+dir[1])] = self.recur(n, k-1, r+dir[0], c+dir[1], mem)
-                sm += mem[(k, r+dir[0], c+dir[1])]
+                mem[(k-1, r+dir[0], c+dir[1])] = self.recur(n, k-1, r+dir[0], c+dir[1], mem)
+                sm += mem[(k-1, r+dir[0], c+dir[1])]
 
         return sm
 ```
