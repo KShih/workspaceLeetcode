@@ -15937,3 +15937,119 @@ class Solution:
         return dp[-1]
 ```
 ---
+## 688. Knight Probability in Chessboard｜ 2/6
+On an NxN chessboard, a knight starts at the r-th row and c-th column and attempts to make exactly K moves. The rows and columns are 0 indexed, so the top-left square is (0, 0), and the bottom-right square is (N-1, N-1).
+
+A chess knight has 8 possible moves it can make, as illustrated below. Each move is two squares in a cardinal direction, then one square in an orthogonal direction.
+
+![](assets/markdown-img-paste-20200206183415149.png)
+
+Each time the knight is to move, it chooses one of eight possible moves uniformly at random (even if the piece would go off the chessboard) and moves there.
+
+The knight continues moving until it has made exactly K moves or has moved off the chessboard. Return the probability that the knight remains on the board after it has stopped moving.
+
+Example:
+
+Input: 3, 2, 0, 0
+Output: 0.0625
+Explanation: There are two moves (to (1,2), (2,1)) that will keep the knight on the board.
+From each of those positions, there are also two moves that will keep the knight on the board.
+The total probability the knight stays on the board is 0.0625.
+
+
+Note:
+
+N will be between 1 and 25.
+K will be between 0 and 100.
+The knight always initially starts on the board.
+### 思路
+
+Recursive 解，但要想到如何cache
+
+### Code
+Naive TLE
+``` py
+class Solution:
+    def __init__(self):
+        self.cnt = 0
+        self.dirs = [(1,2), (1,-2), (-1,2), (-1,-2), (2,1), (2,-1), (-2,1), (-2,-1)]
+
+    def knightProbability(self, N: int, K: int, r: int, c: int) -> float:
+        if K == 0:
+            return 1.0
+        self.recur(N, K, r, c)
+        return self.cnt / (8**K)
+
+    def recur(self, n, k, r, c):
+        if k == 0:
+            return
+        for dir in self.dirs:
+            if 0 <= r+dir[0] < n and 0 <= c+dir[1] < n:
+                if k == 1:
+                    self.cnt += 1
+                self.recur(n, k-1, r+dir[0], c+dir[1])
+        return
+```
+
+Memorization but still TLE (Maybe because still recursive thought return value directly):
+```py
+class Solution:
+    def knightProbability(self, N: int, K: int, r: int, c: int) -> float:
+        mem = {}
+        return self.recur(N, K, r, c, mem) / 8**K
+
+
+    def recur(self, n, k, r, c, mem):
+        if k == 0:
+            return 1.0
+        if (k, r, c) in mem:
+            return mem[(k,r,c)]
+
+        sm = 0
+        for dir in ((1,2), (1,-2), (-1,2), (-1,-2), (2,1), (2,-1), (-2,1), (-2,-1)):
+            if 0 <= r+dir[0] < n and 0 <= c+dir[1] < n:
+                mem[(k, r+dir[0], c+dir[1])] = self.recur(n, k-1, r+dir[0], c+dir[1], mem)
+                sm += mem[(k, r+dir[0], c+dir[1])]
+
+        return sm
+```
+
+Perfect solution without Cache
+```py
+class Solution:
+    def knightProbability(self, N: int, K: int, r: int, c: int) -> float:
+        mem = {}
+        def recur(k, r, c, P):
+            p = 0
+            if 0 <= r < N and 0 <= c < N:
+                if k < K:
+                    for dx, dy in ((1,2), (1,-2), (-1,2), (-1,-2), (2,1), (2,-1), (-2,1), (-2,-1)):
+                        nex_x, nex_y = r + dx, c + dy
+                        p += recur(k+1, nex_x, nex_y, P/8.0)
+                else:
+                    p = P
+            return p
+        return recur(0, r, c, 1.0)
+```
+
+Perfect solution with Cache
+```py
+class Solution:
+    def knightProbability(self, N: int, K: int, r: int, c: int) -> float:
+        mem = {}
+        def recur(k, r, c, P):
+            res = 0
+            if 0 <= r < N and 0 <= c < N:
+                if k < K:
+                    for dx, dy in ((1,2), (1,-2), (-1,2), (-1,-2), (2,1), (2,-1), (-2,1), (-2,-1)):
+                        nex_x, nex_y = r + dx, c + dy
+
+                        if (nex_x, nex_y, k+1) not in mem:
+                            mem[(nex_x, nex_y, k+1)] = recur(k+1, nex_x, nex_y, P/8.0)
+                        res += mem[(nex_x, nex_y, k+1)]
+                else:
+                    res = P
+            return res
+        return recur(0, r, c, 1.0)
+```
+---
