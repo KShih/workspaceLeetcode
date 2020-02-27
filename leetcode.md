@@ -16053,3 +16053,62 @@ class Solution:
         return recur(0, r, c, 1.0)
 ```
 ---
+## 863. All Nodes Distance K in Binary Tree｜ 2/27
+We are given a binary tree (with root node root), a target node, and an integer value K.
+
+Return a list of the values of all nodes that have a distance K from the target node.  The answer can be returned in any order.
+
+Example 1:
+
+![](assets/markdown-img-paste-20200227174317797.png)
+### 思路
+對於這種還能往parent方向走的tree題，最快的方法就是建立一個跟parent的連結
+
+最好的方式是直接在node裡面新增.parrent的參數但是leetcode不給這麼做
+
+那就換一種方式建立一個孩子跟parent的map
+
+並且在dfs的步驟中多一個走訪parent的步驟
+
+### Code
+``` py
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def distanceK(self, root: TreeNode, target: TreeNode, K: int) -> List[int]:
+        if not root:    return []
+        parent_map = {root: None}
+        self.build_parent(root, None, parent_map) # build the map {node: node.parent}
+
+        res, seen = [], []
+        self.dfs(target, K, res, seen, parent_map)
+
+        return res
+
+    def dfs(self, root, k, res, seen, parent_map):
+        if root in seen or not root:
+            return
+        else:
+            seen.append(root)
+
+        if k == 0:
+            res.append(root.val)
+        else:
+            self.dfs(root.left, k-1, res, seen, parent_map)
+            self.dfs(root.right, k-1, res, seen, parent_map)
+            self.dfs(parent_map[root], k-1, res, seen, parent_map) # also traverse its parent
+
+    def build_parent(self, root, parent, parent_map):
+        if not root:
+            return
+        parent_map[root] = parent
+        self.build_parent(root.left, root, parent_map)
+        self.build_parent(root.right, root, parent_map)
+
+```
+---
