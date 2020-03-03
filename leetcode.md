@@ -16112,3 +16112,123 @@ class Solution:
 
 ```
 ---
+## 138. Copy List with Random Pointer｜ 3/2
+
+A linked list is given such that each node contains an additional random pointer which could point to any node in the list or null.
+
+Return a deep copy of the list.
+
+The Linked List is represented in the input/output as a list of n nodes. Each node is represented as a pair of [val, random_index] where:
+
+val: an integer representing Node.val
+random_index: the index of the node (range from 0 to n-1) where random pointer points to, or null if it does not point to any node.
+
+![](assets/markdown-img-paste-20200302232748736.png)
+
+### 思路
+
+簡而言之這題就是要求你要完整(深度)複製一個LinkedList(每個節點都要複製)，
+
+這題的難點是在還必須維繫Random Pointer，也就是新的List中的Random pointer也是指向新的節點
+
+兩種做法：一個使用字典實現，另一個inline 空間複雜度O(1)的做法，
+
+1. 字典做法：
+
+把整個node當作key, value則是新的節點，即 Node(oldnode.val)
+
+並在跑一遍node, 這次則是將所有節點的新節點加上`next`跟`random`
+
+因為我們在上一步已經建立所有舊節點的新位置, 因此這個步驟就使用`dic.get()` 把值叫出來就可了
+
+這邊注意一個trick，使用 dict().get()，來取值，可以避免遇到Null時會出錯
+
+(default dict().get()不到東西時會回傳一個default的值)
+
+
+2. O(1) 做法:
+
+這邊的trick是直接在old node旁複製一個new node，
+
+原列表(括弧內為random): 1(2) -> 2(3) -> 3(1)
+
+新列表: 1(2) -> 1(null) -> 2(3) -> 2(null) -> 3(1) -> 3(null)
+
+下個步驟就是將上面random為null的部分填上值，值為oldnode的random的下個節點，
+
+這邊就是為什麼我們要把new node建在old node旁邊的原因，有個通則讓random不random
+
+`node.next.random = node.random.next`
+
+最後一個步驟就是將新的節點取出
+
+### Code
+
+``` py
+"""
+# Definition for a Node.
+class Node:
+    def __init__(self, val, next, random):
+        self.val = val
+        self.next = next
+        self.random = random
+"""
+class Solution:
+    def copyRandomList(self, head: 'Node') -> 'Node':
+        dic = dict()
+        node = head
+        while node:
+            dic[node] = Node(node.val)
+            node = node.next
+
+        node = head
+        while node:
+            dic[node].next = dic.get(node.next)
+            dic[node].random = dic.get(node.random)
+            node = node.next
+
+        return dic.get(head)
+```
+
+O(1) space
+```py
+"""
+# Definition for a Node.
+class Node:
+    def __init__(self, val, next, random):
+        self.val = val
+        self.next = next
+        self.random = random
+"""
+class Solution:
+    def copyRandomList(self, head: 'Node') -> 'Node':
+        if not head: return None
+        # copy a new node next to original one
+        node = head
+        while node:
+            new = Node(node.val)
+            new.next = node.next
+            node.next = new
+            node = node.next.next
+
+        # assign correct random pointer
+        node = head
+        while node:
+            if node.random:
+                node.next.random = node.random.next # could use .next because the new node is right next to original node
+            node = node.next.next
+
+        # create new list
+        node = head
+        newhead = node.next
+        new = newhead
+        while new.next:
+            node.next = new.next
+            new.next = node.next.next
+            node = node.next
+            new = new.next
+
+        return newhead
+
+```
+---
