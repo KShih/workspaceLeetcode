@@ -16338,3 +16338,35 @@ class Solution:
         return stack[0]
 ```
 ---
+## 151. Reverse Words in a String｜ 3/3
+Given an input string, reverse the string word by word.
+![](assets/markdown-img-paste-20200303220825931.png)
+
+### 技巧
+
+使用`rstrip()` 來刪除字串最後的空白
+
+
+### Code
+``` py
+class Solution:
+    def reverseWords(self, s: str) -> str:
+        temp = ""
+        stack = []
+        for ch in s:
+            if ch == " ":
+                if temp != "":
+                    stack.append(temp)
+                    temp = ""
+                continue
+            else:
+                temp += ch
+        if temp != "":
+            stack.append(temp)
+
+        res = ""
+        while stack:
+            res += (stack.pop()) + " "
+        return res.rstrip()
+```
+---
