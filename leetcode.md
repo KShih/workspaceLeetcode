@@ -16291,3 +16291,50 @@ class Solution:
         return seen_once
 ```
 ---
+## 150. Evaluate Reverse Polish Notation｜ 3/3
+Evaluate the value of an arithmetic expression in Reverse Polish Notation.
+
+Valid operators are +, -, *, /. Each operand may be an integer or another expression.
+
+Note:
+
+Division between two integers should truncate toward zero.
+The given RPN expression is always valid. That means the expression would always evaluate to a result and there won't be any divide by zero operation.
+
+![](assets/markdown-img-paste-20200303214915481.png)
+### 思路
+
+唯一要注意的是除法，6//(-132) 在py3 是-1, 但這裡是要為0
+
+### Code
+``` py
+class Solution:
+    def evalRPN(self, tokens: List[str]) -> int:
+        stack = []
+        op = ["+", "-", "*", "/"]
+        while tokens:
+            nex = tokens.pop(0)
+            if nex in op:
+                num2 = int(stack.pop())
+                num1 = int(stack.pop())
+                if nex == "+":
+                    num = num1+num2
+                elif nex == "-":
+                    num = num1-num2
+                elif nex == "*":
+                    num = num1*num2
+                elif nex == "/":
+                    if num1 * num2 < 0 and num1 % num2 != 0:
+                        num = num1//num2 + 1
+                    else:
+                        num = num1//num2
+                else:
+                    print("op error")
+                stack.append(num)
+            else:
+                stack.append(nex)
+        if len(stack) != 1:
+            print("error")
+        return stack[0]
+```
+---
