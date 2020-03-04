@@ -16370,3 +16370,57 @@ class Solution:
         return res.rstrip()
 ```
 ---
+## 152. Maximum Product Subarray｜ 3/3 (使用兩個DP數組)
+
+Given an integer array nums, find the contiguous subarray within an array (containing at least one number) which has the largest product.
+
+Example 1:
+
+Input: [2,3,-2,4]
+
+Output: 6
+
+Explanation: [2,3] has the largest product 6.
+
+
+Example 2:
+
+Input: [-2,0,-1]
+
+Output: 0
+
+Explanation: The result cannot be 2, because [-2,-1] is not a subarray.
+### 思路
+
+一眼就看出是DP題，感覺還跟背包問題有點關係，
+
+但問題的條件沒有像背包問題那麼多(價值, 背包大小)
+
+但複雜的方向是另一種，會有0跟負數的情況，
+
+這種類型的問題沒辦法用一個陣列來記錄所有可能的最優解，
+
+因為*最小的有能在下一個狀態變成最大的*，
+
+因此我們必須使用兩個陣列來分別紀錄，目前的最大跟最小(必須包含當前的數)
+
+即: f[i] 表示子數組 [0, i] 範圍內並且一定包含 nums[i] 數字的最大子數組乘積，g[i] 表示子數組 [0, i] 範圍內並且一定包含 nums[i] 數字的最小子數組乘積
+
+### Code
+``` py
+class Solution:
+    def maxProduct(self, nums: List[int]) -> int:
+        pmax, pmin = [], []
+        for num in nums:
+            if not pmax and not pmin:
+                pmax.append(num)
+                pmin.append(num)
+                continue
+            temp_max = max(num * pmin[-1], max(num, num * pmax[-1]))
+            temp_min = min(num * pmin[-1], min(num, num * pmax[-1]))
+            pmax.append(temp_max)
+            pmin.append(temp_min)
+
+        return max(pmax)
+```
+---
