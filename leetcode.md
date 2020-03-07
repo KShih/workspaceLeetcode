@@ -16424,3 +16424,53 @@ class Solution:
         return max(pmax)
 ```
 ---
+## 156. Binary Tree Upside Down｜ 3/7 (Tree 的右旋)
+Given a binary tree where all the right nodes are either leaf nodes with a sibling (a left node that shares the same parent node) or empty, flip it upside down and turn it into a tree where the original right nodes turned into left leaf nodes. Return the new root.
+
+Example:
+
+![](assets/markdown-img-paste-20200307003953316.png)
+
+### 思路
+
+首先先釐清題目！這題其實就是要我們將這棵樹右旋。
+
+那就可以來思考什麼是右旋，右旋就是左變中，中遍右，右變左。
+
+估計也是使用遞迴/iterative來解決這個問題，首先考慮遞迴。
+
+我們可以先從左下角開始考慮。
+
+程式上沒有所謂的旋轉，竟然知道左下那個節點會變成新的頭，
+
+那我們如果從最左下開始調整，我們便可以利用4底下的 Null node來分別放置5跟2，使其好像旋轉了一般，
+
+因此這時候的樹應該會長成這樣，如圖中的A
+
+在思考時常會以為最後兩行root.left = None, root.right=None，不會造成遺失結點嗎？
+
+但並不會的，我們已經透過把2擺在right就跟之前的節點建立了關聯，並且可以用遞迴迴到上一層
+
+下一層回到舊的跟節點1，重複上面的步驟可以讓1 3 很自然的接到了2的下面。
+
+![](assets/markdown-img-paste-20200307010442616.png)
+
+**結論：樹的旋轉並不是真的選轉，只是將節點接在他該接的位置上而已**
+
+### Code
+``` py
+class Solution:
+    def upsideDownBinaryTree(self, root: TreeNode) -> TreeNode:
+        if not root or not root.left:
+            return root
+        l = root.left # 待會要進行移動的動作，必須將他們與root一樣存起來
+        r = root.right
+        res = self.upsideDownBinaryTree(l)
+
+        l.left = r
+        l.right = root
+        root.left = None
+        root.right = None
+        return res
+```
+---
