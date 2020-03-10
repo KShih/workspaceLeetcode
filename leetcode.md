@@ -16777,3 +16777,64 @@ class Solution:
 
 ```
 ---
+## 163. Missing Ranges｜ 3/10
+Given a sorted integer array nums, where the range of elements are in the inclusive range [lower, upper], return its missing ranges.
+
+Example:
+
+Input: nums = [0, 1, 3, 50, 75], lower = 0 and upper = 99,
+
+Output: ["2", "4->49", "51->74", "76->99"]
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def findMissingRanges(self, nums: List[int], lower: int, upper: int) -> List[str]:
+
+        if not nums or nums[0] != lower:
+            nums.insert(0, lower-1)
+        nums.append(upper+1)
+        res = []
+
+        for i in range(1, len(nums)):
+            if nums[i] - nums[i-1] > 1:
+                if nums[i]-2 == nums[i-1]:
+                    res.append(str(nums[i]-1))
+                else:
+                    res.append(f"{nums[i-1]+1}->{nums[i]-1}")
+        return res
+```
+
+Deal with if the uppder is INT_MAX, we cannot add one on it
+```py
+class Solution:
+    def findMissingRanges(self, nums: List[int], lower: int, upper: int) -> List[str]:
+        res = []
+        next_num = lower
+
+        for i in range(len(nums)):
+            if next_num > nums[i]: # not in the range
+                continue
+
+            if next_num == nums[i]:
+                next_num = nums[i] + 1
+                continue
+
+            res = self.get_range(res, next_num, nums[i]-1)
+            next_num = nums[i] + 1
+
+        # deal with the last element upper
+        if next_num <= upper:
+            res = self.get_range(res, next_num, upper)
+        return res
+
+    def get_range(self, res, n1, n2):
+        if n1 == n2:
+            res.append(str(n1))
+        else:
+            res.append(f"{n1}->{n2}")
+        return res
+```
+---
