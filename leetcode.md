@@ -16585,3 +16585,81 @@ class Solution:
             return True
 ```
 ---
+## 157. Read N Characters Given Read4｜ 3/9
+Given a file and assume that you can only read the file using a given method read4, implement a method to read n characters.
+
+
+
+Method read4:
+
+The API read4 reads 4 consecutive characters from the file, then writes those characters into the buffer array buf.
+
+The return value is the number of actual characters read.
+
+Note that read4() has its own file pointer, much like FILE *fp in C.
+
+Definition of read4:
+
+    Parameter:  char[] buf
+    Returns:    int
+
+Note: buf[] is destination not source, the results from read4 will be copied to buf[]
+Below is a high level example of how read4 works:
+
+File file("abcdefghijk"); // File is "abcdefghijk", initially file pointer (fp) points to 'a'
+char[] buf = new char[4]; // Create buffer with enough space to store characters
+read4(buf); // read4 returns 4. Now buf = "abcd", fp points to 'e'
+read4(buf); // read4 returns 4. Now buf = "efgh", fp points to 'i'
+read4(buf); // read4 returns 3. Now buf = "ijk", fp points to end of file
+
+Method read:
+
+By using the read4 method, implement the method read that reads n characters from the file and store it in the buffer array buf. Consider that you cannot manipulate the file directly.
+
+The return value is the number of actual characters read.
+
+![](assets/markdown-img-paste-20200309201149187.png)
+![](assets/markdown-img-paste-20200309201207909.png)
+
+### 思路
+
+
+### Code
+``` py
+"""
+The read4 API is already defined for you.
+
+    @param buf, a list of characters
+    @return an integer
+    def read4(buf):
+
+# Below is an example of how the read4 API can be called.
+file = File("abcdefghijk") # File is "abcdefghijk", initially file pointer (fp) points to 'a'
+buf = [' '] * 4 # Create buffer with enough space to store characters
+read4(buf) # read4 returns 4. Now buf = ['a','b','c','d'], fp points to 'e'
+read4(buf) # read4 returns 4. Now buf = ['e','f','g','h'], fp points to 'i'
+read4(buf) # read4 returns 3. Now buf = ['i','j','k',...], fp points to end of file
+"""
+class Solution:
+    def read(self, buf, n):
+        """
+        :type buf: Destination buffer (List[str])
+        :type n: Number of characters to read (int)
+        :rtype: The number of actual characters read (int)
+        """
+        idx = 0 # global idx for how far we write into buf
+        while n > 0:
+            buf4 = [""] * 4 # the buf we use to catch the data, and use to append to buf
+            length = read4(buf4) # read into buf4
+            if length == 0:
+                return idx
+            else:
+                # Write into buf directly (we ask to make sure buf contain correct data)
+                for i in range(min(length, n)):
+                    buf[idx] = buf4[i]
+                    idx += 1
+                    n -= 1 # the maximum we still can read
+        return idx
+
+```
+---
