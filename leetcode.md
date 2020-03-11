@@ -16915,3 +16915,62 @@ class Solution:
         return num1, num2
 ```
 ---
+## 166. Fraction to Recurring Decimal｜ 3/11
+Given two integers representing the numerator and denominator of a fraction, return the fraction in string format.
+
+If the fractional part is repeating, enclose the repeating part in parentheses.
+
+Example 1:
+
+Input: numerator = 1, denominator = 2
+
+Output: "0.5"
+
+Example 2:
+
+Input: numerator = 2, denominator = 1
+
+Output: "2"
+
+Example 3:
+
+Input: numerator = 2, denominator = 3
+
+Output: "0.(6)"
+
+### 技巧
+
+- 取代最後面的特定文字: rstrip('char')
+
+### 思路
+
+小數點後的算法：我們要算出小數每一位，採取的方法是每次把餘數乘10，再除以除數，得到的商即為小數的下一位數字。
+
+因此並不會出現小數點後有"235728" 當到第二個2的時候就會開始循環了。
+
+3.14159xxx -> 這個例子不會出現在整數除法當中
+
+### Code
+``` py
+class Solution:
+    def fractionToDecimal(self, numerator: int, denominator: int) -> str:
+        n, r = divmod(abs(numerator), abs(denominator))
+
+        sign = "-" if numerator * denominator < 0 else ""
+        result = [sign + str(n), '.']
+        stack = []
+
+        while r not in stack:
+            stack.append(r)
+            n, r = divmod(r*10, abs(denominator))
+            result.append(str(n))
+
+        idx = stack.index(r) # get what is the position started to repeat in stack
+        result.insert(idx+2, '(' ) # insert after quotient and '.', so it's +2
+        result.append(')')
+
+        # there is case that will break the while loop with zero repeat, which shouldn be return in answer
+        # after replace (0), there is case that is no remainder like 4/2, need to rstrip the '.'
+        return ''.join(result).replace('(0)', '').rstrip('.')
+```
+---
