@@ -17100,3 +17100,31 @@ class Solution:
             end -= 1
 ```
 ---
+## 187. Repeated DNA Sequences｜ 3/12
+All DNA is composed of a series of nucleotides abbreviated as A, C, G, and T, for example: "ACGAATTCCG". When studying DNA, it is sometimes useful to identify repeated sequences within the DNA.
+
+Write a function to find all the 10-letter-long sequences (substrings) that occur more than once in a DNA molecule.
+
+Example:
+
+Input: s = "AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT"
+
+Output: ["AAAAACCCCC", "CCCCCAAAAA"]
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def findRepeatedDnaSequences(self, s: str) -> List[str]:
+        dic = dict()
+        res = set()
+        for i in range(len(s)):
+            str1 = s[i:i+10]
+            if str1 in dic:
+                res.add(str1)
+            else:
+                dic[str1] = 1
+        return res
+```
+---
