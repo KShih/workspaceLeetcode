@@ -17026,3 +17026,77 @@ class Solution:
 
 
 ---
+## 186. Reverse Words in a String II｜ 3/12
+Given an input string , reverse the string word by word.
+
+Example:
+
+Input:  ["t","h","e"," ","s","k","y"," ","i","s"," ","b","l","u","e"]
+
+Output: ["b","l","u","e"," ","i","s"," ","s","k","y"," ","t","h","e"]
+
+Note:
+
+A word is defined as a sequence of non-space characters.
+
+The input string does not contain leading or trailing spaces.
+
+The words are always separated by a single space.
+
+Follow up: Could you do it in-place without allocating extra space?
+
+### 思路
+
+
+### Code
+Using stack:
+``` py
+class Solution:
+    def reverseWords(self, s: List[str]) -> None:
+        """
+        Do not return anything, modify s in-place instead.
+        """
+        str1 = ""
+        stack = []
+        for i in range(len(s)):
+            if s[i] == ' ':
+                if str1 != "":
+                    stack.append(str1)
+                stack.append(" ")
+                str1 = ""
+            else:
+                str1 += s[i]
+        if str1 != "":
+            stack.append(str1)
+
+        i = 0
+        while stack:
+            word = stack.pop()
+            for ch in word:
+                s[i] = ch
+                i += 1
+```
+
+In-place
+```py
+class Solution:
+    def reverseWords(self, s: List[str]) -> None:
+        """
+        Do not return anything, modify s in-place instead.
+        """
+        self.reverse(s, 0, len(s)-1)
+        idx = 0
+        for i in range(len(s)):
+            if s[i] == ' ':
+                self.reverse(s, idx, i-1)
+                idx = i+1
+            if i == len(s)-1:
+                self.reverse(s, idx, i)
+
+    def reverse(self, s, start, end):
+        while end > start:
+            s[start], s[end] = s[end], s[start]
+            start += 1
+            end -= 1
+```
+---
