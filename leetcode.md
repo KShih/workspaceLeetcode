@@ -16974,3 +16974,55 @@ class Solution:
         return ''.join(result).replace('(0)', '').rstrip('.')
 ```
 ---
+## 179. Largest Number｜ 3/11
+Given a list of non negative integers, arrange them such that they form the largest number.
+
+Example 1:
+
+Input: [10,2]
+
+Output: "210"
+
+Example 2:
+
+Input: [3,30,34,5,9]
+
+Output: "9534330"
+
+Note: The result may be very large, so you need to return a string instead of an integer.
+
+### 思路
+
+ (a="2",b="11") a is bigger than b because "211" >"112"
+
+### Code
+Prefer this solution
+``` py
+class Solution:
+    def largestNumber(self, nums: List[int]) -> str:
+        numStrings = [Comparable(n) for n in nums]
+        numStrings.sort()
+        output = ''.join((e.value for e in numStrings))
+        return output.lstrip('0') or '0'
+
+class Comparable:
+    # object that can be sorted thanks to magic methods.
+    def __init__(self, num):
+        self.value = str(num)
+    def __lt__(self, other):
+        # '82' is before '824' because '82|824' is greater than '824|82'
+        return self.value + other.value > other.value + self.value
+```
+
+In python3, you cannot use `cmp`, so it's kinda hard to understand
+```py
+import functools
+class Solution:
+    def largestNumber(self, nums: List[int]) -> str:
+        num = [str(x) for x in nums]
+        num.sort(key = functools.cmp_to_key(lambda b, a: ((a+b)>(b+a))-((a+b)<(b+a)) ))
+        return ''.join(num).lstrip('0') or '0'
+```
+
+
+---
