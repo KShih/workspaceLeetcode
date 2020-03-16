@@ -17259,3 +17259,87 @@ class Solution:
         return True
 ```
 ---
+## 198. House Robber｜ 3/16 (DP 經典題！打通DP任督二脈)
+You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security system connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
+
+Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight without alerting the police.
+
+Example 1:
+
+Input: [1,2,3,1]
+Output: 4
+
+Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
+             Total amount you can rob = 1 + 3 = 4.
+Example 2:
+
+Input: [2,7,9,3,1]
+Output: 12
+
+Explanation: Rob house 1 (money = 2), rob house 3 (money = 9) and rob house 5 (money = 1).
+             Total amount you can rob = 2 + 9 + 1 = 12.
+
+### 技巧
+
+- 如何思考DP題！
+    - 題目要我們求出最大值，那我們可以定義dp[i] 為[0, i]區間的最大值
+    - 維護一個一位數組 dp，其中 dp[i] 表示 [0, i] 區間可以搶奪的最大值，對當前i來說，有搶和不搶兩種互斥的選擇，不搶即為 dp[i-1]（等價於去掉 nums[i] 只搶 [0, i-1] 區間最大值），搶即為 dp[i-2] + nums[i]（等價於去掉 nums[i-1]）
+
+
+### 思路
+
+自己想出的dp題！！
+
+靠測資寫出來的, [2,7,9,3,1]
+
+要是靠greedy, 選擇了2跟7的最大值, 就會造成錯誤解
+
+所以正確的方式其實是`max(a[i]+a[i+2], a[i+1])`
+
+可寫出 a[0][0] = 0, a[0][1] = 2
+
+a[1][0] = 2 ( max(a[0][0], a[0][1]) )
+
+a[1][1] = 7 (a[0][0]+7)
+
+a[2][0] = 7, a[2][1] = 2 + 9
+
+由此推理可寫出轉移方程式。
+
+並且透過多一個位置空間來更方便的initial
+
+--
+
+使用一維數組的DP:
+
+維護一個一位數組 dp，其中 dp[i] 表示 [0, i] 區間可以搶奪的最大值，對當前i來說，有搶和不搶兩種互斥的選擇，不搶即為 dp[i-1]（等價於去掉 nums[i] 只搶 [0, i-1] 區間最大值），搶即為 dp[i-2] + nums[i]（等價於去掉 nums[i-1]）
+
+### Code
+``` py
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        if not nums:
+            return 0
+        dp = [[0 for _ in range(len(nums)+1)] for i in range(len(nums)+1)]
+
+        for i in range(1, len(nums)+1):
+            dp[i][0] = max(dp[i-1][0], dp[i-1][1])
+            dp[i][1] = dp[i-1][0] + nums[i-1]
+
+        return max(dp[-1][0], dp[-1][1])
+```
+
+1-dimension dp
+```py
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        if not nums:
+            return 0
+        dp = [0 for _ in range(len(nums)+1)]
+        dp[0], dp[1] = 0, nums[0]
+
+        for i in range(2, len(nums)+1):
+            dp[i] = max(dp[i-1], dp[i-2] + nums[i-1])
+        return dp[-1]
+```
+---
