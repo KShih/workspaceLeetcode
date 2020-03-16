@@ -17174,3 +17174,88 @@ class MinStack:
         return self.min_stack[-1]
 ```
 ---
+## 131. Palindrome Partitioning<Backtrack>｜ 3/16
+Given a string s, partition s such that every substring of the partition is a palindrome.
+
+Return all possible palindrome partitioning of s.
+
+Example:
+
+Input: "aab"
+Output:
+[
+  ["aa","b"],
+  ["a","a","b"]
+]
+
+### 技巧
+
+- Backtracking 時注意`reference`的問題
+    - deep copy the whole list: `comb[:]`
+    - Reason
+        - I have some discussion in other similar issue, and I think the reason should be that `if we use path during the recursive function call, it will use the reference of path, so if path is modified later, the content of res will be updated as well`. Thus we will get empty list in the end. But if we use path[:], it will create a new list and append it to res. The change of path will not affect the content of res
+
+### 思路
+
+Backtracking法: 直接看concise的解法
+
+### Code
+Same idea, concise solution
+```py
+class Solution:
+    def partition(self, s: str) -> List[List[str]]:
+        res = []
+        self.combination(s, [], res)
+        return res
+
+    def combination(self, s, path, res):
+        if not s:
+            res.append(path[:])
+            return
+
+        for start in range(1, len(s)+1):
+            if not self.isPalin(s[:start]):
+                continue
+            path.append(s[:start])
+            self.combination(s[start:], path, res)
+            path.pop()
+
+
+    def isPalin(self, s):
+        return s == s[::-1]
+```
+
+Use `int` varible to trace the current position, `Backtracking`
+``` py
+class Solution:
+    def partition(self, s: str) -> List[List[str]]:
+        res = []
+        comb = []
+        self.combination(s, 0, comb, res)
+        return res
+
+    def combination(self, s, start, comb, res):
+        if start == len(s):
+            res.append(comb[:]) # deep copy
+            return
+
+        for i in range(start, len(s)):
+
+            if not self.isPalin(s, start, i):
+                continue
+
+            comb.append(s[start:i+1])
+            self.combination(s, i+1, comb, res)
+            comb.pop()
+
+
+    def isPalin(self, s, start, end):
+        while start < end:
+            if s[start] != s[end]:
+                return False
+            else:
+                start += 1
+                end -= 1
+        return True
+```
+---
