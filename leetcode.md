@@ -17128,3 +17128,49 @@ class Solution:
         return res
 ```
 ---
+## 155. Min Stack｜ 3/16
+
+Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.
+
+push(x) -- Push element x onto stack.
+pop() -- Removes the element on top of the stack.
+top() -- Get the top element.
+getMin() -- Retrieve the minimum element in the stack.
+
+### 思路
+使用兩個stack，一個keep the order stack, 另一個 min stack
+
+如何main tain min_stack?
+
+push時，當新的value比現在這個value還小時push進min stack
+
+pop時，如果要pop的是最小value，則min stack裡的也要跟著pop
+
+### Code
+``` py
+class MinStack:
+
+    def __init__(self):
+        """
+        initialize your data structure here.
+        """
+        self.stack = []
+        self.min_stack = []
+
+    def push(self, x: int) -> None:
+        self.stack.append(x)
+        if not self.min_stack or x <= self.min_stack[-1]:
+            self.min_stack.append(x)
+
+    def pop(self) -> None:
+        t = self.stack.pop()
+        if t == self.min_stack[-1]:
+            self.min_stack.pop()
+
+    def top(self) -> int:
+        return self.stack[-1]
+
+    def getMin(self) -> int:
+        return self.min_stack[-1]
+```
+---
