@@ -17343,3 +17343,52 @@ class Solution:
         return dp[-1]
 ```
 ---
+## 199. Binary Tree Right Side View｜ 3/19
+Given a binary tree, imagine yourself standing on the right side of it, return the values of the nodes you can see ordered from top to bottom.
+
+Example:
+![](assets/markdown-img-paste-20200319175426945.png)
+### 思路
+
+Level order traversal
+
+### Code
+dfs recursive
+``` py
+class Solution:
+    def rightSideView(self, root: TreeNode) -> List[int]:
+        res = []
+        lev_node = []
+        self.level_trav(root, 0, lev_node)
+
+        for i in range(len(lev_node)):
+            res.append(lev_node[i][-1])
+        return res
+
+    def level_trav(self, root, level, lev_node):
+        if root:
+            if level == len(lev_node):
+                lev_node.append([])
+            lev_node[level].append(root.val)
+            self.level_trav(root.left, level+1, lev_node)
+            self.level_trav(root.right, level+1, lev_node)
+```
+
+bfs iterative
+```py
+class Solution:
+    def rightSideView(self, root: TreeNode) -> List[int]:
+        lev_node = []
+        queue = [(root, 0)]
+
+        while queue:
+            node, level = queue.pop(0)
+            if node:
+                if len(lev_node) == level:
+                    lev_node.append([])
+                lev_node[level].append(node.val)
+                queue.append((node.left, level+1))
+                queue.append((node.right, level+1))
+        return [x[-1] for x in lev_node]
+```
+---
