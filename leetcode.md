@@ -17435,3 +17435,31 @@ class Solution:
         return n << shift
 ```
 ---
+## 203. Remove Linked List Elements｜ 3/25
+Remove all elements from a linked list of integers that have value val.
+
+Example:
+
+Input:  1->2->6->3->4->5->6, val = 6
+
+Output: 1->2->3->4->5
+
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def removeElements(self, head: ListNode, val: int) -> ListNode:
+        dum = ListNode(-1)
+        dum.next = head
+        cur = dum
+
+        while cur.next:
+            if cur.next.val == val:
+                cur.next = cur.next.next
+            else:
+                cur = cur.next
+        return dum.next
+```
+---
