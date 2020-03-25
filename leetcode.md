@@ -17392,3 +17392,46 @@ class Solution:
         return [x[-1] for x in lev_node]
 ```
 ---
+## 201. Bitwise AND of Numbers Range｜ 3/25
+Given a range [m, n] where 0 <= m <= n <= 2147483647, return the bitwise AND of all numbers in this range, inclusive.
+
+Example 1:
+
+Input: [5,7]
+Output: 4
+
+Example 2:
+
+Input: [0,1]
+Output: 0
+
+Explanation:
+
+[5,7] : 101 AND 110 AND 111 = 100 = 4
+
+### 思路
+
+由觀察得知我們要求的就是這個區間裡所有的數的共同left most bit，
+
+![](assets/markdown-img-paste-2020032515004079.png)
+
+然而我們不需要每個數都去考慮，只需考慮區間內的最大跟最小就行了，
+
+因此可以得到將m跟n都同時right shift一位，然後判斷m跟n是否相等，
+
+*並同時紀錄shift的量，if m = n時，此時的shift的量就是右邊該補0的量，*
+
+*補零我們可以使用left shift來達成*
+
+### Code
+``` py
+class Solution:
+    def rangeBitwiseAnd(self, m: int, n: int) -> int:
+        shift = 0
+        while m < n:
+            m = m >> 1
+            n = n >> 1
+            shift += 1
+        return n << shift
+```
+---
