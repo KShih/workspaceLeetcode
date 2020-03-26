@@ -17631,3 +17631,65 @@ class Solution:
         return res
 ```
 ---
+## 210. Course Schedule II｜ 3/26 (Unfinished, need Topological sort to solve)
+There are a total of n courses you have to take, labeled from 0 to n-1.
+
+Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
+
+Given the total number of courses and a list of prerequisite pairs, return the ordering of courses you should take to finish all courses.
+
+There may be multiple correct orders, you just need to return one of them. If it is impossible to finish all courses, return an empty array.
+
+![](assets/markdown-img-paste-20200326171539116.png)
+### 思路
+
+無法使用backtracking 來解這題
+### Code
+``` py
+"""
+Backtracking solution is not adoptable to this question.
+For this question we need to know the depth of each node, so that we know where to start walking from.
+NEED to use Topological Sort
+"""
+
+from collections import defaultdict
+class Solution:
+    def findOrder(self, numCourses: int, prerequisites: List[List[int]]) -> List[int]:
+        courseDic = defaultdict(list)
+        for relation in prerequisites:
+            cur, prev = relation[0], relation[1]
+            courseDic[prev].append(cur)
+
+        path, checked, res = [False] * numCourses, [False] * numCourses, set()
+
+        print(courseDic)
+        for course in range(numCourses):
+            hasCycle, res = self.isCycle(path, checked, res, course, courseDic)
+            if hasCycle:
+                return []
+            if len(res) == numCourses:
+                return res
+    def isCycle(self, path, checked, res, course, courseDic):
+        if path[course]:
+            return True, res
+        if checked[course]:
+            return False, res
+
+        path[course] = True
+        hasCycle = False
+        temp = res
+        temp.add(course)
+        for child in courseDic[course]:
+            hasCycle, temp = self.isCycle(path, checked, temp, child, courseDic)
+            if hasCycle:
+                break
+
+        path[course] = False # reset back tracking
+        checked[course] = True
+
+        if hasCycle == False:
+            res = temp
+        return hasCycle, res
+
+```
+---
