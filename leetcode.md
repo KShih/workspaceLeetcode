@@ -17463,3 +17463,66 @@ class Solution:
         return dum.next
 ```
 ---
+## 207. Course Schedule｜ 3/25
+There are a total of numCourses courses you have to take, labeled from 0 to numCourses-1.
+
+Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
+
+Given the total number of courses and a list of prerequisite pairs, is it possible for you to finish all courses?
+
+![](assets/markdown-img-paste-20200326132525643.png)
+
+### 思路
+
+Using `checked` as cache, if we don't use it we will encounter the worst case, chain,
+
+which is: 1-2-3-4-5
+
+we visit: 1-2-3-4-5, 2-3-4-5, 3-4-5 ...
+
+so that we use cached to note that there is no cycle in 5, 4, 3, 2, 1
+
+### Code
+Backtracking solution to find cycle in graph
+``` py
+from collections import defaultdict
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        courseDict = defaultdict(list)
+
+        for relation in prerequisites:
+            cur, prev = relation[0], relation[1]
+            courseDict[prev].append(cur)
+
+        path = [False] * numCourses
+        checked = [False] * numCourses # using the cache to memorize which node has no cycle
+
+        for course in range(numCourses):
+            if self.isCycle(course, path, checked, courseDict):
+                return False
+        return True
+
+
+    def isCycle(self, course, path, checked, courseDict):
+
+        if checked[course]:
+            return False # this node have been checked, no loop
+
+        # this node have been visited, -> is loop
+        if path[course]:
+            return True
+
+        path[course] = True
+
+        # check if there's no cycle
+        detech = False
+        for child in courseDict[course]:
+            detech = self.isCycle(child, path, checked, courseDict)
+            if detech: # find cycle in one child
+                break
+
+        path[course] = False # reset back tracking
+        checked[course] = True
+        return detech
+```
+---
