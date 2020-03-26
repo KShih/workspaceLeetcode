@@ -17526,3 +17526,108 @@ class Solution:
         return detech
 ```
 ---
+## 209. Minimum Size Subarray Sum｜ 3/26
+Given an array of n positive integers and a positive integer s, find the minimal length of a contiguous subarray of which the sum ≥ s. If there isn't one, return 0 instead.
+
+Example:
+
+Input: s = 7, nums = [2,3,1,2,4,3]
+Output: 2
+Explanation: the subarray [4,3] has the minimal length under the problem constraint.
+
+Follow up:
+If you have figured out the O(n) solution, try coding another solution of which the time complexity is O(n log n).
+### 思路
+
+two solution: 1. two pointer, 2. binary search
+
+![](assets/markdown-img-paste-20200326152522929.png)
+
+### Code
+``` py
+class Solution:
+    def minSubArrayLen(self, s: int, nums: List[int]) -> int:
+        if sum(nums) < s:
+            return 0
+        cur = []
+        res = len(nums)
+        # add elem until satisfied
+        for i, num in enumerate(nums):
+            if sum(cur) < s:
+                cur.append(num)
+            else:
+                res = len(cur)
+                break
+
+        idx = len(cur)
+        # add next elem
+        for i in range(idx, len(nums)):
+            cur.append(nums[i])
+            # try to pop from front until cannot satisfie
+            res = self.check_pop(s, cur, res)
+        # to check the pop if it's not get into for loop
+        res = self.check_pop(s, cur, res)
+        return res
+
+    def check_pop(self, s, cur, res):
+        while True:
+            if sum(cur) - cur[0] >= s:
+                cur.pop(0)
+            else:
+                break
+        return min(res, len(cur))
+```
+
+Same idea, but using pointer to achieve
+```py
+class Solution:
+    def minSubArrayLen(self, s: int, nums: List[int]) -> int:
+        left, right, leng, sums, res = 0, 0, len(nums), 0, len(nums)+1
+
+        while right < leng:
+            while s > sums and right < leng:
+                sums += nums[right]
+                right += 1
+            while s <= sums and left < leng: # note here should use <=, or if s==sum, the outer while loop won't stop
+                res = min(res, right - left)
+                sums -= nums[left]
+                left += 1
+        return res if res != len(nums) + 1 else 0
+
+```
+
+Binary Search
+```py
+class Solution:
+    def minSubArrayLen(self, s: int, nums: List[int]) -> int:
+        if s > sum(nums):
+            return 0
+        sum_n = [0]
+        # create sum array
+        for num in nums:
+            sum_n.append(sum_n[-1]+num)
+        sum_n.pop(0)
+
+        # bin search
+        l, r = 0, len(sum_n)-1
+
+        while l < r:
+            mid = l + (r-l)//2
+            if sum_n[mid] == s:
+                r = mid # bc we need to use r afterward, we need to let r reflect the mid
+                break
+            elif sum_n[mid] > s:
+                r = mid
+            else:
+                l = mid + 1
+
+        res = r+1
+        scan_idx = 0
+        for i in range(r, len(sum_n)):
+            cur = sum_n[i]
+            while cur - sum_n[scan_idx] >= s:
+                scan_idx += 1
+                res = min(res, i-scan_idx+1)
+        return res
+```
+---
