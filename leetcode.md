@@ -17751,3 +17751,145 @@ class Solution:
         return str1
 ```
 ---
+## 211. Add and Search Word - Data structure design｜ 3/27
+Design a data structure that supports the following two operations:
+
+void addWord(word)
+
+bool search(word)
+
+search(word) can search a literal word or a regular expression string containing only letters a-z or .. A . means it can represent any one letter.
+
+Example:
+
+addWord("bad")
+
+addWord("dad")
+
+addWord("mad")
+
+search("pad") -> false
+
+search("bad") -> true
+
+search(".ad") -> true
+
+search("b..") -> true
+
+Note:
+You may assume that all words are consist of lowercase letters a-z.
+### 思路
+使用字典樹實踐
+
+Trie結構: 一個dict{"char": TrieNode}, 一個isWord(bool)
+
+### Code
+Trie字典樹:
+```py
+class TrieNode:
+        def __init__(self):
+            self.ch_list = {}
+            self.isWord = False
+
+class WordDictionary:
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.root = TrieNode()
+
+    def addWord(self, word: str) -> None:
+        """
+        Adds a word into the data structure.
+        """
+        root = self.root
+        for ch in word:
+            if ch not in root.ch_list:
+                root.ch_list[ch] = TrieNode()
+            root = root.ch_list[ch]
+        root.isWord = True
+
+    def search(self, word: str) -> bool:
+        """
+        Returns if the word is in the data structure. A word could contain the dot character '.' to represent any one letter.
+        """
+        return self.search_word(word, self.root)
+
+    def search_word(self, word, root):
+        if not word:
+            if root.isWord:
+                return True
+            else:
+                return False
+        if word[0] == ".":
+            for entry in root.ch_list:
+                if self.search_word(word[1:], root.ch_list[entry]):
+                    return True
+            return False
+        elif word[0] in root.ch_list:
+            return self.search_word(word[1:], root.ch_list[word[0]])
+        else:
+            return False
+
+# Your WordDictionary object will be instantiated and called as such:
+# obj = WordDictionary()
+# obj.addWord(word)
+# param_2 = obj.search(word)
+```
+
+土法煉鋼法:
+``` py
+class WordDictionary:
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.dic = dict()
+
+    def addWord(self, word: str) -> None:
+        """
+        Adds a word into the data structure.
+        """
+        self.dic[word] = len(word)
+
+    def search(self, word: str) -> bool:
+        """
+        Returns if the word is in the data structure. A word could contain the dot character '.' to represent any one letter.
+        """
+        leng = len(word)
+
+        if leng not in self.dic.values():
+            return False
+        else:
+
+            cand = []
+            for key in self.dic:
+                if self.dic[key] == leng:
+                    cand.append(key)
+            return self.find(word, cand, 0)
+
+    def find(self, word, cand, idx):
+
+        if idx == len(word) or len(cand) == 0:
+            if len(cand) > 0:
+                return True
+            else:
+                return False
+
+        if word[idx] == '.':
+            return self.find(word, cand, idx+1)
+
+        new_cand = []
+        for entry in cand:
+            if entry[idx] == word[idx]:
+                new_cand.append(entry)
+        return self.find(word, new_cand, idx+1)
+
+# Your WordDictionary object will be instantiated and called as such:
+# obj = WordDictionary()
+# obj.addWord(word)
+# param_2 = obj.search(word)
+```
+---
