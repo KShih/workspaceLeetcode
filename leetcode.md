@@ -17893,3 +17893,63 @@ class WordDictionary:
 # param_2 = obj.search(word)
 ```
 ---
+## 213. House Robber II｜ 3/27
+You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed. All houses at this place are arranged **in a circle.** That means the first house is the neighbor of the last one. Meanwhile, adjacent houses have security system connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
+
+Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight without alerting the police.
+
+Example 1:
+
+Input: [2,3,2]
+
+Output: 3
+
+Explanation: **You cannot rob house 1 (money = 2) and then rob house 3 (money = 2),because they are adjacent houses.**
+Example 2:
+
+Input: [1,2,3,1]
+
+Output: 4
+
+Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
+             Total amount you can rob = 1 + 3 = 4.
+### 思路
+
+處理circle的狀況就是只能取頭，或只能取尾
+
+但需要另外處理只有一間房子的情況(不能去頭 也不能去尾)
+
+### Code
+Using two dimension DP
+```py
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        if len(nums) <= 1:
+            return nums[0] if len(nums) != 0 else 0
+        return max(self.rob_hourse(nums[1:]), self.rob_hourse(nums[:-1]))
+    def rob_hourse(self, nums):
+        sums = [[0] * 2 for _ in range(len(nums)+1)]
+        for i in range(1, (len(nums)+1) ):
+            sums[i][0] = max(sums[i-1][0], sums[i-1][1])
+            sums[i][1] = sums[i-1][0] + nums[i-1]
+        return max(sums[-1][0], sums[-1][1])
+```
+
+If not using dp
+``` py
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        if len(nums) <= 1:
+            return nums[0] if len(nums) != 0 else 0
+        return max(self.rob_hourse(nums[1:]), self.rob_hourse(nums[:-1]))
+    def rob_hourse(self, nums):
+        rob, notRob = 0, 0
+        for num in nums:
+            pre_rob = rob
+            pre_notRob = notRob
+
+            rob = pre_notRob + num
+            notRob = max(pre_rob, pre_notRob)
+        return max(rob, notRob)
+```
+---
