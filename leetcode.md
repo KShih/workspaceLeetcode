@@ -17723,3 +17723,31 @@ class Solution:
         return cnt
 ```
 ---
+## 205. Isomorphic Strings｜ 3/26
+Given two strings s and t, determine if they are isomorphic.
+
+Two strings are isomorphic if the characters in s can be replaced to get t.
+
+All occurrences of a character must be replaced with another character while preserving the order of characters. No two characters may map to the same character but a character may map to itself.
+
+![](assets/markdown-img-paste-2020032619533122.png)
+### 思路
+
+將其轉換成共同的形式
+
+### Code
+``` py
+class Solution:
+    def isIsomorphic(self, s: str, t: str) -> bool:
+        return self.converter(s) == self.converter(t)
+
+    def converter(self, s):
+        dic = dict()
+        str1 = ""
+        for c in s:
+            if c not in dic:
+                dic[c] = str(len(dic)+1)
+            str1 += dic[c]
+        return str1
+```
+---
