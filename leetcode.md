@@ -18032,3 +18032,49 @@ class Solution:
         return res
 ```
 ---
+## 214. Shortest Palindrome｜ 3/29
+Given a string s, you are allowed to convert it to a palindrome by adding characters in front of it. Find and return the shortest palindrome you can find by performing this transformation.
+
+Example 1:
+
+Input: "aacecaaa"
+
+Output: "aaacecaaa"
+
+Example 2:
+
+Input: "abcd"
+
+Output: "dcbabcd"
+
+### 思路
+
+在考慮ex1的時候可以得出我們首先必須把此字串中包含的最長回文先找出來，再進行補全，
+
+那如何找最長回文呢？ 一開始在想方法時覺得太複雜了，如果起點可以是字串中的任何起點的話，
+
+但題目只允許從最前面去補全，這意味著，當我們在找原字串存在的最長回文時**必須要包含第一個字母**，
+
+這樣就簡單許多了，我們依序將後面的字母加到第一個字母後，並紀錄最長的長度
+
+第二個path則是將不全的字串補全，完整的字串則直接返回
+
+### Code
+``` py
+class Solution:
+    def shortestPalindrome(self, s: str) -> str:
+        max_palin_leng = 0
+        for i in range(len(s)+1):
+            max_palin_leng = max(max_palin_leng, self.len_palin(s[:i]))
+        if max_palin_leng == len(s):
+            return s
+        else:
+            res_str = s[max_palin_leng:]
+            return res_str[::-1] + s
+
+    def len_palin(self, s):
+        if s[::1] == s[::-1]:
+            return len(s)
+        return 0
+```
+---
