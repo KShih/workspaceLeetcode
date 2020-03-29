@@ -18004,3 +18004,31 @@ class Solution:
         return True
 ```
 ---
+## 12. Integer to Roman｜ 3/29
+![](assets/markdown-img-paste-20200329092550734.png)
+
+![ ](assets/markdown-img-paste-20200329092613788.png)
+
+Example 5:
+
+Input: 1994
+Output: "MCMXCIV"
+Explanation: M = 1000, CM = 900, XC = 90 and IV = 4.
+
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def intToRoman(self, num: int) -> str:
+        roman = [(1000, "M"), (900, "CM"), (500, "D"), (400, "CD"), (100, "C"), (90, "XC"), (50, "L"), (40, "XL"), (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I")]
+
+        res = ""
+        for val in roman:
+            while num >= val[0]:
+                num -= val[0]
+                res += val[1]
+        return res
+```
+---
