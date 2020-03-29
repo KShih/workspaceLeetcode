@@ -18078,3 +18078,52 @@ class Solution:
         return 0
 ```
 ---
+## 219. Contains Duplicate II｜ 3/29
+Given an array of integers and an integer k, find out whether there are two distinct indices i and j in the array such that nums[i] = nums[j] and the absolute difference between i and j is at most k.
+
+Example 1:
+
+Input: nums = [1,2,3,1], k = 3
+
+Output: true
+
+Example 2:
+
+Input: nums = [1,0,1,1], k = 1
+
+Output: true
+
+Example 3:
+
+Input: nums = [1,2,3,1,2,3], k = 2
+
+Output: false
+### 思路
+
+建立元素與idx的hash
+
+再去比較相同hash slot中的idx距離
+
+### Code
+``` py
+from collections import defaultdict
+class Solution:
+    def containsNearbyDuplicate(self, nums: List[int], k: int) -> bool:
+        num_idx_dict = defaultdict(list)
+        for i, num in enumerate(nums):
+            num_idx_dict[num].append(i)
+
+        for entry in num_idx_dict:
+            if len(num_idx_dict[entry]) < 2:
+                continue
+            if self.isLessK(num_idx_dict[entry], k):
+                return True
+        return False
+
+    def isLessK(self, idx_list, k):
+        for i in range(len(idx_list)-1):
+            if idx_list[i+1] - idx_list[i] <= k:
+                return True
+        return False
+```
+---
