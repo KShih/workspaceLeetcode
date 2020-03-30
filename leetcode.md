@@ -18127,3 +18127,137 @@ class Solution:
         return False
 ```
 ---
+## 220. Contains Duplicate III｜ 3/30
+Given an array of integers, find out whether there are two distinct indices i and j in the array such that the absolute difference between nums[i] and nums[j] is at most t and the absolute difference between i and j is at most k.
+
+Example 1:
+
+Input: nums = [1,2,3,1], k = 3, t = 0
+
+Output: true
+
+Example 2:
+
+Input: nums = [1,0,1,1], k = 1, t = 2
+
+Output: true
+
+Example 3:
+
+Input: nums = [1,5,9,1,5,9], k = 2, t = 3
+
+Output: false
+
+### 技巧
+
+Bucket Sort: 用來快速的將一個陣列分類，並找出特定range的
+
+### 思路
+- 用字典分類, 然後再根據key排序, 還是TLE
+
+    - 會在key數量很大時fail
+
+- 使用 TreeSet, or Balanced Binary tree
+    - 使用滑動窗口處理index range
+    - 再從這個逐漸變大的窗口中找出最大最小，判斷是否在區間內
+    - 由於是逐漸擴大的窗口，每個存在tree中的元素都有經過檢驗，因此可以判斷成最大罪小不存在，則就是不存在
+    - 詳見 LC 的官方solution
+    
+- Bucket Sort + Sliding Window
+    - 我們可以先使用滑動窗口來處理index range的問題
+    - 剩下的問題就是如何在 constant 時間中在這個window中找出，是否有符合range的數
+    - 這時就可以使用 Bucket 法
+        - ![](assets/markdown-img-paste-20200330150804242.png)
+
+### Code
+Bucket Sort
+```py
+class Solution:
+    def containsNearbyAlmostDuplicate(self, nums: List[int], k: int, t: int) -> bool:
+        if k<0 or t<0:
+            return False
+        bucket = dict()
+        bucket_size = t
+        for i, num in enumerate(nums):
+            idx = num // bucket_size if bucket_size != 0 else num
+            if idx in bucket:
+                return True
+
+            # check nearby bucket
+            if idx-1 in bucket:
+                that = bucket[idx-1]
+                if abs(that - num) <= t:
+                    return True
+            if idx+1 in bucket:
+                that = bucket[idx+1]
+                if abs(that - num) <= t:
+                    return True
+
+            # move the window
+            bucket[idx] = num
+            if i >= k:
+                expired_idx = nums[i-k] // bucket_size if bucket_size != 0 else nums[i-k]
+                del bucket[expired_idx] # can delete a bucket bc only alow one elem in a bucket(if there is a num going to same bucket, we return True in advance)
+        return False
+```
+
+Simplify Version
+```py
+class Solution:
+    def containsNearbyAlmostDuplicate(self, nums: List[int], k: int, t: int) -> bool:
+        if k<0 or t<0:
+            return False
+        bucket = dict()
+        bucket_size = t
+        for i, num in enumerate(nums):
+            idx = num // bucket_size if bucket_size != 0 else num
+
+            for nearby_bucket in (idx-1, idx, idx+1): # rule out the bucket that needed to be looked for
+                if nearby_bucket in bucket and abs(bucket[nearby_bucket] - num) <= t:
+                    return True
+
+            # move the window
+            bucket[idx] = num
+            if i >= k:
+                expired_idx = nums[i-k] // bucket_size if bucket_size != 0 else nums[i-k]
+                del bucket[expired_idx] # can delete a bucket bc only alow one elem in a bucket(if there is a num going to same bucket, we return True in advance)
+        return False
+```
+
+
+用字典分類, 然後再根據key排序, 還是TLE
+
+``` py
+from collections import defaultdict
+class Solution:
+    def containsNearbyAlmostDuplicate(self, nums: List[int], k: int, t: int) -> bool:
+        if t < 0:
+            return False
+        num_idx_dict = defaultdict(list)
+        for i, num in enumerate(nums):
+            num_idx_dict[num].append(i)
+
+        num_idx_list = []
+        for entry in num_idx_dict:
+            num_idx_list.append((entry, num_idx_dict[entry]))
+        num_idx_list = sorted(num_idx_list)
+
+        for i, entry in enumerate(num_idx_list):
+            # self find
+            if self.isLessK(entry[1], k):
+                return True
+            # find those idx whose key range is within t
+            for j in range(i+1, len(num_idx_list)):
+                if num_idx_list[j][0] - entry[0] <= t:
+                    idx_list = entry[1] + num_idx_list[j][1]
+                    if self.isLessK(sorted(idx_list), k):
+                        return True
+        return False
+
+    def isLessK(self, idx_list, k):
+        for i in range(len(idx_list)-1):
+            if idx_list[i+1] - idx_list[i] <= k:
+                return True
+        return False
+```
+---
