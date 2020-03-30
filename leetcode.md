@@ -18162,7 +18162,7 @@ Bucket Sort: 用來快速的將一個陣列分類，並找出特定range的
     - 再從這個逐漸變大的窗口中找出最大最小，判斷是否在區間內
     - 由於是逐漸擴大的窗口，每個存在tree中的元素都有經過檢驗，因此可以判斷成最大罪小不存在，則就是不存在
     - 詳見 LC 的官方solution
-    
+
 - Bucket Sort + Sliding Window
     - 我們可以先使用滑動窗口來處理index range的問題
     - 剩下的問題就是如何在 constant 時間中在這個window中找出，是否有符合range的數
@@ -18259,5 +18259,51 @@ class Solution:
             if idx_list[i+1] - idx_list[i] <= k:
                 return True
         return False
+```
+---
+## 221. Maximal Square｜ 3/30
+Given a 2D binary matrix filled with 0's and 1's, find the largest square containing only 1's and return its area.
+
+Example:
+
+Input:
+
+1 0 1 0 0
+
+1 0 1 1 1
+
+1 1 1 1 1
+
+1 0 0 1 0
+
+Output: 4
+### 思路
+
+相對於之前找最大長方形的題，不曉得哪邊是長哪邊是寬，這題相對好處理
+
+透過正方形的性質 長 = 寬 = 對角線
+
+我們可以透過dp數組紀錄，以這個點為正方形右下角，所可以形成的最大正方形。
+
+那麼我們就需要考慮此點的 [上, 左, 左上] 的dp值，三者取最小
+
+![](assets/markdown-img-paste-20200330230051909.png)
+
+### Code
+``` py
+class Solution:
+    def maximalSquare(self, matrix: List[List[str]]) -> int:
+        if not matrix or not matrix[0]:
+            return 0
+        r, c = len(matrix), len(matrix[0])
+        dp = [[0 if matrix[i][j] == '0' else 1 for j in range(c)] for i in range(r)]
+
+        for i in range(1, r):
+            for j in range(1, c):
+                if dp[i][j] == 1:
+                    dp[i][j] = min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1
+
+        res = max(max(row) for row in dp)
+        return res**2
 ```
 ---
