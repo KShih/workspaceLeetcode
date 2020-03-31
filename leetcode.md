@@ -18307,3 +18307,98 @@ class Solution:
         return res**2
 ```
 ---
+## 218. The Skyline Problem｜ 3/31
+A city's skyline is the outer contour of the silhouette formed by all the buildings in that city when viewed from a distance. Now suppose you are given the locations and height of all the buildings as shown on a cityscape photo (Figure A), write a program to output the skyline formed by these buildings collectively (Figure B).
+
+![](assets/markdown-img-paste-20200331132617537.png)
+
+Notes:
+
+The number of buildings in any input list is guaranteed to be in the range [0, 10000].
+
+The input list is already sorted in ascending order by the left x position Li.
+
+The output list must be sorted by the x position.
+
+There must be no consecutive horizontal lines of equal height in the output skyline. For instance, [...[2 3], [4 5], [7 5], [11 5], [12 7]...] is not acceptable; the three lines of height 5 should be merged into one in the final output as such: [...[2 3], [4 5], [12 7], ...]
+
+### 思路
+
+1. Divide and conquer
+    - Didn't implement myself
+2. Max Heap (Priority Queue)
+    - ![](assets/markdown-img-paste-2020033113282766.png)
+### Code
+Heap
+``` py
+class Solution:
+    def getSkyline(self, buildings: List[List[int]]) -> List[List[int]]:
+        # possible corner positions
+        position = set([b[0] for b in buildings] + [b[1] for b in buildings])
+
+        hp = [] # heap store current still availible building (-height, right)
+        sky = [[-1,0]]
+        i = 0
+        for p in sorted(position):
+
+            # add the new buildings whose left side is lefter than position p
+            # they are candidates for the current highest building
+            while i < len(buildings) and buildings[i][0] <= p:
+                heappush(hp, (-buildings[i][2], buildings[i][1]) )
+                i += 1
+
+            # remove the past buildings whose right side is lefter than position p
+            # bc we need to access to the top of the heap(highest existing building) afterwards
+            while hp and hp[0][1] <= p:
+                heappop(hp)
+
+            # pick the highest existing building at this moment, or 0 for ground
+            height = -hp[0][0] if hp else 0
+            self.add_sky(p, height, sky)
+
+        return sky[1:]
+
+    def add_sky(self, cur_p, height, sky):
+        if height != sky[-1][1]:
+            sky.append([cur_p, height])
+```
+
+參考：Divide and conquer
+```py
+class Solution(object):
+    def getSkyline(self, blds):
+        """
+        :type blds: List[List[int]]
+        :rtype: List[List[int]]
+        """
+        if not blds: return []
+        if len(blds) == 1: return [[blds[0][0], blds[0][2]], [blds[0][1], 0]]
+        mid = len(blds) // 2
+        left = self.getSkyline(blds[:mid])
+        right = self.getSkyline(blds[mid:])
+        return self.merge(left, right)
+
+    def merge(self, left, right):
+        h1, h2, res = 0, 0, []
+        while left and right:
+            if left[0][0] < right[0][0]:
+                pos, h1 = left[0]
+                left = left[1:]
+            elif left[0][0] > right[0][0]:
+                pos, h2 = right[0]
+                right = right[1:]
+            else:
+                pos, h1 = left[0]
+                h2 = right[0][1]
+                left = left[1:]
+                right = right[1:]
+            H = max(h1, h2)
+            if not res or H != res[-1][1]:
+                res.append([pos, H])
+        if left:
+            res += left
+        if right:
+            res += right
+        return res
+```
+---
