@@ -18402,3 +18402,15 @@ class Solution(object):
         return res
 ```
 ---
+# *Heap 用途總結*
+- heap 這個資料結構適合處理
+    - 動態 新增/移除 的資料, Sweep
+    - 同時又必須維持一定的順序
+    - 例子:
+        - keep track of top 1/3 scores
+            - Use two heap, Max heap and min heap
+        - 需要多少個月臺來容納火車, 給定每班車的進出時間
+    - 設計:
+        - Heap要存什麼, 以什麼做為排序基準
+        - 什麼情況下可以 push
+        - 什麼情況下要 pop
