@@ -7880,6 +7880,15 @@ Note how the start is always included, and the end always excluded. This makes s
 
 ### 思路
 
+Binary Search
+
+- https://www.youtube.com/watch?v=LPFhl65R7ww
+- ![](assets/markdown-img-paste-20200409002046321.png)
+- Note in binary search right should be set to m, instead of m-1 because mid could be possibly equal to m (when using up all the element in nums1 or nums1 is empty)
+- Note should add the *mid > lo* in the condition to avoid empty or index out of range
+
+Recursive approach
+
 這道題要求兩個已經排好序的數列的中位數。中位數的定義：如果數列有偶數個數，那麼中位數為中間兩個數的平均值；如果數列有奇數個數，那麼中位數為中間的那個數。比如{1，2，3，4，5}的中位數為3。{1，2，3，4，5，6}的中位數為（3+4）/ 2 = 3.5。那麼這題最直接的思路就是將兩個數列合併在一起，然後排序，然後找到中位數就行了。可是這樣最快也要O((m+n)log(m+n))的時間複雜度
 
 首先我們來看如何找到兩個數列的第k小個數，即程序中getKth(A, B , k)函數的實現。用一個例子來說明這個問題：A = {1，3，5，7}；B = {2，4，6，8，9，10}；如果要求第7個小的數，A數列的元素個數為4，B數列的元素個數為6；k/2 = 7/2 = 3，而A中的第3個數A[2]=5；B中的第3個數B[2]=6；而A[2]<B[2]；則A[0]，A[1]，A[2]中必然不可能有第7個小的數。因為A[2]<B[2]，所以比A[2]小的數最多可能為A[0], A[1], B[0], B[1]這四個數，也就是說A[2]最多可能是第5個大的數，由於我們要求的是getKth(A, B, 7)；現在就變成了求getKth(A', B, 4)；即A' = {7}；B不變，求這兩個數列的第4個小的數，因為A[0]，A[1]，A[2]中沒有解，所以我們直接刪掉它們就可以了。
@@ -7887,6 +7896,46 @@ Note how the start is always included, and the end always excluded. This makes s
 ![](assets/markdown-img-paste-20190831094519590.png)
 
 ### Code
+Binary Search Aproach
+```py
+def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
+    m, n = len(nums1), len(nums2)
+    if (m > n):
+        return self.findMedianSortedArrays(nums2, nums1)
+    half = int((m + n) / 2)
+    lo, hi = 0, m # note it's m instead of m-1 bc possible use up nums1
+    while lo <= hi:
+        i = lo + int((hi - lo) / 2)
+        j = half - i
+        if i > lo and nums1[i - 1] > nums2[j]:
+            hi = i - 1
+        elif i < hi and nums2[j - 1] > nums1[i]:
+            lo = i + 1
+        else:
+            # find minRight
+            if i == m:
+                minRight = nums2[j]
+            elif j == n:
+                minRight = nums1[i]
+            else:
+                minRight = min(nums2[j], nums1[i])
+
+            if (m + n) % 2 != 0:  # If there are odd elements.
+                return minRight
+
+            # find maxLeft
+            if i == 0:
+                maxLeft = nums2[j - 1]
+            elif j == 0:
+                maxLeft = nums1[i - 1]
+            else:
+                maxLeft = max(nums1[i - 1], nums2[j - 1])
+
+            return (maxLeft + minRight) * 0.5
+
+```
+
+Recursive approach:
 ``` py
 class Solution(object):
     def findKth(self, A, B, k):
