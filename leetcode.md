@@ -4015,25 +4015,34 @@ public:
 
 ## ***[Start of the Binary Search]***
 ### Conclusion
-https://www.cnblogs.com/grandyang/p/6854825.html
-Case of the Exception of the Range: Leetcode: 108, 34
+https://segmentfault.com/a/1190000016825704
+
 - What is the sign of Binary Search question:
   1. limitation of the time complexity O(log(n))
   2. given an (part of) sorted array
 
 - Properties of Binary search
-  1. if the the counts of array elems is even, then we pick the lower of the center
-
-(?) This rule is questionable !!!, just pick up a way and try with simple data [], [1], [1,2] ... etc.
-actually it depends on how you set r:
-if you set r to len(nums), then you use while __l < r__. when l == r, the search space becomes empty.
-if you set r to len(nums)-1(inclusive), then you should use while __l <= r__. when l > r, the search space becomes empty.
-because eventually you need the while loop to be terminated with an empty range.
+  1. if the the counts of array elems is even, then we pick the lower of the center(偏左)
+  2. 除了查找右邊界的時候是要把mid變成偏右 (原本的mid算法+1)
 
 ### Conclusion Update
 1. Always use right = len(nums) -1, because you may want to access arr[right]!
-   1. So you have to use left <= right in termination.
-2. Always use < or <=, and always put the arr[mid] in the left.
+2. 最單純的binary search, 查找特定的值:
+    - l <= r
+    - mid == target: break
+    - l = mid + 1
+    - r = mid - 1
+3. 查找左邊界:
+    - l < r
+    - l = mid +1
+    - **r = mid**
+4. 查找右邊界:
+    - l < r
+    - **mid = l + (r-l)//2 + 1**
+    - **l = mid**
+    - r = mid - 1
+
+- ![](assets/markdown-img-paste-20200408150759697.png)
 
 ---
 ## 704. Binary Search｜ 6/15
