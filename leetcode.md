@@ -18423,3 +18423,116 @@ class Solution(object):
         - Heap要存什麼, 以什麼做為排序基準
         - 什麼情況下可以 push
         - 什麼情況下要 pop
+---
+## 222. Count Complete Tree Nodes｜ 4/8
+Given a complete binary tree, count the number of nodes.
+
+Note:
+
+Definition of a complete binary tree from Wikipedia:
+In a complete binary tree every level, except possibly the last, is completely filled, and all nodes in the last level are as far left as possible. It can have between 1 and 2h nodes inclusive at the last level h.
+
+![](assets/markdown-img-paste-20200408103752423.png)
+
+### 技巧
+
+這題的技巧在於如何給定葉節點的index，規劃出從root到此節點的路徑
+
+也是使用二元搜尋法(binary search)!
+
+詳見: ![](assets/markdown-img-paste-20200408151630423.png)
+
+### 思路
+
+Binary Search:
+
+首先先計算出樹的深度，再透過這個深度去得到這個深度最多有多少個葉節點
+
+然後用二元搜尋法去判斷該節點是否存在
+
+這題的技巧在於如何給定業節點的index，規劃出從root到此節點的路徑
+
+也是使用二元搜尋法!
+
+詳見: ![](assets/markdown-img-paste-20200408151630423.png)
+
+Naive:
+
+用BFS找出 h-1 層的節點 有多少個孩子
+
+用兩個queue 一個是current層, 另一個是next層
+
+最後計算2^0 + 2^1 + ... 2^(h-1) + 葉節點 = 2^h -1 + 葉
+
+### Code
+Binary Search Solution
+```py
+class Solution:
+    def countNodes(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+        d = self.compute_depth(root)
+        if d == 0:
+            return 1
+
+        l, r = 0, 2**d -1 # the most possible right in the last level
+        while l <= r:
+            mid = l + (r-l) // 2
+            if self.exist(mid, d, root): # find out mid is exist
+                l = mid+1
+            else:
+                r = mid-1
+        return (2**d - 1) + l
+
+    def compute_depth(self, node):
+        # find out the depth
+        d = 0
+        while node.left:
+            d += 1
+            node = node.left
+        return d
+
+    def exist(self, idx, d, root):
+        # the tricky part of this question
+        # using binary search to findout how to walk from root to idx
+        l, r = 0, 2**d -1
+        for _ in range(d):
+            mid = l + (r-l) // 2
+            if idx > mid:
+                l = mid + 1
+                root = root.right
+            else:
+                r = mid
+                root = root.left
+        return root is not None
+
+```
+
+Naive Solution
+``` py
+class Solution:
+    def countNodes(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+        cur, nex = [], []
+        h = 0
+        cur.append((root, h))
+
+        while cur:
+            node, h = cur.pop(0)
+            if node.left:
+                nex.append((node.left, h+1))
+            else:
+                break
+            if node.right:
+                nex.append((node.right, h+1))
+            else:
+                break
+
+            if not cur:
+                cur = nex
+                nex = []
+                h += 1
+        return 2 ** (h+1) - 1 + len(nex)
+```
+---
