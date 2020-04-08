@@ -6709,11 +6709,49 @@ You are given an API bool isBadVersion(version) which will return whether versio
 ![](assets/markdown-img-paste-20190818184432126.png)
 
 ### 思路
-Use Binary search to solve.
-if mid is bad, search its left. otherwise, search its right.
-0 and n should be included.
+
+典型binary search查找邊界問題:
+
+可用茶左邊或右邊兩種解法來解
 
 ### Code
+
+Find Left boarder version:
+```py
+class Solution:
+    def firstBadVersion(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        l, r = 0, n
+        while l < r:
+            mid = l + (r-l) // 2
+            if isBadVersion(mid):
+                r = mid
+            else:
+                l = mid +1
+        return l
+```
+
+Find Right boarder version:
+```py
+class Solution:
+    def firstBadVersion(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        l, r = 0, n
+        while l < r:
+            mid = l + (r-l) // 2 + 1
+            if not isBadVersion(mid):
+                l = mid
+            else:
+                r = mid -1
+        return r+1
+```
+
 ``` c
 // Forward declaration of isBadVersion API.
 bool isBadVersion(int version);
