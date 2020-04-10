@@ -4041,6 +4041,9 @@ https://segmentfault.com/a/1190000016825704
     - **mid = l + (r-l)//2 + 1**
     - **l = mid**
     - r = mid - 1
+5. 注意查找左右邊界的if判斷式寫法:
+    - **if 判斷式均要放 >= or <= 的情形**
+    - 詳見LC34三刷code
 
 - ![](assets/markdown-img-paste-20200408150759697.png)
 
@@ -4125,13 +4128,18 @@ public:
 };
 ```
 ---
-## 34. Find First and Last Position of Element in Sorted Array｜ 6/15
+## 34. Find First and Last Position of Element in Sorted Array｜ 6/15 (BS左右邊界)
 Given an array of integers nums sorted in ascending order, find the starting and ending position of a given target value.
 
 Your algorithm's runtime complexity must be in the order of O(log n).
 
 If the target is not found in the array, return [-1, -1].
 ![34](assets/markdown-img-paste-20190615152011129.png)
+### 三刷思路
+
+利用Binary search小結的模板公式, 一次AC好用！
+
+注意 if 判斷式是固定寫法！
 
 ### 二刷思路更新
 
@@ -4201,6 +4209,35 @@ instead of calculating mid as mid = i+(j-i)/2, we now do: i + (j-i+1)/2
     Therefore, i + (j-i+1)/2 , __biased towards the right__
 
 ### Code
+三刷, two binary search with 模板！
+```py
+class Solution:
+    def searchRange(self, nums: List[int], target: int) -> List[int]:
+        if not nums:
+            return [-1,-1]
+        # find left bound
+        l, r = 0, len(nums)-1
+
+        while l < r:
+            mid = l + (r-l)//2
+            if nums[mid] >= target:
+                r = mid
+            else:
+                l = mid+1
+        left = l if nums[l] == target else -1
+
+        # find right bound
+        l, r = 0, len(nums)-1
+        while l < r:
+            mid = l + (r-l)//2 +1
+            if nums[mid] <= target:
+                l = mid
+            else:
+                r = mid-1
+        right = r if nums[r] == target else -1
+        return [left, right]
+```
+
 Two binary search
 ```py
 class Solution:
@@ -4404,7 +4441,7 @@ class Solution:
             return 0 if nums[0] == target else -1
 
         rotate_index = find_rotate_index(0, n - 1)
-        
+
         # if array is not rotated, search in the entire array
         if rotate_index == 0:
             return search(0, n - 1)
