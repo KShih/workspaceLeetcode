@@ -18879,3 +18879,86 @@ class Solution:
         return (r-l)*(t-b) != 0
 ```
 ---
+## 224. Basic Calculator ｜ 4/10
+
+Implement a basic calculator to evaluate a simple expression string.
+
+The expression string may contain open ( and closing parentheses ), the plus + or minus sign -, non-negative integers and empty spaces .
+
+Example 1:
+
+Input: "1 + 1"
+Output: 2
+
+Example 2:
+
+Input: " 2-1 + 2 "
+Output: 3
+
+Example 3:
+
+Input: "(1+(4+5+2)-3)+(6+8)"
+Output: 23
+
+Note:
+You may assume that the given expression is always valid.
+Do not use the eval built-in library function.
+
+### 技巧
+
+1. 遇到左括號相當於開啟子程序，必須maintain當前結果與left前的sign
+2. 遇到右括號相當於結束子程序，將當前的結果與之前存起來的做運算
+3. 利用operand 與 +/- 來維持當前結果
+
+### 思路
+
+思考這個例子: 33 - (2+4) + 5
+
+1. 括號會影響減號計算，所以要用stack來處理
+2. 數字不只一個位元所以要用operand來記錄當前數字
+3. 遇到加減時，相當於當前的operand結束，此時更新sign跟res 並初始化operand
+3. 遇到left parentheses(簡稱left) 時需要把目前的結果放進stack裡
+    1. 此時必須要記錄left前的 sign, 因此需要一個變量sign來記錄最近一次的加減是什麼
+    2. 把當前結果放盡stack之後就視同新的t程序開始, 因此要初始化
+4. 遇到right的時候
+    1. 表示括號內的程序結束，因此可以更新res
+    2. 將新的res的結果 乘上 left旁的 sign
+    3. 將上一部更新的res 加上 stack中的先前結果
+
+
+### Code
+``` py
+class Solution:
+    def calculate(self, s: str) -> int:
+        stack = []
+        operand = 0
+        sign = 1 # 1 means positive, -1 means negative
+        res = 0 # for the ongoing result
+
+        for c in s:
+            if c.isdigit():
+                operand = 10 * operand +  int(c) # forming the number more than one digit
+
+            elif c == '+' or c == '-':
+                res += operand * sign # update the current result with its previous save sign status
+                operand = 0
+                sign = 1 if c == '+' else -1 # update the current sign status for case if next c is '('
+
+            elif c == '(':
+                stack.append(res)
+                stack.append(sign) # save the current sign
+                # reset everything since will start a new calculation
+                res = 0
+                operand = 0
+                sign = 1
+
+            elif c == ')':
+                res += operand * sign
+                sign = stack.pop() # the previous sign " - (2+4) "
+                res = sign * res + stack.pop()
+                operand = 0
+                sign = 1
+
+        return res + operand*sign
+```
+---
