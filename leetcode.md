@@ -18771,7 +18771,7 @@ class Solution:
         return i
 ```
 ---
-## 844. Backspace String Compare｜ 4/10
+## 844. Backspace String Compare｜ 4/10 (W2D2)
 Given two strings S and T, return if they are equal when both are typed into empty text editors. # means a backspace character.
 
 Example 1:
@@ -18810,5 +18810,37 @@ class Solution:
             else:
                 stack.append(c)
         return stack
+```
+---
+## 223. Rectangle Area｜ 4/10
+Find the total area covered by two rectilinear rectangles in a 2D plane.
+
+Each rectangle is defined by its bottom left corner and top right corner as shown in the figure.
+
+![](assets/markdown-img-paste-20200410125602101.png)
+
+### 技巧
+
+找尋四邊形的重疊:
+- ![](assets/markdown-img-paste-2020041012571448.png)
+
+區間重疊:
+- 假設 四個區間:(4,6), (7,9), (1,5), (6,7), 判斷是否重疊
+    - 先依據區間左端點排序 -> (1,5), (4,6), (6,7), (7,9)
+    - 要試下個端點的左 小於 上個端點的右 -> 重疊
+
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def computeArea(self, A: int, B: int, C: int, D: int, E: int, F: int, G: int, H: int) -> int:
+        left = max(A,E)
+        right = max( min(C,G), left)
+        bottom = max(B,F)
+        top = max(min(D,H), bottom)
+
+        return (C-A)*(D-B) - (right-left)*(top-bottom) + (G-E)*(H-F)
 ```
 ---
