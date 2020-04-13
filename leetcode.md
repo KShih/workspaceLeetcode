@@ -2925,8 +2925,16 @@ public:
 
 ```
 ---
-## @543. Diameter of Binary Tree｜ 5/1
+## @543. Diameter of Binary Tree｜ 5/1 (W2D4)
 ![](assets/markdown-img-paste-20190630235236837.png)
+
+### 二刷思路
+
+我們要求的就是某一點的左右子樹 各自的最大深度和，而該點不需要為根節點
+
+使用 post order traversal 去更新父結點的 max_depth
+
+並同時更新全域變數max_path
 
 ### 思路
 拆解題目後：求根結點的左右兩個子樹的深度之和
@@ -2938,6 +2946,24 @@ public:
 可以從方法1歸納出：當不限於root時，就是recursive main function with root->left and root->right
 
 ### Code
+```py
+class Solution:
+    def __init__(self):
+        self.max_path = 0
+
+    def diameterOfBinaryTree(self, root: TreeNode) -> int:
+        self.get_max_depth(root)
+        return self.max_path
+
+    def get_max_depth(self, node):
+        if not node:
+            return 0
+        left = self.get_max_depth(node.left)
+        right = self.get_max_depth(node.right)
+        self.max_path = max(self.max_path, left+right) # update the max val
+
+        return 1 + max(left, right) # return the depth
+```
 多此一舉用了兩個recursive，過不了測資
 ``` c++
 /**
