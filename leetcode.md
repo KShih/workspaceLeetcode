@@ -18838,6 +18838,60 @@ class Solution:
         return stack
 ```
 ---
+## 525. Contiguous Array｜ 4/14 (W2 D6)
+Given a binary array, find the maximum length of a contiguous subarray with equal number of 0 and 1.
+
+Example 1:
+
+Input: [0,1]
+Output: 2
+
+Explanation: [0, 1] is the longest contiguous subarray with equal number of 0 and 1.
+
+
+Example 2:
+
+Input: [0,1,0]
+Output: 2
+
+Explanation: [0, 1] (or [1, 0]) is a longest contiguous subarray with equal number of 0 and 1.
+Note: The length of the given binary array will not exceed 50,000.
+
+### 技巧
+
+- Acumulated Sum 的變形
+- Hashmap 快速定位
+
+### 思路
+
+- ![](assets/markdown-img-paste-20200414143944396.png)
+
+- 初始相法是對的, 累積和, 但這邊用到了稍微不同的技巧
+    - 如果遇到零 -1, 遇到一 +1
+- 這樣遇到了之前出現過的sum時，可以使用`hash map`來快速定位第一次出現此sum的位置
+- 藉由這兩個位置的diff 可以求出此種組合的長度
+- 初始化在字典裡放入 (0, -1) 表示: 陣列一開始的和是0, 位置是-1
+    - 假設遇到[0,1] 時sum又回到0, 此時index=1, 減去放在字典裡的-1 等於正確答案2
+### Code
+``` py
+class Solution:
+    def findMaxLength(self, nums: List[int]) -> int:
+        sums = 0
+        dic = {0: -1} # initialize with sum=0: index=(-1)
+        res = 0
+
+        for i, num in enumerate(nums):
+            if num == 0:
+                sums -= 1
+            else:
+                sums += 1
+            if sums in dic:
+                res = max(res, i-dic[sums])
+            else:
+                dic[sums] = i
+        return res
+```
+---
 ## 223. Rectangle Area｜ 4/10
 Find the total area covered by two rectilinear rectangles in a 2D plane.
 
