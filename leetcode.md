@@ -18951,6 +18951,7 @@ Do not use the eval built-in library function.
     2. 將新的res的結果 乘上 left旁的 sign
     3. 將上一部更新的res 加上 stack中的先前結果
 
+- Solution2: 通解寫法, 非optimal
 
 ### Code
 ``` py
@@ -18986,6 +18987,46 @@ class Solution:
                 sign = 1
 
         return res + operand*sign
+```
+
+General Solution
+```py
+class Solution:
+    def calculate(self, s: str) -> int:
+        res, curRes, num, op = 0, 0, 0, '+'
+        i = 0
+
+        while i < len(s):
+            c = s[i]
+            if c.isdigit():
+                num = num*10 + int(c)
+            elif c == '(':
+                cnt = 0
+                for j in range(i, len(s)):
+                    if s[j] == '(':
+                        cnt += 1
+                    if s[j] == ')':
+                        cnt -= 1
+                    if cnt == 0:
+                        break
+                num = self.calculate(s[i+1:j])
+                i = j
+
+
+            if c in ['+', '-'] or i == len(s)-1:
+                # update curRes
+                if op == '+':
+                    curRes += num
+                elif op == '-':
+                    curRes -= num
+                res += curRes
+                curRes = 0
+
+                # update
+                op, num = c, 0
+
+            i += 1
+        return res
 ```
 ---
 ## 227. Basic Calculator II｜ 4/14
