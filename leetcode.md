@@ -19132,3 +19132,76 @@ class Solution:
         return res
 ```
 ---
+## 772. Basic Calculator III｜ 4/14
+mplement a basic calculator to evaluate a simple expression string.
+
+The expression string may contain open ( and closing parentheses ), the plus + or minus sign -, non-negative integers and empty spaces .
+
+The expression string contains only non-negative integers, +, -, *, / operators , open ( and closing parentheses ) and empty spaces . The integer division should truncate toward zero.
+
+You may assume that the given expression is always valid. All intermediate results will be in the range of [-2147483648, 2147483647].
+
+Some examples:
+
+"1 + 1" = 2
+
+" 6-4 / 2 " = 4
+
+"2*(5+5*2)/3+(6/2+8)" = 21
+
+"(2+6* 3+5- (3*14/7+2)*5)+3" = -12
+
+### 思路
+
+使用暫存器原理的General Solution
+
+比上題只要將 for loop 改成 while loop,
+
+並使用遞歸將( ) 視為子程序來處理
+
+### Code
+``` py
+class Solution:
+    def calculate(self, s: str) -> int:
+        res, curRes, num, op = 0, 0, 0, '+'
+        i = 0
+
+        while i < len(s):
+            c = s[i]
+            if c.isdigit():
+                num = num*10 + int(c)
+            elif c == '(':
+                cnt = 0
+                for j in range(i, len(s)):
+                    if s[j] == '(':
+                        cnt += 1
+                    if s[j] == ')':
+                        cnt -= 1
+                    if cnt == 0:
+                        break
+                num = self.calculate(s[i+1:j])
+                i = j
+
+            if c in ['+', '-', '*', '/'] or i == len(s)-1:
+                # update curRes
+                if op == '+':
+                    curRes += num
+                elif op == '-':
+                    curRes -= num
+                elif op == '*':
+                    curRes *= num
+                elif op == '/':
+                    curRes = int(curRes / num)
+
+                # determine whether update res from curRes
+                if c in ['+', '-'] or i == len(s)-1:
+                    res += curRes
+                    curRes = 0
+
+                # update
+                op, num = c, 0
+
+            i += 1
+        return res
+```
+---
