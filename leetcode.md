@@ -18988,3 +18988,147 @@ class Solution:
         return res + operand*sign
 ```
 ---
+## 227. Basic Calculator II｜ 4/14
+Implement a basic calculator to evaluate a simple expression string.
+
+The expression string contains only non-negative integers, +, -, *, / operators and empty spaces . The integer division should truncate toward zero.
+
+Example 1:
+
+Input: "3+2*2"
+Output: 7
+
+Example 2:
+
+Input: " 3/2 "
+Output: 1
+
+Example 3:
+
+Input: " 3+5 / 2 "
+Output: 5
+
+Note:
+
+You may assume that the given expression is always valid.
+
+### 技巧
+
+- Python 除法請一律使用 int( a / b ) <- 負數除法也適用
+    - a // b 會跟c++的結果不同 e.x: -3 // 2 = -2 instad of -1
+
+### 思路
+
+#### Naive:
+
+- 這題與上一提的不同是這題沒有括號，但必須額外處理乘法除法必須先做的程序
+
+- 用 for or 用 while:
+    - 用 while : 可一次將數字讀完但須多處考慮 i 的變化
+    - 用 for: 代碼比較漂亮
+
+- 先思考何時停止:
+    - 讀到下個 +/-/*// 的時候
+    - 讀完運算數字的時候
+
+- 遇到數字:
+    - 連續讀到完，並且把數字*sign存進stack
+- 遇到加減:
+    - 單純變號
+- 遇到乘除:
+    - 先略過乘除後可能的leading space
+    - 讀入下個數字
+    - 與stack.top運算後放回stack
+- 最後再將stack內的結果全部加起來，完工
+
+#### General:
+
+- 使用暫存器的概念來區分unfinished式子、finished式子
+- 就需要curRes 與 previous operator (op) 來記錄這些事
+- 如果 c 不是數字，或者是最後的字元
+    - 更新暫存器裡的值 with previous operator
+        - 如果是加減: 就相當於把 num 搬進去暫存器裡
+        - 如果是乘除: 相當於對curRes 做累積乘法與除法
+- 如果 c 是 '+', '-' 表示當前式子完成
+    - 將暫存器的值，更新到global
+- 如果 c 是 '*', '/' 表示當前式子未完成
+    - 保留暫存器的值來為往後做累積
+
+
+### Code
+Naive:
+``` py
+class Solution:
+    def calculate(self, s: str) -> int:
+        i, operand, sign, stack = 0, 0, 1, []
+
+        while i < len(s):
+            if s[i].isdigit():
+                while i < len(s) and s[i].isdigit():
+                    operand = operand*10 + int(s[i])
+                    i += 1
+                stack.append(operand * sign)
+                operand = 0
+
+            elif s[i] == '+':
+                sign = 1
+                i += 1
+            elif s[i] == '-':
+                sign = -1
+                i += 1
+            elif s[i] == '*' or s[i] == '/':
+                op = s[i] # save op
+                while not s[i].isdigit(): # eliminate leading space
+                    i += 1
+                # read next number
+                while i < len(s) and s[i].isdigit():
+                    operand = operand*10 + int(s[i])
+                    i += 1
+                operand2 = stack.pop()
+
+                if op == '*':
+                    stack.append(operand2 * operand)
+                else:
+                    stack.append(int(operand2 / operand)) # python 除法請用
+                operand = 0
+            else:
+                i += 1
+
+        res = 0
+        while stack: # add up the reamining elem in stack
+            res += stack.pop()
+        return res
+```
+
+
+General solution
+``` py
+class Solution:
+    def calculate(self, s: str) -> int:
+        res, curRes, num, op = 0, 0, 0, '+'
+
+        for i, c in enumerate(s):
+            if c.isdigit():
+                num = num*10 + int(c)
+
+            if c in ['+', '-', '*', '/'] or i == len(s)-1:
+                # update curRes
+                if op == '+':
+                    curRes += num
+                elif op == '-':
+                    curRes -= num
+                elif op == '*':
+                    curRes *= num
+                elif op == '/':
+                    curRes = int(curRes / num)
+
+                # determine whether update res from curRes
+                if c in ['+', '-'] or i == len(s)-1:
+                    res += curRes
+                    curRes = 0
+
+                # update
+                op, num = c, 0
+        return res
+```
+---
