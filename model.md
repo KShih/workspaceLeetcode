@@ -76,3 +76,16 @@ while i < len(s):
             i += 1
         return res
 ```
+
+---
+
+## Accumulated Sum
+
+- 累積陣列值的技巧
+
+### 技巧變形1: +1 -1
+
+- `525`
+- binary array:
+    - 遇到0: sum-1
+    - 遇到1: sum+1
