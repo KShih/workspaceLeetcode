@@ -19434,3 +19434,132 @@ class Solution:
             return str(start) + "->" + str(end)
 ```
 ---
+## 352. Data Stream as Disjoint Intervals｜ 4/15 (Very good question)
+Given a data stream input of non-negative integers a1, a2, ..., an, ..., summarize the numbers seen so far as a list of disjoint intervals.
+
+For example, suppose the integers from the data stream are 1, 3, 7, 2, 6, ..., then the summary will be:
+
+[1, 1]
+
+[1, 1], [3, 3]
+
+[1, 1], [3, 3], [7, 7]
+
+[1, 3], [7, 7]
+
+[1, 3], [6, 7]
+
+
+Follow up:
+
+What if there are lots of merges and the number of disjoint intervals are small compared to the data stream's size?
+### 思路
+1. Heap + Set:
+- Same idea with LC228, but our goal is to
+    1. Keep the order, or at least keep the order of next element
+    2. avoid duplicate
+- therefore we have solution1,
+- and build solution2 with more concise code and at little bit better efficiency
+    - store the data with initialized interval
+    - try to merge unmerged data into interval
+
+2. Binary Search:
+- Find the position to insert
+    - the interval whose start is larger than the value
+    - then insert in front of it
+- Merge with the inserting value with its next interval
+- Merge with the previous interval
+### Code
+Extending with LC228:
+``` py
+class SummaryRanges:
+
+    def __init__(self):
+        self.data = []
+        self.seen = set()
+
+    def addNum(self, val: int) -> None:
+        if val not in self.seen:
+            self.seen.add(val)
+            self.data.append(val)
+
+    def getIntervals(self) -> List[List[int]]:
+        temp = self.data[:] # avoid pop the real element in self.data
+        heapq.heapify(temp)
+        ranges = [heapq.heappop(temp)]
+        res = []
+        while temp:
+            nexts = heapq.heappop(temp)
+            if ranges[-1]+1 == nexts:
+                ranges.append(nexts)
+            else:
+                res.append(self.build_range(ranges))
+                ranges = [nexts]
+        res.append(self.build_range(ranges))
+
+        return res
+
+    def build_range(self, ranges):
+        if not ranges:
+            return
+        if len(ranges) == 1:
+            return [ranges[0], ranges[0]]
+        else:
+            return [ranges[0], ranges[-1]]
+```
+
+Better One:
+```py
+class SummaryRanges:
+
+    def __init__(self):
+        self.intervals = []
+        self.seen = set()
+
+    def addNum(self, val):
+        if val not in self.seen:
+            self.seen.add(val)
+            heapq.heappush(self.intervals, [val, val])
+
+    def getIntervals(self):
+        tmp = []
+
+        while self.intervals:
+            cur = heapq.heappop(self.intervals)
+
+            if tmp and tmp[-1][1]+1 == cur[0]:
+                tmp[-1][1] = cur[1] # merge
+            else:
+                tmp.append(cur)
+        self.intervals = tmp
+        return self.intervals
+```
+
+Binary Search:
+```py
+class SummaryRanges:
+    def __init__(self):
+        self.intervals = []
+
+    def merge(self, idx):
+        if idx+1 < len(self.intervals) and idx>=0 and self.intervals[idx+1][0]-self.intervals[idx][1]<=1:
+            self.intervals[idx][1] = max(self.intervals[idx][1], self.intervals[idx+1][1])
+            self.intervals.pop(idx+1)
+
+    def addNum(self, val: int) -> None:
+        l, r = 0, len(self.intervals)-1
+        while l<=r:
+            mid = (l+r)//2
+            if self.intervals[mid][0] >= val:
+                r = mid - 1
+            else:
+                l = mid + 1
+
+        self.intervals.insert(l, [val, val])
+        self.merge(l) # merge next [val, val], [next]
+        self.merge(l-1) # merge prvious
+
+    def getIntervals(self) -> List[List[int]]:
+        return self.intervals
+```
+---
