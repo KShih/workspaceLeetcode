@@ -19366,3 +19366,71 @@ class Solution:
         return res
 ```
 ---
+## 228. Summary Ranges｜ 4/15
+Given a sorted integer array without duplicates, return the summary of its ranges.
+
+Example 1:
+
+Input:  [0,1,2,4,5,7]
+
+Output: ["0->2","4->5","7"]
+
+Explanation: 0,1,2 form a continuous range; 4,5 form a continuous range.
+Example 2:
+
+Input:  [0,2,3,4,6,8,9]
+
+Output: ["0","2->4","6","8->9"]
+
+Explanation: 2,3,4 form a continuous range; 8,9 form a continuous range.
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def summaryRanges(self, nums: List[int]) -> List[str]:
+        temp = []
+        res = []
+        for i in range(len(nums)):
+            if not temp:
+                temp.append(nums[i])
+            else:
+                if nums[i] == temp[-1]+1:
+                    temp.append(nums[i])
+                else:
+                    res.append(self.add_res(temp))
+                    temp = [nums[i]]
+        if temp:
+            res.append(self.add_res(temp))
+        return res
+    def add_res(self, ranges):
+        if not ranges:
+            return
+        elif len(ranges) == 1:
+            return str(ranges[0])
+        else:
+            return str(ranges[0]) + "->" + str(ranges[-1])
+```
+
+Two pointer, space optimal
+```py
+class Solution:
+    def summaryRanges(self, nums: List[int]) -> List[str]:
+        if not nums:
+            return []
+        res = []
+        start, end = 0, 0
+        for i in range(len(nums)-1):
+            if nums[i] != nums[i+1]-1:
+                res.append(self.add_res(nums[start], nums[i]))
+                start = i+1
+        res.append(self.add_res(nums[start], nums[-1]))
+        return res
+    def add_res(self, start, end):
+        if start == end:
+            return str(start)
+        else:
+            return str(start) + "->" + str(end)
+```
+---
