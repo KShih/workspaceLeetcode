@@ -19691,3 +19691,67 @@ class Solution:
         return [n for n in (num1, num2) if nums.count(n) > len(nums)//3]
 ```
 ---
+## 234. Palindrome Linked List｜ 5/29
+Given a singly linked list, determine if it is a palindrome.
+
+Example 1:
+
+Input: 1->2
+Output: false
+Example 2:
+
+Input: 1->2->2->1
+Output: true
+Follow up:
+Could you do it in O(n) time and O(1) space?
+### 思路
+不使用stack的:
+
+用快慢指針找到中點後，針對中點後的list去reverse，然後比較
+
+### Code
+``` py
+class Solution:
+    def isPalindrome(self, head: ListNode) -> bool:
+        li = []
+        while head:
+            li.append(head.val)
+            head = head.next
+        return self.isPalin(li)
+    def isPalin(self,li):
+        return li[::1] == li[::-1]
+```
+
+```py
+class Solution:
+    def isPalindrome(self, head: ListNode) -> bool:
+        if not head:
+            return True
+        mid = self.getMid(head)
+        list2 = self.reverseList(mid.next)
+
+        while head and list2:
+            if head.val != list2.val:
+                return False
+            head = head.next
+            list2 = list2.next
+        return True
+
+
+    def getMid(self, head):
+        slow, fast = head, head
+        while fast.next and fast.next.next:
+            slow = slow.next
+            fast = fast.next.next
+        return slow
+
+    def reverseList(self, head):
+        pre = None
+        while head:
+            nex = head.next
+            head.next = pre
+            pre = head
+            head = nex
+        return pre
+```
+---
