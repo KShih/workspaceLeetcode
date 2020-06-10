@@ -19755,3 +19755,52 @@ class Solution:
         return pre
 ```
 ---
+## 240. Search a 2D Matrix II｜ 8/29
+Write an efficient algorithm that searches for a value in an m x n matrix. This matrix has the following properties:
+
+Integers in each row are sorted in ascending from left to right.
+Integers in each column are sorted in ascending from top to bottom.
+Example:
+
+Consider the following matrix:
+
+[
+  [1,   4,  7, 11, 15],
+  [2,   5,  8, 12, 19],
+  [3,   6,  9, 16, 22],
+  [10, 13, 14, 17, 24],
+  [18, 21, 23, 26, 30]
+]
+Given target = 5, return true.
+
+Given target = 20, return false.
+
+### 思路
+
+從左下開始找，要是比target小就往右，比target大就往上
+### Code
+``` py
+class Solution:
+    def searchMatrix(self, matrix: List[List[int]], target: int)-> bool:
+        if not len(matrix) or not len(matrix[0]):
+			# Quick response for empty matrix
+            return False
+        h, w = len(matrix), len(matrix[0])
+        # Start adaptive search from bottom left corner
+        y, x = h-1, 0
+        while True:
+            if y < 0 or x >= w:
+                break
+            current = matrix[y][x]
+            if target < current:
+                # target is smaller, then go up
+                y -= 1
+            elif target > current:
+                # target is larger, then go right
+                x += 1
+            else:
+                # hit target
+                return True
+        return False
+```
+---
