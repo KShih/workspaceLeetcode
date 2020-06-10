@@ -19885,3 +19885,46 @@ class Solution:
         return res
 ```
 ---
+## 244. Shortest Word Distance II｜ 6/10
+Design a class which receives a list of words in the constructor, and implements a method that takes two words word1 and word2 and return the shortest distance between these two words in the list. Your method will be called repeatedly many times with different parameters.
+
+Example:
+Assume that words = ["practice", "makes", "perfect", "coding", "makes"].
+
+Input: word1 = “coding”, word2 = “practice”
+Output: 3
+
+Input: word1 = "makes", word2 = "coding"
+Output: 1
+
+Note:
+You may assume that word1 does not equal to word2, and word1 and word2 are both in the list.
+### 思路
+
+將較小的那個往後移一位，使得 res 可能會變小(如果移動後還是比另一個不動的list的元素小)
+
+### Code
+``` py
+class WordDistance:
+
+    def __init__(self, words: List[str]):
+        self.dic = {}
+        for i, word in enumerate(words):
+            if word not in self.dic:
+                self.dic[word] = [i]
+            else:
+                self.dic[word].append(i)
+
+    def shortest(self, word1: str, word2: str) -> int:
+        i, j = 0, 0 # pointer to word1_list, and word2_list
+        list1, list2 = self.dic[word1], self.dic[word2]
+        res = float(inf)
+        while i < len(list1) and j < len(list2):
+            res = min(res, abs(list1[i] - list2[j]))
+            if list1[i] < list2[j]:
+                i += 1
+            else:
+                j += 1
+        return res
+```
+---
