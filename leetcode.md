@@ -19884,6 +19884,20 @@ class Solution:
                     res = min(res, abs(idx1 - idx2))
         return res
 ```
+
+Same code with 245(more scalable):
+```py
+class Solution:
+    def shortestDistance(self, words: List[str], word1: str, word2: str) -> int:
+        idx = -1
+        res = float(inf)
+        for i, word in enumerate(words):
+            if word1 == word or word2 == word:
+                if idx != -1 and (word1 == word2 or word != words[idx]):
+                    res = min(res, abs(i - idx))
+                idx = i
+        return res
+```
 ---
 ## 244. Shortest Word Distance II｜ 6/10
 Design a class which receives a list of words in the constructor, and implements a method that takes two words word1 and word2 and return the shortest distance between these two words in the list. Your method will be called repeatedly many times with different parameters.
@@ -19925,6 +19939,39 @@ class WordDistance:
                 i += 1
             else:
                 j += 1
+        return res
+```
+---
+## 245. Shortest Word Distance III｜ 6/11
+iven a list of words and two words word1 and word2, return the shortest distance between these two words in the list.
+
+word1 and word2 may be the same and they represent two individual words in the list.
+
+Example:
+Assume that words = ["practice", "makes", "perfect", "coding", "makes"].
+
+Input: word1 = “makes”, word2 = “coding”
+Output: 1
+
+Input: word1 = "makes", word2 = "makes"
+Output: 3
+
+Note:
+You may assume word1 and word2 are both in the list.
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def shortestWordDistance(self, words: List[str], word1: str, word2: str) -> int:
+        idx = -1
+        res = float(inf)
+        for i, word in enumerate(words):
+            if word1 == word or word2 == word:
+                if idx != -1 and (word1 == word2 or word != words[idx]):
+                    res = min(res, abs(i - idx))
+                idx = i
         return res
 ```
 ---
