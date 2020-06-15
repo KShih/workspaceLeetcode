@@ -20008,3 +20008,58 @@ class Solution:
         return True
 ```
 ---
+## 247. Strobogrammatic Number II｜ 6/15
+A strobogrammatic number is a number that looks the same when rotated 180 degrees (looked at upside down).
+
+Find all strobogrammatic numbers that are of length = n.
+
+Example:
+
+Input:  n = 2
+Output: ["11","69","88","96"]
+### 思路
+
+觀察：
+
+n = 0:   none
+
+n = 1:   0, 1, 8
+
+n = 2:   11, 69, 88, 96
+
+n = 3:   101, 609, 808, 906, 111, 619, 818, 916, 181, 689, 888, 986
+
+n = 4:   1001, 6009, 8008, 9006, 1111, 6119, 8118, 9116, 1691, 6699, 8698, 9696, 1881, 6889, 8888, 9886, 1961, 6969, 8968, 9966
+
+n = 2 時是在 n = 0 的元素的左右側加上 [0 0] [1 1] [8 8] [6 9] [9 6]
+
+n = 4 時是在 n = 2 的元素的左右側加上 [0 0] [1 1] [8 8] [6 9] [9 6]
+
+若此 n 為最後一階元素，則不加上 0 0
+
+因此我們可以用遞迴來解，因為必須控制最後一層不加上 0 0，因此我們需要多傳一個本來的 n 作為flag，m 作為增減的標的
+
+### Code
+``` py
+class Solution:
+    def findStrobogrammatic(self, n: int) -> List[str]:
+        return self.find(n, n)
+
+    def find(self, m, n):
+        if m == 0:
+            return [""]
+        if m == 1:
+            return ["0", "1", "8"]
+
+        base = self.find(m-2, n)
+        res = []
+        for num in base:
+            if m != n:
+                res.append("0" + num + "0")
+            res.append("1" + num + "1")
+            res.append("8" + num + "8")
+            res.append("6" + num + "9")
+            res.append("9" + num + "6")
+        return res
+```
+---
