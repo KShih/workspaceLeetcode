@@ -20213,3 +20213,69 @@ class Solution:
         return True
 ```
 ---
+## 253. Meeting Rooms II｜ 6/17
+
+Given an array of meeting time intervals consisting of start and end times [[s1,e1],[s2,e2],...] (si < ei), find the minimum number of conference rooms required.
+
+Example 1:
+
+Input: [[0, 30],[5, 10],[15, 20]]
+Output: 2
+Example 2:
+
+Input: [[7,10],[2,4]]
+Output: 1
+
+### 思路
+
+1. Heap:
+
+heap 裡面放此meeting 的結束時間，
+如果下個開始時間彼此結束時間還要早，則必須再開一間
+
+如果比這個時間還要晚，表時timeline已經移動到那個開始時間，則必須pop (否則timeline永遠不會前進)
+
+2. TreeMap:
+
+類似開啟與關閉room的概念，
+我們用一個dict當作時間軸，開始會議就在該時間段+1, 關閉則-1
+
+### Code
+min Heap:
+``` py
+import heapq
+class Solution:
+    def minMeetingRooms(self, intervals: List[List[int]]) -> int:
+        if not intervals:
+            return 0
+        intervals = sorted(intervals, key=lambda x: x[0])
+        room = 1
+        heap = [intervals[0][1]]
+        for i in range(1, len(intervals)):
+            if intervals[i][0] < heap[0]:
+                room += 1
+            else:
+                heapq.heappop(heap)
+            heapq.heappush(heap,intervals[i][1])
+        return room
+```
+
+self implement TreeMap:
+```py
+from collections import defaultdict
+class Solution:
+    def minMeetingRooms(self, intervals: List[List[int]]) -> int:
+        timeline = defaultdict(int)
+        room, res = 0, 0
+        for i in intervals:
+            timeline[i[0]] += 1
+            timeline[i[1]] -= 1
+        timeline = timeline.items()
+        timeline = sorted(timeline) # converting the dict into sorted tuple
+
+        for entry in timeline:
+            room += entry[1]
+            res = max(res, room)
+        return res
+```
+---
