@@ -20369,3 +20369,58 @@ class Solution:
                 self.helper( n//i, i, comb+[i])
 ```
 ---
+## 255. Verify Preorder Sequence in Binary Search Tree｜ 6/18
+Given an array of numbers, verify whether it is the correct preorder traversal sequence of a binary search tree.
+
+You may assume each number in the sequence is unique.
+
+Consider the following binary search tree:
+
+![](assets/markdown-img-paste-20200618131734462.png)
+### 思路
+
+當前節點的值一定大於其左子樹中任何一個節點值，而且其右子樹中的任何一個節點值都不能小於當前節點值，可以用這個性質來驗證，
+
+先設一個最小值 low，然後遍曆數組，如果當前值小於這個最小值 low，返回 false，對於根節點，將其壓入棧中，然後往後遍歷，*如果遇到的數字比棧頂元素小，說明是其左子樹的點*，繼續壓入棧中，直到遇到的數字比棧頂元素大，那麼就是右邊的值了，需要找到是哪個節點的右子樹，所以更新 low 值並刪掉棧頂元素，然後繼續和下一個棧頂元素比較，如果還是大於，則繼續更新 low 值和刪掉棧頂，直到棧為空或者當前棧頂元素大於當前值停止，壓入當前值，這樣如果遍歷完整個數組之前都沒有返回 false 的話，最後返回 true 即可
+
+### Code
+
+Using stack
+``` py
+class Solution:
+    def verifyPreorder(self, preorder: List[int]) -> bool:
+        if not preorder:
+            return True
+        low = -float(inf)
+        stack = [preorder[0]] # we keep the root and its left child in the stack
+
+        for i in range(1, len(preorder)):
+            num = preorder[i]
+            if num < low:
+                return False
+
+            while stack and stack[-1] < num:
+                low = stack.pop()
+            stack.append(num)
+        return True
+```
+
+Without stack but using stack concept
+```py
+class Solution:
+    def verifyPreorder(self, preorder: List[int]) -> bool:
+        if not preorder:
+            return True
+        low, ptr = -float(inf), -1 # ptr is for implement the top of the stack
+
+        for num in preorder:
+            if low > num:
+                return False
+            while ptr >= 0 and num > preorder[ptr]:
+                low = preorder[ptr]
+                ptr -= 1
+            ptr += 1
+            preorder[ptr] = num # will be different when going to different sub tree
+        return True
+```
+---
