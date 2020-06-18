@@ -20279,3 +20279,93 @@ class Solution:
         return res
 ```
 ---
+## 254. Factor Combinations｜ 6/18
+Numbers can be regarded as product of its factors. For example,
+
+8 = 2 x 2 x 2;
+  = 2 x 4.
+Write a function that takes an integer n and return all possible combinations of its factors.
+
+Note:
+
+You may assume that n is always positive.
+Factors should be greater than 1 and less than n.
+Example 1:
+
+Input: 1
+Output: []
+Example 2:
+
+Input: 37
+Output:[]
+Example 3:
+
+Input: 12
+Output:
+[
+  [2, 6],
+  [2, 2, 3],
+  [3, 4]
+]
+Example 4:
+
+Input: 32
+Output:
+[
+  [2, 16],
+  [2, 2, 8],
+  [2, 2, 2, 4],
+  [2, 2, 2, 2, 2],
+  [2, 4, 4],
+  [4, 8]
+]
+### 思路
+
+方法一：backtracking 時只向後看避免重複，另外題目不允許 [[]], 與 [n]，所以我們在push進去res的時候要判斷一下
+
+方法二：
+
+以12為例，當第一段我們發現 12 % 2 == 0 的時候就可以把 [2,6] 放進去了，
+
+然後再進去backtrack 6，這種方式我們只需要 loop 到 sqrt(n)
+
+### Code
+Backtracking
+``` py
+class Solution:
+    def getFactors(self, n: int) -> List[List[int]]:
+        self.res = []
+        self.helper(n, 2, [])
+        return self.res
+
+    def helper(self, n, start, comb):
+        if n == 1:
+            if len(comb) > 1: # not allow empty or [n]
+                self.res.append(comb)
+            return
+
+        for i in range(start, n+1):
+            if n % i == 0:
+                self.helper( n//i, i, comb+[i])
+```
+
+Faster backtracking
+```py
+class Solution:
+    def getFactors(self, n: int) -> List[List[int]]:
+        self.res = []
+        self.helper(n, 2, [])
+        return self.res
+
+    def helper(self, n, start, comb):
+        if n == 1:
+            if len(comb) > 1: # not allow empty or [n]
+                self.res.append(comb)
+            return
+
+        for i in range(start, int(math.sqrt(n+1))+1): # 還有loop的數量
+            if n % i == 0:
+                self.res.append(comb + [i, n//i]) # 只有這裡不一樣！
+                self.helper( n//i, i, comb+[i])
+```
+---
