@@ -20489,3 +20489,39 @@ def solution(nums, target):
 
 ```
 ---
+## 249. Group Shifted Strings｜ 7/11
+![](assets/markdown-img-paste-20200711104414446.png)
+
+計算每個字串的偏移量
+
+### 思路
+
+相同偏移量的字串相當於跟首字母差距一樣的字串
+
+deal with ["abc","am"] -> 在每個字母差值背後加上一個分隔號
+
+deal with ["az", "ba"] -> 把每個負數的偏移量加上26
+
+### Code
+``` py
+class Solution:
+    def groupStrings(self, strings: List[str]) -> List[List[str]]:
+        dic = dict()
+        for s in strings:
+            thisDelta = self.getDif(s)
+            if thisDelta not in dic:
+                dic[thisDelta] = [s]
+            else:
+                dic[thisDelta].append(s)
+        return [val for val in dic.values()]
+
+    def getDif(self, s):
+        base = ord(s[0])
+        delta = ""
+        for c in s:
+            diff = ord(c) - base
+            delta += str(diff) if diff > 0 else str(diff+26)
+            delta += ','
+        return delta
+```
+---
