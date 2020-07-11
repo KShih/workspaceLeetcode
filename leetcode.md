@@ -20525,3 +20525,117 @@ class Solution:
         return delta
 ```
 ---
+## 261. Graph Valid Tree｜ 7/11
+Given n nodes labeled from 0 to n-1 and a list of undirected edges (each edge is a pair of nodes), write a function to check whether these edges make up a valid tree.
+
+Example 1:
+
+Input: n = 5, and edges = [[0,1], [0,2], [0,3], [1,4]]
+
+Output: true
+
+Example 2:
+
+Input: n = 5, and edges = [[0,1], [1,2], [2,3], [1,3], [1,4]]
+
+Output: false
+
+Note: you can assume that no duplicate edges will appear in edges. Since all edges are undirected, [0,1] is the same as [1,0] and thus will not appear together in edges.
+### 思路
+
+用 DFS 來做，根據 pair 來建立一個圖的結構，用鄰接鏈表來表示，還需要一個一位數組v來記錄某個結點是否被訪問過，然後用 DFS 來搜索結點0，遍歷的思想是，當 DFS 到某個結點，先看當前結點是否被訪問過，如果已經被訪問過，說明環存在，直接返回 false，如果未被訪問過，現在將其狀態標記為已訪問過，然後到鄰接鏈表裡去找跟其相鄰的結點繼續遞歸遍歷，注意還需要一個變量 pre 來記錄上一個結點，以免回到上一個結點，這樣遍歷結束後，就把和結點0相鄰的節點都標記為 true，然後再看v裡面是否還有沒被訪問過的結點，如果有，則說明圖不是完全連通的，返回 false，反之返回 true
+
+Iterative ：
+沒有標記 pre ，作法是每次新增 neibor 後則要從 neibor 的map裡面移除掉自己，以免重複拜訪
+
+Union Find:
+
+Union Find 在這邊的應用就是找出共同的root 並assign給該root!
+
+如果再 find 的過程中發現該edge的x跟y同屬於同個 group，表示環存在
+
+比如: 0 <-> 1, 1 <-> 2 => 經過union find 之後會變成 0 <-> 1, 0 <-> 2
+
+root_x = Find(0) = 0
+root_y = Find(1) = 1
+Union( root_x, root_y ) => {1: 0}: (1的root是0)
+
+root_x = Find(1) = 0
+root_y = Find(2) = 2
+Union( root_x, root_y ) => {1: 0, 2: 0}: (1的root是0, 2的root是0)
+
+
+### Code
+dfs:
+``` py
+from collections import defaultdict
+class Solution:
+    def validTree(self, n: int, edges: List[List[int]]) -> bool:
+        maps = defaultdict(list)
+        visit = defaultdict(lambda: False)
+        for e in edges:
+            maps[e[0]].append(e[1])
+            maps[e[1]].append(e[0])
+        if not self.dfs(maps, visit, 0, -1):
+            return False
+        for a in range(n):
+            if not visit[a]:
+                return False
+        return True
+
+    def dfs(self, maps, visit, cur, pre):
+        if visit[cur]:
+            return False
+        visit[cur] = True
+        for e in maps[cur]:
+            if e != pre:
+                if not self.dfs(maps, visit, e, cur):
+                    return False
+        return True
+```
+
+dfs with iterative:
+```py
+from collections import defaultdict
+class Solution:
+    def validTree(self, n: int, edges: List[List[int]]) -> bool:
+        maps = defaultdict(set)
+        for e in edges:
+            maps[e[0]].add(e[1])
+            maps[e[1]].add(e[0])
+        stack = [0]
+        visit = set()
+
+        while stack:
+            e = stack.pop()
+            if e in visit:
+                return False
+            visit.add(e)
+            for neibor in maps[e]:
+                stack.append(neibor)
+                maps[neibor].remove(e)
+        return True if len(visit) == n else False
+```
+
+Union Find:
+```py
+class Solution:
+    def validTree(self, n: int, edges: List[List[int]]) -> bool:
+        if len(edges) != n-1:
+            return False
+
+        self.roots = [-1 for _ in range(n)]
+        for x, y in edges:
+            root_x = self.find(x)
+            root_y = self.find(y)
+            if root_x == root_y:
+                return False
+            self.roots[root_x] = root_y # union
+        return True
+
+    def find(self, node):
+        while self.roots[node] != -1:
+            node = self.roots[node] # recursively find the root
+        return node
+```
+---
