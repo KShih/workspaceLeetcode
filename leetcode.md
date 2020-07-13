@@ -20685,3 +20685,76 @@ class Solution:
         return True
 ```
 ---
+## 264. Ugly Number II｜ 7/13
+
+Write a program to find the n-th ugly number.
+
+Ugly numbers are positive numbers whose prime factors only include 2, 3, 5.
+
+Example:
+
+Input: n = 10
+
+Output: 12
+
+Explanation: 1, 2, 3, 4, 5, 6, 8, 9, 10, 12 is the sequence of the first 10 ugly numbers.
+
+Note:
+
+1 is typically treated as an ugly number.
+n does not exceed 1690.
+### 思路
+
+heap:
+
+第 n 個數，就想到使用 heap
+
+但注意必須使用一個 seen 去追蹤哪些數被加進去 dic 過
+
+
+DP:
+
+使用三個指標去 maintain 三個被取出的位置，
+
+要求的醜陋數就是從已經生成的序列中取出來的，每次都從三個列表中取出當前最小的那個加入序列，來形成醜陋數列
+
+### Code
+min heap solution:
+
+O (n log n)
+``` py
+import heapq
+class Solution:
+    def nthUglyNumber(self, n: int) -> int:
+        heap = [1]
+        seen = {1}
+        for _ in range(1,n):
+            top = heapq.heappop(heap)
+
+            for i in [2, 3, 5]:
+                new_ugly = top * i
+                if new_ugly not in seen:
+                    heapq.heappush(heap, new_ugly)
+                    seen.add(new_ugly)
+        return heapq.heappop(heap)
+```
+
+dp solution:
+O (n)
+```py
+def nthUglyNumber(self, n):
+   if n <= 0:
+       return 0
+   ugly = [1] * n
+   i2 = i3 = i5 = 0
+   for i in xrange(1, n):
+       ugly[i] = min(ugly[i2]*2, ugly[i3]*3, ugly[i5]*5)
+       if ugly[i] == ugly[i2]*2:
+           i2 += 1
+       if ugly[i] == ugly[i3]*3:
+           i3 += 1
+       if ugly[i] == ugly[i5]*5:
+           i5 += 1
+   return ugly[-1]
+```
+---
