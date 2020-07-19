@@ -20795,3 +20795,76 @@ class Solution:
         return sums == 1 or sums == 0
 ```
 ---
+## 267. Palindrome Permutation II｜ 7/19
+
+Given a string s, return all the palindromic permutations (without duplicates) of it. Return an empty list if no palindromic permutation could be form.
+
+Example 1:
+
+Input: "aabb"
+Output: ["abba", "baab"]
+Example 2:
+
+Input: "abc"
+Output: []
+
+### 思路
+
+"aabbccc"
+
+1. 找出生成回文的前段的元素 -> "abc"
+    1. 需注意若是奇數字段的次數大於1, 需加入"一些"進入元素list中
+2. 從元素去生成組合 -> ["abc", "acb", "bca", "bac", "cab", "cba"]
+    1. 用 set() 去避免重複的組合生成
+3. 組合成回文字段 -> ["abcccba", acbcbca ...]
+
+
+### Code
+``` py
+from collections import Counter
+class Solution:
+    def generatePalindromes(self, s: str) -> List[str]:
+        counter = Counter(s)
+        if len(counter) <= 1:
+            return [s]
+        is_odd_palin = False
+        li, res = [], [] # list for generating palin combination
+
+        # Step1: generate the element to produce combination
+        for entry in counter:
+            counts = counter[entry]
+            if counts % 2 != 0:
+                if is_odd_palin: # can't form any palin if more than one odd counts appear
+                    return []
+                else:
+                    if counts >= 1: # should add into palin combination list
+                        li += [entry for _ in range(counts // 2)] # aaaaa -> aa, mid: a
+                    mid = entry
+                    is_odd_palin = True
+            else:
+                li += [entry for _ in range(counts // 2)] # aaaabbbb -> aabb
+
+        # Step2
+        gen_palin = self.genComb(li) # return the combination
+
+        # Step3
+        for p in gen_palin:
+            if is_odd_palin:
+                res.append(p+mid+p[::-1])
+            else:
+                res.append(p+p[::-1])
+        return res
+
+    def genComb(self,li): # generating combination
+        if len(li) == 1:
+            return li
+        res = set()
+        for i, c in enumerate(li):
+            li.pop(i)
+            child = self.genComb(li)
+            for str in child:
+                res.add(c+str)
+            li.insert(i, c)
+        return res
+```
+---
