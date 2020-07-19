@@ -20758,3 +20758,40 @@ def nthUglyNumber(self, n):
    return ugly[-1]
 ```
 ---
+## 266. Palindrome Permutation｜ 7/19
+Given a string, determine if a permutation of the string could form a palindrome.
+
+Example 1:
+
+Input: "code"
+Output: false
+
+Example 2:
+
+Input: "aab"
+Output: true
+
+Example 3:
+
+Input: "carerac"
+Output: true
+### 思路
+
+
+### Code
+``` py
+from collections import defaultdict
+class Solution:
+    def canPermutePalindrome(self, s: str) -> bool:
+        counter = defaultdict(int)
+        for c in s:
+            if counter[c] == 0:
+                counter[c] += 1
+            else:
+                counter[c] -= 1
+        sums = 0
+        for e in counter.values():
+            sums += e
+        return sums == 1 or sums == 0
+```
+---
