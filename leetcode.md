@@ -20868,3 +20868,78 @@ class Solution:
         return res
 ```
 ---
+## 268. Missing Number｜ 7/19
+
+Given an array containing n distinct numbers taken from 0, 1, 2, ..., n, find the one that is missing from the array.
+
+Example 1:
+
+Input: [3,0,1]
+Output: 2
+Example 2:
+
+Input: [9,6,4,2,3,5,7,0,1]
+Output: 8
+Note:
+Your algorithm should run in linear runtime complexity. Could you implement it using only constant extra space complexity?
+
+
+### 思路
+
+- Counting sort solution:
+
+Since all numbers are unique, we can try placing each number at its correct place, for example, placing 0 at index 0, placing 1 at index 1, and so on.
+
+Once we have every number in its correct place, we can iterate the array to find the index which does not have the correct number, and that index will be our missing number.
+
+- Sum solution:
+
+道題給我們n個數字，是0到n之間的數但是有一個數字去掉了，讓我們尋找這個數字，要求線性的時間複雜度和常數級的空間複雜度。那麼最直觀的一個方法是用等差數列的求和公式求出0到n之間所有的數字之和，然後再遍曆數組算出給定數字的累積和，然後做減法，差值就是丟失的那個數字，參見代碼如下
+
+- 如果給定的數組是排序過的，使用binary search解
+
+### Code
+Counting sort solution:
+``` py
+class Solution:
+    def missingNumber(self, nums: List[int]) -> int:
+        i = 0
+        while i < len(nums):
+            num = nums[i]
+            if num == i or num == len(nums):
+                i += 1
+            else:
+                nums[i], nums[num] = nums[num], nums[i]
+        for i in range(len(nums)):
+            if nums[i] != i:
+                return i
+        return len(nums)
+```
+
+Sum solution:
+```py
+class Solution:
+    def missingNumber(self, nums: List[int]) -> int:
+        sums = 0
+        n = len(nums)
+        for num in nums:
+            sums += num
+        actual_sum = ((1 + n) * n) // 2
+        return actual_sum - sums
+```
+
+Binary Search:
+```py
+class Solution:
+    def missingNumber(self, nums: List[int]) -> int:
+        nums = sorted(nums)
+        l, r = 0, len(nums)
+        while l < r:
+            mid = l +(r-l)//2
+            if mid < nums[mid]:
+                r = mid
+            else:
+                l = mid+1
+        return l
+```
+---
