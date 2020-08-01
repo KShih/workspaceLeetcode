@@ -21044,3 +21044,40 @@ class Solution:
                         self.order += end
 ```
 ---
+## 270. Closest Binary Search Tree Value｜ 8/1
+Given a non-empty binary search tree and a target value, find the value in the BST that is closest to the target.
+
+Note:
+
+Given target value is a floating point.
+You are guaranteed to have only one unique value in the BST that is closest to the target.
+Example:
+
+Input: root = [4,2,5,1,3], target = 3.714286
+
+    4
+   / \
+  2   5
+ / \
+1   3
+
+Output: 4
+### 思路
+如果這個節點比跟結點小，可能的解一定是在其左，否則其右
+
+### Code
+``` py
+class Solution:
+    def closestValue(self, root: TreeNode, target: float) -> int:
+        res = [-1, float('inf')]
+        while root:
+            diff = abs(target - root.val)
+            if diff < res[1]:
+                res = [root.val, diff]
+            if target < root.val:
+                root = root.left
+            else:
+                root = root.right
+        return res[0]
+```
+---
