@@ -21269,3 +21269,52 @@ class Solution:
         return res
 ```
 ---
+## 279. Perfect Squares｜ 8/12
+Given a positive integer n, find the least number of perfect square numbers (for example, 1, 4, 9, 16, ...) which sum to n.
+
+Example 1:
+
+Input: n = 12
+Output: 3
+Explanation: 12 = 4 + 4 + 4.
+Example 2:
+
+Input: n = 13
+Output: 2
+Explanation: 13 = 4 + 9.
+
+### 思路
+dp[i] 可以去更新 dp[i + j*j]
+
+### Code
+``` py
+class Solution:
+    def numSquares(self, n: int) -> int:
+        dp = [float("inf") for _ in range(n+1)]
+        dp[0], dp[1] = 0, 1
+        for i in range(n):
+            for j in range(1, n):
+                if i + j*j > n:
+                    break
+                dp[i+j*j] = min(dp[i+j*j], dp[i]+1)
+        return dp[n]
+```
+
+數學解法(參考):
+```c
+class Solution {
+public:
+    int numSquares(int n) {
+        while (n % 4 == 0) n /= 4;
+        if (n % 8 == 7) return 4;
+        for (int a = 0; a * a <= n; ++a) {
+            int b = sqrt(n - a * a);
+            if (a * a + b * b == n) {
+                return !!a + !!b;
+            }
+        }
+        return 3;
+    }
+};
+```
+---
