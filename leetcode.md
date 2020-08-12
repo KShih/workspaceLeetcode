@@ -21318,3 +21318,52 @@ public:
 };
 ```
 ---
+## 280. Wiggle Sort｜ 8/12
+Given an unsorted array nums, reorder it in-place such that nums[0] <= nums[1] >= nums[2] <= nums[3]....
+
+Example:
+
+Input: nums = [3,5,2,1,6,4]
+
+Output: One possible answer is [3,5,1,6,2,4]
+### 思路
+
+n log n:
+
+在第一個數後 2跟3調換 4跟5調換
+
+3 5 2 1 4 6
+
+1 2 3 4 5 6
+
+1 3 2 5 4 6
+
+
+O(n):
+
+經觀察知，
+
+n = odd 時，nums[n] >= nums[n-1]
+
+n = even 時，nums[n] <= nums[n-1]
+
+### Code
+O(nlog(n))
+``` py
+def wiggleSort(self, nums: List[int]) -> None:
+    nums[:] = sorted(nums)
+    for i in range(1, len(nums)-1, 2):
+        nums[i], nums[i+1] = nums[i+1], nums[i]
+```
+
+O(n)
+```py
+def wiggleSort(self, nums: List[int]) -> None:
+    if len(nums) <= 1:
+        return
+    for i in range(1, len(nums)):
+        if (i % 2 == 0 and nums[i-1] < nums[i]) or (i % 2 == 1 and nums[i-1] > nums[i]):
+            nums[i-1], nums[i] = nums[i], nums[i-1]
+```
+
+---
