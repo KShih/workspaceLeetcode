@@ -89,3 +89,26 @@ while i < len(s):
 - binary array:
     - 遇到0: sum-1
     - 遇到1: sum+1
+
+---
+
+## Binary Search
+
+1. Always use right = len(nums) -1, because you may want to access arr[right]!
+2. 最單純的binary search, 查找特定的值:
+    - l <= r
+    - mid == target: break
+    - l = mid + 1
+    - r = mid - 1
+3. 查找左邊界:
+    - l < r
+    - l = mid +1
+    - **r = mid**
+4. 查找右邊界:
+    - l < r
+    - **mid = l + (r-l)//2 + 1**
+    - **l = mid**
+    - r = mid - 1
+5. 注意查找左右邊界的if判斷式寫法:
+    - **if 判斷式均要放 >= or <= 的情形**
+    - 詳見LC34三刷code

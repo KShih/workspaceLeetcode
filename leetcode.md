@@ -21367,3 +21367,59 @@ def wiggleSort(self, nums: List[int]) -> None:
 ```
 
 ---
+## 275. H-Index II｜ 8/13
+Given an array of citations sorted in ascending order (each citation is a non-negative integer) of a researcher, write a function to compute the researcher's h-index.
+
+According to the definition of h-index on Wikipedia: "A scientist has index h if h of his/her N papers have at least h citations each, and the other N − h papers have no more than h citations each."
+
+Example:
+
+Input: citations = [0,1,3,5,6]
+Output: 3
+Explanation: [0,1,3,5,6] means the researcher has 5 papers in total and each of them had
+             received 0, 1, 3, 5, 6 citations respectively.
+             Since the researcher has 3 papers with at least 3 citations each and the remaining
+             two with no more than 3 citations each, her h-index is 3.
+Note:
+
+If there are several possible values for h, the maximum one is taken as the h-index.
+
+Follow up:
+
+This is a follow up problem to H-Index, where citations is now guaranteed to be sorted in ascending order.
+Could you solve it in logarithmic time complexity?
+
+直接套入公式:
+這道題讓我們求H指數，這個質數是用來衡量研究人員的學術水平的質數，定義為一個人的學術文章有n篇分別被引用了n次，那麼H指數就是n。而且wiki上直接給出了算法，可以按照如下方法確定某人的H指數：1、將其發表的所有SCI論文按被引次數從高到低排序；2、從前往後查找排序後的列表，直到某篇論文的序號大於該論文被引次數。所得序號減一即為H指數。
+### 思路
+
+1. 根據公式由高到低排序，以及序號的關係，必須用 `長度-此題index` 來實現
+2. 根據描述，歸類此題為尋找左邊界題
+3. 帶入模板，最後回傳 長度-序號
+
+注意此題，宣告right 的地方必須設為len(ci), 跟模板: len(ci)-1 不一樣
+
+如不修正，也能通過大部分的側資，但測資 [0,0] 會fail
+
+### Code
+``` py
+def hIndex(self, ci: List[int]) -> int:
+    if not ci:
+        return 0
+    if len(ci) == 1:
+        if ci[0] != 0:
+            return 1
+        else:
+            return 0
+
+    l, r, n = 0, len(ci), len(ci)
+    while l < r:
+        mid = l + (r-l)//2
+        h = n-mid
+        if h <= ci[mid]:
+            r = mid
+        else:
+            l = mid+1
+    return n-l
+```
+---
