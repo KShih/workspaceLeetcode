@@ -14941,7 +14941,7 @@ Input: s1 = "aabcc", s2 = "dbbca", s3 = "aadbbbaccc"
 
 Output: false
 
-### 學習
+### 技巧
 
 1. Recursive 思路漏洞:
 
@@ -21421,5 +21421,88 @@ def hIndex(self, ci: List[int]) -> int:
         else:
             l = mid+1
     return n-l
+```
+---
+## 281. Zigzag Iterator｜ 8/14
+
+Given two 1d vectors, implement an iterator to return their elements alternately.
+Example:
+
+Input:
+v1 = [1,2]
+v2 = [3,4,5,6]
+Output: [1,3,2,4,5,6]
+Explanation: By calling next repeatedly until hasNext returns false, the order of elements returned by next should be: [1,3,2,4,5,6].
+
+
+Follow up:
+
+What if you are given k 1d vectors? How well can your code be extended to such cases?
+
+Clarification for the follow up question:
+The "Zigzag" order is not clearly defined and is ambiguous for k > 2 cases. If "Zigzag" does not look right to you, replace "Zigzag" with "Cyclic". For example:
+
+Input:
+[1,2,3]
+[4,5,6,7]
+[8,9]
+
+Output: [1,4,8,2,5,9,3,6,7].
+
+Your ZigzagIterator object will be instantiated and called as such:
+i, v = ZigzagIterator(v1, v2), []
+while i.hasNext(): v.append(i.next())
+
+### 技巧
+
+- iter(list) 去使用python iterator
+
+- next(it) 去取值並遞增it
+
+### 思路
+
+Way1: Naive
+
+用 cur 去控制位置，用 mod 去輪詢
+
+用 failCount 去判斷是否所有list 都走完了
+
+Way2: Queue
+
+用一個queue去存 各個 list 的 iterator, 但必須保有 list 長度資訊
+
+如果此list還沒有end, 就把此list 的it 再push進queue
+
+### Code
+``` py
+class ZigzagIterator:
+    def __init__(self, v1: List[int], v2: List[int]):
+        self.cur = -1    # cursor pos
+        self.count = 2  # two list
+        self.v1 = v1
+        self.v2 = v2
+
+    def next(self) -> int:
+        curListNum = self.cur % self.count
+        if curListNum == 0:
+            curList = self.v1
+        else:
+            curList = self.v2
+        return curList.pop(0)
+
+    def hasNext(self) -> bool:
+        failCount = 0
+        while failCount <= self.count:
+            self.cur += 1
+            curListNum = self.cur % self.count
+            if curListNum == 0:
+                curList = self.v1
+            else:
+                curList = self.v2
+            if len(curList) > 0:
+                return True
+            else:
+                failCount += 1
+        return False
 ```
 ---
