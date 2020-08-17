@@ -21621,3 +21621,75 @@ class PeekingIterator:
 #     iter.next()         # Should return the same value as [val].
 ```
 ---
+## 285. Inorder Successor in BST｜ 8/17
+Given a binary search tree and a node in it, find the in-order successor of that node in the BST.
+
+The successor of a node p is the node with the smallest key greater than p.val.
+
+![](assets/markdown-img-paste-20200817111513847.png)
+
+Note:
+
+If the given node has no in-order successor in the tree, return null.
+It's guaranteed that the values of the tree are unique.
+
+### 思路
+
+1. Way1: in-order traverse then iterate over the res
+2. Way2: looking for target during traversal
+3. Way3: 利用BST性質 <trickier but preferable>
+    - 這種方法充分地利用到了 BST 的性質，首先看根節點值和p節點值的大小，如果根節點值大，說明p節點肯定在左子樹中，那麼此時先將 res 賦為 root，然後 root 移到其左子節點，循環的條件是 root 存在，再比較此時 root 值和p節點值的大小，如果還是 root 值大，重複上面的操作，如果p節點值，那麼將 root 移到其右子節點，這樣當 root 為空時，res 指向的就是p的後繼節點
+### Code
+``` py
+def inorderSuccessor(self, root: 'TreeNode', p: 'TreeNode') -> 'TreeNode':
+    stack, res = [], []
+    node = root
+    while node or stack:
+        if node:
+            stack.append(node)
+            node = node.left
+        else:
+            node = stack.pop()
+            res.append(node)
+            node = node.right
+    for i, node in enumerate(res):
+        if node == p:
+            if i < len(res)-1:
+                return res[i+1]
+            else:
+                return None
+    return None
+```
+
+Way2
+```py
+def inorderSuccessor(self, root: 'TreeNode', p: 'TreeNode') -> 'TreeNode':
+    stack, found = [], False
+    node = root
+    while node or stack:
+        if node:
+            stack.append(node)
+            node = node.left
+        else:
+            node = stack.pop()
+            if found:
+                return node
+            if node == p:
+                found = True
+            node = node.right
+    return None
+```
+
+Way3
+```py
+def inorderSuccessor(self, root: 'TreeNode', p: 'TreeNode') -> 'TreeNode':
+    res = None
+    while root:
+        if root.val > p.val:
+            res = root # record the potential next node of the root.left
+            root = root.left
+        else:
+            root = root.right
+    return res
+```
+---
