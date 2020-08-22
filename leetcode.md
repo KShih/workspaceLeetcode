@@ -21693,3 +21693,100 @@ def inorderSuccessor(self, root: 'TreeNode', p: 'TreeNode') -> 'TreeNode':
     return res
 ```
 ---
+## 286. Walls and Gates｜ 8/22
+You are given a m x n 2D grid initialized with these three possible values.
+
+-1 - A wall or an obstacle.
+0 - A gate.
+INF - Infinity means an empty room. We use the value 231 - 1 = 2147483647 to represent INF as you may assume that the distance to a gate is less than 2147483647.
+Fill each empty room with the distance to its nearest gate. If it is impossible to reach a gate, it should be filled with INF.
+
+Example:
+
+Given the 2D grid:
+
+INF  -1  0  INF
+INF INF INF  -1
+INF  -1 INF  -1
+  0  -1 INF INF
+After running your function, the 2D grid should be:
+
+  3  -1   0   1
+  2   2   1  -1
+  1  -1   2  -1
+  0  -1   3   4
+
+### 思路
+
+time: O(mn)
+### Code
+DFS
+``` py
+class Solution:
+    def wallsAndGates(self, rooms: List[List[int]]) -> None:
+        self.rooms = rooms
+        self.dirs = [(1,0), (0,1), (0,-1), (-1,0)]
+        for i in range(len(rooms)):
+            for j in range(len(rooms[i])):
+                if rooms[i][j] == 0:
+                    self.dfs((i, j), 0)
+
+    def dfs(self, pos, depth):
+        x, y = pos[0], pos[1]
+        if self.rooms[x][y] < depth:
+            return
+        else:
+            self.rooms[x][y] = depth
+            for dir in self.dirs:
+                if 0 <= x+dir[0] < len(self.rooms) and 0 <= y+dir[1] < len(self.rooms[0]):
+                    self.dfs((x+dir[0], y+dir[1]), depth+1)
+```
+
+BFS
+```py
+class Solution:
+    def wallsAndGates(self, rooms: List[List[int]]) -> None:
+        if not rooms:
+            return
+        ROW, COL = len(rooms), len(rooms[0])
+        directions = [(1,0), (0,1), (-1,0), (0,-1)]
+        queue = []
+        for i in range(ROW):
+            for j in range(COL):
+                if rooms[i][j] == 0:
+                    queue.append(((i,j),0))
+
+        while queue:
+            pos, depth = queue.pop(0)
+            x, y = pos[0], pos[1]
+            for dir_x, dir_y in directions:
+                new_x, new_y = x+dir_x, y+dir_y
+                if 0 <= new_x < ROW and 0 <= new_y < COL and depth < rooms[new_x][new_y]:
+                    rooms[new_x][new_y] = depth+1
+                    queue.append(((new_x, new_y), depth+1))
+```
+
+BFS 不記錄深度值，把自己當深度
+```py
+class Solution:
+    def wallsAndGates(self, rooms: List[List[int]]) -> None:
+        if not rooms:
+            return
+        ROW, COL = len(rooms), len(rooms[0])
+        directions = [(1,0), (0,1), (-1,0), (0,-1)]
+        queue = []
+        for i in range(ROW):
+            for j in range(COL):
+                if rooms[i][j] == 0:
+                    queue.append((i,j))
+
+        while queue:
+            pos = queue.pop(0)
+            x, y = pos[0], pos[1]
+            for dir_x, dir_y in directions:
+                new_x, new_y = x+dir_x, y+dir_y
+                if 0 <= new_x < ROW and 0 <= new_y < COL and rooms[new_x][new_y] == 2147483647:
+                    rooms[new_x][new_y] = rooms[x][y]+1
+                    queue.append((new_x, new_y))
+```
+---
