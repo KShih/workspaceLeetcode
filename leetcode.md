@@ -21913,3 +21913,78 @@ class Solution:
         return start
 ```
 ---
+## 288. Unique Word Abbreviation(糞題)｜ 8/23
+An abbreviation of a word follows the form <first letter><number><last letter>. Below are some examples of word abbreviations:
+
+a) it                      --> it    (no abbreviation)
+
+     1
+     ↓
+b) d|o|g                   --> d1g
+
+              1    1  1
+     1---5----0----5--8
+     ↓   ↓    ↓    ↓  ↓
+c) i|nternationalizatio|n  --> i18n
+
+              1
+     1---5----0
+     ↓   ↓    ↓
+d) l|ocalizatio|n          --> l10n
+
+Additionally for any string s of size less than or equal to 2 their abbreviation is the same string s.
+Find whether its abbreviation is unique in the dictionary. A word's abbreviation is called unique if any of the following conditions is met:
+
+There is no word in dictionary such that their abbreviation is equal to the abbreviation of word.
+Else, for all words in dictionary such that their abbreviation is equal to the abbreviation of word those words are equal to word.
+
+
+Example 1:
+
+Input
+["ValidWordAbbr","isUnique","isUnique","isUnique","isUnique"]
+[[["deer","door","cake","card"]],["dear"],["cart"],["cane"],["make"]]
+Output
+[null,false,true,false,true]
+
+Explanation
+ValidWordAbbr validWordAbbr = new ValidWordAbbr(["deer", "door", "cake", "card"]);
+validWordAbbr.isUnique("dear"); // return False
+validWordAbbr.isUnique("cart"); // return True
+validWordAbbr.isUnique("cane"); // return False
+validWordAbbr.isUnique("make"); // return True
+
+
+Constraints:
+
+Each word will only consist of lowercase English characters
+
+### 思路
+
+1. dictionary = {"dear"},  isUnique("door") -> false
+
+2. dictionary = {"door", "door"}, isUnique("door") -> true
+
+3. dictionary = {"dear", "door"}, isUnique("door") -> false
+
+從上面三個例子可以看出，當縮寫一致的時候，字典中的單詞均和給定單詞相同時，返回 true。這裡需要用 HashMap 來建立縮寫形式和其對應的單詞的映射，把所有縮寫形式的相同單詞放到一個 HashSet 中，然後再判斷是否 unique 的時候只需要看給定單詞的縮寫形式的 HashSet 裡面該單詞的個數是否和 HashSet 中的元素總數相同，相同的話就是上面的第二種情況，返回 true。需要注意的是由於 HashSet 中不能有重複值，所有上面第二種情況只會有一個 door 存在 HashSet 裡，但是並不影響判斷結果
+
+### Code
+``` py
+def __init__(self, dictionary):
+    self.dic = collections.defaultdict(set)
+    for s in dictionary:
+        val = s
+        if len(s) > 2:
+            s = s[0]+str(len(s)-2)+s[-1]
+        self.dic[s].add(val)
+
+def isUnique(self, word):
+    val = word
+    if len(word) > 2:
+        word = word[0]+str(len(word)-2)+word[-1]
+    # if word abbreviation not in the dictionary, or word itself in the dictionary (word itself may
+    # appear multiple times in the dictionary, so it's better using set instead of list)
+    return len(self.dic[word]) == 0 or (len(self.dic[word]) == 1 and val == list(self.dic[word])[0])
+```
+---
