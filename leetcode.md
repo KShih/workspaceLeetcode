@@ -21988,3 +21988,58 @@ def isUnique(self, word):
     return len(self.dic[word]) == 0 or (len(self.dic[word]) == 1 and val == list(self.dic[word])[0])
 ```
 ---
+## 290. Word Pattern｜ 8/23
+Given a pattern and a string str, find if str follows the same pattern.
+
+Here follow means a full match, such that there is a bijection between a letter in pattern and a non-empty word in str.
+
+Example 1:
+
+Input: pattern = "abba", str = "dog cat cat dog"
+Output: true
+Example 2:
+
+Input:pattern = "abba", str = "dog cat cat fish"
+Output: false
+Example 3:
+
+Input: pattern = "aaaa", str = "dog cat cat dog"
+Output: false
+Example 4:
+
+Input: pattern = "abba", str = "dog dog dog dog"
+Output: false
+Notes:
+You may assume pattern contains only lowercase letters, and str contains lowercase letters that may be separated by a single space.
+### 思路
+
+matcher.values() -> is O(n), not a good idea
+
+use another dictionary instead
+
+死在測資:
+
+"abba"
+
+"dog dog dog dog"
+
+### Code
+``` py
+class Solution:
+    def wordPattern(self, pattern: str, str: str) -> bool:
+        strs = str.split(' ')
+        if len(strs) != len(pattern):
+            return False
+
+        matcher = dict()
+        for i, str in enumerate(strs):
+            if pattern[i] in matcher.keys():
+                if str != matcher[pattern[i]]:
+                    return False
+            else:
+                if str in matcher.values():
+                    return False
+                matcher[pattern[i]] = str
+        return True
+```
+---

@@ -122,3 +122,9 @@ while i < len(s):
     1. phase1: 快慢指針找出重合點
     2. phase2: 另一個指針從起始點出發, 與慢指針一步步前進, 重合處即是環的開始
     3. 見 LC142, 287
+
+---
+
+## Bit manipulate
+
+1. https://medium.com/techie-delight/bit-manipulation-interview-questions-and-practice-problems-27c0e71412e7
