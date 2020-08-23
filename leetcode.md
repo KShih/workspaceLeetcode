@@ -21790,3 +21790,126 @@ class Solution:
                     queue.append((new_x, new_y))
 ```
 ---
+## 287. Find the Duplicate Number｜ 8/22
+Given an array nums containing n + 1 integers where each integer is between 1 and n (inclusive), prove that at least one duplicate number must exist. Assume that there is only one duplicate number, find the duplicate one.
+
+Example 1:
+
+Input: [1,3,4,2,2]
+Output: 2
+Example 2:
+
+Input: [3,1,3,4,2]
+Output: 3
+Note:
+
+You must not modify the array (assume the array is read only).
+You must use only constant, O(1) extra space.
+Your runtime complexity should be less than O(n2).
+There is only one duplicate number in the array, but it could be repeated more than once.
+
+### 思路
+
+1. 暴力姐
+2. Binary Search 模板：尋找左邊界
+   - 由這三個例子可以知道當 lessCnt "<=" mid 該做什麼處理
+   - 在宣告時就已經朝著 "l" 跟 "r" 都有可能是可能解的方向
+       - [1,2,3,4,5,5]
+         - lessCnt = 3 -> 可以排除掉1,2,3, 所以 l = mid+1
+       - [1,2,3,3,4,5]
+         - lessCnt = 4 -> 可以排除掉4,5, 所以 r = mid
+       - [1,1,2,3,4,5]
+
+3. 快慢指針尋找環的進入點 (BEST!)
+    - ![](assets/markdown-img-paste-20200823114722542.png)
+
+### Code
+
+暴力解:
+```py
+class Solution:
+    def findDuplicate(self, nums: List[int]) -> int:
+        RANG = len(nums)-1
+        SUM = (1+RANG) * RANG // 2
+        numSum = sum(nums)
+        target = abs(numSum - SUM) % 2
+        for i in range(target, RANG+1, 2):
+            cnt = 0
+            for num in nums:
+                if num == i:
+                    cnt += 1
+            if cnt > 1:
+                return i
+
+        target = (target+1)%2
+        for i in range(target, RANG+1, 2):
+            cnt = 0
+            for num in nums:
+                if num == i:
+                    cnt += 1
+            if cnt > 1:
+                return i
+```
+
+Binary Search 尋找左邊界:
+``` py
+def findDuplicate(self, nums: List[int]) -> int:
+    RANG = len(nums)-1
+    l, r = 1, RANG
+
+    while l < r:
+        mid = l + (r-l) // 2
+
+        lessCnt = 0
+        for num in nums:
+            if num <= mid:
+                lessCnt += 1
+        if lessCnt <= mid:
+            l = mid +1
+        else:
+            r = mid
+    return r
+```
+
+Binary Search 尋找特定值:
+```py
+class Solution:
+    def findDuplicate(self, nums: List[int]) -> int:
+        RANG = len(nums)-1
+        l, r = 1, RANG
+
+        while l <= r:
+            mid = l + (r-l) // 2
+
+            lessCnt = 0
+            for num in nums:
+                if num < mid:
+                    lessCnt += 1
+            if lessCnt < mid:
+                l = mid +1
+            else:
+                r = mid -1
+        return r
+```
+
+快慢指針
+``` py
+class Solution:
+    def findDuplicate(self, nums: List[int]) -> int:
+        slow = nums[0]
+        fast = nums[slow]
+        start = 0
+
+        # phase 1: get the meeting point
+        while slow != fast:
+            slow = nums[slow]
+            fast = nums[nums[fast]]
+
+        # phase 2: start from begining, one step each to find the start of the loop
+        while start != slow:
+            slow = nums[slow]
+            start = nums[start]
+
+        return start
+```
+---

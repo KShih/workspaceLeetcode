@@ -95,6 +95,7 @@ while i < len(s):
 ## Binary Search
 
 1. Always use right = len(nums) -1, because you may want to access arr[right]!
+    - 在宣告時就已經朝著 "l" 跟 "r" 都有可能是可能解的方向, 所以在限縮左右邊界時也要保持這個特性
 2. 最單純的binary search, 查找特定的值:
     - l <= r
     - mid == target: break
@@ -112,3 +113,12 @@ while i < len(s):
 5. 注意查找左右邊界的if判斷式寫法:
     - **if 判斷式均要放 >= or <= 的情形**
     - 詳見LC34三刷code
+
+
+---
+
+## LinkedList
+1. 快慢指針找環
+    1. phase1: 快慢指針找出重合點
+    2. phase2: 另一個指針從起始點出發, 與慢指針一步步前進, 重合處即是環的開始
+    3. 見 LC142, 287
