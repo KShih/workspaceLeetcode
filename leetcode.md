@@ -22065,3 +22065,98 @@ class Solution:
         return ans[n%4]
 ```
 ---
+## 291. Word Pattern II｜ 8/23
+Given a pattern and a string str, find if str follows the same pattern.
+
+Here follow means a full match, such that there is a bijection between a letter in pattern and a non-empty substring in str.
+
+
+
+Example 1:
+
+Input: pattern = "abab", str = "redblueredblue"
+Output: true
+Example 2:
+
+Input: pattern = "aaaa", str = "asdasdasdasd"
+Output: true
+Example 3:
+
+Input: pattern = "aabb", str = "xyzabcxzyabc"
+Output: false
+
+
+Constraints:
+
+You may assume both pattern and str contains only lowercase letters.
+### 思路
+
+用遞歸解
+
+O(n^2)
+### Code
+``` py
+class Solution:
+    def wordPatternMatch(self, pattern: str, str: str) -> bool:
+        if len(pattern) > len(str):
+            return False
+        self.wordSet = set()
+        self.matcher = dict()
+        return self.helper(pattern, str)
+
+    def helper(self, pattern, str):
+        if len(pattern) == 0 and len(str) == 0:
+            return True
+        if len(pattern) == 0 or len(str) == 0: # one of each is not zero
+            return False
+
+        if pattern[0] in self.matcher.keys():
+            word = self.matcher[pattern[0]]
+            try:
+                if str.index(word) != 0:
+                    return False
+                return self.helper(pattern[1:], str[len(word):])
+            except: # cannot index
+                return False
+        else:
+            for i in range(len(str)):
+                word = str[:i+1]
+                if word in self.wordSet:
+                    continue
+                self.wordSet.add(word)
+                self.matcher[pattern[0]] = word
+                if self.helper(pattern[1:], str[i+1:]):
+                    return True
+                self.wordSet.remove(word)
+                del self.matcher[pattern[0]]
+            return False
+```
+
+Simpler solution
+```py
+def wordPatternMatch(self, pattern, str):
+    return self.dfs(pattern, str, {})
+
+def dfs(self, pattern, str, dict):
+    if len(pattern) == 0 and len(str) > 0:
+        return False
+    if len(pattern) == len(str) == 0:
+        return True
+
+    # abcde redblue
+    # ^xxxx ^^^xxxx
+    #   5       7
+    # Try to match pattern `a` with at most 3 characters.
+    # That is 7 - 5 + 1, and the last + 1 is for Python range.
+    for end in range(1, len(str)-len(pattern)+2):
+        if pattern[0] not in dict and str[:end] not in dict.values():
+            dict[pattern[0]] = str[:end]
+            if self.dfs(pattern[1:], str[end:], dict):
+                return True
+            del dict[pattern[0]]
+        elif pattern[0] in dict and dict[pattern[0]] == str[:end]:
+            if self.dfs(pattern[1:], str[end:], dict):
+                return True
+    return False
+```
+---
