@@ -22354,3 +22354,102 @@ class NumArray:
         return self.sumList[j] - self.sumList[i-1]
 ```
 ---
+## 1305. All Elements in Two Binary Search Trees｜ 9/6
+Given two binary search trees root1 and root2.
+
+Return a list containing all the integers from both trees sorted in ascending order.
+
+![](assets/markdown-img-paste-2020090621551460.png)
+
+Example 1:
+
+
+Input: root1 = [2,1,4], root2 = [1,0,3]
+Output: [0,1,1,2,3,4]
+Example 2:
+
+Input: root1 = [0,-10,10], root2 = [5,1,7,0,2]
+Output: [-10,0,0,1,2,5,7,10]
+Example 3:
+
+Input: root1 = [], root2 = [5,1,7,0,2]
+Output: [0,1,2,5,7]
+Example 4:
+
+Input: root1 = [0,-10,10], root2 = []
+Output: [-10,0,10]
+
+![](assets/markdown-img-paste-20200906215537331.png)
+
+Input: root1 = [1,null,8], root2 = [8,1]
+Output: [1,1,8,8]
+
+Constraints:
+
+Each tree has at most 5000 nodes.
+Each node's value is between [-10^5, 10^5].
+### 思路
+
+![](assets/markdown-img-paste-20200906215745144.png)
+
+### Code
+One path solution
+``` py
+class Solution:
+    def getAllElements(self, root1: TreeNode, root2: TreeNode) -> List[int]:
+        res, stack1, stack2 = [], [], []
+
+        while root1 or root2 or stack1 or stack2:
+
+            # go as left as possible
+            while root1:
+                stack1.append(root1)
+                root1 = root1.left
+
+            while root2:
+                stack2.append(root2)
+                root2 = root2.left
+
+            # choose from stack1
+            if not stack2 or (stack1 and stack1[-1].val <= stack2[-1].val):
+                top = stack1.pop()
+                res.append(top.val)
+                root1 = top.right
+            else: # choose from stack 2
+                top = stack2.pop()
+                res.append(top.val)
+                root2 = top.right
+        return res
+```
+
+Iterative inorder + merge two list:
+```py
+def getAllElements(self, root1: TreeNode, root2: TreeNode) -> List[int]:
+    list1 = self.inOrder(root1)
+    list2 = self.inOrder(root2)
+
+    return sorted(list1+list2)
+
+def inOrder(self, root):
+    stack, res = [], []
+
+    while stack or root:
+        while root:
+            stack.append(root)
+            root = root.left
+        top = stack.pop()
+        res.append(top.val)
+        root = top.right
+    return res
+```
+
+Recursive inorder + merge two list:
+```py
+class Solution:
+    def getAllElements(self, root1: TreeNode, root2: TreeNode) -> List[int]:
+        return sorted(self.inOrder(root1)+self.inOrder(root2))
+
+    def inOrder(self, root):
+        return self.inOrder(root.left) + [root.val] + self.inOrder(root.right) if root else []
+```
+---
