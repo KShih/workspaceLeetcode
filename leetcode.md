@@ -22453,3 +22453,103 @@ class Solution:
         return self.inOrder(root.left) + [root.val] + self.inOrder(root.right) if root else []
 ```
 ---
+## 835. Image Overlap｜ 9/7
+
+Two images A and B are given, represented as binary, square matrices of the same size.  (A binary matrix has only 0s and 1s as values.)
+
+We translate one image however we choose (sliding it left, right, up, or down any number of units), and place it on top of the other image.  After, the overlap of this translation is the number of positions that have a 1 in both images.
+
+(Note also that a translation does not include any kind of rotation.)
+
+What is the largest possible overlap?
+
+Example 1:
+
+Input: A = [[1,1,0],
+            [0,1,0],
+            [0,1,0]]
+       B = [[0,0,0],
+            [0,1,1],
+            [0,0,1]]
+Output: 3
+Explanation: We slide A to right by 1 unit and down by 1 unit.
+Notes:
+
+1 <= A.length = A[0].length = B.length = B[0].length <= 30
+0 <= A[i][j], B[i][j] <= 1
+
+### 思路
+
+- Naive:
+    - 先得到兩個map的相對偏移量，再試著去將此偏移量位移
+    - pass 48/49....
+
+- 用字典統計 sliding pattern:
+    - https://leetcode.com/problems/image-overlap/discuss/150504/Python-Easy-Logic
+    - now the positions of 1's that are stored are for A and B are
+        - positions of A -> (0,0), (0,1), (1,1), (2,1)
+        - positions of B -> (1,1), (1,2), (2,2)
+    - 取 t1 = (0,0),  t2 = (2,2) => d = (2-0,2-0)
+    - 這表示如果我們要將 t1 t2 重合，須將圖1 右2 下2，我們把這個pattern儲存起來
+    - 那麼爾後若有也是此 pattern 的點，我們就可知道 右2 下2 這個pattern可以使其他點也重合
+### Code
+Dict:
+```py
+class Solution:
+    def largestOverlap(self, A, B):
+        d = collections.defaultdict(int)
+        a, b = [], []
+
+        for i in range(len(A)):
+            for j in range(len(A[0])):
+                if(A[i][j] == 1):
+                    a.append((i,j))
+                if(B[i][j] == 1):
+                    b.append((i,j))
+        ans = 0
+        for t1 in a:
+            for t2 in b:
+                t3 = (t2[0]-t1[0],t2[1]-t1[1])
+                d[t3] += 1
+                ans = max(ans, d[t3])
+        return ans
+```
+
+Naive:
+``` py
+class Solution:
+    def largestOverlap(self, A: List[List[int]], B: List[List[int]]) -> int:
+        setA = self.getRelative(A)
+        setB = self.getRelative(B)
+
+        # choose the less one to be shifted
+        if len(setA) > len(setB):
+            setA, setB = setB, setA
+
+        res = 0
+        for i in range(len(A)):
+            for j in range(len(A[0])):
+                newSet = set()
+                newSetLeft = set()
+                for tup in setA:
+                    newSet.add((tup[0]+i, tup[1]+j)) # shift up, right
+                    newSetLeft.add((tup[0]-i, tup[1]-j)) # shift down, left
+                res = max(res, len(newSet) - len(newSet-setB))
+                res = max(res, len(newSetLeft) - len(newSetLeft-setB))
+        return res
+
+    def getRelative(self, pic):
+        flag = False
+        start = None
+        setPic = set()
+
+        for i in range(len(pic)):
+            for j in range(len(pic[0])):
+                if pic[i][j] == 1:
+                    if not flag:
+                        flag = True
+                        start = (i, j)
+                    setPic.add((i-start[0], j-start[1]))
+        return setPic
+```
+---
