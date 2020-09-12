@@ -22574,3 +22574,41 @@ class Solution:
         return setPic
 ```
 ---
+## 346. Moving Average from Data Stream｜ 9/12
+Given a stream of integers and a window size, calculate the moving average of all integers in the sliding window.
+
+Example:
+
+MovingAverage m = new MovingAverage(3);
+m.next(1) = 1
+
+m.next(10) = (1 + 10) / 2
+
+m.next(3) = (1 + 10 + 3) / 3
+
+m.next(5) = (10 + 3 + 5) / 3
+### 思路
+
+紀錄total 就不用每次都sum了
+### Code
+``` py
+class MovingAverage:
+
+    def __init__(self, size: int):
+        """
+        Initialize your data structure here.
+        """
+        self.queue = []
+        self.total = 0
+        self.size = size
+
+    def next(self, val: int) -> float:
+
+        if len(self.queue) == self.size:
+            pop = self.queue.pop(0)
+            self.total -= pop
+        self.total += val
+        self.queue.append(val)
+        return self.total / len(self.queue)
+```
+---
