@@ -22812,3 +22812,51 @@ class Solution:
             self.maxTime = max(self.maxTime, hour*60 + minute)
 ```
 ---
+## 763. Partition Labels｜ 9/20
+A string S of lowercase English letters is given. We want to partition this string into as many parts as possible so that each letter appears in at most one part, and return a list of integers representing the size of these parts.
+
+
+
+Example 1:
+
+Input: S = "ababcbacadefegdehijhklij"
+Output: [9,7,8]
+Explanation:
+The partition is "ababcbaca", "defegde", "hijhklij".
+This is a partition so that each letter appears in at most one part.
+A partition like "ababcbacadefegde", "hijhklij" is incorrect, because it splits S into less parts.
+
+
+Note:
+
+S will have length in range [1, 500].
+S will consist of lowercase English letters ('a' to 'z') only.
+
+### 思路
+
+查看range內是否有elem 是還在外的, 有的話就更新右邊界
+
+如果i不斷遞增到了又邊界，表示這中間都沒有超過的，則此就為一個frame
+
+### Code
+clean code, two pointer, O(n)
+``` py
+from collections import defaultdict
+class Solution:
+    def partitionLabels(self, S: str) -> List[int]:
+        if not S:
+            return []
+        dic = defaultdict(int)
+        for i, c in enumerate(S):
+            dic[c] = i
+
+        left, right = 0, dic[S[0]]
+        while i < len(S):
+            right = max(right, dic[S[i]])
+            if i == right: # no elem in this range is out of this range
+                res.append(right-left+1)
+                left = right + 1
+            i += 1
+        return res
+```
+---
