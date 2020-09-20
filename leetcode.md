@@ -22612,3 +22612,74 @@ class MovingAverage:
         return self.total / len(self.queue)
 ```
 ---
+## 459. Repeated Substring Pattern｜ 9/20
+Given a non-empty string check if it can be constructed by taking a substring of it and appending multiple copies of the substring together. You may assume the given string consists of lowercase English letters only and its length will not exceed 10000.
+
+
+
+Example 1:
+
+Input: "abab"
+
+Output: True
+
+Explanation: It's the substring "ab" twice.
+
+Example 2:
+
+Input: "aba"
+
+Output: False
+
+Example 3:
+
+Input: "abcabcabcabc"
+
+Output: True
+
+Explanation: It's the substring "abc" four times. (And the substring "abcabc" twice.)
+### 思路
+
+2. Optimal
+
+smart solution:
+
+s = abab
+
+1. s重複兩次 -> abababab
+2. 去頭去尾 bababa
+3. 去尋找s b*abab*a
+
+3. Regular expression
+
+### Code
+Naive:
+``` py
+class Solution:
+    def repeatedSubstringPattern(self, s: str):
+        for i in range(1,len(s)//2+1):
+            if self.isSub(s[:i], s[i:]):
+                return True
+        return False
+
+    def isSub(self, window, s):
+        if len(s) == 0:
+            return True
+        if len(s) % len(window) != 0:
+            return False
+        if s[:len(window)] != window:
+                return False
+        else:
+            return self.isSub(window, s[len(window):])
+```
+
+Optimal:
+```py
+class Solution:
+    def repeatedSubstringPattern(self, s: str):
+        if not s:
+            return False
+        ss = (s+s)[1:-1]
+        return ss.find(s) != -1
+```
+---
