@@ -22683,3 +22683,132 @@ class Solution:
         return ss.find(s) != -1
 ```
 ---
+## 949. Largest Time for Given Digits｜ 9/20
+
+Given an array arr of 4 digits, find the latest 24-hour time that can be made using each digit exactly once.
+
+24-hour times are formatted as "HH:MM", where HH is between 00 and 23, and MM is between 00 and 59. The earliest 24-hour time is 00:00, and the latest is 23:59.
+
+Return the latest 24-hour time in "HH:MM" format.  If no valid time can be made, return an empty string.
+
+
+
+Example 1:
+
+Input: A = [1,2,3,4]
+Output: "23:41"
+Explanation: The valid 24-hour times are "12:34", "12:43", "13:24", "13:42", "14:23", "14:32", "21:34", "21:43", "23:14", and "23:41". Of these times, "23:41" is the latest.
+Example 2:
+
+Input: A = [5,5,5,5]
+Output: ""
+Explanation: There are no valid 24-hour times as "55:55" is not valid.
+Example 3:
+
+Input: A = [0,0,0,0]
+Output: "00:00"
+Example 4:
+
+Input: A = [0,0,1,0]
+Output: "10:00"
+
+
+Constraints:
+
+arr.length == 4
+0 <= arr[i] <= 9
+
+
+### 思路
+
+Good example for learning permutation!
+
+see this post approach 3!
+
+https://leetcode.com/problems/largest-time-for-given-digits/solution/
+
+![](assets/markdown-img-paste-20200920184115401.png)
+
+![](assets/markdown-img-paste-20200920184143884.png)
+
+![](assets/markdown-img-paste-2020092018421234.png)
+
+The function can be implemented in recursion, due to its nature of divide-and-conquer and backtracking.
+
+The base case of the function would be start == len(array), where we've fixed all the prefixes and reached the end of the combination. In this case, we simply add the current array as one of the results of combination.
+
+When we still have some postfix that need to be permutated, i.e. start < len(array), we then apply backtracking to try out all possible permutations for the postfixes, i.e. permutate(array, start+1). More importantly, we need to swap the start element with each of the elements following the start index (including the start element). The goal is two-fold: 1). we generate different prefixes for the final combination; 2). we generate different lists of candidates in the postfixes, so that the permutations generated from the postfixes would vary as well.
+
+At the end of backtracking, we will swap the start element back to its original position, so that we can try out other alternatives.
+
+For each permutation, we apply the same logic as in the previous approach, i.e. check if the permutation is of valid time and update the maximum time.
+
+![time complexity](assets/markdown-img-paste-20200920184259775.png)
+
+T: O(1)
+
+S: O(1)
+
+### Code
+``` py
+class Solution:
+    def largestTimeFromDigits(self, A: List[int]) -> str:
+        A = sorted(A)[::-1]
+
+        for i1, num1 in enumerate(A):
+            if num1 > 2:
+                continue
+            dup = A[:]
+            dup.pop(i1)
+
+            for i2, num2 in enumerate(dup):
+                if num1 == 2 and num2 > 3:
+                    continue
+                dup.pop(i2)
+
+                for i3, num3 in enumerate(dup):
+                    if num3 > 5:
+                        continue
+                    dup.pop(i3)
+                    return str(num1)+str(num2)+":"+str(num3)+str(dup[-1])
+
+                dup.append(num2)
+            dup.append(num1)
+        return ""
+```
+
+Permutation solution
+```py
+class Solution:
+    def largestTimeFromDigits(self, A: List[int]) -> str:
+        self.maxTime = -1
+        self.permu(A, 0)
+
+        minute = self.maxTime % 60
+        hour = self.maxTime // 60
+
+        return "{:02d}:{:02d}".format(hour, minute) if self.maxTime != -1 else ""
+
+    def permu(self, array, start):
+        if start == len(array):
+            self.getTime(array)
+        else:
+            for idx in range(start, len(array)):
+                array = self.swap(array, start, idx)
+                self.permu(array, start+1)
+                array = self.swap(array, start, idx) # clear state, swap back
+
+    def swap(self, array, pos1, pos2):
+        if pos1 != pos2:
+            array[pos1], array[pos2] = array[pos2], array[pos1]
+        return array
+
+    def getTime(self, array):
+        h1, h2, m1, m2 = array
+        hour = h1*10 + h2
+        minute = m1*10 + m2
+
+        if hour < 24 and minute < 60:
+            self.maxTime = max(self.maxTime, hour*60 + minute)
+```
+---
