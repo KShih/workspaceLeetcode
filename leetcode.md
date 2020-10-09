@@ -23016,3 +23016,38 @@ class Solution:
             return res
 ```
 ---
+## 701. Insert into a Binary Search Tree｜ 10/8
+You are given the root node of a binary search tree (BST) and a value to insert into the tree. Return the root node of the BST after the insertion. It is guaranteed that the new value does not exist in the original BST.
+
+Notice that there may exist multiple valid ways for the insertion, as long as the tree remains a BST after insertion. You can return any of them.
+
+Example 1:
+
+![](assets/markdown-img-paste-2020100914495922.png)
+### 思路
+
+1. 找到 val 該插入的位置
+2. 並與其parent相連
+
+### Code
+``` py
+class Solution:
+    def insertIntoBST(self, root: TreeNode, val: int) -> TreeNode:
+        if not root:
+            return TreeNode(val)
+        dum = root
+
+        while root:
+            parent = root
+            if val > root.val:
+                root = root.right
+            else:
+                root = root.left
+        if val > parent.val:
+            parent.right = TreeNode(val)
+        else:
+            parent.left = TreeNode(val)
+
+        return dum
+```
+---
