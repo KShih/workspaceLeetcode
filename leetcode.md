@@ -22860,3 +22860,65 @@ class Solution:
         return res
 ```
 ---
+## 304. Range Sum Query 2D - Immutable｜ 10/9
+Given a 2D matrix matrix, find the sum of the elements inside the rectangle defined by its upper left corner (row1, col1) and lower right corner (row2, col2).
+
+![](assets/markdown-img-paste-20201009141154391.png)
+### 思路
+
+1. 第一個直覺一定是accumlated sum, 那有兩種解法
+    1. 每一行各自維繫其行的sum 如上一題的方法，然後再把 m 行的行和加總
+        1. The pre-computation in the constructor takes O(mn) time.
+        2. The sumRegion query takes O(m) time.
+    2. 維護二維的和，然後透過 A - B - C + D 求得區域和
+        1. ![](assets/markdown-img-paste-20201009135520159.png)
+        2. Sum(ABCD)=Sum(OD)−Sum(OB)−Sum(OC)+Sum(OA)
+        3. The pre-computation in the constructor takes O(mn) time.
+        4. Each sumRegion query takes O(1)time.
+2. 結論
+    1. 第一種方法比較好寫但比較慢
+    2. 第二種方法比較快但比較複雜
+### Code
+維護一維的和
+```py
+class NumMatrix:
+
+    def __init__(self, matrix: List[List[int]]):
+        if not matrix:
+            return
+        self.dp = []
+        for i in range(len(matrix)):
+            arr = []
+            for j in range(len(matrix[0])):
+                if j == 0:
+                    arr.append(matrix[i][j])
+                else:
+                    arr.append(arr[j-1]+matrix[i][j])
+            self.dp.append(arr)
+
+    def sumRegion(self, row1: int, col1: int, row2: int, col2: int) -> int:
+        _sum = 0
+        for i in range(row1, row2+1):
+            if col1 -1 < 0:
+                _sum += self.dp[i][col2]
+            else:
+                _sum += self.dp[i][col2] - self.dp[i][col1-1]
+        return _sum
+```
+
+維護二維的和
+``` py
+class NumMatrix:
+
+    def __init__(self, matrix: List[List[int]]):
+        if not matrix:
+            return
+        self.dp = [[0 for j in range(len(matrix[0])+1)] for i in range(len(matrix)+1)]
+        for i in range(len(matrix)):
+            for j in range(len(matrix[0])):
+                self.dp[i+1][j+1] = matrix[i][j] + self.dp[i+1][j] + self.dp[i][j+1] - self.dp[i][j]
+
+    def sumRegion(self, row1: int, col1: int, row2: int, col2: int) -> int:
+        return self.dp[row2+1][col2+1] - self.dp[row1][col2+1] - self.dp[row2+1][col1] + self.dp[row1][col1]
+```
+---
