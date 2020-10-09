@@ -22922,3 +22922,97 @@ class NumMatrix:
         return self.dp[row2+1][col2+1] - self.dp[row1][col2+1] - self.dp[row2+1][col1] + self.dp[row1][col1]
 ```
 ---
+## 624. Maximum Distance in Arrays｜ 10/8
+You are given m arrays, where each array is sorted in ascending order. Now you can pick up two integers from two different arrays (each array picks one) and calculate the distance. We define the distance between two integers a and b to be their absolute difference |a - b|. Your task is to find the maximum distance.
+
+Example 1:
+
+Input: arrays = [[1,2,3],[4,5],[1,2,3]]
+
+Output: 4
+Explanation: One way to reach the maximum distance 4 is to pick 1 in the first or third array and pick 5 in the second array.
+
+Example 2:
+
+Input: arrays = [[1],[1]]
+Output: 0
+
+Example 3:
+
+Input: arrays = [[1],[2]]
+Output: 1
+
+Example 4:
+
+Input: arrays = [[1,4],[0,5]]
+Output: 4
+
+Constraints:
+
+1. m == arrays.length
+2. 2 <= m <= 104
+3. 1 <= arrays[i].length <= 500
+4. -104 <= arrays[i][j] <= 104
+5. arrays[i] is sorted in ascending order.
+6. There will be at most 105 integers in all the arrays.
+
+### 思路
+1. heapq
+    1. 把每一個 (val, 所在行數)，分別塞進 max heap 跟 min heap
+    2. 從 max heap 跟 min heap 取出比較，如果行數相等就必須找下一個
+    3. 但不知道要找 max heap的還是min heap的，所以都找！
+    4. return 最大的那個
+    5. O(m log(n))
+        1. heappush: log(n)
+2. two pointer
+    1. 用兩個 _min, _max 指針分別只到第一行的頭尾
+    2. 走到下一個，分別用current _min 減去 此行的max, current _max 減去此行的min, 並與res 求大
+    3. 走完 return
+    4. O(m)
+
+### Code
+two pointer:
+``` py
+class Solution:
+    def maxDistance(self, arrays: List[List[int]]) -> int:
+        _min, _max, res = arrays[0][0], arrays[0][-1], -float(inf)
+
+        for i in range(1, len(arrays)):
+            res = max(
+                res,
+                abs(arrays[i][0] - _max),
+                abs(arrays[i][-1]- _min)
+            )
+            _min = min(_min, arrays[i][0])
+            _max = max(_max, arrays[i][-1])
+        return res
+```
+
+heap:
+``` py
+import heapq
+class Solution:
+    def maxDistance(self, arrays: List[List[int]]) -> int:
+        minList, maxList = [],[]
+        for i in range(len(arrays)):
+            heapq.heappush(minList, (arrays[i][0], i))
+            heapq.heappush(maxList, (-1 * arrays[i][-1], i))
+
+
+        if minList[0][1] != maxList[0][1]:
+            return abs(-1*maxList[0][0]-minList[0][0])
+        else:
+            res = 0
+            minList2 = minList[:]
+            maxList2 = maxList[:]
+            # fix min
+            heapq.heappop(maxList)
+            res = abs(minList[0][0] - maxList[0][0]* -1)
+
+            #fix max
+            heapq.heappop(minList2)
+            res = max(res, abs(minList2[0][0] - maxList2[0][0]* -1))
+
+            return res
+```
+---
