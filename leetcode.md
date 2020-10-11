@@ -23197,3 +23197,81 @@ class Solution:
         return len(arrowList)
 ```
 ---
+## 307. Range Sum Query - Mutable｜ 10/11
+Given an integer array nums, find the sum of the elements between indices i and j (i ≤ j), inclusive.
+
+The update(i, val) function modifies nums by updating the element at index i to val.
+
+Example:
+
+Given nums = [1, 3, 5]
+
+sumRange(0, 2) -> 9
+
+update(1, 2)
+
+sumRange(0, 2) -> 8
+
+Constraints:
+
+The array is only modifiable by the update function.
+
+You may assume the number of calls to update and sumRange function is distributed evenly.
+
+0 <= i <= j <= nums.length - 1
+### 思路
+1. Naive:
+    - 更新就更新，求和時再加總回傳，暴力解
+2. Naive Accumulated Sum:
+    - 無法高效解，因為更新一個num後面整排sum都要跟著更新
+3. Bucket Accumulated Sum:
+    - 修正Naive sum的解法，使得不用更新後面整排Sum
+    - 把一整串 Num 拆成平均的 bucketSize，並求sum，更新就只要更新那一個bucket sum就好
+    - Time:
+        - BuildTree: O(n)
+        - Update: O(1)
+        - Sum: O(sqrt(n))
+4. Segement tree
+    - 具有訊息的 Binary tree
+    - 比較複雜，詳見 https://www.cnblogs.com/grandyang/p/4985506.html
+    - Time(詳見 https://leetcode.com/problems/range-sum-query-mutable/solution/):
+        - BuildTree: O(n)
+        - Update: O(log(n))
+        - Sum: O(log(n))
+
+### Code
+Bucket Accumulated Sum
+``` py
+class NumArray:
+
+    def __init__(self, nums: List[int]):
+        bucketSize = int(len(nums)**0.5)
+        bucketSum = []
+
+        for i, num in enumerate(nums):
+            if i % bucketSize == 0:
+                bucketSum.append(num)
+            else:
+                bucketSum[-1] += num
+
+        self.bucketSize = bucketSize
+        self.bucketSum = bucketSum
+        self.nums = nums
+
+    def update(self, i: int, val: int) -> None:
+        bucket = i // self.bucketSize
+        diff = val - self.nums[i]
+        self.bucketSum[bucket] += diff
+        self.nums[i] = val
+
+    def sumRange(self, i: int, j: int) -> int:
+        iBucket = i // self.bucketSize
+        jBucket = j // self.bucketSize
+
+        fullSum = sum(self.bucketSum[iBucket:jBucket]) # Note! no need to +1
+        fullSum += sum(self.nums[jBucket*self.bucketSize:j+1]) # add the back rest
+        fullSum -= sum(self.nums[iBucket*self.bucketSize:i]) # minus the first rest
+
+        return fullSum
+```
+---
