@@ -23275,3 +23275,65 @@ class NumArray:
         return fullSum
 ```
 ---
+## 859. Buddy Strings| 10/12
+Given two strings A and B of lowercase letters, return true if you can swap two letters in A so the result is equal to B, otherwise, return false.
+
+Swapping letters is defined as taking two indices i and j (0-indexed) such that i != j and swapping the characters at A[i] and A[j]. For example, swapping at indices 0 and 2 in "abcd" results in "cbad".
+
+ 
+
+Example 1:
+
+Input: A = "ab", B = "ba"
+Output: true
+Explanation: You can swap A[0] = 'a' and A[1] = 'b' to get "ba", which is equal to B.
+Example 2:
+
+Input: A = "ab", B = "ab"
+Output: false
+Explanation: The only letters you can swap are A[0] = 'a' and A[1] = 'b', which results in "ba" != B.
+Example 3:
+
+Input: A = "aa", B = "aa"
+Output: true
+Explanation: You can swap A[0] = 'a' and A[1] = 'a' to get "aa", which is equal to B.
+Example 4:
+
+Input: A = "aaaaaaabc", B = "aaaaaaacb"
+Output: true
+Example 5:
+
+Input: A = "", B = "aa"
+Output: false
+ 
+
+Constraints:
+
+0 <= A.length <= 20000
+0 <= B.length <= 20000
+A and B consist of lowercase letters.
+
+### 思路
+
+首先字符串A和B长度必须要相等，不相等的话直接返回 false。假如起始时A和B就完全相等，那么只有当A中有重复字符出现的时候，才能返回 true。快速检测重复字符的方法就是利用 HashSet 的自动去重复功能，将A中所有字符存入 HashSet 中，若有重复字符，那么最终 HashSet 的大小一定会小于原字符串A的长度
+
+### Code
+
+```py
+from collections import Counter
+class Solution:
+    def buddyStrings(self, A: str, B: str) -> bool:
+        if len(A) != len(B):
+            return False
+        if A == B and len(set(A)) < len(A):
+            return True
+        
+        listA, listB = [],[]
+        for i in range(len(A)):
+            if A[i] != B[i]:
+                listA.append(A[i])
+                listB.append(B[i])
+        return len(listA) == 2 and listA == listB[::-1]
+```
+
+---
