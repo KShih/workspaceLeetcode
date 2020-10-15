@@ -23280,7 +23280,7 @@ Given two strings A and B of lowercase letters, return true if you can swap two 
 
 Swapping letters is defined as taking two indices i and j (0-indexed) such that i != j and swapping the characters at A[i] and A[j]. For example, swapping at indices 0 and 2 in "abcd" results in "cbad".
 
- 
+
 
 Example 1:
 
@@ -23305,7 +23305,7 @@ Example 5:
 
 Input: A = "", B = "aa"
 Output: false
- 
+
 
 Constraints:
 
@@ -23327,7 +23327,7 @@ class Solution:
             return False
         if A == B and len(set(A)) < len(A):
             return True
-        
+
         listA, listB = [],[]
         for i in range(len(A)):
             if A[i] != B[i]:
@@ -23336,4 +23336,56 @@ class Solution:
         return len(listA) == 2 and listA == listB[::-1]
 ```
 
+---
+## 310. Minimum Height Tree｜ 10/15
+A tree is an undirected graph in which any two vertices are connected by exactly one path. In other words, any connected graph without simple cycles is a tree.
+
+Given a tree of n nodes labelled from 0 to n - 1, and an array of n - 1 edges where edges[i] = [ai, bi] indicates that there is an undirected edge between the two nodes ai and bi in the tree, you can choose any node of the tree as the root. When you select a node x as the root, the result tree has height h. Among all possible rooted trees, those with minimum height (i.e. min(h))  are called minimum height trees (MHTs).
+
+Return a list of all MHTs' root labels. You can return the answer in any order.
+
+The height of a rooted tree is the number of edges on the longest downward path between the root and a leaf.
+
+![](assets/markdown-img-paste-20201015114043656.png)
+
+### 思路
+
+- 1. Meet in the middleNode
+    - Our problem want us to find the minimum height trees and return their root labels. First we can think about a simple case -- a path graph.
+    - For a path graph of n nodes, find the minimum height trees is trivial. Just designate the middle point(s) as roots.
+    - Despite its triviality, let design a algorithm to find them.
+    - Suppose we don't know n, nor do we have random access of the nodes. We have to traversal. It is very easy to get the idea of two pointers. One from each end and move at the same speed. When they meet or they are one step away, (depends on the parity of n), we have the roots we want.
+- 2. 尋找根節點 -> 除去葉節點
+    - ![](assets/markdown-img-paste-20201015113127563.png)
+    - 圖論中的葉節點即是只有一個 neibor 的節點 => 除去
+    - 當除去第一層的葉節點, 必須去更新其鄰居, 鄰居也就是下一層的葉節點
+    - 持續做直到根, 根可能有兩個, 因此 n > 2
+
+- 小結: **圖論題優先想到建立 adjcent map, 然後從葉節點開始走訪**
+
+### Code
+``` py
+class Solution:
+    def findMinHeightTrees(self, n: int, edges: List[List[int]]) -> List[int]:
+        if n == 1: return [0]
+        adj = [set() for _ in range(n)]
+        for a, b in edges:
+            adj[a].add(b)
+            adj[b].add(a)
+
+        leaves = [i for i in range(len(adj)) if len(adj[i]) == 1]
+
+        while n > 2: # the rest node
+            n -= len(leaves) # remove leave, the rest node
+
+            newLeaves = []
+            # update adjList, queeue
+            for i in leaves:
+                nb = adj[i].pop() # neibor of leave
+                adj[nb].remove(i)
+                if len(adj[nb]) == 1:
+                    newLeaves.append(nb)
+            leaves = newLeaves
+        return leaves
+```
 ---
