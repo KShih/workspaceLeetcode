@@ -23389,3 +23389,52 @@ class Solution:
         return leaves
 ```
 ---
+## 309. Best Time to Buy and Sell Stock with Cooldown｜ 10/19
+Say you have an array for which the ith element is the price of a given stock on day i.
+
+Design an algorithm to find the maximum profit. You may complete as many transactions as you like (ie, buy one and sell one share of the stock multiple times) with the following restrictions:
+
+You may not engage in multiple transactions at the same time (ie, you must sell the stock before you buy again).
+After you sell your stock, you cannot buy stock on next day. (ie, cooldown 1 day)
+Example:
+
+Input: [1,2,3,0,2]
+
+Output: 3
+
+Explanation: transactions = [buy, sell, cooldown, buy, sell]
+### 思路
+
+1. 使用狀態機轉換
+    - ![](assets/markdown-img-paste-20201019161436553.png)
+2. 搭配 formula 去計算出每個狀態在每個時間點的價格
+    - sold[i] = hold[i−1]+price[i]
+        - 只有一種狀態，就是由 buy(hold) 轉來
+    - held[i] = max(held[i−1],reset[i−1]−price[i])
+    - reset[i] = max(reset[i−1],sold[i−1])
+3. 得出狀態轉移表格
+    - 箭頭方向即結果可能來源方向
+    - ![](assets/markdown-img-paste-20201019161712842.png)
+
+4. 加分題
+    - 如何得知transaction的path
+    - In the above graph, by starting from the final state, and walking backward following the path, we could obtain a sequence of actions that leads to the maximal profits at the end, i.e. [buy, sell, cooldown, buy, sell].
+
+股票系列總結帖:
+
+https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/discuss/108870/most-consistent-ways-of-dealing-with-the-series-of-stock-problems
+### Code
+``` py
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        sold, hold, reset = -float(inf), -float(inf), 0
+
+        for price in prices:
+            pre_sold = sold
+
+            sold = hold + price
+            hold = max(hold, reset - price)
+            reset = max(reset, pre_sold)
+        return max(sold, reset)
+```
+---
