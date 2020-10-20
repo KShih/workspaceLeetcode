@@ -23591,3 +23591,40 @@ class Solution:
 
 ### 區間DP非常規走訪, DP
 ---
+## 314. Binary Tree Vertical Order Traversal｜ 10/20
+Given a binary tree, return the vertical order traversal of its nodes' values. (ie, from top to bottom, column by column).
+
+If two nodes are in the same row and column, the order should be from left to right.
+
+![](assets/markdown-img-paste-20201020230640872.png)
+
+### 思路
+
+回傳由左而右的樹垂直走訪，
+
+層序遍歷，左節點-1，又節點+1
+
+### Code
+``` py
+from collections import defaultdict
+class Solution:
+    def verticalOrder(self, root: TreeNode) -> List[List[int]]:
+        if not root:
+            return []
+        dic = defaultdict(list)
+        queue = [(root, 0)]
+
+        while queue:
+            node, column = queue.pop(0)
+            dic[column].append(node.val)
+
+            if node.left:
+                queue.append((node.left, column-1))
+            if node.right:
+                queue.append((node.right, column+1))
+
+        dic_item = dic.items()
+        dic_item = sorted(dic_item, key=lambda x:x[0])
+        return [x[1] for x in dic_item]
+```
+---
