@@ -23535,3 +23535,59 @@ class Solution(object):
         return C
 ```
 ---
+## 312. Burst Balloons｜ 10/20
+
+Given n balloons, indexed from 0 to n-1. Each balloon is painted with a number on it represented by array nums. You are asked to burst all the balloons. If the you burst balloon i you will get nums[left] * nums[i] * nums[right] coins. Here left and right are adjacent indices of i. After the burst, the left and right then becomes adjacent.
+
+Find the maximum coins you can collect by bursting the balloons wisely.
+
+Note:
+
+You may imagine nums[-1] = nums[n] = 1. They are not real therefore you can not burst them.
+0 ≤ n ≤ 500, 0 ≤ nums[i] ≤ 100
+
+![](assets/markdown-img-paste-20201020212444704.png)
+
+### 思路
+
+![](assets/markdown-img-paste-20201020213636717.png)
+
+這道題提出了一種打氣球的遊戲，每個氣球都對應著一個數字，每次打爆一個氣球，得到的金幣數是被打爆的氣球的數字和其兩邊的氣球上的數字相乘，如果旁邊沒有氣球了，則按1算，以此類推，求能得到的最多金幣數。參見題目中給的例子，題意並不難理解。那麼大家拿到題後，總是會習慣的先去想一下暴力破解法吧，這道題的暴力搜索將相當的複雜，因為每打爆一個氣球，斷開的地方又重新挨上，所有剩下的氣球又要重新遍歷，這使得分治法不能 work，整個的時間複雜度會相當的高，不要指望可以通過 OJ。而對於像這種求極值問題，一般都要考慮用動態規劃 Dynamic Programming 來做，維護一個二維動態數組 dp，其中 dp[i][j] 表示打爆區間 [i,j] 中的所有氣球能得到的最多金幣。題目中說明了邊界情況，當氣球周圍沒有氣球的時候，旁邊的數字按1算，這樣可以在原數組兩邊各填充一個1，方便於計算。這道題的最難點就是找狀態轉移方程，還是從定義式來看，假如區間只有一個數，比如 dp[i][i]，那麼計算起來就很簡單，直接乘以周圍兩個數字即可更新。如果區間裡有兩個數字，就要算兩次了，先打破第一個再打破了第二個，或者先打破第二個再打破第一個，比較兩種情況，其中較大值就是該區間的 dp 值。假如區間有三個數呢，比如 dp[1][3]，怎麼更新呢？如果先打破第一個，剩下兩個怎麼辦呢，難道還要分別再遍歷算一下嗎？這樣跟暴力搜索的方法有啥區別呢，還要 dp 數組有啥意思。所謂的狀態轉移，就是假設已知了其他狀態，來推導現在的狀態，現在是想知道 dp[1][3] 的值，那麼如果先打破了氣球1，剩下了氣球2和3，若之前已經計算了 dp[2][3] 的話，就可以使用其來更新 dp[1][3] 了，就是打破氣球1的得分加上 dp[2][3]。那假如先打破氣球2呢，只要之前計算了 dp[1][1] 和 dp[3][3]，那麼三者加起來就可以更新 dp[1][3]。同理，先打破氣球3，就用其得分加上 dp[1][2] 來更新 dp[1][3]。說到這裡，是不是感覺豁然開朗了 ^.^
+
+那麼對於有很多數的區間 [i, j]，如何來更新呢？現在是想知道 dp[i][j] 的值，這個區間可能比較大，但是如果知道了所有的小區間的 dp 值，然後聚沙成塔，逐步的就能推出大區間的 dp 值了。還是要遍歷這個區間內的每個氣球，就用k來遍歷吧，k在區間 [i, j] 中，假如第k個氣球最後被打爆，那麼此時區間 [i, j] 被分成了三部分，[i, k-1]，[k]，和 [k+1, j]，只要之前更新過了 [i, k-1] 和 [k+1, j] 這兩個子區間的 dp 值，可以直接用 dp[i][k-1] 和 dp[k+1][j]，那麼最後被打爆的第k個氣球的得分該怎麼算呢，你可能會下意識的說，就乘以周圍兩個氣球被 nums[k-1] * nums[k] * nums[k+1]，但其實這樣是錯誤的，為啥呢？dp[i][k-1] 的意義是什麼呢，是打爆區間 [i, k-1] 內所有的氣球後的最大得分，此時第 k-1 個氣球已經不能用了，同理，第 k+1 個氣球也不能用了，相當於區間 [i, j] 中除了第k個氣球，其他的已經爆了，那麼周圍的氣球只能是第 i-1 個，和第 j+1 個了，所以得分應為 nums[i-1] * nums[k] * nums[j+1]，分析到這裡，狀態轉移方程應該已經躍然紙上了吧，如下所示：
+
+dp[i][j] = max(dp[i][j], nums[i - 1] * nums[k] * nums[j + 1] + dp[i][k - 1] + dp[k + 1][j])                 ( i ≤ k ≤ j )
+
+有了狀態轉移方程了，就可以寫代碼，下面就遇到本題的第二大難點了，區間的遍歷順序。一般來說，遍歷所有子區間的順序都是i從0到n，然後j從i到n，然後得到的 [i, j] 就是子區間。但是這道題用這種遍歷順序就不對，在前面的分析中已經說了，這裡需要先更新完所有的小區間，然後才能去更新大區間，而用這種一般的遍歷子區間的順序，會在更新完所有小區間之前就更新了大區間，從而不一定能算出正確的dp值，比如拿題目中的那個例子 [3, 1, 5, 8] 來說，一般的遍歷順序是：
+
+[3] -> [3, 1] -> [3, 1, 5] -> [3, 1, 5, 8] -> [1] -> [1, 5] -> [1, 5, 8] -> [5] -> [5, 8] -> [8]
+
+顯然不是我們需要的遍歷順序，正確的順序應該是先遍歷完所有長度為1的區間，再是長度為2的區間，再依次累加長度，直到最後才遍歷整個區間：
+
+[3] -> [1] -> [5] -> [8] -> [3, 1] -> [1, 5] -> [5, 8] -> [3, 1, 5] -> [1, 5, 8] -> [3, 1, 5, 8]
+
+這裡其實只是更新了 dp 數組的右上三角區域，最終要返回的值存在 dp[1][n] 中，其中n是兩端添加1之前數組 nums 的個數。參見代碼如下：
+
+### Code
+``` py
+class Solution:
+    def maxCoins(self, nums: List[int]) -> int:
+        n = len(nums)
+        nums.insert(0, 1)
+        nums.append(1)
+
+        dp = [[0 for _ in range(n+2)] for _ in range(n+2)]
+
+        for leng in range(1, n+1):
+            for i in range(1, n-leng+2):
+
+                j = i + leng - 1
+                for k in range(i, j+1): # iterate over k ballon in range(i, j)
+                    bk = nums[i-1]*nums[k]*nums[j+1]
+                    dp[i][j] = max(dp[i][j], bk + dp[i][k-1] + dp[k+1][j])
+
+        return dp[1][n]
+```
+
+### 區間DP非常規走訪, DP
+---
