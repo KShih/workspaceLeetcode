@@ -23589,7 +23589,7 @@ class Solution:
         return dp[1][n]
 ```
 
-### 區間DP非常規走訪, DP
+### Tag: 區間DP非常規走訪, DP
 ---
 ## 314. Binary Tree Vertical Order Traversal｜ 10/20
 Given a binary tree, return the vertical order traversal of its nodes' values. (ie, from top to bottom, column by column).
@@ -23627,4 +23627,69 @@ class Solution:
         dic_item = sorted(dic_item, key=lambda x:x[0])
         return [x[1] for x in dic_item]
 ```
+---
+## 316. Remove Duplicate Letters｜ 10/21
+
+Given a string s, remove duplicate letters so that every letter appears once and only once. You must make sure your result is the smallest in lexicographical order among all possible results.
+
+Note: This question is the same as 1081: https://leetcode.com/problems/smallest-subsequence-of-distinct-characters/
+
+Example 1:
+
+Input: s = "bcabc"
+
+Output: "abc"
+
+Example 2:
+
+Input: s = "cbacdcbc"
+
+Output: "acdb"
+
+Constraints:
+
+1 <= s.length <= 104
+
+s consists of lowercase English letters.
+
+### 思路
+
+這道題讓我們移除重複字母，使得每個字符只能出現一次，而且結果要按字母順序排，前提是不能打亂其原本的相對位置。
+
+我們的解題思路是：
+
+先建立一個哈希表來統計每個字母出現的次數，還需要一個visited數字來紀錄每個字母是否被訪問過
+
+我們遍歷整個字符串，對於遍歷到的字符，先在哈希表中將其值減一，然後看visited中是否被訪問過，若訪問過則繼續循環，說明該字母已經出現在結果中並且位置已經安排妥當。
+
+如果沒訪問過，我們和結果中最後一個字母比較，如果該字母的ASCII碼小並且結果中的最後一個字母在哈希表中的值不為0(說明後面還會出現這個字母)，
+
+那麼我們此時就要在結果中刪去最後一個字母且將其標記為未訪問，然後加上當前遍歷到的字母，並且將其標記為已訪問，以此類推直至遍歷完整個字符串s，此時結果裡的字符串即為所求。
+
+這裡有個小技巧，我們一開始給結果字符串res中放個"0"，就是為了在第一次比較時方便，如果為空就沒法和res中的最後一個字符比較了，而‘0’的ASCII碼要小於任意一個字母的，所以不會有問題。最後我們返回結果時再去掉開頭那個‘0’即可
+
+### Code
+``` py
+from collections import Counter
+
+class Solution:
+    def removeDuplicateLetters(self, s: str) -> str:
+        counter = Counter(s)
+        visited = {k: False for k in counter.keys()}
+
+        res = "0" # trick: since "0" < "a"
+        for c in s:
+            counter[c] -= 1
+            if visited[c]:
+                continue
+
+            # compare with that char
+            while c < res[-1] and counter[res[-1]] > 0:
+                visited[res[-1]] = False
+                res = res[:-1]
+            res += c
+            visited[c] = True
+        return res[1:]
+```
+### Tag: Greedy
 ---
