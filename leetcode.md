@@ -23700,24 +23700,24 @@ Given a string array words, find the maximum value of length(word[i]) * length(w
 Example 1:
 
 Input: ["abcw","baz","foo","bar","xtfn","abcdef"]
-Output: 16 
+Output: 16
 
 Explanation: The two words can be "abcw", "xtfn".
 
 Example 2:
 
 Input: ["a","ab","abc","d","cd","bcd","abcd"]
-Output: 4 
+Output: 4
 
 Explanation: The two words can be "ab", "cd".
 
 Example 3:
 
 Input: ["a","aa","aaa","aaaa"]
-Output: 0 
+Output: 0
 
 Explanation: No such pair of words.
- 
+
 
 Constraints:
 
@@ -23747,7 +23747,7 @@ words[i] consists only of lowercase English letters.
 
 優化:
 
-可以用 dic 去紀錄出現過的mask, 
+可以用 dic 去紀錄出現過的mask,
 
 因為某些words的的mask是一樣的可以取兩者間的最大值紀錄即可,
 
@@ -23763,7 +23763,7 @@ class Solution:
         masks = [0] * n
         lens = [0] * n
         bit_number = lambda ch : ord(ch) - ord('a')
-        
+
         for i in range(n):
             bitmask = 0
             for ch in words[i]:
@@ -23771,7 +23771,7 @@ class Solution:
                 bitmask |= 1 << bit_number(ch)
             masks[i] = bitmask
             lens[i] = len(words[i])
-            
+
         max_val = 0
         for i in range(n):
             for j in range(i + 1, n):
@@ -23791,7 +23791,7 @@ class Solution:
             for c in word:
                 mask |= 1 << ord(c) - ord("a")
             dic[mask] = max(dic[mask], len(word))
-            
+
         res = 0
         for x in dic:
             for y in dic:
@@ -23801,4 +23801,55 @@ class Solution:
 ```
 
 ### Tag: Bit操作, mask
+---
+## 319. Bulb Switcher｜ 10/22
+
+There are n bulbs that are initially off. You first turn on all the bulbs. Then, you turn off every second bulb. On the third round, you toggle every third bulb (turning on if it's off or turning off if it's on). For the i-th round, you toggle every i bulb. For the n-th round, you only toggle the last bulb. Find how many bulbs are on after n rounds.
+
+Example:
+
+Input: 3
+Output: 1
+
+Explanation:
+At first, the three bulbs are [off, off, off].
+
+After first round, the three bulbs are [on, on, on].
+
+After second round, the three bulbs are [on, off, on].
+
+After third round, the three bulbs are [on, off, off].
+
+So you should return 1, because there is only one bulb is on.
+
+### 思路
+這道題給了我們n個燈泡，第一次打開所有的燈泡，第二次每兩個更改燈泡的狀態，第三次每三個更改燈泡的狀態，以此類推，第n次每n個更改燈泡的狀態。讓我們求n次後，所有亮的燈泡的個數。此題是CareerCup 6.6 Toggle Lockers 切換鎖的狀態。
+
+那麼我們來看這道題吧，還是先枚舉個小例子來分析下，比如只有5個燈泡的情況，'X'表示滅，‘√’表示亮，如下所示：
+
+初始狀態：    X    X    X    X    X
+
+第一次：      √    √    √    √    √
+
+第二次：      √     X    √    X    √
+
+第三次：      √     X    X    X    √
+
+第四次：      √     X    X    √    √
+
+第五次：      √     X    X    √    X
+
+那麼最後我們發現五次遍歷後，只有1號和4號燈泡是亮的，而且很巧的是它們都是平方數，是巧合嗎，還是其中有什麼玄機。我們仔細想想，對於第n個燈泡，只有當次數是n的因子的之後，才能改變燈泡的狀態，即n能被當前次數整除，比如當n為36時，它的因數有(1,36), (2,18), (3,12), (4,9), (6,6), 可以看到前四個括號裡成對出現的因數各不相同，括號中前面的數改變了燈泡狀態，後面的數又變回去了，等於燈泡的狀態沒有發生變化，只有最後那個(6,6)，在次數6的時候改變了一次狀態，沒有對應其它的狀態能將其變回去了，所以燈泡就一直是點亮狀態的。所以所有平方數都有這麼一個相等的因數對，即所有平方數的燈泡都將會是點亮的狀態。
+
+那麼問題就簡化為了求1到n之間完全平方數的個數，我們可以用force brute來比較從1開始的完全平方數和n的大小
+
+討論：這道題有個follow up就是，如果我們toggle的順序不是1，2，3，4...，而是1，3，5，7...，或者是2，4，6，8... 的話，還怎麼做？博主想的是，比如對於1，3，5，7...，那麼就是先把所有的燈點亮，然後關掉3，6，9，12，15...等的燈，然後toggle的是5，10，15...等等，然後再toggle的是7，14，21...，我們發現，純2的倍數的燈永遠不會被改變，比如2，4，8，16... 這些燈狀態不會變，有些燈只會變一次，比如3，6，9等，而有些燈會變兩次，比如15（3x5），21（3x7），35（5x7）等，有些燈會變三次，比如105（3x5x7），那麼我們可以觀察出規律了，**toggle的次數跟奇數因子的數字有關（注意這裡的奇數因子不包括1）**，只要有奇數個奇因子，那麼燈就是滅的，只要有偶數個奇因子，那麼燈就是亮的。
+
+### Code
+``` py
+class Solution:
+    def bulbSwitch(self, n: int) -> int:
+        return int(n ** (0.5))
+```
+### Tag: Math
 ---
