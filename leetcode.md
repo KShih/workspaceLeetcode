@@ -23853,3 +23853,45 @@ class Solution:
 ```
 ### Tag: Math
 ---
+## 320. Generalized Abbreviation｜ 10/27
+Write a function to generate the generalized abbreviations of a word.
+
+Note: The order of the output does not matter.
+
+Example:
+
+Input: "word"
+
+Output:
+
+["word", "1ord", "w1rd", "wo1d", "wor1", "2rd", "w2d", "wo2", "1o1d", "1or1", "w1r1", "1o2", "2r1", "3d", "w3", "4"]
+
+### 思路
+1. 對於每個字母，都可以選擇自己要 數字化(skip) 或者 實體化
+2. 數字化則要讓 skip_count+1
+3. 實體化則要在目前實體化的字串後，先加上目前skip的數量，再加上實體化的自己，並把skip_count歸零
+4. 如: w2d 為 實體->數字->數字->實體
+5. 也可畫個樹狀圖輔助視覺
+6. O(n * 2^n)
+
+### Code
+``` py
+class Solution:
+    def generateAbbreviations(self, word: str) -> List[str]:
+        res = []
+        def backtrack(idx, cur, skip_count):
+            if idx == len(word):
+                res.append(cur + str(skip_count) if skip_count > 0 else cur)
+            else:
+                # skip cur (數字化)
+                backtrack(idx+1, cur, skip_count+1)
+
+                # summarize the current count (實體化)
+                backtrack(idx+1, cur + (str(skip_count) if skip_count > 0 else '') + word[idx], 0)
+
+        backtrack(0, '', 0)
+        return res
+```
+
+### Tag: backtrack
+---
