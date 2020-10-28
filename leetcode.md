@@ -23976,3 +23976,64 @@ class Solution:
 
 ### Tag: DP
 ---
+## 323. Number of Connected Components in an Undirected Graph｜ 10/28
+Given n nodes labeled from 0 to n - 1 and a list of undirected edges (each edge is a pair of nodes), write a function to find the number of connected components in an undirected graph.
+
+![](assets/markdown-img-paste-20201028230708405.png)
+### 思路
+
+1. Way1: 圖論先建立 adjList, 然後考慮用 DFS or BFS 解
+2. Way2: UnionFind
+
+### Code
+DFS:
+``` py
+from collections import defaultdict
+class Solution:
+    def countComponents(self, n: int, edges: List[List[int]]) -> int:
+        adjList = [[] for _ in range(n)]
+        visited = [False for _ in range(n)]
+
+        for x, y in edges:
+            adjList[x].append(y)
+            adjList[y].append(x)
+
+        res = 0
+        for i in range(n):
+            if not visited[i]:
+                res += 1
+                self.dfs(adjList, visited, i)
+        return res
+
+    def dfs(self, adjList, visited, i):
+        if visited[i]:
+            return
+        visited[i] = True
+
+        for e in adjList[i]:
+            self.dfs(adjList, visited, e) # visited its connected point
+```
+
+UnionFind:
+```py
+class Solution:
+    def countComponents(self, n: int, edges: List[List[int]]) -> int:
+        self.rootMap = [i for i in range(n)] # initialize every node's root is itself
+        res = n # therefore, there are n region
+
+        for x, y in edges:
+            rootX, rootY = self.find(x), self.find(y)
+            if rootX != rootY:
+                self.rootMap[rootY] = rootX
+                res -= 1
+        return res
+
+    # find i's root
+    def find(self, i):
+        while self.rootMap[i] != i:
+            i = self.rootMap[i]
+        return self.rootMap[i]
+```
+
+### Tag: Graph, DFS, UnionFind
+---
