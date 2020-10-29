@@ -23984,6 +23984,7 @@ Given n nodes labeled from 0 to n - 1 and a list of undirected edges (each edge 
 
 1. Way1: 圖論先建立 adjList, 然後考慮用 DFS or BFS 解
 2. Way2: UnionFind
+3. Way3: BFS
 
 ### Code
 DFS:
@@ -24035,5 +24036,35 @@ class Solution:
         return self.rootMap[i]
 ```
 
-### Tag: Graph, DFS, UnionFind
+BFS:
+```py
+class Solution:
+    def countComponents(self, n: int, edges: List[List[int]]) -> int:
+        adjList = [[] for _ in range(n)]
+        seen = set()
+        component = 0
+        queue = []
+
+        for x, y in edges:
+            adjList[x].append(y)
+            adjList[y].append(x)
+
+        for i in range(n):
+            if i not in seen:
+                seen.add(i)
+                queue.append(i)
+                self.bfs(queue, adjList, seen)
+                component +=1
+        return component
+
+    def bfs(self, queue, adjList, seen):
+        while queue:
+            top = queue.pop(0)
+            for neibor in adjList[top]:
+                if neibor not in seen:
+                    seen.add(neibor)
+                    queue.append(neibor)
+```
+
+### Tag: Graph, DFS, UnionFind, BFS
 ---
