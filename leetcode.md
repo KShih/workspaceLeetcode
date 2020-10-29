@@ -24068,3 +24068,54 @@ class Solution:
 
 ### Tag: Graph, DFS, UnionFind, BFS
 ---
+## 325. Maximum Size Subarray Sum Equals k｜ 8/29
+
+Given an array nums and a target value k, find the maximum length of a subarray that sums to k. If there isn't one, return 0 instead.
+
+Note:
+The sum of the entire nums array is guaranteed to fit within the 32-bit signed integer range.
+
+Example 1:
+
+Input: nums = [1, -1, 5, -2, 3], k = 3
+Output: 4
+
+Explanation: The subarray [1, -1, 5, -2] sums to 3 and is the longest.
+
+Example 2:
+
+Input: nums = [-2, -1, 2, 1], k = 1
+Output: 2
+
+Explanation: The subarray [-1, 2] sums to 1 and is the longest.
+
+Follow Up:
+Can you do it in O(n) time?
+
+### 思路
+
+1. 基本的思路就是accumulated sum
+2. 但題目要求O(n)，hashmap就是解
+3. 此外此題也不需要使用一個陣列去存 accSum, 維繫一個目前累計和的變數即可
+4. accSum在hashmap重複時只存第一個 i, (因為這樣才會是最長)
+
+### Code
+``` py
+class Solution:
+    def maxSubArrayLen(self, nums: List[int], k: int) -> int:
+        sums, sumMap, maxLeng = 0, {}, 0
+
+        for i, num in enumerate(nums):
+            sums += num
+            if sums == k:
+                maxLeng = i+1 # accumulate from the start is the max leng
+            elif (sums-k) in sumMap:
+                maxLeng = max(maxLeng, i-sumMap[sums-k])
+
+            if sums not in sumMap: # record the first i which accSum is sums
+                sumMap[sums] = i
+        return maxLeng
+```
+
+### Tag: Accumulated Sum, HashMap
+---
