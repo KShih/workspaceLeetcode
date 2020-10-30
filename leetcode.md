@@ -24226,3 +24226,92 @@ class Solution:
 
 ### Tag: BinaryTree concept
 ---
+## 332. Reconstruct Itinerary| 10/30
+
+Given a list of airline tickets represented by pairs of departure and arrival airports [from, to], reconstruct the itinerary in order. All of the tickets belong to a man who departs from JFK. Thus, the itinerary must begin with JFK.
+
+Note:
+
+- If there are multiple valid itineraries, you should return the itinerary that has the smallest lexical order when read as a single string. For example, the itinerary ["JFK", "LGA"] has a smaller lexical order than ["JFK", "LGB"].
+
+- All airports are represented by three capital letters (IATA code).
+
+- You may assume all tickets form at least one valid itinerary.
+
+- One must use all the tickets once and only once.
+
+Example 1:
+
+Input: [["MUC", "LHR"], ["JFK", "MUC"], ["SFO", "SJC"], ["LHR", "SFO"]]
+
+Output: ["JFK", "MUC", "LHR", "SFO", "SJC"]
+
+Example 2:
+
+Input: [["JFK","SFO"],["JFK","ATL"],["SFO","ATL"],["ATL","JFK"],["ATL","SFO"]]
+
+Output: ["JFK","ATL","JFK","SFO","ATL","SFO"]
+
+Explanation: Another possible reconstruction is ["JFK","SFO","ATL","JFK","ATL","SFO"].
+             But it is larger in lexical order.
+
+### 思路
+
+1. getNextStop 中要使用 while 而不是 if
+    - [["JFK","KUL"],["JFK","NRT"],["NRT","JFK"]] 這個例子
+    - 如果使用 if 結果會是 ["JFK", "KUL"]
+    - 如果用 while, 可以讓錯序的點先插入到最後:
+        - ["KUL"] -> ["NRT","KUL"] -> ["JFK","NRT","KUL"]
+
+2. Iterative 要注意在拿stack裡的元素的時候不能直接 pop(), 否則就無法將先拜訪的元素插入到res當中了
+### Code
+Recursive:
+```py
+import heapq
+class Solution:
+    def findItinerary(self, tickets: List[List[str]]) -> List[str]:
+        self.res = []
+        dic = dict()
+        for start, end in tickets:
+            if start not in dic:
+                dic[start] = [end]
+            else:
+                heapq.heappush(dic[start], end)
+        self.dic = dic
+        self.getNextStop("JFK")
+        return self.res
+        
+    def getNextStop(self, curStop):
+        while curStop in self.dic and len(self.dic[curStop]) != 0:
+            nextStop = heapq.heappop(self.dic[curStop])
+            self.getNextStop(nextStop)
+        self.res.insert(0,curStop)
+```
+
+Iterative
+```py
+import heapq
+class Solution:
+    def findItinerary(self, tickets: List[List[str]]) -> List[str]:
+        res = []
+        dic = dict()
+        for start, end in tickets:
+            if start not in dic:
+                dic[start] = [end]
+            else:
+                heapq.heappush(dic[start], end)
+        
+        stack = ["JFK"]
+        while stack:
+            curStop = stack[-1] # cannot pop here
+            if curStop not in dic or len(dic[curStop]) == 0:
+                res.insert(0, curStop)
+                stack.pop()
+            else:
+                nextStop = heapq.heappop(dic[curStop])
+                stack.append(nextStop)
+        return res
+```
+
+### Tag: Backtrack, Heap, Hash, 
+---
