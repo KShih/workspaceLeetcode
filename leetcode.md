@@ -24280,7 +24280,7 @@ class Solution:
         self.dic = dic
         self.getNextStop("JFK")
         return self.res
-        
+
     def getNextStop(self, curStop):
         while curStop in self.dic and len(self.dic[curStop]) != 0:
             nextStop = heapq.heappop(self.dic[curStop])
@@ -24300,7 +24300,7 @@ class Solution:
                 dic[start] = [end]
             else:
                 heapq.heappush(dic[start], end)
-        
+
         stack = ["JFK"]
         while stack:
             curStop = stack[-1] # cannot pop here
@@ -24313,5 +24313,71 @@ class Solution:
         return res
 ```
 
-### Tag: Backtrack, Heap, Hash, 
+### Tag: Backtrack, Heap, Hash,
+---
+## 333. Largest BST Subtree｜ 11/5
+Given the root of a binary tree, find the largest subtree, which is also a Binary Search Tree (BST), where the largest means subtree has the largest number of nodes.
+
+A Binary Search Tree (BST) is a tree in which all the nodes follow the below-mentioned properties:
+
+The left subtree values are less than the value of their parent (root) node's value.
+The right subtree values are greater than the value of their parent (root) node's value.
+Note: A subtree must include all of its descendants.
+
+Follow up: Can you figure out ways to solve it with O(n) time complexity?
+
+![](assets/markdown-img-paste-20201105091312102.png)
+
+### 思路
+
+1. Topdown:
+    - 先確認整棵樹是否合法，若合法直接計算所有節點 (左+右全取)
+    - 若不合法則就要分別檢查左子跟右子，取其大
+2. BottonUp:
+    - Divide and Conquer 法去從leftMost node 往上
+    - 注意 if not root 那邊的判斷式
+    - 如果當前是葉結點，其也算是 BST，那麼肯定希望能進入 if 從句，從而使得回傳的三元組的第一項能加1，但是 if 的條件是當前結點值要大於左子樹中的最大值，現在左子結點是空的，為了保證條件能通過，我們將空的左子樹的最大值設置為整型最小值，這樣一定能通過，同理，將空的右子樹的最小值設置為整型最大值，這就是空結點的三元組的作用
+    - 相反的如果違反BST rule, 就要回應相對的leftMax, rightMin來破壞進入if條件，如Example1中的7，回應到上層的rightMin為 float(-inf)，肯定可以破壞if條件
+
+### Code
+Top down, seeing every node as root: O(n^2)
+``` py
+class Solution:
+    def largestBSTSubtree(self, root: TreeNode) -> int:
+        if not root: return 0
+        # Need to first check if root isValid, if yes, return whole tree
+        # if not, return the max of left or right tree
+        if self.isValid(root, -float(inf), float(inf)):
+            return self.count(root)
+        return max(self.largestBSTSubtree(root.left), self.largestBSTSubtree(root.right))
+
+    def isValid(self, root, minBound, maxBound) -> bool:
+        if not root: return True
+        if root.val <= minBound or root.val >= maxBound:
+            return False
+        # for left child, the only bound is cannot over the parent's value
+        return self.isValid(root.left, minBound, root.val) and self.isValid(root.right, root.val, maxBound)
+
+    def count(self, root) -> int:
+        if not root: return 0
+        return self.count(root.left) + self.count(root.right) + 1
+```
+
+Button Up, Going up from leftmost node: O(n)
+```py
+class Solution:
+    def largestBSTSubtree(self, root: TreeNode) -> int:
+        return self.divideAndConquer(root)[0]
+
+    def divideAndConquer(self, root):
+        if not root:
+            return 0, float(inf), -float(inf) # Notice!! this condition is BST
+        leftCount, leftMin, leftMax = self.divideAndConquer(root.left)
+        rightCount, rightMin, rightMax = self.divideAndConquer(root.right)
+
+        if leftMax < root.val < rightMin:
+            return leftCount+rightCount+1, min(leftMin, root.val), max(rightMax, root.val) # isBST
+        return max(leftCount, rightCount), -float(inf), float(inf) # notBST
+```
+### Tag: Recursive, divideAndConquer, BST
 ---
