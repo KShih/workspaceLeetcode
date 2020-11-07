@@ -24527,3 +24527,48 @@ class Solution:
 
 ### Tag: #LIS, #array, #bisect, #binarySearch
 ---
+## 329. Longest Increasing Path in a Matrix｜ 11/7
+
+Given an integer matrix, find the length of the longest increasing path.
+
+From each cell, you can either move to four directions: left, right, up or down. You may NOT move diagonally or move outside of the boundary (i.e. wrap-around is not allowed).
+
+![](assets/markdown-img-paste-2020110716141580.png)
+
+### 思路
+
+1. DP+recursive
+    - 那麼這道題的解法要用遞歸和DP來解，用DP的原因是為了提高效率，避免重複運算。我們需要維護一個二維動態數組dp，其中dp[i][j]表示數組中以(i,j)為起點的最長遞增路徑的長度，初始將dp數組都賦為0，當我們用遞歸調用時，遇到某個位置(x, y), 如果dp[x][y]不為0的話，我們直接返回dp[x][y]即可，不需要重複計算。我們需要以數組中每個位置都為起點調用遞歸來做，比較找出最大值。在以一個位置為起點用DFS搜索時，對其四個相鄰位置進行判斷，如果相鄰位置的值大於上一個位置，則對相鄰位置繼續調用遞歸，並更新一個最大值，搜素完成後返回即可
+### Code
+O(mn)
+``` py
+class Solution:
+    def longestIncreasingPath(self, matrix: List[List[int]]) -> int:
+        if not matrix:
+            return 0
+        self.r, self.c = len(matrix), len(matrix[0])
+        self.matrix = matrix
+        self.direction = [(0,1), (1,0), (0,-1), (-1,0)]
+        self.dp = [[0 for _ in range(self.c)] for _ in range(self.r)]
+
+        res = 0
+        for i in range(self.r):
+            for j in range(self.c):
+                res = max(res, self.dfs(i,j))
+        return res
+
+    def dfs(self, i, j):
+        if self.dp[i][j] != 0:
+            return self.dp[i][j]
+        maxCount = 1
+        for x, y in self.direction:
+            if 0 <= i+x < self.r and 0 <= j+y < self.c and self.matrix[i+x][j+y] > self.matrix[i][j]:
+                    pathCount = 1 + self.dfs(i+x, j+y)
+                    maxCount = max(maxCount, pathCount)
+
+        self.dp[i][j] = maxCount
+        return maxCount
+```
+
+### Tag: DP, Memorization
+---
