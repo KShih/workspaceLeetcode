@@ -13127,6 +13127,57 @@ def lengthOfLIS(self, nums: List[int]) -> int:
 
     return res
 ```
+
+Using libary (bisect), binary search
+```py
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        n = len(nums)
+        inc = [float(inf)]*(n)
+        res = 0
+
+        for num in nums:
+            x = bisect.bisect_left(inc, num)
+            inc[x] = num
+            res = max(res, x+1)
+
+        return res
+```
+
+Binary search with DP
+```py
+class Solution(object):
+    def lengthOfLIS(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        def bSearch(arr, target):
+            i = 0
+            j = len(arr)
+            while i < j:
+                mid = (i+j) / 2
+                if arr[mid] == target:
+                    return mid
+                elif arr[mid] < target:
+                    i = mid+1
+                else:
+                    j = mid
+            return i
+
+        if not nums:
+            return 0
+        rec = [nums[0]]
+        for i in range(1, len(nums)):
+            index = bSearch(rec, nums[i])
+            if index == len(rec):
+                rec.append(nums[i])
+            else:
+                rec[index] = nums[i]
+        return len(rec)
+```
+
+### Tag: #BinarySearch, #DP, #LIS
 ---
 
 ## ***Trie***
