@@ -24381,3 +24381,98 @@ class Solution:
 ```
 ### Tag: Recursive, divideAndConquer, BST
 ---
+## 334. Increasing Triplet Subsequence｜ 11/7
+Given an unsorted array return whether an increasing subsequence of length 3 exists or not in the array.
+
+Formally the function should:
+
+Return true if there exists i, j, k
+such that arr[i] < arr[j] < arr[k] given 0 ≤ i < j < k ≤ n-1 else return false.
+Note: Your algorithm should run in O(n) time complexity and O(1) space complexity.
+
+Example 1:
+
+Input: [1,2,3,4,5]
+Output: true
+
+Example 2:
+
+Input: [5,4,3,2,1]
+Output: false
+
+### 技巧
+1. bisect_left(array, num, [lo, hi]): 回傳插入此num到以排序到array可以使得array不需要重新被排序的index
+    - bisect_left 其實就是binary search!!
+
+### 思路
+1. 兩變數解法:
+    - 用兩個變數 small, medium
+    - 兩個變數存完若下個數 > medium，return True
+2. 兩陣列解法:
+    - 一個陣列往後去存當前所遇到的最小值
+    - 一個陣列往前去存當前所遇到的最大值
+    - 若是 maxArray > nums[i] > minArray
+    - 表示 後面還有比nums[i]大的，前面也有筆nums[i]小的，return True
+    - 例子
+        - nums:        8  3  5  1  6
+        - foward:      8  3  3  1  1
+        - backward:  8  6  6  6  6
+        - 我們發現數字5滿足forward[i] < nums[i] < backward[i]，所以三元子序列存在。
+3. Lower bound 作法 (Inspiration from LIS):
+    - 透過 bisect.bisect_left 回傳插入的位置來得知目前有多少數小於此數
+    - Generalized 的解法
+
+### Code
+T(n), S(1)
+``` py
+class Solution:
+    def increasingTriplet(self, nums: List[int]) -> bool:
+        small, medium = float(inf), float(inf)
+        for num in nums:
+            if num < small:
+                small = num
+            elif small < num < medium:
+                medium = num
+            elif num > medium:
+                return True
+        return False
+```
+
+T(n), S(2n)
+```py
+class Solution:
+    def increasingTriplet(self, nums: List[int]) -> bool:
+        if not nums:
+            return False
+        n = len(nums)
+        min_forward, max_backward = [nums[0]]*n, [nums[-1]]*n
+
+        for i in range(1, n):
+            min_forward[i] = min(nums[i], min_forward[i-1])
+
+        for i in range(n-2, -1, -1):
+            max_backward[i] = max(nums[i], max_backward[i+1])
+
+        for i in range(n):
+            if max_backward[i] > nums[i] > min_forward[i]:
+                return True
+        return False
+```
+
+
+LIS 的方法(可generalize 到 k 個)
+```py
+class Solution:
+    def increasingSubsequence(self, nums, k):
+        k = 3
+        inc = [float('inf')] * (k - 1)
+        for x in nums:
+            i = bisect.bisect_left(inc, x)
+            if i >= k - 1:
+                return True
+            inc[i] = x
+        return False
+```
+
+### Tag: #LIS, #array, #bisect, #binarySearch
+---
