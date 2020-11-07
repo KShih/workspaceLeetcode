@@ -24648,3 +24648,70 @@ class Solution:
 
 ### Tag: #BitManipulate
 ---
+## 191. Number of 1 Bits｜ 11/7
+
+Write a function that takes an unsigned integer and returns the number of '1' bits it has (also known as the Hamming weight).
+
+Example 1:
+
+Input: n = 00000000000000000000000000001011
+
+Output: 3
+
+Explanation: The input binary string 00000000000000000000000000001011 has a total of three '1' bits.
+
+Example 2:
+
+Input: n = 00000000000000000000000010000000
+
+Output: 1
+
+Explanation: The input binary string 00000000000000000000000010000000 has a total of one '1' bit.
+
+Example 3:
+
+Input: n = 11111111111111111111111111111101
+
+Output: 31
+
+Explanation: The input binary string 11111111111111111111111111111101 has a total of thirty one '1' bits.
+
+
+Constraints:
+
+The input must be a binary string of length 32
+
+### 思路
+1. Naive, using mask
+    - 用 mask 每次乘2 去做逐一由右檢查到左
+2. n & (n-1) 可以 take out 1 最右邊的數(least significant bit)
+    - 111 & 110 = 110
+    - 110 & 101 = 100
+    - 100 & 011 = 000
+
+### Code
+```py
+class Solution:
+    def hammingWeight(self, n: int) -> int:
+        bits, mask = 0, 1
+
+        # 32 = max length of n in bit
+        for i in range(32):
+            if n & mask != 0:
+                bits += 1
+            mask <<= 1
+        return bits
+```
+
+``` py
+class Solution:
+    def hammingWeight(self, n: int) -> int:
+        sum = 0
+        while n != 0:
+            n &= (n-1)
+            sum += 1
+        return sum
+```
+
+### Tag: #BitManipulate
+---
