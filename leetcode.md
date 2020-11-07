@@ -24572,3 +24572,79 @@ class Solution:
 
 ### Tag: DP, Memorization
 ---
+## 338. Counting Bits｜ 11/7
+Given a non negative integer number num. For every numbers i in the range 0 ≤ i ≤ num calculate the number of 1's in their binary representation and return them as an array.
+
+Example 1:
+
+Input: 2
+Output: [0,1,1]
+
+Example 2:
+
+Input: 5
+Output: [0,1,1,2,1,2]
+
+Follow up:
+
+It is very easy to come up with a solution with run time O(n*sizeof(integer)). But can you do it in linear time O(n) /possibly in a single pass?
+Space complexity should be O(n).
+Can you do it like a boss? Do it without using any builtin function like __builtin_popcount in c++ or in any other language.
+### 思路
+
+![](assets/markdown-img-paste-20201107173445898.png)
+
+1. 長度為 3 的 bit (4~7), 其bit排列是 0~3的結果前面加一個1
+    - 把每個階段(總bit位數+1)的結果拿出來+1加到result裡就行
+2. DP 解法
+    - 一樣是由前面的結果去更新後面的概念，但不需要多new一個prev陣列
+    - res[4] = res[0]+1, res[4+1] = res[1]+1 ...
+    - 每個階段的開始都是2的倍數 (1, 2, 4,...)
+3. DP 解法
+    - res[7] = res[7/2] + 1
+    - 111 = 11 + 1
+
+### Code
+``` py
+class Solution:
+    def countBits(self, num: int) -> List[int]:
+        res = [0]
+        if num == 0:
+            return res
+
+        while True:
+            prev = res[:]
+            for prev_cnt in prev:
+                if len(res) > num:
+                    return res
+                res.append(prev_cnt+1)
+        return res
+```
+
+```py
+class Solution:
+    def countBits(self, num: int) -> List[int]:
+        res = [0] * (num+1)
+
+        i, b = 0, 1
+        while b <= num:
+            while i < b and i + b <= num:
+                res[i + b] = res[i] + 1
+                i += 1
+            i = 0
+            b <<= 1
+        return res
+```
+
+```py
+class Solution:
+    def countBits(self, num: int) -> List[int]:
+        res = [0] * (num+1)
+
+        for i in range(1, num+1):
+            res[i] = res[i >> 1] + (i & 1) # x / 2 is x >> 1; x % 2 is x & 1
+        return res
+```
+
+### Tag: #BitManipulate
+---
