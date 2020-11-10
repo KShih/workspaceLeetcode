@@ -24715,3 +24715,133 @@ class Solution:
 
 ### Tag: #BitManipulate
 ---
+## 341. Flatten Nested List Iterator｜ 11/9
+
+Given a nested list of integers, implement an iterator to flatten it.
+
+Each element is either an integer, or a list -- whose elements may also be integers or other lists.
+
+Example 1:
+
+Input: [[1,1],2,[1,1]]
+Output: [1,1,2,1,1]
+Explanation: By calling next repeatedly until hasNext returns false,
+             the order of elements returned by next should be: [1,1,2,1,1].
+Example 2:
+
+Input: [1,[4,[6]]]
+Output: [1,4,6]
+Explanation: By calling next repeatedly until hasNext returns false,
+             the order of elements returned by next should be: [1,4,6].
+
+```py
+# """
+# This is the interface that allows for creating nested lists.
+# You should not implement it, or speculate about its implementation
+# """
+#class NestedInteger:
+#    def isInteger(self) -> bool:
+#        """
+#        @return True if this NestedInteger holds a single integer, rather than a nested list.
+#        """
+#
+#    def getInteger(self) -> int:
+#        """
+#        @return the single integer that this NestedInteger holds, if it holds a single integer
+#        Return None if this NestedInteger holds a nested list
+#        """
+#
+#    def getList(self) -> [NestedInteger]:
+#        """
+#        @return the nested list that this NestedInteger holds, if it holds a nested list
+#        Return None if this NestedInteger holds a single integer
+#        """
+
+# Your NestedIterator object will be instantiated and called as such:
+# i, v = NestedIterator(nestedList), []
+# while i.hasNext(): v.append(i.next())
+```
+
+### 思路
+
+1. 巢狀、有序地走訪想到使用DFS，可以用 Recursive 或者 stack 解
+2. 除了stack之外另外new一個list去接unpack的int，如果unpack後仍然是list，就在push回stack
+3. 加完所有int之後再把list反轉
+
+### Code
+Iterative:
+``` py
+class NestedIterator:
+    def __init__(self, nestedList: [NestedInteger]):
+        def push2StackFromList(nestedList):
+            for ni in nestedList:
+                if ni.isInteger():
+                    stack.append(ni.getInteger())
+                else:
+                    stack.append(ni.getList())
+
+        flatList, stack = [], []
+        push2StackFromList(nestedList)
+
+        while stack:
+            top = stack.pop()
+            if type(top) == int:
+                flatList.append(top)
+            else:
+                push2StackFromList(top)
+
+        self.flatList = flatList[::-1]
+        self.cur = 0
+
+    def next(self) -> int:
+        nextVal = self.flatList[self.cur]
+        self.cur += 1
+        return nextVal
+
+    def hasNext(self) -> bool:
+        if self.cur == len(self.flatList):
+            return False
+        return True
+```
+
+More concise iterative
+```py
+class NestedIterator(object):
+    def __init__(self, nestedList):
+        self.stack = nestedList[::]
+
+    def next(self):
+        return self.stack.pop(0).getInteger()
+
+    def hasNext(self):
+        while self.stack:
+            top = self.stack[0]
+            if top.isInteger():
+                return True
+            self.stack = top.getList() + self.stack[1:]
+        return False
+```
+
+Recursive
+```py
+class NestedIterator:
+    def __init__(self, nestedList: [NestedInteger]):
+        def flatten_list(nested_list):
+            for nested_integer in nested_list:
+                if nested_integer.isInteger():
+                    self._integers.append(nested_integer.getInteger())
+                else:
+                    flatten_list(nested_integer.getList())
+        self._integers = []
+        self._position = -1 # Pointer to previous returned.
+        flatten_list(nestedList)
+
+    def next(self) -> int:
+        self._position += 1
+        return self._integers[self._position]
+
+    def hasNext(self) -> bool:
+        return self._position + 1 < len(self._integers)
+```
+### Tag: DFS, stack
+---
