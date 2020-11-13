@@ -16760,7 +16760,13 @@ Explanation: t is "aabbb" which its length is 5.
 
 並維繫一個left，來標示目前在字典中的字母，最左邊的位置
 
+Naive 的解法是字典裡存count，然後一個一個移動直到 left_most char 的 count 為零才能刪除，
+
+Optimal 的解法是用字典裡存的 index，每次字典size > 2的時候刪除最小的
+
 ### Code
+
+Sliding window (Naive)
 ``` py
 class Solution:
     def lengthOfLongestSubstringTwoDistinct(self, s: str) -> int:
@@ -16782,6 +16788,28 @@ class Solution:
             res = max(res, i-left + 1)
 
         return res
+```
+
+Sliding window (Optimal)
+```py
+class Solution:
+    def lengthOfLongestSubstringTwoDistinct(self, s: str) -> int:
+        if len(s) < 3:
+            return len(s)
+        left_most_map = {}
+        l, r, max_len = 0, 0, 2
+
+        for i, ch in enumerate(s):
+            left_most_map[ch] = i
+            r += 1
+
+            if len(left_most_map) > 2:
+                del_idx = min(left_most_map.values())
+                del left_most_map[s[del_idx]]
+                l = del_idx+1
+
+            max_len = max(max_len, r-l)
+        return max_len
 ```
 ---
 ## 161. One Edit Distance｜ 3/9
@@ -24901,4 +24929,50 @@ class TicTacToe:
 ```
 
 ### Tag: #Array
+---
+## 340. Longest Substring with At Most K Distinct Characters｜ 11/13
+Given a string, find the length of the longest substring T that contains at most k distinct characters.
+
+Example 1:
+
+Input: s = "eceba", k = 2
+
+Output: 3
+
+Explanation: T is "ece" which its length is 3.
+
+Example 2:
+
+Input: s = "aa", k = 1
+
+Output: 2
+
+Explanation: T is "aa" which its length is 2.
+### 思路
+
+第159題的延伸
+
+### Code
+``` py
+class Solution:
+    def lengthOfLongestSubstringKDistinct(self, s: str, k: int) -> int:
+        if len(s) < k+1:
+            return len(s)
+        left_most_map = {}
+        l, r, max_len = 0, 0, k
+
+        for i, ch in enumerate(s):
+            left_most_map[ch] = i
+            r += 1
+
+            if len(left_most_map) > k:
+                del_idx = min(left_most_map.values())
+                del left_most_map[s[del_idx]]
+                l = del_idx+1
+
+            max_len = max(max_len, r-l)
+        return max_len
+```
+
+### Tag: #SlidingWindow #DictSize
 ---
