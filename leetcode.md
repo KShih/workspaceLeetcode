@@ -25077,3 +25077,56 @@ class SnakeGame:
 
 ### Tag:
 ---
+## 345. Reverse Vowels of a String｜ 11/15
+Write a function that takes a string as input and reverse only the vowels of a string.
+
+Example 1:
+
+Input: "hello"
+Output: "holle"
+
+Example 2:
+
+Input: "leetcode"
+Output: "leotcede"
+Note:
+The vowels does not include the letter "y".
+
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def reverseVowels(self, s: str) -> str:
+        vowel = set(['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'])
+        l, r = 0, len(s)-1
+        s = list(s)
+        while l < r:
+            if s[l] in vowel and s[r] in vowel:
+                s[l], s[r] = s[r], s[l]
+                l += 1
+                r -= 1
+            elif s[l] in vowel:
+                r -= 1
+            else:
+                l += 1
+        return "".join(s)
+```
+
+```py
+class Solution:
+    def reverseVowels(self, s: str) -> str:
+        vowel = set(['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'])
+        index = []
+        for i in range(len(s)):
+            if s[i] in vowel:
+                index.append(i)
+        s = list(s)
+        n = len(index)
+        for i in range(n//2):
+            s[index[i]], s[index[n-i-1]] = s[index[n-i-1]], s[index[i]]
+        return "".join(s)
+```
+### Tag:
+---
