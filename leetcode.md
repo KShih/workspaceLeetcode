@@ -25130,3 +25130,83 @@ class Solution:
 ```
 ### Tag:
 ---
+## 350. Intersection of Two Arrays II｜ 11/16
+Given two arrays, write a function to compute their intersection.
+
+Example 1:
+
+Input: nums1 = [1,2,2,1], nums2 = [2,2]
+Output: [2,2]
+Example 2:
+
+Input: nums1 = [4,9,5], nums2 = [9,4,9,8,4]
+Output: [4,9]
+Note:
+
+Each element in the result should appear as many times as it shows in both arrays.
+The result can be in any order.
+
+Follow up:
+
+What if the given array is already sorted? How would you optimize your algorithm?
+
+What if nums1's size is small compared to nums2's size? Which algorithm is better?
+
+What if elements of nums2 are stored on disk, and the memory is limited such that you cannot load all elements into the memory at once?
+
+### 思路
+
+- Thinking process:
+1. If an interviewer gives you this problem, your first question should be - how should I handle duplicates? Your second question, perhaps, can be about the order of inputs and outputs. Such questions manifest your problem-solving skills, and help you steer to the right solution.
+2.
+
+- follow-up answer:
+
+1. Approach 2
+2. Appraach 1 is better cuz we can choose the smallest to be stored in HashMap
+3. Three choice
+    1. 如果只有nums2不能放在內存中，則將nums1做成哈希表，nums2分批加載到內存中處理。(If only nums2 cannot fit in memory, put all elements of nums1 into a HashMap, read chunks of array that fit into the memory, and record the intersections.)
+
+    2. 如果nums1和nums2都很大，都不適合儲存在內存，那麼就用外部排序分別來sort它們。將每2G(舉例)讀入內存，使用2指針技術，然後從內存中讀取更多的2G。重複此操作，直到沒有更多數據從磁盤讀取。(If both nums1 and nums2 are so huge that neither fit into the memory, sort them using external sort, read (let’s say) 2G of each into memory and then using the 2 pointer technique, then read 2G more from the array that has been exhausted. Repeat this until no more data to read from disk.)
+
+    3. 還有一種思路是將這兩個字符串存放在分佈式系統中（不管是否自設計），然後使用MapReduce技術來解決問題。
+
+
+### Code
+Hashmap (優化: 先判斷兩個array的大小，將小的做成hashmap，減少內存消耗)
+``` py
+from collections import Counter
+class Solution:
+    def intersect(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        _counter = Counter(nums1)
+        res = []
+        for num in nums2:
+            if _counter[num] > 0:
+                _counter[num] -= 1
+                res.append(num)
+        return res
+```
+
+TwoPointer
+```py
+class Solution:
+    def intersect(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        nums1 = sorted(nums1)
+        nums2 = sorted(nums2)
+
+        p1, p2 = 0, 0
+        res = []
+        while p1 < len(nums1) and p2 < len(nums2):
+            if nums1[p1] == nums2[p2]:
+                res.append(nums1[p1])
+                p1 += 1
+                p2 += 1
+            elif nums1[p1] > nums2[p2]:
+                p2 += 1
+            else:
+                p1 += 1
+        return res
+```
+
+### Tag: #Hashmap, #TwoPinter
+---
