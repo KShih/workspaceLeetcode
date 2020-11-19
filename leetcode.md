@@ -25210,3 +25210,57 @@ class Solution:
 
 ### Tag: #Hashmap, #TwoPinter
 ---
+## 360. Sort Transformed Array｜ 11/19
+Given a sorted array of integers nums and integer values a, b and c. Apply a quadratic function of the form f(x) = ax2 + bx + c to each element x in the array.
+
+The returned array must be in sorted order.
+
+Expected time complexity: O(n)
+
+Example 1:
+
+Input: nums = [-4,-2,2,4], a = 1, b = 3, c = 5
+Output: [3,9,15,33]
+Example 2:
+
+Input: nums = [-4,-2,2,4], a = -1, b = 3, c = 5
+Output: [-23,-5,1,7]
+
+### 思路
+
+拋物線性質，a>0 開口向上，兩邊直大於中間
+
+Note: 用一個 index 去控制填入陣列的順序
+
+### Code
+``` py
+class Solution:
+    def sortTransformedArray(self, nums: List[int], a: int, b: int, c: int) -> List[int]:
+        def quadratic(x):
+            return a*x*x + b*x + c
+        n = len(nums)
+        index = 0 if a < 0 else n-1
+        l, r, ans = 0, n-1, [0] * n
+        while l <= r:
+            l_val, r_val = quadratic(nums[l]), quadratic(nums[r])
+            if a >= 0:
+                if l_val > r_val:
+                    ans[index] = l_val
+                    l += 1
+                else:
+                    ans[index] = r_val
+                    r -= 1
+                index -= 1
+            else:
+                if l_val > r_val:
+                    ans[index] = r_val
+                    r -= 1
+                else:
+                    ans[index] = l_val
+                    l += 1
+                index += 1
+        return ans
+```
+
+### Tag: #TwoPointer, #Math
+---
