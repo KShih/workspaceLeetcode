@@ -25264,3 +25264,143 @@ class Solution:
 
 ### Tag: #TwoPointer, #Math
 ---
+## 362. Design Hit Counter｜ 11/19
+Design a hit counter which counts the number of hits received in the past 5 minutes.
+
+Each function accepts a timestamp parameter (in seconds granularity) and you may assume that calls are being made to the system in chronological order (ie, the timestamp is monotonically increasing). You may assume that the earliest timestamp starts at 1.
+
+It is possible that several hits arrive roughly at the same time.
+
+Example:
+
+HitCounter counter = new HitCounter();
+
+// hit at timestamp 1.
+counter.hit(1);
+
+// hit at timestamp 2.
+counter.hit(2);
+
+// hit at timestamp 3.
+counter.hit(3);
+
+// get hits at timestamp 4, should return 3.
+counter.getHits(4);
+
+// hit at timestamp 300.
+counter.hit(300);
+
+// get hits at timestamp 300, should return 4.
+counter.getHits(300);
+
+// get hits at timestamp 301, should return 3.
+counter.getHits(301);
+Follow up:
+What if the number of hits per second could be very large? Does your design scale?
+
+### 思路
+- 解法1
+    - 這道題讓我們設計一個點擊計數器，能夠返回五分鐘內的點擊數，提示了有可能同一時間內有多次點擊。由於操作都是按時間順序的，下一次的時間戳都會大於等於本次的時間戳，那麼最直接的方法就是用一個隊列queue，每次點擊時都將當前時間戳加入queue中，然後在需要獲取點擊數時，我們從隊列開頭開始看，如果開頭的時間戳在5分鐘以外了，就刪掉，直到開頭的時間戳在5分鐘以內停止，然後返回queue的元素個數即為所求的點擊數
+- 解法2: 如果需要keep所以hit的紀錄
+    - 下面這種方法和上面的方法很像，用了一個數組保存所有的時間戳，然後要返回點擊數時，只需要從開頭找到第一個在5分鐘的時間戳的坐標，然後用數組總長度減去這個坐標即可，和上面的方法不同的是，這個方法不刪掉之前的時間戳，缺點是會很佔空間，而且越到後面效率越低，參見代碼如下：
+- 解法3: 如果hit很大量
+    - 由於Follow up中說每秒中會有很多點擊，下面這種方法就比較巧妙了，定義了兩個大小為300的一維數組times和hits，分別用來保存時間戳和點擊數，在點擊函數中，將時間戳對300取餘，然後看此位置中之前保存的時間戳和當前的時間戳是否一樣，一樣說明是同一個時間戳，那麼對應的點擊數自增1，如果不一樣，說明已經過了五分鐘了，那麼將對應的點擊數重置為1。那麼在返回點擊數時，我們需要遍歷times數組，找出所有在5分中內的位置，然後把hits中對應位置的點擊數都加起來即可
+
+### Code
+解法1
+``` py
+class HitCounter:
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.queue = []
+
+
+    def hit(self, timestamp: int) -> None:
+        """
+        Record a hit.
+        @param timestamp - The current timestamp (in seconds granularity).
+        """
+        self.queue.append(timestamp)
+
+
+    def getHits(self, timestamp: int) -> int:
+        """
+        Return the number of hits in the past 5 minutes.
+        @param timestamp - The current timestamp (in seconds granularity).
+        """
+        while self.queue and timestamp >= self.queue[0]+300:
+            self.queue.pop(0)
+        return len(self.queue)
+```
+
+解法2
+```py
+class HitCounter:
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.queue = []
+
+
+    def hit(self, timestamp: int) -> None:
+        """
+        Record a hit.
+        @param timestamp - The current timestamp (in seconds granularity).
+        """
+        self.queue.append(timestamp)
+
+
+    def getHits(self, timestamp: int) -> int:
+        """
+        Return the number of hits in the past 5 minutes.
+        @param timestamp - The current timestamp (in seconds granularity).
+        """
+        latest = 0
+        while latest < len(self.queue) and timestamp >= self.queue[latest]+300:
+            latest += 1
+        return len(self.queue) - latest
+```
+
+FollowUp
+```py
+class HitCounter:
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.ts_idx_map = {}
+        self.hit_count = {}
+
+
+    def hit(self, timestamp: int) -> None:
+        """
+        Record a hit.
+        @param timestamp - The current timestamp (in seconds granularity).
+        """
+        idx = timestamp % 300
+        if (idx in self.ts_idx_map and self.ts_idx_map[idx] != timestamp) or (idx not in self.ts_idx_map): # already pass 300s or first met -> initial
+            self.ts_idx_map[idx] = timestamp
+            self.hit_count[idx] = 1
+        else:
+            self.hit_count[idx] += 1
+
+    def getHits(self, timestamp: int) -> int:
+        """
+        Return the number of hits in the past 5 minutes.
+        @param timestamp - The current timestamp (in seconds granularity).
+        """
+        count = 0
+        for key in self.ts_idx_map:
+            if self.ts_idx_map[key]+300 > timestamp:
+                count += self.hit_count[key]
+        return count
+```
+
+### Tag: #Design #Queue #HashMap
+---
