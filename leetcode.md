@@ -8448,10 +8448,14 @@ Follow up:
 
 If you have figured out the O(n) solution, try coding another solution using the divide and conquer approach, which is more subtle.
 
+Follow up:
+    - find out the max subarray less than k
+        - GO to #363, optimal solution's function.
+
 
 ### 思路
 
-1, Directly apprach:
+1, Kadne Algorithm:
 
 Compare this element vs this element + pastMax combination (curSum)
 
@@ -8470,20 +8474,31 @@ Time complexity: We use O(n) operation and leave two T(n/2) problems.
 
 T(n) = 2T(n/2) + O(n) => T(n) = O(nlogn)
 
-### Code
-``` py
-class Solution(object):
-    def maxSubArray(self, nums):
-        """
-        :type nums: List[int]
-        :rtype: int
-        """
-        curSum, res = -(sys.maxint)-1, -(sys.maxint)-1 # Or can set as nums[0]
-        for num in nums:                               # And loop from nums[1] -> in nums[1:]:
-            curSum = max(num+curSum, num)
-            res = max(res, curSum)
+3. Follow up:
 
-        return res
+- 如果數列中含有負數元素，允許返回長度為零的子數列
+
+### Code
+Kadane
+``` py
+class Solution:
+    def maxSubArray(self, nums: List[int]) -> int:
+        max_global, max_current = nums[0], nums[0]
+        for num in nums[1:]:
+            max_current = max(num, num + max_current)
+            max_global = max(max_current, max_global)
+        return max_global
+```
+
+Kadane Follow-up
+```py
+class Solution:
+    def maxSubArray(self, nums: List[int]) -> int:
+        max_global, max_current = 0, 0
+        for num in nums[1:]:
+            max_current = max(0, num + max_current)
+            max_global = max(max_current, max_global)
+        return max_global
 ```
 
 Divide and Conquer Way:
@@ -25403,4 +25418,110 @@ class HitCounter:
 ```
 
 ### Tag: #Design #Queue #HashMap
+---
+## 363. Max Sum of Rectangle No Larger Than K｜ 11/28
+Given a non-empty 2D matrix matrix and an integer k, find the max sum of a rectangle in the matrix such that its sum is no larger than k.
+
+Example:
+
+Input: matrix = [[1,0,1],[0,-2,3]], k = 2
+Output: 2
+Explanation: Because the sum of rectangle [[0, 1], [-2, 3]] is 2,
+             and 2 is the max number no larger than k (k = 2).
+Note:
+
+The rectangle inside the matrix must have an area > 0.
+
+What if the number of rows is much larger than the number of columns?
+
+### 思路
+
+- Optimal:
+    1. Two pointer to scan all the possibility (horizontal)
+        - fixed left, right walk through the end
+        - left++, right move back to left
+    2. scan all the column and add them up to the `columnSum`(1D)
+    3. find out the max sub sum that less than k in this 1D columnSum
+        0. in Java, one can just use `TreeSet` to find out the result
+        1. in Python, using `insort`, and `bisect_left` to maintain the TreeSet
+            0. Note: Python's `insort` is O(n)
+            1. sum up the current element
+            2. then our target turn into `find out the max sub sum that less than curSum-k`
+            3. find out the index that satisfy above condition
+            4. update the res
+    4. find out the max sub sum in all the possiblity of 1D columnSum
+    5. https://www.youtube.com/watch?v=yCQN096CwWM&ab_channel=TusharRoy-CodingMadeSimple
+        1. ![](assets/markdown-img-paste-20201128142922437.png)
+        2. ![](assets/markdown-img-paste-20201128142907419.png)
+        3. ![](assets/markdown-img-paste-20201128142957894.png)
+        4. ![](assets/markdown-img-paste-20201128143025850.png)
+
+- complexity:
+    - in Java:
+        - Space: O(row)
+        - Time: O(col * col * row)
+    - in Python
+        - Space: O(row)
+        - Time: O(col * col * row * row)
+        - Since `insort` takes O(n) comparing to `TreeSet.add`
+
+### Code
+Accumulated Sum (TLE):
+``` py
+class Solution:
+    def maxSumSubmatrix(self, matrix, k):
+        r, c = len(matrix), len(matrix[0])
+        acc_sum = [[0 for _ in range(c+1)] for _ in range(r+1)]
+        res = float('-inf')
+        for i in range(1, r+1):
+            for j in range(1, c+1):
+                acc_sum[i][j] = matrix[i-1][j-1] + acc_sum[i-1][j] + acc_sum[i][j-1] - acc_sum[i-1][j-1]
+
+                # Iterate over all the combination of the sub-sum
+                for i2 in range(1, i+1):
+                    for j2 in range(1, j+1):
+                        sub_sum = acc_sum[i][j] - acc_sum[i2-1][j] - acc_sum[i][j2-1] + acc_sum[i2-1][j2-1]
+                        if sub_sum <= k:
+                            res = max(res, sub_sum)
+        return res
+```
+
+Optimal
+```py
+class Solution:
+    def maxSumSubmatrix(self, matrix: List[List[int]], k: int) -> int:
+        if not matrix or not matrix[0]:
+            return 0
+
+        R, C = len(matrix), len(matrix[0])
+        res = float('-inf')
+
+        for left in range(C):
+
+            # new column sum array for each sliding window iteration
+            columnSum = [0] * R
+
+            for right in range(left, C):
+                for column in range(R):
+                    columnSum[column] += matrix[column][right]
+                res = max(res, self.oneDsubMatrixLessThanK(columnSum, k))
+        return res
+
+
+    def oneDsubMatrixLessThanK(self, matrix, k):
+        curSum, curSumArray, res = 0, [0], float('-inf')
+
+        for i in range(len(matrix)):
+            curSum += matrix[i]
+
+            # find out the max previous subSum's index can sum up with curSum and less than k
+            idx = bisect.bisect_left(curSumArray, curSum - k)
+
+            if 0 <= idx < len(curSumArray): # avoid index out of range
+                res = max(res, curSum - curSumArray[idx])
+
+            # sorted insert the curSum into curSumArray
+            bisect.insort(curSumArray, curSum)
+        return res
+```
 ---
