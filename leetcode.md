@@ -25618,3 +25618,103 @@ class Twitter:
 
 ### Tag: #Design #heap
 ---
+## 365. Water and Jug Problem｜ 11/28
+You are given two jugs with capacities x and y litres. There is an infinite amount of water supply available. You need to determine whether it is possible to measure exactly z litres using these two jugs.
+
+If z liters of water is measurable, you must have z liters of water contained within one or both buckets by the end.
+
+Operations allowed:
+
+Fill any of the jugs completely with water.
+Empty any of the jugs.
+Pour water from one jug into another till the other jug is completely full or the first jug itself is empty.
+Example 1: (From the famous "Die Hard" example)
+
+Input: x = 3, y = 5, z = 4
+Output: True
+Example 2:
+
+Input: x = 2, y = 6, z = 5
+Output: False
+
+
+Constraints:
+
+0 <= x <= 10^6
+0 <= y <= 10^6
+0 <= z <= 10^6
+
+### 思路
+
+1. 雖然是BFS的解法超時了，但這才是這題的精髓，面試時根本想不出來數學的解法
+2. GCD solution:
+    - solve: ax + by = z, if (x,y) exist
+    - e.g.: `4 = (-2) * 3 + 2 * 5`
+
+### Code
+``` py
+class Solution:
+    def canMeasureWater(self, x: int, y: int, z: int) -> bool:
+        # initial the states of two cup
+        visited, queue = {(0, 0)}, [(0, 0)]
+
+        while queue:
+            # process current node
+            a, b = queue.pop(0)
+            if a == z or b == z or a+b == z:
+                return True
+
+            # gen more node
+            states = self.gen_states(a, b, x, y)
+
+            # check visited
+            for state in states:
+                if state not in visited:
+                    queue.append(state)
+                    visited.add(state)
+        return False
+    def gen_states(self, a, b, x, y):
+        states = []
+
+        # fill one of the cup
+        states.append((a, y))
+        states.append((x, b))
+
+        # empty one of the cup
+        states.append((0, b))
+        states.append((a, 0))
+
+        # poor one cup to the other
+        if a+b < y:
+            states.append((0, a+b))
+        else:
+            states.append((a-(y-b), y)) # can only poor y-b to b
+
+        if a+b < x:
+            states.append((a+b, 0))
+        else:
+            states.append((x, b-(x-a))) # can only poor x-a to a
+
+        return states
+```
+
+Math solution:
+```py
+class Solution(object):
+    def canMeasureWater(self, x, y, z):
+        """
+        :type x: int
+        :type y: int
+        :type z: int
+        :rtype: bool
+        """
+        a,b=x,y
+        while y:
+            r=x%y
+            x=y
+            y=r
+        return bool(not z or (x and z<=a+b and not z%x))
+```
+
+### Tag: #Math, #BFS
+---
