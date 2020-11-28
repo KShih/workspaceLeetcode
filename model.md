@@ -135,4 +135,77 @@ while i < len(s):
 
 - One line python(Pretty useful!)
     - ![](assets/markdown-img-paste-2020090620195401.png)
-    - 
+    -
+
+---
+
+## BFS
+
+```py
+def bfs():
+    # initialize
+    visited, queue = {}, []
+
+    while queue:
+        # process current node
+        var = queue.pop(0)
+
+        # gen more node
+        more_nodes = self.gen_more_node(var)
+
+        # check visited
+        for next_node in more_nodes:
+            if next_node not in visited:
+                queue.append(next_node)
+                visited.add(next_node)
+```
+
+## DFS
+
+Recursive:
+```py
+visited = set()
+
+def dfs(node, visited):
+    if node in visited:
+        return # already visited, terminated
+
+    # process current node here
+
+    # gen more node
+    more_nodes = self.gen_more_node(node)
+
+    for next_node in more_nodes:
+        if not next_node in visted:
+            dfs(next_node, visited)
+```
+
+Iterative:
+```py
+
+def DFS(tree):
+    visited, stack = [], [tree.root]
+
+    while stack:
+        node = stack.pop()
+
+        # process current node
+
+        # gen more node
+        more_nodes = self.gen_more_node(node)
+
+        for next_node in more_nodes:
+            if not next_node in visted:
+                stack.append(next_node)
+                visited.add(next_node)
+```
+
+## 總結 BFS, DFS 五部曲
+1. 建立 queue/stack, visited set
+2. while queue/stack not empty {
+3.       處理當前節點
+4.       擴展節點
+5.       入 queue/stack, 更新 visited
+6. }
+
+---
