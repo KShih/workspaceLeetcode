@@ -25987,3 +25987,130 @@ class Solution:
 
 ### Tag: #DP, #Math
 ---
+## 361. Bomb Enemy｜ 11/29
+Given a 2D grid, each cell is either a wall 'W', an enemy 'E' or empty '0' (the number zero), return the maximum enemies you can kill using one bomb.
+The bomb kills all the enemies in the same row and column from the planted point until it hits the wall since the wall is too strong to be destroyed.
+Note: You can only put the bomb at an empty cell.
+
+Example:
+
+Input: [["0","E","0","0"],["E","0","W","E"],["0","E","0","0"]]
+Output: 3
+
+Explanation: For the given grid,
+
+0 E 0 0
+
+E 0 W E
+
+0 E 0 0
+
+Placing a bomb at (1,1) kills 3 enemies.
+
+### 思路
+
+1. 累計數組
+    - 建立四個累加數組 v1, v2, v3, v4，
+    - 其中 v1 是水平方向從左到右的累加數組，v2 是水平方向從右到左的累加數組，v3 是豎直方向從上到下的累加數組，v4 是豎直方向從下到上的累加數組，
+    - 建立好這個累加數組後，對於任意位置 (i, j)，其可以炸死的最多敵人數就是 v1[i][j] + v2[i][j] + v3[i][j] + v4[i][j]，最後通過比較每個位置的累加和，就可以得到結果
+2. DP
+    - ![](assets/markdown-img-paste-20201129183822446.png)
+    - 主要透過兩個變數 rowCount 跟 colCount[]
+    - 水平掃描整個 map
+        - rowCount 迴圈的去計算此行的 E 數
+        - colCount[j] 迴圈的去計算此列的 E 數
+        - 何時需重新計數?
+            - 行、列的起頭
+            - 上一行或上一列是 Wall
+
+### Code
+``` py
+class Solution:
+    def maxKilledEnemies(self, grid: List[List[str]]) -> int:
+        if not grid or not grid[0]:
+            return 0
+        R, C = len(grid), len(grid[0])
+        v1 = [[0 for _ in range(C)] for _ in range(R)] # count from left to right
+        v2 = [[0 for _ in range(C)] for _ in range(R)] # count from right to left
+        v3 = [[0 for _ in range(C)] for _ in range(R)] # count from up to down
+        v4 = [[0 for _ in range(C)] for _ in range(R)] # count from down to up
+
+        for i in range(R):
+
+            for j in range(C):
+                if j == 0 or grid[i][j] == 'W':
+                    k = 0
+                else:
+                    k = v1[i][j-1]
+                v1[i][j] = k+1 if grid[i][j] == 'E' else k
+
+            for j in range(C-1, -1, -1):
+                if j == C-1 or grid[i][j] == 'W':
+                    k = 0
+                else:
+                    k = v2[i][j+1]
+                v2[i][j] = k+1 if grid[i][j] == 'E' else k
+
+        for j in range(C):
+
+            for i in range(R):
+                if i == 0 or grid[i][j] == 'W':
+                    k = 0
+                else:
+                    k = v3[i-1][j]
+                v3[i][j] = k+1 if grid[i][j] == 'E' else k
+
+            for i in range(R-1, -1, -1):
+                if i == R-1 or grid[i][j] == 'W':
+                    k = 0
+                else:
+                    k = v4[i+1][j]
+                v4[i][j] = k+1 if grid[i][j] == 'E' else k
+
+        res = 0
+        for i in range(R):
+            for j in range(C):
+                if grid[i][j] == '0':
+                    res = max(res, v1[i][j]+v2[i][j]+v3[i][j]+v4[i][j])
+        return res
+```
+
+DP:
+```py
+class Solution:
+    def maxKilledEnemies(self, grid: List[List[str]]) -> int:
+        if not grid or not grid[0]:
+            return 0
+
+        R, C = len(grid), len(grid[0])
+
+        rowCount = 0
+        colCount = [0]*C
+        res = 0
+
+        for i in range(R):
+            for j in range(C):
+
+                # horizontal
+                if j == 0 or grid[i][j-1] == 'W':
+                    rowCount = 0
+                    for j1 in range(j, C):
+                        if grid[i][j1] == 'W':
+                            break
+                        rowCount += 1 if grid[i][j1] == 'E' else 0
+
+                # vertical
+                if i == 0 or grid[i-1][j] == 'W':
+                    colCount[j] = 0
+                    for i1 in range(i, R):
+                        if grid[i1][j] == 'W':
+                            break
+                        colCount[j] += 1 if grid[i1][j] == 'E' else 0
+
+                if grid[i][j] == '0':
+                    res = max(res, rowCount+colCount[j])
+        return res
+```
+
+### Tag: #DP, #Grid
+---
