@@ -25805,3 +25805,107 @@ class Solution:
 
 ### Tag: #BFS, #DFS
 ---
+## 366. Find Leaves of Binary Tree｜ 11/29
+
+Given a binary tree, collect a tree's nodes as if you were doing this: Collect and remove all leaves, repeat until the tree is empty.
+
+
+
+Example:
+
+Input: [1,2,3,4,5]
+
+          1
+         / \
+        2   3
+       / \
+      4   5
+
+Output: [[4,5,3],[2],[1]]
+
+
+Explanation:
+
+1. Removing the leaves [4,5,3] would result in this tree:
+
+          1
+         /
+        2
+
+
+2. Now removing the leaf [2] would result in this tree:
+
+          1
+
+
+3. Now removing the leaf [1] would result in the empty tree:
+
+          []
+[[3,5,4],[2],[1]], [[3,4,5],[2],[1]], etc, are also consider correct answers since per each level it doesn't matter the order on which elements are returned.
+
+
+### 思路
+1. 撥洋蔥法:
+    - main function 控制 level
+    - remove function 去做遞迴 當掃描到跟節點的時候
+        - 更新leaves
+        - 更新完後此節點必須清掉, 清掉的方法就是返回 None, 並且讓 call 他的自己接 None
+        - 最後返回更新後的節點 node
+
+2. 相對高度:
+    - ![](assets/markdown-img-paste-20201129133808789.png)
+    - 利用相對高度的原理來找到此leave應該放在哪個位置
+### Code
+撥洋蔥法:
+``` py
+class Solution:
+    def findLeaves(self, root: TreeNode) -> List[List[int]]:
+        res = []
+        while root:
+            self.leaves = []
+            root = self.remove(root)
+            res.append(self.leaves)
+        return res
+
+    def remove(self, node):
+        if not node:
+            return None
+
+        if not node.left and not node.right:
+            self.leaves.append(node.val)
+            return None
+
+        node.left = self.remove(node.left)
+        node.right= self.remove(node.right)
+
+        return node
+```
+
+相對高度法
+```py
+class Solution:
+    def findLeaves(self, root: TreeNode) -> List[List[int]]:
+        self.res = []
+        _ = self.getHeight(root)
+
+        return self.res
+
+    def getHeight(self, node):
+        if not node:
+            return 0
+
+        left = self.getHeight(node.left)
+        right = self.getHeight(node.right)
+
+        max_height = max(left, right)+1
+
+        if max_height > len(self.res):
+            self.res.append([])
+
+        self.res[max_height-1].append(node.val)
+
+        return max_height
+```
+
+### Tag: #DFS #BinaryTree
+---
