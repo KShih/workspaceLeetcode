@@ -25809,8 +25809,6 @@ class Solution:
 
 Given a binary tree, collect a tree's nodes as if you were doing this: Collect and remove all leaves, repeat until the tree is empty.
 
-
-
 Example:
 
 Input: [1,2,3,4,5]
@@ -25908,4 +25906,84 @@ class Solution:
 ```
 
 ### Tag: #DFS #BinaryTree
+---
+## 343. Integer Break｜ 11/29
+
+Given a positive integer n, break it into the sum of at least two positive integers and maximize the product of those integers. Return the maximum product you can get.
+
+Example 1:
+
+Input: 2
+Output: 1
+Explanation: 2 = 1 + 1, 1 × 1 = 1.
+Example 2:
+
+Input: 10
+Output: 36
+Explanation: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36.
+Note: You may assume that n is not less than 2 and not larger than 58.
+
+### 思路
+
+1. DP:
+    - 類似 collect coin 那提的概念，如果知道了前面，就可以很快速的算出後面
+    - 用button up DP, 從3開始循環到n，並且對於每個數從 1 開始拆分到 i-1
+    - 裡面的 j*(i-j) 是拆分為兩個數的情形
+    - j * dp[i-j] 是拆分為多個數字的情況
+2. Math:
+    - 題目提示中讓用 O(n) 的時間複雜度來解題，而且告訴我們找7到 10 之間的規律，那麼我們一點一點的來分析：
+
+    - 正整數從1開始，但是1不能拆分成兩個正整數之和，所以不能當輸入。
+
+    - 那麼2只能拆成 1+1，所以乘積也為1。
+
+    - 數字3可以拆分成 2+1 或 1+1+1，顯然第一種拆分方法乘積大為2。
+
+    - 數字4拆成 2+2，乘積最大，為4。
+
+    - 數字5拆成 3+2，乘積最大，為6。
+
+    - 數字6拆成 3+3，乘積最大，為9。
+
+    - 數字7拆為 3+4，乘積最大，為 12。
+
+    - 數字8拆為 3+3+2，乘積最大，為 18。
+
+    - 數字9拆為 3+3+3，乘積最大，為 27。
+
+    - 數字10拆為 3+3+4，乘積最大，為 36。
+
+    - 那麼通過觀察上面的規律，我們可以看出從5開始，數字都需要先拆出所有的3，一直拆到剩下一個數為2或者4，因為剩4就不用再拆了，拆成兩個2和不拆沒有意義，而且4不能拆出一個3剩一個1，這樣會比拆成 2+2 的乘積小。這樣我們就可以寫代碼了，先預處理n為2和3的情況，然後先將結果 res 初始化為1，然後當n大於4開始循環，結果 res 自乘3，n自減3，根據之前的分析，當跳出循環時，n只能是2或者4，再乘以 res 返回即可
+
+### Code
+DP solution
+``` py
+class Solution:
+    def integerBreak(self, n: int) -> int:
+        dp = [0] * (n+1)
+        dp[1], dp[2] = 1, 1
+
+        for i in range(3, n+1):
+            for j in range(1, i):
+                dp[i] = max(dp[i], max( j*(i-j) , j*dp[i-j]))
+        return dp[n]
+```
+
+Math
+```py
+class Solution:
+    def integerBreak(self, n: int) -> int:
+        if n == 2:
+            return 1
+        elif n == 3:
+            return 2
+
+        res = 1
+        while n > 4:
+            n -= 3
+            res *= 3
+        return res * n
+```
+
+### Tag: #DP, #Math
 ---
