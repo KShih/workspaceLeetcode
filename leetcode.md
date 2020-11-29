@@ -25718,3 +25718,90 @@ class Solution(object):
 
 ### Tag: #Math, #BFS
 ---
+## 364. Nested List Weight Sum II｜ 11/29
+Given a nested list of integers, return the sum of all integers in the list weighted by their depth.
+
+Each element is either an integer, or a list -- whose elements may also be integers or other lists.
+
+Different from the previous question where weight is increasing from root to leaf, now the weight is defined from bottom up. i.e., the leaf level integers have weight 1, and the root level integers have the largest weight.
+
+Example 1:
+
+Input: [[1,1],2,[1,1]]
+Output: 8
+Explanation: Four 1's at depth 1, one 2 at depth 2.
+Example 2:
+
+Input: [1,[4,[6]]]
+Output: 17
+Explanation: One 1 at depth 3, one 4 at depth 2, and one 6 at depth 1; 1*3 + 4*2 + 6*1 = 17.
+### 思路
+
+1. BFS:
+    - 用 queue 存尚未處理完的
+2. DFS:
+    - 靠著不停的遞迴child, 來增加mother的depth
+3. Optimal:
+    - 靠著不停的加上unweighted, 來增加先放進去的元素的權重
+
+### Code
+BFS
+``` py
+class Solution:
+    def depthSumInverse(self, nestedList: List[NestedInteger]) -> int:
+        process_q, int_list = [(e, 0) for e in nestedList], []
+        maxLevel = 0
+        while process_q:
+            top, level = process_q.pop()
+            if top.isInteger():
+                int_list.append((top, level))
+            else:
+                for e in top.getList():
+                    process_q.append((e, level+1))
+                maxLevel = max(maxLevel, level+1)
+        res = 0
+        for i, level in int_list:
+            res += i.getInteger() * (maxLevel+1-level)
+        return res
+```
+
+DFS
+```py
+class Solution:
+    def depthSumInverse(self, nestedList: List[NestedInteger]) -> int:
+        return self.dfs(nestedList)[0]
+    def dfs(self, nestedList):
+        cur_sum, child_list = 0, []
+
+        for elem in nestedList:
+            if elem.isInteger():
+                cur_sum += elem.getInteger()
+            else:
+                child_list.extend(elem.getList())
+        if len(child_list) == 0:
+            return cur_sum, 1
+
+        child_sum, depth = self.dfs(child_list)
+
+        return cur_sum*(depth+1) + child_sum, depth+1
+```
+
+Optimal:
+```py
+class Solution:
+    def depthSumInverse(self, nestedList: List[NestedInteger]) -> int:
+        weighted, unweighted = 0, 0
+        while len(nestedList) > 0:
+            nextLevel = []
+            for elem in nestedList:
+                if elem.isInteger():
+                    unweighted += elem.getInteger()
+                else:
+                    nextLevel.extend(elem.getList())
+            weighted += unweighted
+            nestedList = nextLevel
+        return weighted
+```
+
+### Tag: #BFS, #DFS
+---
