@@ -26165,3 +26165,89 @@ class Solution:
 
 ### Tag: #BinarySearch
 ---
+## 368. Largest Divisible Subset｜ 11/30
+
+Given a set of distinct positive integers, find the largest subset such that every pair (Si, Sj) of elements in this subset satisfies:
+
+Si % Sj = 0 or Sj % Si = 0.
+
+If there are multiple solutions, return any subset is fine.
+
+Example 1:
+
+Input: [1,2,3]
+Output: [1,2] (of course, [1,3] will also be ok)
+Example 2:
+
+Input: [1,2,4,8]
+Output: [1,2,4,8]
+
+### 思路
+
+1. DP:
+    - https://youtu.be/Wv6DlL0Sawg?t=518
+    - 我們初始化我們的 DP 陣列為所有的 [num], 因為每個數可以被自己整除
+    - 然後從第二個元素 i 開始 loop 到最後
+        - 再來我們試著在 i 之前的元素嘗試看看能不能將 i 加入其陣列中
+        - 我們都去試著用 i 去對他取餘看是否等於零，若等於零則表示可加入
+        - 但我們 dp[i] 只要放最長的數組就好，所以我們還要去檢查是否 dp[j]+1 > dp[i]
+        - 若大於 我們更新 dp[i] = dp[j] + [num]
+    - 這題其實是 LIS 的變形
+
+- Followup:
+    - why we need to sort?
+    - a % b == 0, only if a == b or a > b.
+    - yes, we don't need sort or we compare both a % b or b % a == 0,
+    - and this will result in n^2 other comparation, which is slower than we sort.
+
+### Code
+TLE
+``` py
+class Solution:
+    def largestDivisibleSubset(self, nums: List[int]) -> List[int]:
+        if not nums:
+            return []
+        nums = sorted(nums)
+        groups = [[nums[0]]]
+
+        for num in nums[1:]:
+            flag = False
+            new_groups = []
+            for group in groups:
+                if num > group[-1] and num % group[-1] == 0:
+                    new_groups.append(group+[num])
+                elif group[-1] > num > group[0] and group[-1] % num == 0 and num % group[0] == 0:
+                    new_groups.append(group+[num])
+                elif group[0] > num and group[0] % num == 0:
+                    new_groups.append(group+[num])
+            new_groups.append([num])
+            groups += new_groups
+        res = []
+        for group in groups:
+            if len(group) > len(res):
+                res = group
+        return res
+```
+
+DP
+```py
+class Solution:
+    def largestDivisibleSubset(self, nums: List[int]) -> List[int]:
+        if not nums:
+            return []
+
+        nums = sorted(nums)
+        N = len(nums)
+        dp = [[num] for num in nums]
+        maxDP = []
+
+        for i in range(N):
+            for j in range(i):
+                if nums[i] % nums[j] == 0 and len(dp[j])+1 > len(dp[i]):
+                    dp[i] = dp[j] + [nums[i]]
+            if len(dp[i]) > len(maxDP):
+                maxDP = dp[i]
+        return maxDP
+```
+### Tag: #DP, #LIS
+---
