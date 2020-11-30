@@ -26114,3 +26114,54 @@ class Solution:
 
 ### Tag: #DP, #Grid
 ---
+## 367. Valid Perfect Square｜ 11/30
+Given a positive integer num, write a function which returns True if num is a perfect square else False.
+
+Follow up: Do not use any built-in library function such as sqrt.
+
+Example 1:
+
+Input: num = 16
+Output: true
+Example 2:
+
+Input: num = 14
+Output: false
+
+
+Constraints:
+
+1 <= num <= 2^31 - 1
+
+### 思路
+
+Binary Search model usage.
+
+Find specific value:
+    - left <= right
+    - left = mid+1
+    - right = mid-1
+
+### Code
+``` py
+class Solution:
+    def isPerfectSquare(self, num: int) -> bool:
+        if num == 1:
+            return True
+
+        left, right = 0, num
+        while right >= left:
+            mid = left + (right-left)//2
+            guess = mid*mid
+            if guess == num:
+                return True
+
+            if guess > num:
+                right = mid-1
+            else:
+                left = mid+1
+        return False
+```
+
+### Tag: #BinarySearch
+---
