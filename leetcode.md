@@ -8009,44 +8009,83 @@ Recursive approach
 
 ![](assets/markdown-img-paste-20190831094519590.png)
 
+### 解題分析
+
+1. Recursive:
+    1. 首先我們先試著化簡這題
+        1. 如果 A 的大小為零，那麼就是直接回傳 B[k]
+        2. 如果 k == 1 就是直接回傳 min(A[0], B[0])
+    2. 那麼我們可以來思考如何讓其中一個陣列變為零(or 變小): 篩選掉絕對不可能是答案的值, 直到其中一個陣列變為零 或是 k == 1
+    3. 假設 k=7, A[2] < B[2], 那麼 A[0], A[1], A[2] 絕不可能是答案，且絕對是在 "前k小的陣列中"
+    4. 根據此種性質我們可以設計我們的演算法:
+        1. 條件: A 陣列小於等於 B陣列的 size, 因為我們要滿足條件 lenA == 0, return B[k]
+        2. 我們使用 binary search 的概念操作 A 陣列, 我們先取出兩個標的 A[i], B[j]
+        3. i=(k // 2)  ;  j=(k-i)
+        4. 若 A[i] <= B[j] => 查詢條件變為 A[i:], B, k-i
+        5. 反之 => 查詢條件變為 A, B[j:], k-j
+    5. 此種算法適合當 k 是奇數的時候， 若 k 是偶數，我們要取出 第k個 跟 第k+1個 做平均
+
+2. Binary Search:
+    1. 假設我們知道該如何切割兩個陣列，那麼中位數就可以很容易取出來了
+    2. 根據切割點我們可以得到 左半邊(x1, y1), 右半邊(x2, y2) => (舉個例子, 固定B陣列大於A陣列)
+        1. 如果今天總長度是奇數 答案就是 minRight <min(x2, y2)> (B陣列大於A陣列的情況下)
+        2. 如果今天總長度是偶數 答案就是 maxLeft + minRight 的平均
+    3. 再來的目標就是要如何找出正確的 x1, y1, x2, y2
+    4. 這四個點有一個原生的關係，x1 < x2; y1 < y2
+    5. 那再來要產生的關係就是 x1 <= y2, y1 <= x2, 如此一來加上原生的關係就可以正確的切割左右半邊
+    6. 那麼我們這邊就可以採用 **找出特定mid** 的 binarySearch 模板
+        1. 我們假設 A[mid] 為 x2, A[mid-1] 為 x1
+        2. 因此我們的 mid 是可以超過陣列大小的！(在 A所有元素均小於B的情況下)
+        3. 所以我們這邊跟模板不一樣的地方就是 r 要設成模板+1, 也就是 len(A)
+        4. 首先我們不停的更新我們的 i, j 直到分好組，(注意這邊要對 i 做限制 i > l, i < r)
+        5. 分好組後開始尋找我們的 minRight 跟 maxLeft
+        6. 如果有任何一個陣列元素全部用光了，那麼就可以直接找出 minRight, 跟 maxLeft了 (因為會overflow)
+        7. 如果是奇數的長度，那麼minRight就可以直接回傳, 否則繼續找出maxLeft, 然後取平均回傳
+
 ### Code
 Binary Search Aproach
 ```py
-def findMedianSortedArrays(self, nums1: List[int], nums2: List[int]) -> float:
-    m, n = len(nums1), len(nums2)
-    if (m > n):
-        return self.findMedianSortedArrays(nums2, nums1)
-    half = int((m + n) / 2)
-    lo, hi = 0, m # note it's m instead of m-1 bc possible use up nums1
-    while lo <= hi:
-        i = lo + int((hi - lo) / 2)
-        j = half - i
-        if i > lo and nums1[i - 1] > nums2[j]:
-            hi = i - 1
-        elif i < hi and nums2[j - 1] > nums1[i]:
-            lo = i + 1
-        else:
-            # find minRight
-            if i == m:
-                minRight = nums2[j]
-            elif j == n:
-                minRight = nums1[i]
+class Solution:
+    def findMedianSortedArrays(self, A: List[int], B: List[int]) -> float:
+        lenA, lenB = len(A), len(B)
+        if lenA > lenB:
+            return self.findMedianSortedArrays(B, A)
+
+        half = (lenA+lenB)//2
+        l, r = 0, len(A)
+
+        # we let A[i]= x2, A[i-1]= x1
+        # B[i]= y2, B[i-1]= y1
+        while l <= r:
+            i = l + (r-l)//2
+            j = half-i
+
+            if i > l and A[i-1] > B[j]:
+                r = i-1
+            elif i < r and B[j-1] > A[i]:
+                l = i+1
+            # successfully grouped
             else:
-                minRight = min(nums2[j], nums1[i])
+                # find minRight
+                if i == lenA:
+                    minRight = B[j] # bc A[i] will overflow
+                elif j == lenB:
+                    minRight = A[i]
+                else:
+                    minRight = min(A[i], B[j])
 
-            if (m + n) % 2 != 0:  # If there are odd elements.
-                return minRight
+                if (lenA + lenB) % 2 !=0 :
+                    return minRight
 
-            # find maxLeft
-            if i == 0:
-                maxLeft = nums2[j - 1]
-            elif j == 0:
-                maxLeft = nums1[i - 1]
-            else:
-                maxLeft = max(nums1[i - 1], nums2[j - 1])
+                # find maxLeft
+                if i == 0:
+                    maxLeft = B[j-1]
+                elif j == 0:
+                    maxLeft = A[i-1]
+                else:
+                    maxLeft = max(A[i-1], B[j-1])
 
-            return (maxLeft + minRight) * 0.5
-
+                return (maxLeft+minRight) * 0.5
 ```
 
 Recursive approach:
@@ -8078,6 +8117,8 @@ class Solution(object):
         else:
             return (self.findKth(nums1, nums2, (lenA+lenB)/2) + self.findKth(nums1, nums2, (lenA+lenB)/2+1)) * 0.5
 ```
+### Tag: #BinarySearch
+
 ---
 ## 5. Longest Palindromic Substring｜ 8/31
 Given a string s, find the longest palindromic substring in s. You may assume that the maximum length of s is 1000.
