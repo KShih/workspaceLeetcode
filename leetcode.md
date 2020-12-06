@@ -4161,6 +4161,13 @@ Your algorithm's runtime complexity must be in the order of O(log n).
 
 If the target is not found in the array, return [-1, -1].
 ![34](assets/markdown-img-paste-20190615152011129.png)
+
+### 解題分析
+
+1. 首先先嘗試著思考能不能一次binary search就找到，發現不可能
+2. 做兩次binary search 一次找左邊屆一次找右邊界
+3. 按照模板寫就ok
+
 ### 三刷思路
 
 利用Binary search小結的模板公式, 一次AC好用！
@@ -4235,6 +4242,38 @@ instead of calculating mid as mid = i+(j-i)/2, we now do: i + (j-i+1)/2
     Therefore, i + (j-i+1)/2 , __biased towards the right__
 
 ### Code
+四刷 clean code binary search with 模板
+```py
+class Solution:
+    def searchRange(self, nums: List[int], target: int) -> List[int]:
+        if not nums:
+            return [-1,-1]
+
+        res = [-1, -1]
+        l, r = 0, len(nums)-1
+        while l < r:
+            mid = l + (r-l)//2
+            if nums[mid] < target:
+                l = mid+1
+            else:
+                r = mid
+        if nums[r] == target: # break 條件是 l = mid+1, 所以這邊取r當左邊界
+            res[0] = r
+
+        l, r = 0, len(nums)-1
+        while l < r:
+            mid = l + (r-l)//2+1
+            if nums[mid] > target:
+                r = mid-1
+            else:
+                l = mid
+        if nums[l] == target:
+            res[1] = l
+
+        return res
+```
+
+
 三刷, two binary search with 模板！
 ```py
 class Solution:

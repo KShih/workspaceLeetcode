@@ -112,6 +112,7 @@ while i < len(s):
     - r = mid - 1
 5. 注意查找左右邊界的if判斷式寫法:
     - **if 判斷式均要放 >= or <= 的情形 (因配合我們宣告 r = len(nums)-1)**
+    - 不見得！用一些 testcase 去帶去思考
     - 詳見LC34三刷code
 
 
