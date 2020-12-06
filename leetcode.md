@@ -4112,12 +4112,47 @@ Given a sorted array and a target value, return the index if the target is found
 
 You may assume no duplicates in the array.
 ![35](assets/markdown-img-paste-20190614171646554.png)
+
+### 解題思路
+
+1. 這提要求我們找出數值的位置或者是正確的插入點
+2. 根據這個測資 [1,3,5,6] 假設要求找出 t=2, t=3
+3. 可以把此題歸類在尋找 *不大於target的右邊界*
+    1. 那麼可以分成找到 target 了 => return l
+    2. 沒找到 target
+        1. 小於 target
+        2. 大於 target
+4. 最後再處理一些 edge case
+    1. [1] t=0, t=2
+    2. [1,2] t=0, t=3
+5. 模板套好 最後還是需要處理edge case
+6. 其實這題套 尋找特定值就完全不需要處理edge case了
+
+Sign: 2020,1206
+
 ### 思路
 We can use binary seach.
 Use while-loop is okay here no need the recursion
 
 
 ### Code
+三刷 找右邊界 (2020, 1206)
+```py
+class Solution:
+    def searchInsert(self, nums: List[int], target: int) -> int:
+        l, r = 0, len(nums)-1
+        while l < r:
+            mid = l + (r-l)//2 + 1
+            if nums[mid] > target:
+                r = mid-1
+            else:
+                l = mid
+        if nums[l] != target and nums[l] < target:
+            return l + 1
+        else:
+            return l
+```
+
 ```py
 class Solution:
 def searchInsert(self, nums: List[int], target: int) -> int:
@@ -4153,6 +4188,7 @@ public:
     }
 };
 ```
+### Tag: #BinarySearch
 ---
 ## 34. Find First and Last Position of Element in Sorted Array｜ 6/15 (BS左右邊界)
 Given an array of integers nums sorted in ascending order, find the starting and ending position of a given target value.
