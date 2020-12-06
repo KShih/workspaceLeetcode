@@ -4629,6 +4629,14 @@ Suppose an array sorted in ascending order is rotated at some pivot unknown to y
 
 You are given a target value to search. If found in the array return true, otherwise return false.
 ![81](assets/markdown-img-paste-20190617123030288.png)
+
+### 解題分析
+
+1. 若直接把 LC33的code搬過來，會在這個測資 [3, 1, 1] t=3 時return False
+2. 因此我們必須另外處理重複的數字的情況，最直接的方式就是直接remove掉
+3. 因此不再只是比較大於小於了，現在要處里當 mid == r 的狀況 -> r -= 1
+4. 此時可以再提出一個可優化的狀況，如 [1,1,1,1,1] 找 t=2，這種狀況下會有 worst case O(n)
+
 ### 思路
 the approach we use here is to find the ascending part
 but the duplicate elem will affect this search approach
