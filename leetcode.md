@@ -4716,6 +4716,13 @@ Find the minimum element.
 You may assume no duplicate exists in the array.
 ![153](assets/markdown-img-paste-20190617164545212.png)
 
+### 解題分析
+
+1. 與其說找最小點，不如說找 pivot 點，那只能往 pivot point 的性質去思考
+2. 『pivot point 的前一個點永遠是最大的』
+3. 按照這個思考方向我們可以套用 *尋找左邊界* 的模板
+4. 尋找 mid > r 的左邊界
+
 ### 思路
 We can find out the smallest elem at the reverting point or the decending point
 like [2,3,4,5,1], from 2~5 is ascending, but 5,1 is the steep, the cliff
@@ -4727,6 +4734,19 @@ right will be accessed, so the initialize should be n-1
 mid should be included in next interation, so right = mid
 
 ### Code
+```py
+class Solution:
+    def findMin(self, nums: List[int]) -> int:
+        l, r = 0, len(nums)-1
+
+        while l < r:
+            mid = l + (r-l)//2
+            if nums[mid] > nums[r]:
+                l = mid + 1
+            else:
+                r = mid
+        return nums[r]
+```
 ``` c
 class Solution {
 public:
@@ -4748,6 +4768,7 @@ public:
     }
 };
 ```
+### Tag: #BinarySearch #Tricky
 ---
 ## 154. Find Minimum in Rotated Sorted Array II｜ 6/17
 Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
