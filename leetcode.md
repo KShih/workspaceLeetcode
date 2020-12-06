@@ -4872,6 +4872,13 @@ Write an efficient algorithm that searches for a value in an m x n matrix. This 
 Integers in each row are sorted from left to right.
 The first integer of each row is greater than the last integer of the previous row.
 ![74](assets/markdown-img-paste-20190702094040168.png)
+
+### 解題分析
+
+1. 根據LC35，尋找插入點的那題，可以很快地想到要用 *尋找特定值* 的模板
+2. 先對第一列進行搜索找到要尋找的行
+3. 在對該行進行搜索
+
 ### 思路
 It is S-shape sequence.
 We can turn 2-D Matrix Search into 1-D by adopt this rule:
@@ -4882,6 +4889,36 @@ arr[i/n][i%n] => number i element in 1D
 3. left = mid + 1, right = mid
 
 ### Code
+```py
+class Solution:
+    def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
+        if not matrix or not matrix[0]:
+            return False
+        R, C = len(matrix), len(matrix[0])
+
+        l, r = 0, R-1
+        while r >= l:
+            mid = l + (r-l)//2
+            if matrix[mid][0] == target:
+                return True
+            if matrix[mid][0] > target:
+                r = mid-1
+            else:
+                l = mid+1
+
+        targetRow = l-1
+        l, r = 0, C-1
+        while r >= l:
+            mid = l + (r-l)//2
+            if matrix[targetRow][mid] == target:
+                return True
+            if matrix[targetRow][mid] > target:
+                r = mid-1
+            else:
+                l = mid+1
+        return False
+```
+
 ``` c
 class Solution {
 public:
@@ -4907,6 +4944,7 @@ public:
     }
 };
 ```
+### Tag: #BinarySearch
 ---
 ## 378. Kth Smallest Element in a Sorted Matrix｜ 7/2
 Given a n x n matrix where each of the rows and columns are sorted in ascending order, find the kth smallest element in the matrix.
