@@ -4426,6 +4426,16 @@ we can find out:
  combining these two conditions, we can finally said that
  to decide whether the target is in the left or the right side of the array.
 
+### 解題分析
+
+1. 對於已經排序過的或部分排序的陣列 我們首先思考能不能使用binary search來解
+2. 假設我們已經知道轉則點在哪，我們就能知道左右半邊哪邊是遞增排列，進而才能去判斷此target在不在這個半邊裡
+3. 思考遞增排列的性質可以發現最右邊永遠大於最左邊
+4. 找到哪邊是遞增之後就能進而去檢查此target在不在這半邊裡，如果不在的話就改到另一半邊去
+5. 要注意 nums[r] 必須要是 inclusive的，不然像 [1,3] 這個例子就會爆
+6. (應該說當我們宣告 r = len(nums)-1 的時候，在迴圈過程 nums[r] 永遠要被include進判斷式中)
+7. 最後就是基本的找特定值的模板了
+
 ### Code
 Naive solution: find out the rotation point and search in each part
 ```py
@@ -4535,6 +4545,7 @@ public:
     }
 };
 ```
+### Tag: #BinarySearch
 ---
 ## 81. Search in Rotated Sorted Array II｜ 6/17
 Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
