@@ -4814,12 +4814,52 @@ Given an input array nums, where nums[i] ≠ nums[i+1], find a peak element and 
 The array may contain multiple peaks, in that case return the index to any one of the peaks is fine.
 You may imagine that nums[-1] = nums[n] = -∞.
 ![162](assets/markdown-img-paste-20190618141711386.png)
+
+### 解題分析
+
+1. Intuitive Scan, O(n)
+2. Smarter Scan
+    1. 利用到頭跟末均為最小值，且緊鄰兩個數不為相同值，且僅需回傳其中一個 local min
+    2. 頭是谷底，因此第一個數必為遞增起手，只要找到下個元素比他小，就可以回傳ㄌ
+    3. 即便整個陣列都是遞增的，也會 return 最後一個元素，因為尾是谷底
+3. Binary Search
+    1. 尋找遞增的左邊界
+    2. 對比 LC153
+        1. LC153 是部分排序過的並尋找最小值，我們的解法是去尋找 pivot point
+        2. 我們搜尋的目標是 mid 大於最右點的左邊界(因為已部分排序過)
+
 ### 思路
 The peak might happen at the location where the number "start" to descend in an ascending order sorted array
 thus, we should find the n where is nums[n] > nums[n+1]
 However, we should care about the border of the array
 
 ### Code
+
+Binary Search 尋找遞增的左邊界
+```py
+class Solution:
+    def findPeakElement(self, nums: List[int]) -> int:
+        l, r = 0, len(nums)-1
+
+        while l < r:
+            mid = l + (r-l)//2
+            if nums[mid] < nums[mid+1]:
+                l = mid+1
+            else:
+                r = mid
+        return l
+```
+
+Smarter Scan
+```py
+class Solution:
+    def findPeakElement(self, nums: List[int]) -> int:
+        for i in range(1, len(nums)):
+            if nums[i] < nums[i-1]:
+                return i-1
+        return len(nums)-1
+```
+
 ``` c
 class Solution {
 public:
@@ -4834,6 +4874,7 @@ public:
     }
 };
 ```
+### Tag: #BinarySearch
 ---
 ## 852. Peak Index in a Mountain Array｜ 6/18
 Let's call an array A a mountain if the following properties hold:
