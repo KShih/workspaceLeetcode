@@ -12424,10 +12424,23 @@ Input: numbers = [2,7,11,15], target = 9
 Output: [1,2]
 
 Explanation: The sum of 2 and 7 is 9. Therefore index1 = 1, index2 = 2.
-### 思路
+### 解題分析
 
+1. 最一開始的想法是用 BS 找到 mid, 把 mid 當作其中一個點 然後下去找 target-nums[mid]
+2. 但這種做法並無法去設定 left right 變化的條件
+3. 那麼換作用有序掃描的方式去找即可，有兩種做法
+    1. O(n) two pointer 作法
+        1. 有序掃描分別從頭往尾，及從尾往頭掃過
+    2. O(nlogn) Binary Search (真的有人遇到面試官要求用 nlogn 的做法)
+        1. 掃過所有 index 並把 小index 設為 current index
+        2. 那麼目標就是尋找 target - current index 的值了
+        3. 注意，此時因為兩個數並不能重複，因此此時的 left 要設為 current index + 1
+        4. 那麼問題就變成 在 [i+1, len(nums)-1] 中 尋找 target - current index 了
+        5. 此為尋找特定值的模板
+4. 待理解 O(log(n))的做法！
 
 ### Code
+Two pointer O(n)
 ``` py
 def twoSum(self, numbers: List[int], target: int) -> List[int]:
     n = len(numbers)
@@ -12441,6 +12454,79 @@ def twoSum(self, numbers: List[int], target: int) -> List[int]:
             return [start+1, end+1]
     return [-1,-1]
 ```
+
+Binary search O(nlogn)
+```py
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        n = len(nums)
+        for i in range(n):
+            t = target - nums[i]
+            l, r = i+1, n-1
+            while r >= l:
+                mid = l + (r-l)//2
+                if nums[mid] == t:
+                    return [i+1, mid+1]
+                elif nums[mid] > t:
+                    r = mid-1
+                else:
+                    l = mid+1
+        return []
+```
+
+Binary Search O(log(n))
+```java
+class Solution {
+    public int[] twoSum(int[] numbers, int target) {
+        if (numbers == null || numbers.length == 0) {
+            return new int[]{-1, -1};
+        }
+        int lo = 0, hi = numbers.length - 1;
+        while (lo < hi) {
+            int sum = numbers[lo] + numbers[hi];
+            if (sum == target) {
+                return new int[]{lo + 1, hi + 1};
+            } else if (sum > target) {
+                // sum 太大了要移動右邊界
+                // 移動 hi 到使 sum <= target 的位置，也就是 nums[hi] <= target - nums[lo]
+                hi = upperBound(numbers, lo, hi, target - numbers[lo]) - 1;
+            } else {
+                // sum 太小了要移動左邊界
+                // 移動 lo 到使 sum >= target 的位置，也就是 nums[lo] >= target - nums[hi]
+                lo = lowerBound(numbers, lo, hi, target - numbers[hi]);
+            }
+        }
+        return new int[]{-1, -1};
+    }
+    private int upperBound(int[] nums, int lo, int hi, int target) {
+        int left = lo, right = hi + 1;
+        while (left < right) {
+            int mid = left + (right - left >> 1);
+            if (nums[mid] <= target) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        // 返回最後一個大於 target 的值下標
+        return left;
+    }
+    private int lowerBound(int[] nums, int lo, int hi, int target) {
+        int left = lo, right = hi + 1;
+        while (left < right) {
+            int mid = left + (right - left >> 1);
+            if (nums[mid] < target) {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        // 返回第一個大於或等於 target 的值下標
+        return left;
+    }
+}
+```
+### Tag: #BinarySearch #TwoPointer
 ---
 ## Remove the end node from list｜ 10/23
 
