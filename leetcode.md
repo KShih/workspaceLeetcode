@@ -4289,20 +4289,20 @@ class Solution:
         l, r = 0, len(nums)-1
         while l < r:
             mid = l + (r-l)//2
-            if nums[mid] < target:
-                l = mid+1
-            else:
+            if nums[mid] >= target: # 欲求 >= target 的左邊界
                 r = mid
+            else:
+                l = mid +1
         if nums[r] == target: # break 條件是 l = mid+1, 所以這邊取r當左邊界
             res[0] = r
 
         l, r = 0, len(nums)-1
         while l < r:
             mid = l + (r-l)//2+1
-            if nums[mid] > target:
-                r = mid-1
-            else:
+            if nums[mid] <= target: # 欲求 <= target 的右邊界
                 l = mid
+            else:
+                r = mid - 1
         if nums[l] == target:
             res[1] = l
 
@@ -4847,7 +4847,7 @@ class Solution:
                 l = mid+1
             else:
                 r = mid
-        return l
+        return r
 ```
 
 Smarter Scan
