@@ -18162,6 +18162,21 @@ Explanation: the subarray [4,3] has the minimal length under the problem constra
 
 Follow up:
 If you have figured out the O(n) solution, try coding another solution of which the time complexity is O(n log n).
+
+### 解題分析
+
+1. Sliding Window(two pointer) O(n)
+    1. 假設我們已經有了一個 >= s 的陣列了
+    2. 那麼再來可以嘗試的是慢慢把尾巴縮短，若還是 >= s 表示我們找到一個更優解
+
+2. Binary Search O(nlogn)
+    1. 若要使用 BS 的條件是，此陣列必須是有序的
+    2. 那我們能製造出有序陣列的方式就是 accumulated sum (前提是陣列中每個元素都是正數)
+    3. 有了 acc sum array 後，我們便可以思考如何找到最短序列長
+    4. acc[j]-acc[i] 為 i ~ j 的和，但有兩個變數無法使用 BS
+    5. 因此我們用回圈並且固定 acc[i]，那麼條件就變成:
+        1. 尋找在以此 acc[i] 為第一個元素, acc[j]-acc[i] 必須 >= s 的左邊界
+        2. 帶入尋找左邊界的模板，注意 l 要設為 i+1 因為 j 跟 i 不能重複
 ### 思路
 
 two solution: 1. two pointer, 2. binary search
@@ -18169,41 +18184,28 @@ two solution: 1. two pointer, 2. binary search
 ![](assets/markdown-img-paste-20200326152522929.png)
 
 ### Code
-``` py
+Sliding Window
+```py
 class Solution:
     def minSubArrayLen(self, s: int, nums: List[int]) -> int:
-        if sum(nums) < s:
+        if not nums or sum(nums) < s:
             return 0
-        cur = []
-        res = len(nums)
-        # add elem until satisfied
-        for i, num in enumerate(nums):
-            if sum(cur) < s:
-                cur.append(num)
-            else:
-                res = len(cur)
-                break
+        n = len(nums)
+        res = n+1
+        cur_sum = 0
+        l = 0
 
-        idx = len(cur)
-        # add next elem
-        for i in range(idx, len(nums)):
-            cur.append(nums[i])
-            # try to pop from front until cannot satisfie
-            res = self.check_pop(s, cur, res)
-        # to check the pop if it's not get into for loop
-        res = self.check_pop(s, cur, res)
+        for i in range(n):
+            cur_sum += nums[i]
+
+            while cur_sum >= s:
+                res = min(res, i-l+1)
+                cur_sum -= nums[l]
+                l += 1
         return res
-
-    def check_pop(self, s, cur, res):
-        while True:
-            if sum(cur) - cur[0] >= s:
-                cur.pop(0)
-            else:
-                break
-        return min(res, len(cur))
 ```
 
-Same idea, but using pointer to achieve
+Two pointer
 ```py
 class Solution:
     def minSubArrayLen(self, s: int, nums: List[int]) -> int:
@@ -18225,36 +18227,48 @@ Binary Search
 ```py
 class Solution:
     def minSubArrayLen(self, s: int, nums: List[int]) -> int:
-        if s > sum(nums):
+        if not nums or sum(nums) < s:
             return 0
-        sum_n = [0]
-        # create sum array
+
+        # calculate the accumulated sum
+        sums = [0]
         for num in nums:
-            sum_n.append(sum_n[-1]+num)
-        sum_n.pop(0)
+            sums.append(sums[-1]+num)
 
-        # bin search
-        l, r = 0, len(sum_n)-1
+        n = len(sums)
+        res = float(inf)
+        for i in range(n): # iterate through the sums array
+            cur = sums[i] # fix the left one
 
-        while l < r:
-            mid = l + (r-l)//2
-            if sum_n[mid] == s:
-                r = mid # bc we need to use r afterward, we need to let r reflect the mid
-                break
-            elif sum_n[mid] > s:
-                r = mid
-            else:
-                l = mid + 1
+            # 尋找在以此 cur 為第一個元素其最少能大於 s 的元素需要幾個
+            # sums[k] - cur 為此連續元素的和
+            # find left border of sums[k]-cur >= s
+            # l = i+1, 因為不能與 cur 重複
 
-        res = r+1
-        scan_idx = 0
-        for i in range(r, len(sum_n)):
-            cur = sum_n[i]
-            while cur - sum_n[scan_idx] >= s:
-                scan_idx += 1
-                res = min(res, i-scan_idx+1)
+            l, r = i+1, n-1
+            while r > l:
+                mid = l + (r-l) // 2
+                if sums[mid] - cur >= s:
+                    r = mid
+                else:
+                    l = mid+1
+            if sums[r]-cur >= s:
+                res = min(res, r-i)
         return res
 ```
+### Tag: #SlidingWindow #TwoPointer #BinarySearch
+
+### 類似題
+1. Sliding Window 解法類似題
+    1. 1248. Count Number of Nice Subarrays
+    2. 1234. Replace the Substring for Balanced String
+    3. 1004. Max Consecutive Ones III
+    4. 930. Binary Subarrays With Sum
+    5. 992. Subarrays with K Different Integers
+    6. 904. Fruit Into Baskets
+    7. 862. Shortest Subarray with Sum at Least K
+
+
 ---
 ## 210. Course Schedule II｜ 3/26 (Unfinished, need Topological sort to solve)
 There are a total of n courses you have to take, labeled from 0 to n-1.

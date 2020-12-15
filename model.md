@@ -92,6 +92,21 @@ while i < len(s):
 
 ---
 
+## Sliding Window
+
+1. Sliding 的對象 arrray 必須是非負陣列，否則會破壞 window
+2. 題型總和
+    0. 209. Minimum Size Subarray Sum
+    1. 1248. Count Number of Nice Subarrays
+    2. 1234. Replace the Substring for Balanced String
+    3. 1004. Max Consecutive Ones III
+    4. 930. Binary Subarrays With Sum
+    5. 992. Subarrays with K Different Integers
+    6. 904. Fruit Into Baskets
+    7. 862. Shortest Subarray with Sum at Least K
+
+---
+
 ## Binary Search
 
 1. Always use right = len(nums) -1, because you may want to access arr[right]!
