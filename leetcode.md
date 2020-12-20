@@ -12437,9 +12437,60 @@ Explanation: The sum of 2 and 7 is 9. Therefore index1 = 1, index2 = 2.
         3. 注意，此時因為兩個數並不能重複，因此此時的 left 要設為 current index + 1
         4. 那麼問題就變成 在 [i+1, len(nums)-1] 中 尋找 target - current index 了
         5. 此為尋找特定值的模板
-4. 待理解 O(log(n))的做法！
+    3. O(log(n)^2)
+        1. Binary Search 中的 Binary Search
+        2. 最外層的 BS 就是`尋找特定值`的模板
+            1. 如果等於 target 直接回傳
+            2. 如果相加大於了 target
+                1. 移動 r 直到 nums[l] + nums[r] <= target
+                2. let 新目標 = target - nums[l]
+                3. 也就是`尋找 <= 新目標的右邊界`
+            3. 同理小於 target
+                1. `尋找 >= 新目標的左邊界`
 
 ### Code
+Binary search (log(n)^2)
+```py
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        self.nums = nums
+        n = len(nums)
+        l, r = 0, n-1
+        while r >= l:
+            sums = nums[l] + nums[r]
+            if sums == target:
+                return [l+1, r+1]
+            elif sums > target:
+                # too large, move the r until the sums <= target
+                # which is, move the r until nums[r] <= target - nums[l]
+                r = self.higherBound(l, r, target-nums[l])
+            else:
+                # move the l until sums >= target
+                # which is, move the l until nums[l] >= target - nums[r]
+                l = self.lowerBound(l, r, target-nums[r])
+        return [-1, -1]
+
+    def higherBound(self, l, r, target):
+        nums = self.nums
+        while r > l:
+            mid = l + (r-l)//2+1
+            if nums[mid] <= target:
+                l = mid
+            else:
+                r = mid-1
+        return l
+
+    def lowerBound(self, l, r, target):
+        nums = self.nums
+        while r > l:
+            mid = l + (r-l)//2
+            if nums[mid] >= target:
+                r = mid
+            else:
+                l = mid+1
+        return r
+```
+
 Two pointer O(n)
 ``` py
 def twoSum(self, numbers: List[int], target: int) -> List[int]:
@@ -12472,59 +12523,6 @@ class Solution:
                 else:
                     l = mid+1
         return []
-```
-
-Binary Search O(log(n))
-```java
-class Solution {
-    public int[] twoSum(int[] numbers, int target) {
-        if (numbers == null || numbers.length == 0) {
-            return new int[]{-1, -1};
-        }
-        int lo = 0, hi = numbers.length - 1;
-        while (lo < hi) {
-            int sum = numbers[lo] + numbers[hi];
-            if (sum == target) {
-                return new int[]{lo + 1, hi + 1};
-            } else if (sum > target) {
-                // sum 太大了要移動右邊界
-                // 移動 hi 到使 sum <= target 的位置，也就是 nums[hi] <= target - nums[lo]
-                hi = upperBound(numbers, lo, hi, target - numbers[lo]) - 1;
-            } else {
-                // sum 太小了要移動左邊界
-                // 移動 lo 到使 sum >= target 的位置，也就是 nums[lo] >= target - nums[hi]
-                lo = lowerBound(numbers, lo, hi, target - numbers[hi]);
-            }
-        }
-        return new int[]{-1, -1};
-    }
-    private int upperBound(int[] nums, int lo, int hi, int target) {
-        int left = lo, right = hi + 1;
-        while (left < right) {
-            int mid = left + (right - left >> 1);
-            if (nums[mid] <= target) {
-                left = mid + 1;
-            } else {
-                right = mid;
-            }
-        }
-        // 返回最後一個大於 target 的值下標
-        return left;
-    }
-    private int lowerBound(int[] nums, int lo, int hi, int target) {
-        int left = lo, right = hi + 1;
-        while (left < right) {
-            int mid = left + (right - left >> 1);
-            if (nums[mid] < target) {
-                left = mid + 1;
-            } else {
-                right = mid;
-            }
-        }
-        // 返回第一個大於或等於 target 的值下標
-        return left;
-    }
-}
 ```
 ### Tag: #BinarySearch #TwoPointer
 ---
