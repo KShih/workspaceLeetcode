@@ -19064,6 +19064,29 @@ In a complete binary tree every level, except possibly the last, is completely f
 
 ![](assets/markdown-img-paste-20200408103752423.png)
 
+
+### 解題分析
+
+1. Naive 的解法有兩種，其 TS 都是 O(n)
+    1. 逐個逐個 recursively 數
+    2. Inorder, Postorder, Preorder 數
+2. 利用到 Complete Binary Tree (CBT) 的性質
+    1. CBT 一定有一個半邊是 PBT (Perfect Binary Tree) <完全填滿的樹>
+    2. PBT 的節點個數為 2^h -1
+    3. 根據上述兩個性質我們可以很有效率的用到 BinarySearch 的特性
+        1. 將問題切一半，其中一半的問題標示為已完成，專心處理剩下那一半
+3. 偵測 PBT
+    1. 要形成 PBT 其左右子結點的高度一定要相等
+    2. 若是 PBT 則可以直接回傳 2^h -1
+    3. 若不是，則分別對其左右子節點 recursively 去做偵測
+4. 時間複雜度
+    1. getHeight: O(log(n))
+    2. 最糟要做 h 次的 getHeight => O( log(n)^2  )
+    3. 詳細的分析 (https://youtu.be/CvrPf1-flAA?t=717)
+5. 示意圖
+    1. ![](assets/markdown-img-paste-20201220104258272.png)
+
+
 ### 技巧
 
 這題的技巧在於如何給定葉節點的index，規劃出從root到此節點的路徑
@@ -19074,7 +19097,7 @@ In a complete binary tree every level, except possibly the last, is completely f
 
 ### 思路
 
-Binary Search:
+Binary Search (這種太麻煩了，看解題分析):
 
 首先先計算出樹的深度，再透過這個深度去得到這個深度最多有多少個葉節點
 
@@ -19095,6 +19118,32 @@ Naive:
 最後計算2^0 + 2^1 + ... 2^(h-1) + 葉節點 = 2^h -1 + 葉
 
 ### Code
+
+2 刷，簡易版Binary Search
+```py
+class Solution:
+    def countNodes(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+
+        h_left = 1
+        pLeft = root.left
+        while pLeft:
+            h_left += 1
+            pLeft = pLeft.left
+
+        h_right = 1
+        pRight = root.right
+        while pRight:
+            h_right += 1
+            pRight = pRight.right
+
+        if h_left == h_right: # perfect binary tree
+            return (1 << h_left) - 1  # 2^h_left -1
+        else:
+            return 1 + self.countNodes(root.left) + self.countNodes(root.right)
+```
+
 Binary Search Solution
 ```py
 class Solution:
@@ -19165,6 +19214,7 @@ class Solution:
                 h += 1
         return 2 ** (h+1) - 1 + len(nex)
 ```
+### Tag: #BinarySearch #BinaryTree #DividandConquer
 ---
 # Leetcode 30 days challenge
 ---
