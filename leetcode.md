@@ -20285,10 +20285,50 @@ Given target = 5, return true.
 
 Given target = 20, return false.
 
+### 解題分析
+
+1. 與系列題上一題不一樣的地方是上一題是屬於 snake 狀的陣列，因此我們上提我們可以透過類似把陣列展開的方式去進行搜尋
+2. 對於此題最 Naive的方式是對每一行去進行 BS，複雜度為 n log m
+3. 最優解
+    1. 由於此陣列試左到右排序且上到下排序，因此我們永遠可以保證對於每個點其右大於其左，其上小於其下
+    2. 因此我們可以從左下開始走，如果該點已經比target 大了，我們可以永遠保證其右邊都不會有解，因此果斷往上
+    3. 同理往右
+    4. 相當於 Zig-zag 走法的 binary search
+
 ### 思路
 
 從左下開始找，要是比target小就往右，比target大就往上
+
 ### Code
+
+Naive Binary Search O(m log n)
+```py
+class Solution(object):
+def BinarySeach(self,matrix,target):
+        low = 0
+        high = len(matrix)-1
+
+        while low <= high:
+            mid = (low + high) // 2
+
+            if target == matrix[mid]:
+                return True
+            elif target < matrix[mid]:
+                high = mid -1
+            else:
+                low = mid + 1
+        return False
+def searchMatrix(self, matrix, target):
+
+    for row in range(len(matrix)):
+        if matrix[row][0] > target:
+            return False
+        if self.BinarySeach(matrix[row],target):
+            return True
+    return False
+```
+
+Optimal Solution O(m + n)
 ``` py
 class Solution:
     def searchMatrix(self, matrix: List[List[int]], target: int)-> bool:
@@ -20313,6 +20353,7 @@ class Solution:
                 return True
         return False
 ```
+### Tag: #BinarySearch
 ---
 ## 242. Valid Anagram｜ 6/10
 Given two strings s and t , write a function to determine if t is an anagram of s.
