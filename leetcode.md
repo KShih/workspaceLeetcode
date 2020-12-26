@@ -18305,6 +18305,11 @@ There may be multiple correct orders, you just need to return one of them. If it
 ### 思路
 
 無法使用backtracking 來解這題
+
+### 類似題
+
+- Leetcode 953 Alien Dictionary (做完此題再回來改此題)
+
 ### Code
 ``` py
 """
@@ -19820,6 +19825,10 @@ Some examples:
 比上題只要將 for loop 改成 while loop,
 
 並使用遞歸將( ) 視為子程序來處理
+
+### 類似題
+
+Leetcode 1597
 
 ### Code
 ``` py
