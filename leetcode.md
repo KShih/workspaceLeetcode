@@ -3858,7 +3858,7 @@ public:
     }
 };
 ```
-
+### Tag: #BinarySearchTree
 ---
 ## 99. Recover Binary Search Tree｜ 6/13
 Two elements of a binary search tree (BST) are swapped by mistake.
@@ -21613,6 +21613,12 @@ Input: root = [4,2,5,1,3], target = 3.714286
 1   3
 
 Output: 4
+
+### 解題分析
+
+1. 我們如何知道對於 3.7要return 3 or 4?
+2. 我們需要同時 keep 住 diff 的資訊以此來決定是否更新 return 的值
+
 ### 思路
 如果這個節點比跟結點小，可能的解一定是在其左，否則其右
 
@@ -21631,6 +21637,7 @@ class Solution:
                 root = root.right
         return res[0]
 ```
+### Tag: #BinarySeach #BinarySearchTree
 ---
 ## 705. Design HashSet｜ 8/11
 Design a HashSet without using any built-in hash table libraries.
