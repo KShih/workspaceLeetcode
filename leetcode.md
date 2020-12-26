@@ -3712,6 +3712,12 @@ Given a binary search tree, write a function kthSmallest to find the kth smalles
 Note:
 You may assume k is always valid, 1 ≤ k ≤ BST's total elements.
 ![230](assets/markdown-img-paste-20190603181340691.png)
+
+### 解題分析
+1. 講到 Binary Search Tree 應該要想到他的 rank 的性質
+2. 本題就是透過左子結點個數去得到當前結點的 rank 的基本題
+3. 對於 follow-up，可以透過對每個節點增加`其子節點的個數`資訊，這樣就不用每次做增刪改查時都要從新跑 getCount 了
+
 ### 思路
 search in BST -> INORDER
 both Recursive use counting way to find the answer
@@ -3722,6 +3728,24 @@ both Recursive use counting way to find the answer
 4. Follow UP: 這道題的Follow up中說假設該BST被修改的很頻繁，而且查找第k小元素的操作也很頻繁，問我們如何優化。其實最好的方法還是像上面的解法那樣利用分治法來快速定位目標所在的位置，但是每個遞歸都遍歷左子樹所有結點來計算個數的操作並不高效，所以我們應該修改原樹結點的結構，使其保存包括當前結點和其左右子樹所有結點的個數，這樣我們使用的時候就可以快速得到任何左子樹結點總數來幫我們快速定位目標值了。
 
 ### Code
+
+```py
+class Solution:
+    def kthSmallest(self, root: TreeNode, k: int) -> int:
+        root_rank = self.countChild(root.left) + 1
+        if root_rank == k:
+            return root.val
+        if k < root_rank:
+            return self.kthSmallest(root.left, k)
+        else:
+            return self.kthSmallest(root.right, k - root_rank)
+
+    def countChild(self, root):
+        if not root:
+            return 0
+        return 1 + self.countChild(root.left) + self.countChild(root.right)
+```
+
 Recursive:
 ``` c
 class Solution {
