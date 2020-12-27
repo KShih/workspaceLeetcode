@@ -20331,26 +20331,20 @@ def searchMatrix(self, matrix, target):
 Optimal Solution O(m + n)
 ``` py
 class Solution:
-    def searchMatrix(self, matrix: List[List[int]], target: int)-> bool:
-        if not len(matrix) or not len(matrix[0]):
-			# Quick response for empty matrix
-            return False
-        h, w = len(matrix), len(matrix[0])
-        # Start adaptive search from bottom left corner
-        y, x = h-1, 0
-        while True:
-            if y < 0 or x >= w:
-                break
-            current = matrix[y][x]
-            if target < current:
-                # target is smaller, then go up
-                y -= 1
-            elif target > current:
-                # target is larger, then go right
-                x += 1
-            else:
-                # hit target
+    def searchMatrix(self, matrix, target):
+        R, C = len(matrix), len(matrix[0])
+        r, c = R-1, 0 # Start adaptive search from bottom left corner
+
+        while r >= 0 and c < C:
+            cur = matrix[r][c]
+            if cur == target:
                 return True
+            elif cur > target:
+                # target is smaller, then go up
+                r -= 1
+            else:
+                # target is larger, then go right
+                c += 1
         return False
 ```
 ### Tag: #BinarySearch
