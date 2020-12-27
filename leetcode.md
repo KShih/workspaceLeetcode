@@ -22366,6 +22366,24 @@ You must use only constant, O(1) extra space.
 Your runtime complexity should be less than O(n2).
 There is only one duplicate number in the array, but it could be repeated more than once.
 
+### 解題分析
+1. 先進行排序，尋找重複的值只需要看自己前面的是否與自己相等
+    1. 允許修改陣列: T = O(nlogn), S = O(1)
+    2. 不允許: 則 space 變為 O(n)
+2. 把元素都加進去 set 中，並在下一個節點時判斷是否已在set 存在
+    1. T = O(n), S = O(n)
+3. Binary Search
+    1. 以 1 ~ n-1 建立起 left, right 移動的位置表
+    2. 我們不 BS nums陣列，instead 我們 search 這個位置表
+    2. 首先先算出 mid, 並去 nums 中尋找 `lte` mid 的個數
+    3. 若 `lte_cnt` <= mid 表示小於 mid 的左半部並沒有重複值
+    4. 因此此題的目標是: 尋找 `lte_cnt` of k 大於 k 的左邊界
+4. 快慢指針找 cycle 的進入點
+    1. 使用 f(x) = nums[x] 去建立一個 LinkedList 序列
+    2. x, nums[x], nums[nums[x]] ... (當前值 = 前一值在nums中的index)
+    3. 因此當遇到重複的值的時候環就會出現了
+    4. 因此此題就退化為在 list 中找環的起始點
+
 ### 思路
 
 1. 暴力姐
@@ -22411,22 +22429,23 @@ class Solution:
 
 Binary Search 尋找左邊界:
 ``` py
-def findDuplicate(self, nums: List[int]) -> int:
-    RANG = len(nums)-1
-    l, r = 1, RANG
+class Solution:
+    def findDuplicate(self, nums: List[int]) -> int:
+        l, r = 0, len(nums)-1
 
-    while l < r:
-        mid = l + (r-l) // 2
+        while l < r:
+            lte_cnt = 0
+            mid = l + (r-l)//2
 
-        lessCnt = 0
-        for num in nums:
-            if num <= mid:
-                lessCnt += 1
-        if lessCnt <= mid:
-            l = mid +1
-        else:
-            r = mid
-    return r
+            for num in nums:
+                if num <= mid:
+                    lte_cnt += 1
+
+            if lte_cnt > mid:
+                r = mid
+            else:
+                l = mid + 1
+        return r
 ```
 
 Binary Search 尋找特定值:
@@ -22454,22 +22473,22 @@ class Solution:
 ``` py
 class Solution:
     def findDuplicate(self, nums: List[int]) -> int:
-        slow = nums[0]
-        fast = nums[slow]
-        start = 0
+        slow_idx, fast_idx = nums[0], nums[nums[0]]
 
-        # phase 1: get the meeting point
-        while slow != fast:
-            slow = nums[slow]
-            fast = nums[nums[fast]]
+        # Phase1: find intersection
+        while slow_idx != fast_idx:
+            slow_idx = nums[slow_idx]
+            fast_idx = nums[nums[fast_idx]]
 
-        # phase 2: start from begining, one step each to find the start of the loop
-        while start != slow:
-            slow = nums[slow]
-            start = nums[start]
-
-        return start
+        # Phase2: move tutle to start and let them met again
+        # the point is the start of the cycle
+        slow_idx = 0
+        while slow_idx != fast_idx:
+            slow_idx = nums[slow_idx]
+            fast_idx = nums[fast_idx]
+        return slow_idx
 ```
+### Tag: #BinarySeach, #LinkedList
 ---
 ## 288. Unique Word Abbreviation(糞題)｜ 8/23
 An abbreviation of a word follows the form <first letter><number><last letter>. Below are some examples of word abbreviations:
