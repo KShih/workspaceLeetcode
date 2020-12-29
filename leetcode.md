@@ -13471,6 +13471,9 @@ Follow up: Could you improve it to O(n log n) time complexity?
 
 ![](assets/markdown-img-paste-20191114105414926.png)
 
+LIS:
+![](assets/markdown-img-paste-20201228232358670.png)
+
 ### Code
 ``` py
 def lengthOfLIS(self, nums: List[int]) -> int:
@@ -13491,7 +13494,7 @@ Using libary (bisect), binary search
 class Solution:
     def lengthOfLIS(self, nums: List[int]) -> int:
         n = len(nums)
-        inc = [float(inf)]*(n)
+        inc = [float(inf)]*(n) # 優化: 使用下面 res 動態擴展的方式
         res = 0
 
         for num in nums:
@@ -13502,7 +13505,7 @@ class Solution:
         return res
 ```
 
-Binary search with DP
+Binary search with DP (same with above...)
 ```py
 class Solution(object):
     def lengthOfLIS(self, nums):

@@ -137,6 +137,41 @@ while i < len(s):
     - 不見得！用一些 testcase 去帶去思考
     - 詳見LC34三刷code
 
+6. 實作 bisect_left (使用查找特定值模板)
+    ```py
+    def bisect_left(self, arr, target):
+        i = 0
+        j = len(arr)-1
+        while i <= j:
+            mid = i + (j-i)//2
+            if arr[mid] == target:
+                return mid
+            elif arr[mid] < target:
+                i = mid+1
+            else:
+                j = mid-1
+        return i
+    ```
+
+
+---
+
+## LIS
+
+```py
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        n = len(nums)
+        inc = [float(inf)]*(n) # 優化: 使用下面 res 動態擴展的方式
+        res = 0
+
+        for num in nums:
+            x = bisect.bisect_left(inc, num)
+            inc[x] = num
+            res = max(res, x+1)
+
+        return res
+```
 
 ---
 
