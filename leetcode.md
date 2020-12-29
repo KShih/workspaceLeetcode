@@ -6874,7 +6874,82 @@ Given two arrays, write a function to compute their intersection.
 用Hashtable 去操作元素是否存在，以及各數為何
 新增進res後可以將映射值還原成0，來避免下次的新增
 
+- follow up:
+
+They ask for the intersection, which has a trivial solution using a hash or a set.
+
+Then they ask you to solve it under these constraints:
+O(n) time and O(1) space (the resulting array of intersections is not taken into consideration).
+You are told the lists are sorted.
+
+Cases to take into consideration include:
+duplicates, negative values, single value lists, 0's, and empty list arguments.
+Other considerations might include
+sparse arrays.
+
 ### Code
+```py
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        a = set(nums1)
+        b = set(nums2)
+
+        inter = a - (a-b)
+        return [e for e in inter]
+```
+
+Follow-up (two pointer)
+```py
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        if not nums1 or not nums2:
+            return []
+        nums1, n1, p1 = sorted(nums1), len(nums1), 0
+        nums2, n2, p2 = sorted(nums2), len(nums2), 0
+
+        res = []
+        while p1 < n1 and p2 < n2:
+            if nums1[p1] == nums2[p2]:
+                res.append(nums1[p1])
+                p1 += 1
+                p2 += 1
+                while p1 < n1 and nums1[p1] == nums1[p1-1]:
+                    p1 += 1
+                while p2 < n2 and nums2[p2] == nums2[p2-1]:
+                    p2 += 1
+                continue
+
+            if nums1[p1] < nums2[p2]:
+                p1 += 1
+            else:
+                p2 += 1
+        return res
+```
+
+Built-in python:
+```py
+def intersection(self, nums1, nums2):
+    set1 = set(nums1)
+    set2 = set(nums2)
+    return list(set2 & set1)
+```
+
+self-implement:
+```py
+class Solution:
+    def set_intersection(self, set1, set2):
+        return [x for x in set1 if x in set2]
+
+    def intersection(self, nums1, nums2):
+        set1 = set(nums1)
+        set2 = set(nums2)
+
+        if len(set1) < len(set2):
+            return self.set_intersection(set1, set2)
+        else:
+            return self.set_intersection(set2, set1)
+```
+
 ``` c
 class Solution {
 public:
