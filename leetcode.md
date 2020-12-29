@@ -6950,6 +6950,22 @@ class Solution:
             return self.set_intersection(set2, set1)
 ```
 
+優化: 只用一個set, 並去 loop 另一個去尋找是否存在set中
+```py
+class Solution:
+    def intersection(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        if len(nums2) > len(nums1):
+            return self.intersection(nums2, nums1)
+
+        set1 = set(nums1)
+        res = []
+        for num in nums2:
+            if num in set1:
+                res.append(num)
+                set1.remove(num)
+        return res
+```
+
 ``` c
 class Solution {
 public:
@@ -6984,6 +7000,7 @@ public:
     }
 };
 ```
+### Tag: #Set #TwoPointer
 ---
 ## 15. 3Sum｜ 8/18
 Given an array nums of n integers, are there elements a, b, c in nums such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
