@@ -20058,6 +20058,25 @@ For example, suppose the integers from the data stream are 1, 3, 7, 2, 6, ..., t
 Follow up:
 
 What if there are lots of merges and the number of disjoint intervals are small compared to the data stream's size?
+
+### 解題分析
+1. Design 類型的題目可以先詢問哪一隻 function 會比較頻繁的 call
+    1. 若 addNum 比較常 call, 那麼可以把組 interval 的邏輯放在 getInterval 中，如 heap 的解法
+    2. 反之，如 BS 的解法
+2. 資料結構
+    1. 遇到需要維持有序數組的題目要想到兩種解法，BS(bisect_left) 跟 heap
+    2. Heap
+        1. addNum: 需要維繫一個 heap interval, 並利用 set 去過濾掉重複的數字
+        2. getInterval: 逐一將 heap 倒出來，看能不能 merge，最後更新回全域變數
+    3. BS
+        1. addNum:
+            - 在 add 時就先用 BS (bisect_left) 找到一個插入後仍可以維持有序的點，並先暫時插入
+            - 插入完時需要根據此 index 去 merge 其前後的 interval
+            - 這邊可以固定 merge 其後，那麼對於 merge前的操作就只要 merge(index-1) 即可
+        2. merge:
+            - 注意 merge 的條件要設為 <= 1，因為也要處理重複插入的狀況
+            - always merge 後面到前面，然後 pop 後面
+
 ### 思路
 1. Heap + Set:
 - Same idea with LC228, but our goal is to
@@ -20067,13 +20086,19 @@ What if there are lots of merges and the number of disjoint intervals are small 
 - and build solution2 with more concise code and at little bit better efficiency
     - store the data with initialized interval
     - try to merge unmerged data into interval
+    - 優化: 使用一個 bool 變數紀錄是否最近有新增資料，若有再去執行組interval，若沒有直接return
 
 2. Binary Search:
 - Find the position to insert
     - the interval whose start is larger than the value
     - then insert in front of it
 - Merge with the inserting value with its next interval
+    - [2,3], [4,4] => [2,4] and then pop [4,4]
+    - [2,3], [3,3] => [2,3] and then pop [3,3]
 - Merge with the previous interval
+    - [1,1], [2,3]
+    - [2,2], [2,3]
+
 ### Code
 Extending with LC228:
 ``` py
@@ -20167,6 +20192,7 @@ class SummaryRanges:
     def getIntervals(self) -> List[List[int]]:
         return self.intervals
 ```
+### Tag: #BinarySeach #Heap
 ---
 ## 983. Minimum Cost For Tickets｜ 4/26
 In a country popular for train travel, you have planned some train travelling one year in advance.  The days of the year that you will travel is given as an array days.  Each day is an integer from 1 to 365.
