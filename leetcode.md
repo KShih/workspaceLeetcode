@@ -8256,6 +8256,106 @@ class LRUCache(object):
             entry.prev = self.tail
             self.tail = entry
 ```
+
+```py
+class DLinkedNode():
+    def __init__(self):
+        self.key = 0
+        self.value = 0
+        self.prev = None
+        self.next = None
+
+class LRUCache():
+    def _add_node(self, node):
+        """
+        Always add the new node right after head.
+        """
+        node.prev = self.head
+        node.next = self.head.next
+
+        self.head.next.prev = node
+        self.head.next = node
+
+    def _remove_node(self, node):
+        """
+        Remove an existing node from the linked list.
+        """
+        prev = node.prev
+        new = node.next
+
+        prev.next = new
+        new.prev = prev
+
+    def _move_to_head(self, node):
+        """
+        Move certain node in between to the head.
+        """
+        self._remove_node(node)
+        self._add_node(node)
+
+    def _pop_tail(self):
+        """
+        Pop the current tail.
+        """
+        res = self.tail.prev
+        self._remove_node(res)
+        return res
+
+    def __init__(self, capacity):
+        """
+        :type capacity: int
+        """
+        self.cache = {}
+        self.size = 0
+        self.capacity = capacity
+        self.head, self.tail = DLinkedNode(), DLinkedNode()
+
+        self.head.next = self.tail
+        self.tail.prev = self.head
+
+
+    def get(self, key):
+        """
+        :type key: int
+        :rtype: int
+        """
+        node = self.cache.get(key, None)
+        if not node:
+            return -1
+
+        # move the accessed node to the head;
+        self._move_to_head(node)
+
+        return node.value
+
+    def put(self, key, value):
+        """
+        :type key: int
+        :type value: int
+        :rtype: void
+        """
+        node = self.cache.get(key)
+
+        if not node:
+            newNode = DLinkedNode()
+            newNode.key = key
+            newNode.value = value
+
+            self.cache[key] = newNode
+            self._add_node(newNode)
+
+            self.size += 1
+
+            if self.size > self.capacity:
+                # pop the tail
+                tail = self._pop_tail()
+                del self.cache[tail.key]
+                self.size -= 1
+        else:
+            # update the value.
+            node.value = value
+            self._move_to_head(node)
+```
 ---
 
 ## 4. Median of Two Sorted Arrays｜ 8/30
@@ -12961,16 +13061,16 @@ class Solution:
         return dum.next
 
     def reverseOneGroup(self, pre, nxt):
-        last = pre.next
-        cur = last.next
+        fir = pre.next
+        sec = fir.next
 
-        while cur != nxt:
-            last.next = cur.next # cannot use temp here, cuz we have to maintain the start point of reversing
-            cur.next = pre.next
-            pre.next = cur
-            cur = last.next
+        while sec != nxt:
+            fir.next = sec.next # cannot use temp here, cuz we have to maintain the start point of reversing
+            sec.next = pre.next
+            pre.next = sec
+            sec = fir.next
 
-        return last
+        return fir
 ```
 ---
 ## 237. Delete Node in a Linked List｜ 10/23
@@ -18211,6 +18311,28 @@ There are a total of numCourses courses you have to take, labeled from 0 to numC
 Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
 
 Given the total number of courses and a list of prerequisite pairs, is it possible for you to finish all courses?
+
+
+Example 1:
+
+Input: numCourses = 2, prerequisites = [[1,0]]
+Output: true
+Explanation: There are a total of 2 courses to take.
+             To take course 1 you should have finished course 0. So it is possible.
+Example 2:
+
+Input: numCourses = 2, prerequisites = [[1,0],[0,1]]
+Output: false
+Explanation: There are a total of 2 courses to take.
+             To take course 1 you should have finished course 0, and to take course 0 you should
+             also have finished course 1. So it is impossible.
+
+
+Constraints:
+
+The input prerequisites is a graph represented by a list of edges, not adjacency matrices. Read more about how a graph is represented.
+You may assume that there are no duplicate edges in the input prerequisites.
+1 <= numCourses <= 10^5
 
 ![](assets/markdown-img-paste-20200326132525643.png)
 
