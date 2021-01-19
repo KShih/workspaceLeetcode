@@ -8158,105 +8158,22 @@ Could you do both operations in O(1) time complexity?
 
 Example:
 ![](assets/markdown-img-paste-2019082922284299.png)
+
+### 解題分析
+1. 用LinkedList來實作 cache 的機制，但為了使新增與刪除更加快速，選擇使用雙頭LinkedList
+2. 實作 put:
+    1. Put 已存在
+        1. 為了 O(1) 找到該資料在LinkedList的位置來`更新值`與`移動到頭`，使用 map 來存 {key: Node}
+    2. Put 不存在
+        1. 為了讓過舊的資料再刪除時(pop_tail)能一並更新 map(del cache[key]) ，所以 Node 的資料結構要加入 key, value
+
 ### 思路
 
-- 用dummy和tail去指向linklist的頭尾
-- 用雙向指針去刪除節點
-- 要拿entryFinder的值用 .get(key)
-- 刪除entryFinder的值用 del entryFinder[key]
-
-
-    dummy -> entry -> entry ->entry -> entry(tail)
-
-    entryFinder = { key, {key, value} }
+- 用 head 和 tail 去指向linklist的頭尾, 以方便插入新結點以及移除過舊的節點
+    - head -> entry -> entry -> entry -> tail
+- 用雙向指針去刪除特定節點
 
 ### Code
-``` py
-'''
-    dummy -> entry -> entry ->entry -> entry(tail)
-    entryFinder = { key, {key, value} }
-'''
-
-class Node:
-    def __init__(self, key, value):
-        self.key = key
-        self.value = value
-        self.prev = None
-        self.next = None
-
-
-class LRUCache(object):
-
-    def __init__(self, capacity):
-        """
-        :type capacity: int
-        """
-        self.capacity = capacity
-        self.size = 0 # Current size of the cache (linklist)
-        self.dummy = Node(-1,-1)
-        self.tail = self.dummy # Point to the end of list
-        self.entryFinder = {} #  { key, {key, value} }
-
-    def get(self, key):
-        """
-        :type key: int
-        :rtype: int
-        """
-        entry = self.entryFinder.get(key)
-        if entry is not None:
-            self.renew(entry)
-            return entry.value
-        else:
-            return -1
-
-    def put(self, key, value):
-        """
-        :type key: int
-        :type value: int
-        :rtype: None
-        """
-        entry = self.entryFinder.get(key)
-        if entry is None:
-            entry = Node(key, value)
-            self.entryFinder[key] = entry
-
-            # link new node to the tail of list
-            self.tail.next = entry
-            entry.prev = self.tail
-            self.tail = entry
-
-            # Check if over the capcity
-            if self.size < self.capacity:
-                self.size += 1
-            else:
-                # Remove the Node at the most front of the list
-                head = self.dummy.next
-                if head is not None:
-                    self.dummy.next = head.next
-                    head.next.prev = self.dummy
-                # Remove it from dictionary
-                del self.entryFinder[head.key]
-        else:
-            # Put the renew data, whose key exist but the value update, the the tail of the list
-            entry.value = value
-            self.renew(entry)
-
-    # Move the used data to the end of the list
-    def renew(self, entry):
-        if self.tail != entry:
-            # delete(jump over) the entry and linked
-            prevNode = entry.prev
-            nextNode = entry.next
-            prevNode.next = nextNode
-            nextNode.prev = prevNode
-
-            # link the entry to the tail of the list
-            entry.next = None
-            self.tail.next = entry
-            entry.prev = self.tail
-            self.tail = entry
-```
-
 ```py
 class DLinkedNode():
     def __init__(self):
@@ -8356,6 +8273,7 @@ class LRUCache():
             node.value = value
             self._move_to_head(node)
 ```
+### Tag: #LinkedList #DoublyLinkedList
 ---
 
 ## 4. Median of Two Sorted Arrays｜ 8/30

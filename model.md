@@ -180,6 +180,9 @@ class Solution:
     1. phase1: 快慢指針找出重合點
     2. phase2: 另一個指針從起始點出發, 與慢指針一步步前進, 重合處即是環的開始
     3. 見 LC142, 287
+2. Doubly LinkedList
+    1. Insert, Delete: O(1)
+    2. Example: LRU cache <LC146>
 
 ---
 
