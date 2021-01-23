@@ -5513,6 +5513,27 @@ Output: 1->1->2->3->4->4
 Understand with Solution1 (Iterative Way). And learn to write Solution2 (Recursive Way).
 
 ### Code
+
+```py
+class Solution:
+    def mergeTwoLists(self, l1: ListNode, l2: ListNode) -> ListNode:
+        res = ListNode(-1)
+        dum = res
+        while l1 and l2:
+            if l1.val < l2.val:
+                res.next = l1
+                l1 = l1.next
+            else:
+                res.next = l2
+                l2 = l2.next
+            res = res.next
+        if l1:
+            res.next = l1
+        elif l2:
+            res.next = l2
+        return dum.next
+```
+
 Solution1:
 ``` c
 class Solution {
@@ -5556,7 +5577,7 @@ public:
     }
 };
 ```
-
+### Tag: #LinkedList
 ---
 ## 23. Merge k Sorted Lists｜ 7/5
 Merge k sorted linked lists and return it as one sorted list. Analyze and describe its complexity.
