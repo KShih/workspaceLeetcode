@@ -183,6 +183,9 @@ class Solution:
 2. Doubly LinkedList
     1. Insert, Delete: O(1)
     2. Example: LRU cache <LC146>
+3. 在某個節點前插入新結點
+    1. 修改current dummy 的值
+    2. 插入新的dummy 並指向舊的dummy
 
 ---
 

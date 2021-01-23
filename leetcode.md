@@ -5182,6 +5182,12 @@ Follow up:
 What if you cannot modify the input lists? In other words, reversing the lists is not allowed.
 ![](assets/markdown-img-paste-20190703220625136.png)
 
+### 解題分析
+1. 加法的操作一定要從最低位開始
+2. 如果不能使用reverse linked list，當要反轉一個東西時第一個想到的就是stack
+3. 在 return 時也要是正序的，此時只有一種方法，插入到此 node 之前
+4. 這邊用的方法就是去更改 dummy node 的值，為此次要插入的值，隨後在插入一個新的dummy node供下次操作使用
+
 ### 思路
 If we reverse the linked list, this question is as same as the #2.
 However, we use stack to solve this question.
@@ -5202,6 +5208,39 @@ Edge case:
     [1] + [9,9] = [1,0] + [9,9] = [1,0,9]
 
 ### Code
+```py
+class Solution:
+    def addTwoNumbers(self, l1: ListNode, l2: ListNode) -> ListNode:
+        s1, s2 = self.toStack(l1), self.toStack(l2)
+        head = ListNode(-1)
+        carry = 0
+
+        while s1 or s2:
+            if s1:
+                carry += s1.pop().val
+            if s2:
+                carry += s2.pop().val
+
+            head.val = carry % 10 # replace the current dum value
+            dum = ListNode(-1) # insert a new dum node for next op at prev of head
+            dum.next = head
+            head = dum
+
+            carry //= 10
+        if carry == 1:
+            head.val = 1
+            return head
+        else:
+            return head.next
+
+    def toStack(self, l1):
+        s1 = []
+        while l1:
+            s1.append(l1)
+            l1 = l1.next
+        return s1
+```
+
 ``` c
 class Solution {
 public:
@@ -5231,6 +5270,7 @@ public:
     }
 };
 ```
+### Tag: #LinkedList
 ---
 ## 24. Swap Nodes in Pairs｜ 7/4
 Given a linked list, swap every two adjacent nodes and return its head.
