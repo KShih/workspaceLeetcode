@@ -5582,6 +5582,17 @@ public:
 ## 23. Merge k Sorted Lists｜ 7/5
 Merge k sorted linked lists and return it as one sorted list. Analyze and describe its complexity.
 ![](assets/markdown-img-paste-20190705142804335.png)
+
+### 解題分析
+1. Divide and Conquer
+    1. 當 lists 長度為 1 的時候，長度為 2 的時候就跟LC21一樣
+    2. 分割到最小單位即是一個Linklist, 所以 helper 的終止條件為當 l == r
+    3. 若還可分割就繼續分割然後合併
+2. PriorityQueue
+    1. 這邊千萬別把所有的 node 都塞進 pq 裡，我們只在意各個 List 中的第一個 node
+    2. python 的 pq 不能自定義compare rule，所以這邊把此 node 的 idx pair 起來，以作後續的 mapping
+    3. 在 pop pq 並依序用指針串起來後，再繼續 push 節點進 pq，並更新 mapping 到的頭節點為下個結點
+    
 ### 思路
 
 - Sol 1: Merge two list is easier to solve, so here we use divide and conquer to do.
@@ -5600,6 +5611,65 @@ Merge k sorted linked lists and return it as one sorted list. Analyze and descri
 
 
 ### Code
+Divide&Conquer
+```py
+class Solution:
+    def mergeKLists(self, lists: List[ListNode]) -> ListNode:
+        self.lists = lists
+        return self.mergeHelper(0, len(lists)-1)
+
+    def mergeHelper(self, l, r):
+        if l == r:
+            # Conquer
+            return self.lists[l]
+        # Divide
+        mid = l + (r-l)//2
+        leftStartNode = self.mergeHelper(l, mid)
+        rightStartNode = self.mergeHelper(mid+1, r)
+
+        # Merge
+        return self.mergeTwoLists(leftStartNode, rightStartNode)
+
+    # (same as LC21)
+    def mergeTwoLists(self, l1, l2):
+        res = ListNode(-1)
+        dum = res
+        while l1 and l2:
+            if l1.val < l2.val:
+                res.next = l1
+                l1 = l1.next
+            else:
+                res.next = l2
+                l2 = l2.next
+            res = res.next
+        if l1:
+            res.next = l1
+        elif l2:
+            res.next = l2
+        return dum.next
+```
+
+Priority Queue
+```py
+class Solution:
+    def mergeKLists(self, lists: List[ListNode]) -> ListNode:
+        pq, dum = [], ListNode(-1)
+        head = dum
+        for list_idx, node in enumerate(lists):
+            if node:
+                heapq.heappush(pq, (node.val, list_idx))
+        while pq:
+            _, list_idx = heapq.heappop(pq)
+            node = lists[list_idx]
+            head.next = node
+            head = head.next
+
+            if node.next:
+                heapq.heappush(pq, (node.next.val, list_idx))
+                lists[list_idx] = node.next
+        return dum.next
+```
+
 Solution1 (Divide and Conquer) beat 99%:
 ``` c
 class Solution {
@@ -5687,6 +5757,7 @@ public:
     }
 };
 ```
+### Tag: #DivideAndConquer #Recursive #LinkedList #PriorityQueue
 ---
 ## 147. Insertion Sort List｜ 7/8
 Sort a linked list using insertion sort.
