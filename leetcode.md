@@ -12752,6 +12752,19 @@ Given n will always be valid.
 Follow up:
 
 Could you do this in one pass?
+
+### 解題分析
+
+one-path的方法是先讓快指針走了n步
+
+在開始同時讓快慢指針同時前進
+
+當快指針走到底時，慢指針會剛好指導倒數第n個 linklist[-n]
+
+再將此節點刪除即可
+
+一樣需要用到dummy的觀念
+
 ### 思路
 
 只要會刪除到頭節點，
@@ -12821,7 +12834,7 @@ one-path:
 def removeNthFromEnd(self, head, n):
     dummy = ListNode(0)
     dummy.next = head
-    fast = slow = dummy
+    fast = slow = dummy # Note here should be start at dum node
     for _ in xrange(n):
         fast = fast.next
     while fast and fast.next:
@@ -12850,6 +12863,7 @@ class Solution(object):
 
         return head
 ```
+### Tag: #LinkedList
 ---
 ## 24. Swap Nodes in Pairs｜ 10/22 // TODO: Figure out recursive way
 Given a linked list, swap every two adjacent nodes and return its head.
