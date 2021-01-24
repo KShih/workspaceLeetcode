@@ -13108,7 +13108,7 @@ class Solution:
         return res
 ```
 ---
-## 25. Reverse Nodes in k-Group｜ 10/23 // TODO: re-understanding, 好難...
+## 25. Reverse Nodes in k-Group｜ 10/23
 
 Given a linked list, reverse the nodes of a linked list k at a time and return its modified list.
 
@@ -13127,6 +13127,22 @@ Note:
 Only constant extra memory is allowed.
 
 You may not alter the values in the list's nodes, only nodes itself may be changed.
+
+### 解題分析
+
+1. 用 mod 來協助我們找出要 reverse 之 group
+2. 由 pre 指著 group 的前一元素，找到 group 之後，cur.next 為 group 的下個節點(終止點)
+3. 我們設計一個 reverse func 會回傳 reverse 後group的末節點，assign 其為下個group的前節點
+4. reverse func 不要被嚇到，把圖畫出來，把線連起來，Easy
+    1. 首先先確定我們的目標，pre 為永遠不動的指標，用來串上從list中拔出來往前移的節點
+        1. PRE -> 1 -> 2 -> 3 -> 4 -> END
+        2. PRE -> 2 -> 1 -> 3 -> 4 -> END
+        3. PRE -> 3 -> 2 -> 1 -> 4 -> END
+    2. fir 為第一次初始化的 pre.next，其之後也不會改變
+    3. sec 為 fir.next，其為需移動到 group 頭的節點
+    4. 反覆做直到走到 sec 碰到 END 的時候 (END 不需要被移動)
+    5. 最後 return fir 成為下個 group 的 pre
+
 ### 思路
 
 - 如何寫Reverse LinkedList的Template:
@@ -13163,7 +13179,7 @@ class Solution:
         sec = fir.next
 
         while sec != nxt:
-            fir.next = sec.next # cannot use temp here, cuz we have to maintain the start point of reversing
+            fir.next = sec.next
             sec.next = pre.next
             pre.next = sec
             sec = fir.next
