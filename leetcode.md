@@ -14762,6 +14762,17 @@ rotate 3 steps to the right: 0->1->2->NULL
 
 rotate 4 steps to the right: 2->0->1->NULL
 
+### 解題分析
+1. Rotate the LinkedList 就是把頭尾接在一起，再來做找新頭跟斷尾
+2. 若是逆時針，則新頭的位置是在 k % length
+3. 但因為這題是順時針的關係，新頭就變成 length - k % length
+4. 斷尾
+    1. 好理解版：斷尾跟找新頭分開來做，要多一個回圈
+    2. 一起做版：
+        1. 我們把 head 還原到一開始的位置，來找到新頭的 *前一個*，因此此處的 rotation times 要 -1
+        2. 找到後，把 head.next 設為新頭
+        3. 並把 head.next 指向空，即斷尾完成
+
 ### 思路
 
 暴力法肯定超時,
@@ -14788,6 +14799,63 @@ k = 1, time = 3
 
 所以時機點為( length - k % length ) - 1
 ### Code
+
+好理解版
+```py
+class Solution:
+    def rotateRight(self, head: ListNode, k: int) -> ListNode:
+        if not head:
+            return None
+
+        newHead = head
+        length = 1
+
+        # circlize the list
+        while head.next:
+            head = head.next
+            length += 1
+        head.next = newHead
+
+        # find the new head
+        rotate_times = length - k % length
+        for _ in range(rotate_times):
+            newHead = newHead.next
+
+        # cut the tail
+        cutTail = newHead
+        for _ in range(length-1):
+            cutTail = cutTail.next
+        cutTail.next = None
+
+        return newHead
+```
+
+少用一個回圈版
+```py
+def rotateRight(self, head: ListNode, k: int) -> ListNode:
+    if not head:
+        return None
+
+    newHead = head
+    length = 1
+
+    # circlize the list
+    while head.next:
+        head = head.next
+        length += 1
+    head.next = newHead
+
+    # find the node "before" new head
+    rotate_times = length - k % length - 1
+    head = head.next # move back the head to its original place
+    for _ in range(rotate_times):
+        head = head.next
+    newHead = head.next
+    head.next = None
+
+    return newHead
+```
+
 ``` py
 class Solution:
     def rotateRight(self, head: ListNode, k: int) -> ListNode:
@@ -14819,6 +14887,7 @@ class Solution:
             head = head.next
         return count
 ```
+### Tag: #LinkedList
 ---
 ## 62. Unique Paths｜ 11/25
 A robot is located at the top-left corner of a m x n grid (marked 'Start' in the diagram below).
