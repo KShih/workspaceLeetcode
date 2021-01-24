@@ -9714,6 +9714,10 @@ remove(val): Removes an item val from the set if present.
 getRandom: Returns a random element from current set of elements. Each element must have the same probability of being returned.
 ![](assets/markdown-img-paste-20190910231138287.png)
 
+### 解題分析
+1. remove 不能用 pop 特定 index 的方法，因為後面的元素也必須往前補
+2. 但可以把 list 最後的元素的index換到要被刪掉那個的位置
+
 ### 技巧
 
 1. 字典的set(), get() 都是O(1)
@@ -9726,6 +9730,38 @@ getRandom: Returns a random element from current set of elements. Each element m
 ### 思路
 
 ### Code
+```py
+class RandomizedSet:
+
+    def __init__(self):
+        self.list = []
+        self.index = {}
+
+    def insert(self, val: int) -> bool:
+        if self.index.get(val) != None:
+            return False
+        next = len(self.list)
+        self.index[val] = next
+        self.list.append(val)
+        return True
+
+    def remove(self, val: int) -> bool:
+        if self.index.get(val) == None:
+            return False
+        idx = self.index[val]
+        del self.index[val]
+
+        # replace with the last elem
+        # can't use pop(idx) unless we move all elems after idx infront
+        last = self.list.pop()
+        self.list[idx] = last
+        self.index[last] = idx
+        return True
+
+    def getRandom(self) -> int:
+        rand_idx = random.randint(0, len(self.list)-1)
+        return self.list[rand_idx]
+```
 ``` py
 """
  Your RandomizedSet object will be instantiated and called as such:
@@ -9783,6 +9819,7 @@ class RandomizedSet(object):
         import random
         return random.choice(self.num)
 ```
+### Tag: #Array #HashMap
 ---
 ## 324. Wiggle Sort II｜ 9/18
 Given an unsorted array nums, reorder it such that nums[0] < nums[1] > nums[2] < nums[3]....
