@@ -5291,6 +5291,22 @@ Swap process is as below:
 Plus step 5, move the cursor to next swap target.
 
 ### Code
+```py
+class Solution:
+    def swapPairs(self, head: ListNode) -> ListNode:
+        dum = ListNode(-1)
+        dum.next = head
+        cur = dum
+
+        while cur.next and cur.next.next:
+            fir = cur.next
+            sec = cur.next.next
+            fir.next = sec.next
+            sec.next = fir
+            cur.next = sec
+            cur = fir
+        return dum.next
+```
 ``` c
 /*
 * Definition for singly-linked list.
@@ -5325,6 +5341,7 @@ public:
    }
 };
 ```
+### Tag: #LinkedList
 ---
 ## 206. Reverse Linked List｜ 8/13
 Reverse a singly linked list.
@@ -5592,7 +5609,7 @@ Merge k sorted linked lists and return it as one sorted list. Analyze and descri
     1. 這邊千萬別把所有的 node 都塞進 pq 裡，我們只在意各個 List 中的第一個 node
     2. python 的 pq 不能自定義compare rule，所以這邊把此 node 的 idx pair 起來，以作後續的 mapping
     3. 在 pop pq 並依序用指針串起來後，再繼續 push 節點進 pq，並更新 mapping 到的頭節點為下個結點
-    
+
 ### 思路
 
 - Sol 1: Merge two list is easier to solve, so here we use divide and conquer to do.
