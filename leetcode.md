@@ -15372,6 +15372,44 @@ class Solution:
                 cur += 1
 ```
 ---
+## 83. Remove Duplicates from Sorted List｜ 8/29
+Given the head of a sorted linked list, delete all duplicates such that each element appears only once. Return the linked list sorted as well.
+
+![](assets/markdown-img-paste-20210124235919123.png)
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def deleteDuplicates(self, head: ListNode) -> ListNode:
+        dum = ListNode(-1)
+        dum.next = head
+        while head and head.next:
+            cur = head
+            next = head.next
+            while next != None and cur.val == next.val:
+                next = next.next
+
+            head.next = next
+            head = head.next
+        return dum.next
+```
+
+Optimal
+```py
+class Solution:
+    def deleteDuplicates(self, head: ListNode) -> ListNode:
+        cur=head
+        while cur:
+            while cur.next and cur.next.val==cur.val:
+                cur.next=cur.next.next
+            cur=cur.next
+        return head
+```
+
+### Tag: #LinkedList
+---
 ## 82. Remove Duplicates from Sorted List II｜ 12/2
 Given a sorted linked list, delete all nodes that have duplicate numbers, leaving only distinct numbers from the original list.
 
