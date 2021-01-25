@@ -15425,6 +15425,16 @@ Input: 1->1->1->2->3
 
 Output: 2->3
 
+### 解題分析
+1. 如果需要連自己都 skip 掉的話，就必須站在前一個位置看自己
+2. while loop 大致與 LC83 精簡寫法一樣
+3. 在 進入到下次while前，不一樣的地方來了
+    1. 如果有進到 remove process:
+        1. 必須要再往前移一格 prev.next 指到的 elem, 因為在remove完所指到的是最後一個一樣的 elem, 但在這題連一個都不能留
+        2. 因此用一個 flag 去紀錄是否有進到 remove process
+        3. 並且我們 prev 的位置不用推進
+    2. 沒遇到重複就如同一般推進 prev
+
 ### 思路
 Iterative:
 
@@ -15457,6 +15467,28 @@ Recursive:
 將返回值連到 head 的後面，這樣 head 結點還是保留下來了，因為值不同嘛，最後返回 head 即可
 
 ### Code
+
+modify from LC83, optimal
+```py
+class Solution:
+    def deleteDuplicates(self, head: ListNode) -> ListNode:
+        dum = ListNode(-1)
+        dum.next = head
+        prev = dum
+
+        while prev.next:
+            flag = False
+            while prev.next and prev.next.next and prev.next.val == prev.next.next.val:
+                flag = True
+                prev.next = prev.next.next
+
+            if flag: # need to take one more step forward to remove the remain duplicate, but don't move the prev
+                prev.next = prev.next.next
+            else:
+                prev = prev.next
+        return dum.next
+```
+
 Iterative:
 ``` py
 class Solution:
@@ -15491,6 +15523,7 @@ class Solution:
         head.next = self.deleteDuplicates(head.next) # 用這樣串起來的！
         return head
 ```
+### Tag: #LinkedList
 ---
 ## 84. Largest Rectangle in Histogram｜ 12/2
 Given n non-negative integers representing the histogram's bar height where the width of each bar is 1, find the area of largest rectangle in the histogram.
