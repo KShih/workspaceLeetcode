@@ -16175,6 +16175,14 @@ Example:
 
 ![](assets/markdown-img-paste-20191206174914527.png)
 
+### 解題分析
+0. 精簡解法太美了
+1. 從中間把整顆樹拉起來，因此必須先找到 list 的中點，用快慢指針找list中點法
+2. 再分別對其左右半部的 list 進行遞迴
+3. 找根節點的值
+    1. 解法1, 2 都必須用到額外多一個點去紀錄 slow 前一個節點，才能透過 prev.next = None 去切割
+    2. 精簡解法巧妙的將 fast 往前多移一格，當走到底的時後，root 的位置在 slow.next，因此可以直接 slow.next = None 去切
+
 ### 技巧
 
 - 找list的中點使用快慢指針
@@ -16268,6 +16276,7 @@ def sortedListToBST(self, head):
     root.right = self.sortedListToBST(tmp.next)
     return root
 ```
+### Tag: #LinkedList #BST
 ---
 ## 114. Flatten Binary Tree to Linked List｜ 12/8
 Given a binary tree, flatten it to a linked list in-place.
