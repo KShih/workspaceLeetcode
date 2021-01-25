@@ -15637,6 +15637,16 @@ Output: 1->2->2->4->3->5
 
 而dum, new_dum永遠維持不變
 
+### 解題分析
+1. 要把所有小於 x 的點都集中到前面，那麼首先我們要先定義何謂前面？誰的前面？
+2. 答案是第一個 大於等於 x 的點作為切割前後的標竿
+3. 需要用一個 prev 去紀錄哪裡是標竿的前面，因為我們會從標竿後第一個節點開始找到尾巴，然後把小於x的點移到 prev 的下個點
+    1. 要先把 prev.next 記錄下來，作為插入新節點後的 next
+    2. 連接到 prev.next 後
+    3. 跳過該節點
+    4. 把插入的點的 next 連接到舊的 prev.next
+    5. prev 往前移一格
+
 ### 思路
 分割時,可以真的分割如1. 或者new一個新list來代表分割後的結果
 
@@ -15655,6 +15665,29 @@ Output: 1->2->2->4->3->5
 走訪完後, 把兩個list連在一起
 
 ### Code
+move in place
+```py
+class Solution:
+    def partition(self, head: ListNode, x: int) -> ListNode:
+        prev = ListNode(-1)
+        prev.next = head
+        dum = prev
+        while head and head.val < x: # find the node who split front and back
+            head = head.next
+            prev = prev.next
+
+        while head and head.next: # check from head.next since already check the front
+            if head.next.val < x:
+                old_prev_next = prev.next # memo the node after the insertion point
+                prev.next = head.next # concat the node to front part
+                head.next = head.next.next # remove the node in back part
+                prev.next.next = old_prev_next # concat the original next node to the new node in front part
+                prev = prev.next # move forward the node in front part
+            else:
+                head = head.next
+        return dum.next
+```
+
 新list法:
 ``` py
 class Solution:
@@ -15720,6 +15753,7 @@ class Solution:
             else:
                 new_head = new_head.next
 ```
+### Tag: #LinkedList
 ---
 ## 85. Maximal Rectangle｜ 12/4
 Given a 2D binary matrix filled with 0's and 1's, find the largest rectangle containing only 1's and return its area.
