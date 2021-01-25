@@ -13258,6 +13258,10 @@ Input: 1->2->3->4->5->NULL, m = 2, n = 4
 
 Output: 1->4->3->2->5->NULL
 
+### 解題分析
+1. 找出邊界: 旋轉開始的前一個點, 旋轉結束的後一個點
+2. reverse
+
 ### 思路
 
 reverse的寫法與上題一樣
@@ -13267,6 +13271,32 @@ reverse的寫法與上題一樣
 如果用first做停止點, second有機會是Null然後Null.next就爆了
 
 ### Code
+
+```py
+class Solution:
+    def reverseBetween(self, head: ListNode, m: int, n: int) -> ListNode:
+        dum = ListNode(-1)
+        dum.next = head
+        prev = dum
+
+        # find the boundary
+        for _ in range(n):
+            m -= 1
+            if m == 1:
+                prev = head
+            head = head.next
+
+        # reverse from prev.next to the one before head
+        first = prev.next
+        target = first.next
+        while target != head:
+            first.next = target.next
+            target.next = prev.next
+            prev.next = target
+            target = first.next
+        return dum.next
+```
+
 ``` py
 class Solution:
     def reverseBetween(self, head: ListNode, m: int, n: int) -> ListNode:
@@ -13297,6 +13327,7 @@ class Solution:
             second = first.next
         return second
 ```
+### Tag: #LinkedList
 ---
 ## 339. Nested List Weight Sum｜ 10/27
 Given a nested list of integers, return the sum of all integers in the list weighted by their depth.
