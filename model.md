@@ -181,6 +181,7 @@ class Solution:
     2. phase2: 另一個指針從起始點出發, 與慢指針一步步前進, 重合處即是環的開始
     3. 見 LC142, 287
 2. 快慢指針找 List 中點 <LC109>
+    1. head 多先走一步，就可以不需要用到 dum
 2. Doubly LinkedList
     1. Insert, Delete: O(1)
     2. Example: LRU cache <LC146>

@@ -5831,6 +5831,12 @@ public:
 Sort a linked list in O(n log n) time using constant space complexity.
 ![](assets/markdown-img-paste-2019070911421222.png)
 
+### 解題分析
+1. n log n 的排序只有 快速排序，歸併排序，堆排序
+2. 而 LinkedList 的特性是無法透過 index access, 所以快排不適合
+3. Heap sort 也不錯，但缺點是需要新建立節點
+4. Merge sort 最適合
+
 ### 思路
 
 ![](assets/markdown-img-paste-20190709114231524.png)
@@ -5839,6 +5845,38 @@ Sort a linked list in O(n log n) time using constant space complexity.
 併排序的核心是一個 merge() 函數，其主要是合併兩個有序鏈表，這個在 LeetCode 中也有單獨的題目 Merge Two Sorted Lists。由於兩個鏈表是要有序的才能比較容易 merge，那麼對於一個無序的鏈表，如何才能拆分成有序的兩個鏈表呢？我們從簡單來想，什麼時候兩個鏈表一定都是有序的？就是當兩個鏈表各只有一個結點的時候，一定是有序的。而歸併排序的核心其實是分治法 Divide and Conquer，就是將鏈表從中間斷開，分成兩部分，左右兩邊再分別調用排序的遞歸函數 sortList()，得到各自有序的鏈表後，再進行 merge()，這樣整體就是有序的了。因為子鏈表的遞歸函數中還是會再次拆成兩半，當拆到鏈表只有一個結點時，無法繼續拆分了，而這正好滿足了前面所說的“一個結點的時候一定是有序的”，這樣就可以進行 merge 了。然後再回溯回去，每次得到的都是有序的鏈表，然後進行 merge，直到還原整個長度。這裡將鏈表從中間斷開的方法，採用的就是快慢指針，大家可能對快慢指針找鏈表中的環比較熟悉，其實找鏈表中的中點同樣好使，因為快指針每次走兩步，慢指針每次走一步，當快指針到達鏈表末尾時，慢指針正好走到中間位置
 
 ### Code
+```py
+class Solution:
+    def sortList(self, head: ListNode) -> ListNode:
+        if not head or not head.next:
+            return head
+        slow, fast = head, head.next
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+
+        list1 = head
+        list2 = slow.next
+        slow.next = None
+        return self.mergeSortedList(self.sortList(list1), self.sortList(list2))
+
+    def mergeSortedList(self, l1, l2):
+        head = ListNode(-1)
+        dum = head
+        while l1 and l2:
+            if l1.val < l2.val:
+                head.next = l1
+                l1 = l1.next
+            else:
+                head.next = l2
+                l2 = l2.next
+            head = head.next
+        if l1:
+            head.next = l1
+        elif l2:
+            head.next = l2
+        return dum.next
+```
 ``` c
 class Solution {
 public:
@@ -5870,6 +5908,7 @@ public:
     }
 };
 ```
+### Tag: #Linklist #MergeSort
 ---
 ## 707. Design Linked List｜ 7/11
 Design your implementation of the linked list. You can choose to use the singly linked list or the doubly linked list. A node in a singly linked list should have two attributes: val and next. val is the value of the current node, and next is a pointer/reference to the next node. If you want to use the doubly linked list, you will need one more attribute prev to indicate the previous node in the linked list. Assume all nodes in the linked list are 0-indexed.
