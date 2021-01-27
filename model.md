@@ -194,7 +194,9 @@ class Solution:
     2. 當快指針走到底時，慢指針的位置即為所求
 5. 旋轉 LinkedList
     1. 頭尾相接，然後做兩件事：找出新頭, 斷尾
-
+6. 跳者走訪 LinkedList
+    1. 用兩個指標 first, second
+    2. first.next = second.next, second.next = first.next.next
 ---
 
 ## Bit manipulate

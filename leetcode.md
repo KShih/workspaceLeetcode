@@ -25370,14 +25370,10 @@ The length of the linked list is between [0, 10^4].
 ``` py
 class Solution:
     def oddEvenList(self, head: ListNode) -> ListNode:
-        if not head:
-            return None
-
+        if not head or not head.next:
+            return head
         first, second, secondHead = head, head.next, head.next
-        if not second:
-            return first
-
-        while first and second and second.next:
+        while second and second.next:
             first.next = second.next
             second.next = first.next.next
             first = first.next
