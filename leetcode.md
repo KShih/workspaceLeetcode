@@ -17343,6 +17343,18 @@ random_index: the index of the node (range from 0 to n-1) where random pointer p
 
 ![](assets/markdown-img-paste-20200302232748736.png)
 
+### 解題分析
+
+0. 這題的難點是在還必須維繫Random Pointer，也就是新的List中的Random pointer也是指向新的節點，做法有二
+1. Neibor解法: 在旁邊複製一個新的
+    1. 與舊 code 不一樣的地方是，新的寫法把 connect random and connect next 寫再一起了
+    2. 重點有一個，因為 random 的資訊是存在 head, 但 head 的 copy 在 head.next，因此我們必須*站在 copy 的後面*去更改它
+    3. 因此我們初始化 newHead 的時候是給予其 head, 這個值的意義僅僅在我們可以操作他的 next
+    4. 因此在 while 回圈裡面操作新節點的部分都是操作 newHead.next (e.g. newHead.next.random = ... )
+2. Dictionary 解法:
+    1. 將新舊節點 mapping 起來
+    2. 需注意在做串接的時候直接透過 dict 去操作新節點
+
 ### 思路
 
 簡而言之這題就是要求你要完整(深度)複製一個LinkedList(每個節點都要複製)，
@@ -17381,7 +17393,44 @@ random_index: the index of the node (range from 0 to n-1) where random pointer p
 最後一個步驟就是將新的節點取出
 
 ### Code
+Neighbor 解法:
+```py
+class Solution:
+    def copyRandomList(self, head: 'Node') -> 'Node':
+        self.addNeighbor(head)
+        return self.connect(head)
 
+    def addNeighbor(self, head):
+        node = head
+        while node:
+            nxt = node.next
+            newNode = Node(node.val)
+            node.next = newNode
+            newNode.next = nxt
+            node = nxt
+        return head
+
+    def connect(self, head):
+        if not head or not head.next:
+            return
+        newHead = head # work as dum node
+        res = newHead.next
+
+        while head and head.next:
+            temp = head.next.next
+            newHead.next = head.next
+            if head.random:
+                newHead.next.random = head.random.next
+            else:
+                newHead.next.random = None
+
+            head = temp
+            newHead = newHead.next
+
+        return res
+```
+
+Dictionary 解法:
 ``` py
 """
 # Definition for a Node.
@@ -17449,6 +17498,7 @@ class Solution:
         return newhead
 
 ```
+### Tag: #LinkedList #Dictionary
 ---
 ## 137. Single Number II｜ 3/3
 Given a non-empty array of integers, every element appears three times except for one, which appears exactly once. Find that single one.
