@@ -27564,3 +27564,71 @@ class Solution:
 
 ### Tag: #Stack #LinkedList
 ---
+## 829. Consecutive Numbers Sum｜ 1/30
+
+Given a positive integer N, how many ways can we write it as a sum of consecutive positive integers?
+
+Example 1:
+
+- Input: 5
+- Output: 2
+- Explanation: 5 = 5 = 2 + 3
+
+
+Example 2:
+
+- Input: 9
+- Output: 3
+- Explanation: 9 = 9 = 4 + 5 = 2 + 3 + 4
+
+
+Example 3:
+
+- Input: 15
+- Output: 4
+- Explanation: 15 = 15 = 8 + 7 = 4 + 5 + 6 = 1 + 2 + 3 + 4 + 5
+
+Note: 1 <= N <= 10 ^ 9.
+
+### 思路
+
+1. N 為連續整數的和，因此我們可以寫成表達式: N = (x+1) + (x+2) + ... (x+k)
+    - ![](assets/markdown-img-paste-20210130173717605.png)
+2. 化簡後可以得到 N = xk + k(k+1) // 2
+3. 從 xk 可以發覺，假設知道了 k，我們可以用 N % k 是否等於零來知道這個 x 是否有可能為一種解
+4. 這個 k 就是一個範圍，我們在這個範圍嘗試所有的k 並判斷是否為整除，因此下個步驟就是找出這個 k
+5. 數學化簡詳見筆記 or Leetcode Solution
+    - ![](assets/markdown-img-paste-20210130174346878.png)
+6. 優化:
+    1. N = xk + (1+ 2+ ... +k) 在我們的回圈中的意義就是
+        1. 設 k = 1 : N = x*1 + (1) -> (N-1)%1 是否為整數
+        2. 設 k = 2 : N = x*2 + (1+2) -> (N-1-2)%2 是否為整數
+    2. 從 k=1 到 k=2 就是多減了 k，因此我們可以利用遞減 k 來進行優化
+### Code
+``` py
+class Solution:
+    def consecutiveNumbersSum(self, N: int) -> int:
+        res = 0
+        limit = math.ceil((2 * N + 0.25) ** 0.5 - 0.5)
+
+        for k in range(1, limit+1):
+            if (N - k*(k+1)//2) % k == 0:
+                res += 1
+        return res
+```
+
+Optimize
+```py
+class Solution:
+    def consecutiveNumbersSum(self, N: int) -> int:
+        res = 0
+        limit = math.ceil((2 * N + 0.25)**0.5 - 0.5) + 1
+        for k in range(1, limit):
+            N -= k
+            if N % k == 0:
+                res += 1
+        return res
+```
+
+### Tag: #Math
+---
