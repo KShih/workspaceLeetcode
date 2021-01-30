@@ -5490,7 +5490,26 @@ Note: Do not modify the linked list.
 
 [詳細](https://www.cnblogs.com/hiddenfox/p/3408931.html)
 
+**小心！ while loop不可以把 fast != slow 放在 while 的條件判斷式裡，因為 initial slow = fast = head !!**
+
 ### Code
+```py
+class Solution:
+    def detectCycle(self, head: ListNode) -> ListNode:
+        slow, fast = head, head
+
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+            if fast == slow:
+                break
+
+        fast = head
+        while fast != slow:
+            fast = fast.next
+            slow = slow.next
+        return slow
+```
 ``` c
 class Solution {
 public:
