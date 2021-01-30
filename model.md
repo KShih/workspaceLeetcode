@@ -197,6 +197,18 @@ class Solution:
 6. 跳者走訪 LinkedList
     1. 用兩個指標 first, second
     2. first.next = second.next, second.next = first.next.next
+7. Reverse list
+    1. stack 協助
+    2. reverse in place
+        ```py
+        revHead = None # started of the reverse list
+
+        while ptr:
+            nxt = ptr.next
+            ptr.next = revHead
+            revHead = ptr
+            ptr = nxt
+        ```
 ---
 
 ## Bit manipulate

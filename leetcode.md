@@ -6902,6 +6902,20 @@ reorder it to: L0→Ln→L1→Ln-1→L2→Ln-2→…
 You may not modify the values in the list's nodes, only nodes itself may be changed.
 
 ![](assets/markdown-img-paste-20190812083619102.png)
+
+
+### 解題分析
+1. 因為 LinkedList 無法使用 index 去 access 元素，因此我們必須先把插入的元素以及其順序給排好
+2. 這邊首先先用快慢指針找中點的方式找到原始的list以及即將被拿來插入的list
+3. 下一步就是去把要被拿來插入的順序給排好，這邊必須 reverse 這個 part
+    1. 使用 stack reverse
+    2. replace in place
+        1. 首先我們必須先明確的切割兩個 list
+        2. 因此我們在把 reverse 的開頭記錄下來後，先把第一個 list 給設結束
+        3. 然後就使用到 reverse linked list 的模板手法
+4. 最後就是依序將這先點穿插插入到 list 中
+
+
 ### 思路
 The directly think of way is divided into three steps:
 a. find out the mid
@@ -6913,6 +6927,72 @@ We can use the stack to imprement the "reverse" idea (First-in-last-out)
 We can know exactly how much nodes need to be reversely added by getting the middle index of the stack.
 
 ### Code
+use stack
+```py
+class Solution:
+    def reorderList(self, head: ListNode) -> None:
+        """
+        Do not return anything, modify head in-place instead.
+        """
+        while not head:
+            return
+        mid = self.findMid(head)
+        temp = mid
+        stack = []
+        while mid.next: # push the next of the mid
+            stack.append(mid.next)
+            mid.next = mid.next.next
+        temp.next = None
+
+        while head and stack:
+            top = stack.pop()
+            top.next = head.next
+            head.next = top
+            head = head.next.next
+
+    def findMid(self, head):
+        slow, fast = head, head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+        return slow
+```
+
+reverse in place
+```py
+class Solution:
+    def reorderList(self, head: ListNode) -> None:
+        """
+        Do not return anything, modify head in-place instead.
+        """
+        while not head:
+            return
+        mid = self.findMid(head)
+        ptr = mid.next
+        mid.next = None # ended the orig list
+        revHead = None # started of the reverse list
+
+        while ptr:
+            nxt = ptr.next
+            ptr.next = revHead
+            revHead = ptr
+            ptr = nxt
+
+        while head and revHead:
+            nxtRev = revHead.next
+            revHead.next = head.next
+            head.next = revHead
+            head = head.next.next
+            revHead = nxtRev
+
+    def findMid(self, head):
+        slow, fast = head, head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+        return slow
+```
+
 ```c
 class Solution {
 public:
@@ -6974,6 +7054,7 @@ public:
     }
 };
 ```
+### Tag: #LinkedList
 ---
 ## 67. Add Binary｜ 8/13
 Given two binary strings, return their sum (also a binary string).
