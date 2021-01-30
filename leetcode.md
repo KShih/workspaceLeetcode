@@ -5366,6 +5366,35 @@ Recursive is much harder to imagine with.
 6. Return the reverse list results to the upper caller.
 
 ### Code
+
+``` py
+"""
+Solved: CAN YOU DO IT WITHOUT RETURN A NEWHEAD, RETURN THE ORIGINAL HEAD?
+"""
+def reverseList(self, head: ListNode) -> ListNode:
+    # 1->2->3->4->5
+    newHead = None
+    while head:
+        temp = head.next # record 2
+        head.next = newHead # 1->NULL
+        newHead = head # newHead = 1 (the next's parent)
+        head = temp # head = 2
+    return newHead
+```
+
+Recursive
+``` py
+class Solution:
+    def reverseList(self, head: ListNode) -> ListNode:
+        if not head or not head.next: # use not head.next to stand previously
+            return head
+
+        revHead = self.reverseList(head.next) # should not do any modify to it
+        head.next.next = head # modify the second's next to first
+        head.next = None # release the original pointer
+        return revHead
+```
+
 Iterative:
 ``` c
 class Solution {
@@ -5397,44 +5426,6 @@ public:
         return newHead;
     }
 };
-```
-
-``` py
-"""
-Solved: CAN YOU DO IT WITHOUT RETURN A NEWHEAD, RETURN THE ORIGINAL HEAD?
-"""
-def reverseList(self, head: ListNode) -> ListNode:
-    # 1->2->3->4->5
-    newHead = None
-    while head:
-        temp = head.next # record 2
-        head.next = newHead # 1->NULL
-        newHead = head # newHead = 1 (the next's parent)
-        head = temp # head = 2
-    return newHead
-```
-``` py
-def recur_reverseList(self, head, prev):
-    if not head:
-        return prev
-
-    nex = head.next
-    head.next = prev
-    return recur_reverseList(nex, head) # Solved: CAN I WRITE IT DIFFERENTLY? Only if you pass the thing you want to maintain into recursive func
-
-    # OR Write it as:
-    head = self.recur_reverseList(nex, head)
-    print("started to return:", head.val)
-    return head
-    """
-        started to return: 5
-        started to return: 5
-        started to return: 5
-        started to return: 5
-        started to return: 5
-    """
-if __name__ == '__main__':
-    recur_reverseList(head, None)
 ```
 ---
 ## 141. Linked List Cycle｜ 7/4

@@ -209,6 +209,16 @@ class Solution:
             revHead = ptr
             ptr = nxt
         ```
+    3. Recursively
+        ```py
+        if not head or not head.next: # use not head.next to stand previously
+            return head
+
+        revHead = self.reverseList(head.next) # should not do any modify to it
+        head.next.next = head # modify the second's next to first
+        head.next = None # release the original pointer
+        return revHead
+        ```
 ---
 
 ## Bit manipulate
