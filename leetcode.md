@@ -27729,3 +27729,154 @@ class Solution:
 
 ### Tag: #Array #String
 ---
+## 10. Regular Expression Matching (TODO: DP解法)｜ 1/31
+
+Given an input string (s) and a pattern (p), implement regular expression matching with support for '.' and '*' where:
+
+- '.' Matches any single character.​​​​
+- '*' Matches zero or more of the preceding element.
+- The matching should cover the entire input string (not partial).
+
+- Example 1:
+
+    - Input: s = "aa", p = "a"
+    - Output: false
+    - Explanation: "a" does not match the entire string "aa".
+
+- Example 2:
+
+    - Input: s = "aa", p = "a*"
+    - Output: true
+    - Explanation: '*' means zero or more of the preceding element, 'a'. Therefore, by repeating 'a' once, it becomes "aa".
+
+- Example 3:
+
+    - Input: s = "ab", p = ".*"
+    - Output: true
+    - Explanation: ".*" means "zero or more (*) of any character (.)".
+
+- Example 4:
+
+    - Input: s = "aab", p = "c*a*b"
+    - Output: true
+    - Explanation: c can be repeated 0 times, a can be repeated 1 time. Therefore, it matches "aab".
+- Example 5:
+
+    - Input: s = "mississippi", p = "mis*is*p*."
+    - Output: false
+
+
+### 思路
+0. 題目分析
+    1. 如果沒有 * 的存在情況會變成只需要掃描一遍就行
+    2. 但因為有 * 的情況會出現許多後綴 (suffix) 匹配的問題，因此我們選擇 recursive 來解題
+1. p 的情況比較複雜因此我們以 p 作為操作的基礎，首先針對 p 長度 = {0 or 1} 的狀況去做處理，因為後面就得面對出現 * 的狀況需要 *2* 個字元一起看
+2. 首先處理 p 的第二個元素不是 * 的狀況
+    1. 首先判斷 s 是否為空，因為如果不是 * ，那麼第一或第二一定都是 char，如 ["", ".."] should return False
+    2. 再來去做 `single 元素的匹配` {s[0] == p[0] or p[0] == '.'}, 如果一樣那麼繼續 recursive 個去掉第一個字元繼續配
+3. 剩下的狀況就是 p[1] == * 的狀況了:
+    1. 這種狀況下我們首要要解決的問題就是 s 有很多重複的字必須先消除, 如 ["aaaaaaa", "a*"], 做法就是不停的做 `single 元素匹配`
+    2. 但只是這樣做的話少考慮到，萬一這個 * 只是拿來 `消除字元`，如 ["ab", "a*ab"]
+    3. 因此我們需要針對每一種狀態去做假設他是消除字元的用途的猜測，即直接把 p[0], p[1] 消掉匹配剩下的
+4. 該消除的都消除之後，我們始可以直接推進 p (s 如果需要推進早就在 while 裡面推進過了)
+
+5. 上面的解法搞懂後可以進一步將代碼寫的更簡單，邏輯是一樣的
+    1. first_match 就是 single 元素匹配
+    2. 把 while 回圈中的邏輯用成 recursive 去實作
+6. 寫出簡潔的 recursive code 之後可以更進一步將代碼改寫成 DP (top-down)
+    1. 透過 i, j 分別去紀錄各個字串的位置可以省去 slice 字串的時間
+    2. memorize(i, j) 在這邊好像不會有特別的作用 ... 因為各個recursive都是直線前進，不太會去存取重複的
+7. top-down 可以在精簡化 recursive call 寫成 bottom-up
+    1. 如果要用相同邏輯的 bottom-up 必須仰賴前一個狀態的結果時，我們就必須從字串的尾巴倒著來做
+    2. (待理解)
+
+### Code
+Recursive:
+``` py
+class Solution:
+    def isMatch(self, s: str, p: str) -> bool:
+        if len(p) == 0:
+            return len(s) == 0
+        if len(p) == 1:
+            return len(s) == 1 and (s[0] == p[0] or p[0] == '.')
+
+        if p[1] != '*':
+            if len(s) == 0:
+                return False
+            return (s[0] == p[0] or p[0] =='.') and self.isMatch(s[1:], p[1:])
+
+        while len(s) != 0 and (s[0] == p[0] or p[0] == '.'):
+            if self.isMatch(s, p[2:]): # * use as eliminate, ["ab", "a*ab"], ["ab", "a*ac"]
+                return True
+            s = s[1:] # already match p[0]
+
+        # use for the rest match, assume p has matched all it can
+        return self.isMatch(s, p[2:])
+
+# ("ab", "c*ab")
+# ("a*b", "ab")
+# ("a*", "aa")
+# ("a*", "ab")
+# ("a", "*")
+```
+
+Recursive, concise:
+```py
+class Solution(object):
+    def isMatch(self, text, pattern):
+        if not pattern:
+            return not text
+
+        first_match = bool(text) and pattern[0] in {text[0], '.'}
+
+        if len(pattern) >= 2 and pattern[1] == '*':
+            return (self.isMatch(text, pattern[2:]) or
+                    first_match and self.isMatch(text[1:], pattern))
+        else:
+            return first_match and self.isMatch(text[1:], pattern[1:])
+```
+
+DP top-down (memorize of recursive solution):
+```py
+class Solution:
+    def isMatch(self, s: str, p: str) -> bool:
+        memo = {}
+
+        def dp(i, j):
+            if (i, j) not in memo:
+                if j == len(p):
+                    ans = (i == len(s))
+                else:
+                    first_match = i < len(s) and p[j] in {s[i], '.'}
+
+                    if j+1 < len(p) and p[j+1] == '*':
+                        ans = dp(i, j+2) or (first_match and dp(i+1, j))
+                    else:
+                        ans = first_match and dp(i+1, j+1)
+
+                memo[(i,j)] = ans
+            return memo[(i,j)]
+
+        return dp(0, 0)
+```
+
+DP bottom-up
+```py
+class Solution(object):
+    def isMatch(self, text, pattern):
+        dp = [[False] * (len(pattern) + 1) for _ in range(len(text) + 1)]
+
+        dp[-1][-1] = True
+        for i in range(len(text), -1, -1):
+            for j in range(len(pattern) - 1, -1, -1):
+                first_match = i < len(text) and pattern[j] in {text[i], '.'}
+                if j+1 < len(pattern) and pattern[j+1] == '*':
+                    dp[i][j] = dp[i][j+2] or first_match and dp[i+1][j]
+                else:
+                    dp[i][j] = first_match and dp[i+1][j+1]
+
+        return dp[0][0]
+```
+
+### Tag: #Recursive, #DP #TopDown #BottonUp
+---
