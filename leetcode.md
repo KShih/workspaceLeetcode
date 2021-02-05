@@ -122,6 +122,22 @@ A solution set is:
   [2,3,3],
   [3,5]
 ]
+
+### 解題分析
+
+1. backtrack 的基本題
+2. 為了要重複使用且不會得到重複的排列, 這邊用一個trick index, 每次 recursive 時只往這個idx的後面往後看
+    - [1,2,2,3], 5 => get [1,2,2] do not get [2,1,2]
+3. 剪枝優化：先排序過，如果 target - c 已經小於了，就不需要繼續往後看了
+4. 時間複雜度:
+    1. 優化前:
+        1. recursive 的時間複雜度就是 節點數 * 每個節點裡做的事
+        2. 設共 N 個 candidates, 裡面最小的值為 m
+        3. 則最大的樹高為 target/m
+        4. 時間複雜度為 N ^ (target/m +1)
+    2. 優化後:
+        1. big O 是一樣的, 但做了剪枝還是快
+
 ### 思路
 排列問題走dfs，『狀態需紀錄』(只能向後看)
 
@@ -134,6 +150,26 @@ A solution set is:
 與#17不同點，#17是直接取代該值(push&pop一起做)，而此題有push因此在走到底後要pop
 
 ### Code
+優化
+```py
+class Solution:
+    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:
+        res = []
+        candidates = sorted(candidates)
+
+        def backtrack(comb, target, idx):
+            if target == 0:
+                res.append(comb)
+
+            for i in range(idx, len(candidates)):
+                c = candidates[i]
+                if target - c < 0:
+                    break
+                backtrack(comb+[c], target-c, i)
+        backtrack([], target, 0)
+        return res
+```
+
 ``` c++
 class Solution {
 public:
@@ -183,7 +219,7 @@ class Solution:
 
         return res
 ```
-
+### Tag: #Backtrack #Recursive
 ---
 
 ## 40. Combination Sum II

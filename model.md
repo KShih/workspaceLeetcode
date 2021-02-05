@@ -305,3 +305,22 @@ def DFS(tree):
 6. }
 
 ---
+
+## Backtrack
+1. 先得到三要素
+    1. Goal (終止條件)
+    2. Constraint and Choice
+    3. 模板
+    ```py
+    def main():
+        def helper(states):
+            if Goal:
+                # do terminatation e.g. add to result
+            for c in Choice:
+                if Constraint:
+                    helper(states + c)
+    ```
+2. Combination 中不重複的 Trick
+    - 加入 idx 進 states 去遞迴, 在找 choice 時只往 idx 後面的看
+
+---
