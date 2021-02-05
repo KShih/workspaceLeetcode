@@ -251,6 +251,19 @@ A solution set is:
   [5]
 ]
 
+### 解題分析
+
+1. 此題與上提最大的不同在於 `answer 不能重複, 但 candidate含有重複`, e.g.: answer [1,1,2] 與 [1,2,1] 為重複
+2. 那麼現在的問題變成, 如何辨別此答案已被用過了？
+    1. 例子: [1,1,1,2,3] target=4
+    2. 那麼我們首先會得到 [1,1,2], 雖然透過index可以跳過第一個1往後看, 但到了第二個1為基底時, 還是會得出 [1,1,2] 這個解
+3. 因此我們只有把所有 1 視為同一個, 但同時又必須讓不同1可以被重複使用, 因此這邊選用 Counter 來解決
+4. 並且在 Choice 中已不再是 iterate candidates了, 反之是 iterate counter
+5. 當使用過一次 1 之後就把 count-1, 並判斷如果 count = 0 的時候要放棄此 candidate
+6. 初始化
+    1. 為了不讓 [1,1,2] 與 [1,2,1] 同時出現, 我們一樣必須使用到 idx 去紀錄目前訪問到的 counter candidate, 因此我們必須把 counter 在 array 化
+    2. 如果要用到剪枝技巧的話, array 化的counter 一樣需要排序
+
 ### 思路
 
 1. 每個數字只能用一次，因此次態status要+1
@@ -261,6 +274,33 @@ A solution set is:
 而為不影響使用重複的節點的可能性，判斷式也應當放在pop_back之後
 
 ### Code
+```py
+class Solution:
+    def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:
+        res = []
+        counter = Counter(candidates)
+        counter = [(c, counter[c]) for c in counter] # arrayfy counter
+        counter = sorted(counter, key=lambda k: k[0] )
+
+        def backtrack(comb, idx, target):
+            if target == 0:
+                res.append(comb)
+
+            for i in range(idx, len(counter)):
+                c, freq = counter[i]
+                if target - c < 0:
+                    break
+                if freq == 0: # cound only use it again when there is still remain
+                    continue
+
+                counter[i] = (c, freq-1)
+                backtrack(comb + [c], i, target-c)
+                counter[i] = (c, freq) # backtrack
+
+        backtrack([], 0, target)
+        return res
+```
+
 ``` c++
 class Solution {
 public:
@@ -288,7 +328,7 @@ private:
     }
 };
 ```
-
+### Tag: #Backtrack #Counter
 ---
 
 ## 77. Combination
