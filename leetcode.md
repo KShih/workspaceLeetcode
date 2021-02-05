@@ -34,11 +34,39 @@ Example:
 Input: "23"
 Output: ["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"].
 
+### 解題分析
+1. Backtrack 的三要素
+    1. Goal
+        - 走完 str
+    2. Constraint and Choice
+        - 沒有限制，該char所 map 到的都要去走
+
 ### 思路
 input不知道會有多少數值，因此不能使用迴圈解 -> 遞迴解
 字串走訪使用『範圍for』，char in string 搭配遞迴來窮舉所有可能解(dfs)
 
 ### Code
+```py
+class Solution:
+    def letterCombinations(self, digits: str) -> List[str]:
+        self.map = {"2":"abc", "3": "def", "4": "ghi", "5": "jkl", "6": "mno", "7": "pqrs", "8": "tuv", "9": "wxyz"}
+        self.res = []
+        self.digits = digits
+        if digits:
+            self.helper("", 0)
+
+        return self.res
+
+    def helper(self, cur, idx):
+        if idx == len(self.digits):
+            self.res.append(cur)
+            return
+        digit = self.digits[idx]
+
+        for c in self.map[digit]:
+            self.helper(cur+c, idx+1)
+```
+
 ``` c++
 vector<string> letterCombinations(string digits) {
         if (digits.empty()) return {};
@@ -64,6 +92,7 @@ vector<string> letterCombinations(string digits) {
     }
 ```
 
+### Tag: #Backtrack #Recursive
 ---
 
 
