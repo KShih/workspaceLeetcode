@@ -625,12 +625,86 @@ Output:
   [3,1,2],
   [3,2,1]
 ]
+
+### 解題分析
+
+1. 最直觀的方式就是用 pop 的，但這樣時間複雜度會很高，那如何在不 pop 的情況下紀錄此 num 已經被使用過呢?
+2. 很直覺可以使用 set 來輔助，其餘邏輯與 Bruteforce 一樣
+3. 還有一個方法，用 swap 的就可以在不 pop 的情況下製造出差異
+    1. 當 i = start 的那次 iteration 為不改變的 stage
+    2. i != start 就會與母體有差異了
+    3. ![](assets/markdown-img-paste-20210206121711853.png)
+
 ### 思路
 
 permutation用dfs方式去解，
 在set裡搜尋時要從頭開始找起，
 因此需要maintain一個table記錄著元素用過與否
 ### Code
+Optimal swap:
+```py
+class Solution:
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        n = len(nums)
+
+        def backtrack(start):
+            if start == n:
+                res.append(nums[:])
+
+            for i in range(start, n):
+                nums[start], nums[i] = nums[i], nums[start]
+                permutation(start+1)
+                nums[start], nums[i] = nums[i], nums[start]
+
+        backtrack(0)
+        return res
+```
+
+Otimize Bruteforce with set
+``` py
+class Solution:
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        n = len(nums)
+
+        def helper(comb, visited):
+            if len(comb) == n:
+                res.append(comb)
+                return
+
+            for num in nums:
+                if num not in visited:
+                    visited.add(num)
+                    helper(comb + [num], visited)
+                    visited.remove(num)
+
+        if nums:
+            helper([], set())
+        return res
+```
+
+Bruteforce pop:
+```py
+class Solution:
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        res = []
+
+        def helper(comb, nums):
+            if not nums:
+                res.append(comb)
+
+            for i in range(len(nums)):
+                num = nums[i]
+                new_nums = nums[:]
+                new_nums.pop(i)
+                helper(comb + [num], new_nums)
+
+        if nums:
+            helper([], nums)
+        return res
+```
+
 ``` c++
 class Solution {
 public:
@@ -665,7 +739,7 @@ private:
     }
 };
 ```
-
+### Tag: #Backtrack #Permutation #Set
 ---
 
 ## 784. Letter Case Permutation
