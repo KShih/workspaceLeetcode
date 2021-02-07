@@ -322,6 +322,11 @@ def DFS(tree):
     ```
 2. Combination 中不重複的 Trick
     - 加入 idx 進 states 去遞迴, 在找 choice 時只往 idx 後面的看
+3. Time complexity:
+    - O( (bn)^d ) *bn 的 d 次方*
+        - b (base): 為一層的節點數, 也就是 choice的數量
+        - n : 為每個節點內所需操作的時間(通常為 constant time)
+        - d : 為此 recursion tree 的深度(最大)
 
 ---
 

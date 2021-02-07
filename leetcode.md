@@ -817,6 +817,24 @@ Note:
 2. 只有在有一個集合set必須去走訪時，才需要用到for(純粹的遞迴式不一定要存在for的)
 
 ### Code
+```py
+class Solution:
+    def generateParenthesis(self, n: int) -> List[str]:
+        self.res = []
+        self.recursive("", n, n)
+        return self.res
+
+    def recursive(self, comb, left, right):
+        if left == 0 and right == 0:
+            self.res.append(comb)
+            return
+
+        if left > 0:
+            self.recursive(comb + "(", left-1, right)
+        if right > left:
+            self.recursive(comb + ")", left, right-1)
+```
+
 ``` c++
 class Solution {
 public:
