@@ -28059,3 +28059,194 @@ class Solution(object):
 
 ### Tag: #Recursive, #DP #TopDown #BottonUp
 ---
+## 44. Wildcard Matching｜ 2/7
+Given an input string (s) and a pattern (p), implement wildcard pattern matching with support for '?' and '*' where:
+
+'?' Matches any single character.
+'*' Matches any sequence of characters (including the empty sequence).
+The matching should cover the entire input string (not partial).
+
+Example 1:
+
+Input: s = "aa", p = "a"
+Output: false
+Explanation: "a" does not match the entire string "aa".
+Example 2:
+
+Input: s = "aa", p = "*"
+Output: true
+Explanation: '*' matches any sequence.
+Example 3:
+
+Input: s = "cb", p = "?a"
+Output: false
+Explanation: '?' matches 'c', but the second letter is 'a', which does not match 'b'.
+Example 4:
+
+Input: s = "adceb", p = "*a*b"
+Output: true
+Explanation: The first '*' matches the empty sequence, while the second '*' matches the substring "dce".
+Example 5:
+
+Input: s = "acdcb", p = "a*c?b"
+Output: false
+
+
+Constraints:
+
+0 <= s.length, p.length <= 2000
+s contains only lowercase English letters.
+p contains only lowercase English letters, '?' or '*'.
+
+### 類似題
+1. LC10
+2. LC72
+
+### 思路
+
+1. 比起 LC10, 這題算是比較親民版的, 關鍵在於 * 有可能有多個, 要預處理重複 * 的情形 e.g.: ["", "****"]
+2. 一樣優先考慮用 recursive 去解, 然後再進行 memorization 優化, recursive 的解法就是先把條件列完整:
+    1. not P and not S => True
+    2. not S and P = * => True
+    3. p[0] != *
+        -  s[0] = p[0] or p[0] = ? => recur(s[1:], p[1:])
+    4. p[0] == *
+        1. "*" use to Match Empty => recur(s, p[1:])
+        2. "*" use to Match One (or more) => recur(s[1:], p)
+3. 用 i, j 去進行 memorization 的優化
+    1. 就是將本來用字串操作判斷式的邏輯改為以 index 存取，並多加一層判斷是否已經 memo 過
+4. BottonUp solution:
+    1. Memorization 最大的缺點就是, recursive 階層還是太多了
+    2. 那麼我們只能透過 ButtonUp 的 DP, 也就是狀態的轉移
+    3. 首先定義我們的 DP[s_idx][p_idx] 為 s[s_idx] 與 p[p_idx] 是否匹配
+    4. 最大原則: 如果當前的狀態是 match 的，我們就把上一個狀態搬過來，即: dp[i][j] = dp[i-1][j-1]
+    5. 這種方法可以只利用上面第二點列出的 規則3 and 規則4, 直接改寫成狀態轉移的形式
+    6. 關於規則4 在 dp 的改寫:
+        1. isMatch(s[1:], p) 即為 dp[i][j-1], p 保留現在的狀態而 s 推進到下個狀態
+        2. 同理 isMatch(s, p[1:])
+    7. 唯一需要注意的是，此種寫法必須針對領頭 "*" 用來 match 空的狀況，將其狀態初始化為 True
+    8. ![](assets/markdown-img-paste-20210207003608787.png)
+5. 還有一種 backtrack(without recursive) 的解法才是最優解
+    1. 概念來自於我們不需要每種狀態都用 recursive 去解, 也可以直接去猜 "*" 到底 match 幾個？
+    2. 遇到 * 的處理
+        1. 當我們遇到 star 的時候, 把當前的 star 的 idx 記錄下來, 並猜測此 star match 0 個 e.g.: p_idx +1, s_idx 不動
+        2. 那如果其實這個 star 不只是 match 一個呢？就會進入到最後一個 else
+            1. 在這裡換成 p_idx 還原至 star_idx + 1
+            2. s_idx 則是不停的 +1 直到沒有出現 unmatch 的情況才停止
+            3. 若是 match 後右 unmatch 則又會再進入到這個狀態, 此時又會回到猜測此 star 應該 match 更多
+            4. 因此若是永遠都找不到解 s_idx 就會不停的 +1 直到結束, 而 p_idx 會永遠停在 star_idx + 1
+            5. 因此最後判定 p 從 p_idx 的剩餘是否只存在 star，就結束了
+        3. 另外需處理根本沒有 * 卻出現 unmatch 的狀況，不能讓他進入到最後一個 else
+
+### Code
+TLE Recursive
+``` py
+class Solution:
+    def isMatch(self, s: str, p: str) -> bool:
+        if p:
+            # remove duplicate star
+            # for case: ["", "****"]
+            newP = [p[0]]
+            for c in p[1:]:
+                if c != "*" or c != newP[-1]:
+                    newP.append(c)
+            p = "".join(newP)
+        return self.isMatchHelper(s, p)
+
+    def isMatchHelper(self, s, p):
+        if not p:
+            return not s
+        if not s:
+            return p == "*"
+
+        if p[0] != "*":
+            first_match = p[0] in {s[0], "?"}
+            return first_match and self.isMatchHelper(s[1:], p[1:])
+        else:
+            return self.isMatchHelper(s, p[1:]) or self.isMatchHelper(s[1:], p)
+```
+
+Optimize with Memorization
+```py
+class Solution:
+    def isMatch(self, s: str, p: str) -> bool:
+        memo = {}
+        def isMatchHelper(i, j):
+            if (i,j) not in memo:
+                if j == len(p):
+                    ans = (i == len(s))
+                elif i == len(s):
+                    ans = (p[j:] == "*")
+                else:
+                    if p[j] != "*":
+                        first_match = i < len(s) and p[j] in {s[i], "?"}
+                        ans = first_match and isMatchHelper(i+1, j+1)
+                    else:
+                        ans = isMatchHelper(i, j+1) or isMatchHelper(i+1, j)
+                memo[(i,j)] = ans
+            return memo[(i,j)]
+
+
+        if p:
+            # remove duplicate star
+            newP = [p[0]]
+            for c in p[1:]:
+                if c != "*" or c != newP[-1]:
+                    newP.append(c)
+            p = "".join(newP)
+        return isMatchHelper(0, 0)
+```
+
+Optimal Solution DP BottonUp:
+```py
+class Solution:
+    def isMatch(self, s: str, p: str) -> bool:
+        len_s, len_p = len(s), len(p)
+
+        dp = [[False for _ in range(len_p+1)] for _ in range(len_s+1)]
+        for j in range(1, len_p+1):
+            if p[j-1] != "*":
+                break
+            dp[0][j] = True # allow * in the front part of p could be used as match empty
+
+        dp[0][0] = True
+
+        for i in range(1, len_s+1):
+            for j in range(1, len_p+1):
+                if p[j-1] in {s[i-1] or '?'}:
+                    dp[i][j] = dp[i-1][j-1]
+                elif p[j-1] == "*":
+                    dp[i][j] = dp[i-1][j] or dp[i][j-1]
+        return dp[-1][-1]
+```
+
+Tricky best solution
+```py
+class Solution:
+    def isMatch(self, s: str, p: str) -> bool:
+        s_len, p_len = len(s), len(p)
+        s_idx, p_idx = 0, 0
+        star_idx, s_tmp_idx = -1, -1
+
+        while s_idx < s_len:
+            if p_idx < p_len and p[p_idx] in {s[s_idx], "?"}:
+                p_idx += 1
+                s_idx += 1
+            elif p_idx < p_len and p[p_idx] == "*":
+                # record current status
+                # p_idx + 1 => start with match empty
+                star_idx = p_idx
+                s_tmp_idx = s_idx
+                p_idx += 1
+            elif star_idx == -1:
+                # the first match was failed
+                return False
+            else:
+                p_idx = star_idx + 1 # always point to the next char of *
+                s_idx = s_tmp_idx + 1
+                s_tmp_idx = s_idx # but keep move forward s_idx pointer => means match 1, match 2 ... match n
+        return all(x == '*' for x in p[p_idx:]) # the rest of the p should be "*" or empty
+```
+
+### Tag: #DP #Recursive #TopDown #BottonUp
+---

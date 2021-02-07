@@ -324,3 +324,13 @@ def DFS(tree):
     - 加入 idx 進 states 去遞迴, 在找 choice 時只往 idx 後面的看
 
 ---
+
+## DP
+1. TopDown
+    1. 可以從 Recursive 的解法演化而來
+    2. 缺點: 依舊存在 recursive 過多的問題
+    3. 題目: LC10, LC44
+2. BottonUp
+    1. 需直接思考到`如何定義子問題`
+    2. `子問題的狀態如何轉移`
+    3. 大部分的題
