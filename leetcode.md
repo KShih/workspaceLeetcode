@@ -15457,6 +15457,26 @@ You have the following 3 operations permitted on a word:
 
 ![](assets/markdown-img-paste-20191126143734747.png)
 
+### 解題分析
+
+1. 這種字串處理十之八九都是 DP 問題
+2. 把 DP 表格畫出來
+    1. Base case:
+        1. word1 為空字串的情況
+            - ![](assets/markdown-img-paste-20210207132517239.png)
+        2. word2 為空字串的情況
+            - ![](assets/markdown-img-paste-20210207132541799.png)
+    2. word1 = "R", word2 = "H"
+        - ![](assets/markdown-img-paste-20210207132701661.png)
+            - 取 1 + dp[-1][-1] => 表示取代當前
+            - 取 1 + dp[-1][0] => 表示: H 先 變成空字串 -> 再新增 R
+            - 取 1 + dp[0][-1] => 表示: R 先 變成空字串 -> 再新增 H
+    3. word1 = "RO", word2 = "HO"
+        - ![](assets/markdown-img-paste-2021020713333579.png)
+            - 取 1 + dp[1][1] -1 => 表示從上個最佳狀態(H 已變成 R or R 已變成 H)過來, 但字母一樣, 因此可以不必加上取代那一步
+            - 取 1 + dp[1][2] => 表示: RO 先變成 H -> 再新增 O
+            - 取 1 + dp[2][1] => 表示: HO 先變成 R -> 再新增 O
+
 ### 思路
 
 ![](assets/markdown-img-paste-20191126143852861.png)
@@ -15511,6 +15531,7 @@ class Solution:
 
         return dp[-1][-1]
 ```
+### Tag: #DP
 ---
 ## 73. Set Matrix Zeroes｜ 11/27
 Given a m x n matrix, if an element is 0, set its entire row and column to 0. Do it in-place.
