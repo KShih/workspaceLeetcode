@@ -27987,8 +27987,21 @@ Given an input string (s) and a pattern (p), implement regular expression matchi
     1. 透過 i, j 分別去紀錄各個字串的位置可以省去 slice 字串的時間
     2. memorize(i, j) 在這邊好像不會有特別的作用 ... 因為各個recursive都是直線前進，不太會去存取重複的
 7. top-down 可以在精簡化 recursive call 寫成 bottom-up
-    1. 如果要用相同邏輯的 bottom-up 必須仰賴前一個狀態的結果時，我們就必須從字串的尾巴倒著來做
-    2. (待理解)
+    1. ![](assets/markdown-img-paste-20210207220808898.png)
+    2. 此種寫法是與 LC44 LC72 相同的寫法，需學習！
+    3. 大意上還是狀態轉移
+        1. p[j] = s[i] or "." => 直接轉移上個狀態，也就是 dp[i-1][j-1]
+        2. p[j] = "*":
+            1. 如果 p[j-1] = s[i] or ".":
+                - 表示此 * 是用來 match 空的, 因此從 `p 的上上個` 狀態轉移過來, dp[i][j-2]
+            2. 否則 * 可用來:
+                - match 空: dp[i][j-2]
+                - match 一個: dp[i][j-1]
+                - match 多個: dp[i-1][j]
+    4. 注意也是需要預處理陣列:
+        - 目標是解決此種 case: ["aab", "c*aab"]
+        - ![](assets/markdown-img-paste-20210207221505519.png)
+
 
 ### Code
 Recursive:
@@ -28076,6 +28089,32 @@ class Solution(object):
                     dp[i][j] = first_match and dp[i+1][j+1]
 
         return dp[0][0]
+```
+
+DP bottom-up 與 LC72, LC44 一樣的寫法
+```py
+class Solution:
+    def isMatch(self, s: str, p: str) -> bool:
+        s_len, p_len = len(s), len(p)
+        dp = [[False for _ in range(p_len+1)] for _ in range(s_len+1)]
+        dp[0][0] = True
+
+        # for case aab, c*a*b
+        for j in range(1, p_len+1):
+            if p[j-1] == '*' and dp[0][j-2]:
+                dp[0][j] = True
+
+        for i in range(1, s_len+1):
+            for j in range(1, p_len+1):
+                if p[j-1] in {s[i-1], '.'}:
+                    dp[i][j] = dp[i-1][j-1]
+                elif p[j-1] == '*':
+                    # j-2 must > 0 since there is no leading *
+                    if p[j-2] not in {s[i-1], '.'}:
+                        dp[i][j] = dp[i][j-2] # match empty
+                    else:
+                        dp[i][j] = dp[i][j-2] or dp[i-1][j] or dp[i][j-1]
+        return dp[-1][-1]
 ```
 
 ### Tag: #Recursive, #DP #TopDown #BottonUp
