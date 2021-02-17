@@ -787,6 +787,112 @@ private:
 };
 ```
 ### Tag: #Backtrack #Permutation #Set
+
+---
+## 47. Permutations II｜ 2/17
+Given a collection of numbers, nums, that might contain duplicates, return all possible unique permutations in any order.
+
+Example 1:
+
+Input: nums = [1,1,2]
+Output:
+[[1,1,2],
+ [1,2,1],
+ [2,1,1]]
+
+Example 2:
+
+Input: nums = [1,2,3]
+Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+
+
+Constraints:
+
+1 <= nums.length <= 8
+-10 <= nums[i] <= 10
+
+### 解題分析
+
+1. Swap 法
+    1. 為上一題的 follow-up，若延續上題 swap 的解法，nums[idx] 是固定的，若此 nums[i] 已經被拿來 swap 過了，就會出現重複的狀況
+    2. 因此很直覺的我們直接用一個 set 去紀錄曾經 swap 過的元素，就完事了
+    3. 小心: 用來處理 Combination Duplication 的方法 ( nums[i] == nums[i-1] ) 並不適用於此
+        ```py
+        if i > idx  and (nums[i] == nums[i-1] or nums[i] == nums[idx]): # 兩種可能性都考慮了，還是會錯 case: [1,1,2,2,3,3,4]
+            continue
+        ```
+2. Strip 法
+    1. 若使用 strip 法則可以直接用 處理 Combination Duplication 的方法
+    2. ![](assets/markdown-img-paste-20210217235702719.png)
+
+### Code
+Swap 法
+``` py
+class Solution:
+    def permuteUnique(self, nums: List[int]) -> List[List[int]]:
+        n = len(nums)
+        res = []
+        def permute(idx):
+            if idx == n:
+                res.append(nums[:])
+                return
+
+            visited = set()
+            for i in range(idx, n):
+                if nums[i] not in visited:
+                    visited.add(nums[i])
+                    nums[idx], nums[i] = nums[i], nums[idx]
+                    permute(idx+1)
+                    nums[idx], nums[i] = nums[i], nums[idx]
+
+        permute(0)
+        return res
+```
+
+Strip 法
+```py
+class Solution:
+    def permuteUnique(self, nums: List[int]) -> List[List[int]]:
+        n = len(nums)
+        res = []
+        def permute(nums, comb):
+            if len(comb) == n:
+                res.append(comb)
+                return
+
+            for i in range(len(nums)):
+                if i > 0  and nums[i] == nums[i-1]:
+                    continue
+                permute(nums[:i] + nums[i+1:], comb+[nums[i]])
+
+        nums = sorted(nums)
+        permute(nums, [])
+        return res
+```
+
+WrongAnswer (32/33)
+```py
+class Solution:
+    def permuteUnique(self, nums: List[int]) -> List[List[int]]:
+        n = len(nums)
+        res = []
+        def permute(idx):
+            if idx == n:
+                res.append(nums[:])
+                return
+
+            for i in range(idx, n):
+                if i > idx  and (nums[i] == nums[idx] or nums[i] == nums[i-1]):
+                    continue
+                nums[idx], nums[i] = nums[i], nums[idx]
+                permute(idx+1)
+                nums[idx], nums[i] = nums[i], nums[idx]
+        nums = sorted(nums)
+        permute(0)
+        return res
+```
+
+### Tag: #Recursive #Set
 ---
 
 ## 784. Letter Case Permutation
