@@ -429,36 +429,56 @@ Output:
   []
 ]
 
+### 解題分析
+1. 解法1: backtrack
+    1. 與之前題型最不一樣的地方就是，過程中的所有組合都要被記錄，因此不存在終止條件(Goal)
+        2. ![](assets/markdown-img-paste-20210217105809396.png)
+2. 解法2: 分配律
+    1. 起始為一個空陣列, res = [[]]
+    2. 依序複製 res 中所有的元素，並一一加入當前的 nums
+        1. [[]]
+            2. [[], [1]]
+        3. [[],[1]]
+            4. copy [] -> [2]
+            5. copy [1] -> [1, 2]
+        6. [[], [1], [2], [1,2]]
+            7. copy [] -> [3]
+            8. copy [1] -> [1,3]
+            9. copy [2] -> [2,3]
+            10. copy [1,2] -> [1,2,3]
+
+
 ### 思路
 不必設終止條件，純粹dfs走訪就能解
 ### Code
-
+Backtrack
 ```py
-"""
-ret = [[1,2,3],[1,2],[1,3],[1]]
-
-cand, idx = [1], 1
-    cand, idx = [1,2], 2
-        cand, idx = [1,2,3], 3
-    cand, idx = [1,3], 3
-
-
-"""
-
 class Solution:
     def subsets(self, nums: List[int]) -> List[List[int]]:
-        ret = []
-        ret.append([])
-        def recur(cand, idx):
-            if idx == len(nums):
-                return cand
-            for i in range(idx, len(nums)):
-                ret.append(recur(cand+[nums[i]], i+1))
-            return cand
+        res = []
+        n = len(nums)
+
+        def backtrack(idx, comb):
+            res.append(comb)
+
+            for i in range(idx, n):
+                backtrack(i+1, comb+[nums[i]])
+        backtrack(0, [])
+        return res
+```
+
+Solution2: 分配律
+```py
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        res = [[]]
 
         for i in range(len(nums)):
-            ret.append(recur([nums[i]],i+1))
-        return ret
+            size = len(res)
+            for j in range(size):
+                res.append(res[j])
+                res[-1].append(nums[i])
+        return res
 ```
 
 
