@@ -654,6 +654,15 @@ Output:
     1. 當 i = start 的那次 iteration 為不改變的 stage
     2. i != start 就會與母體有差異了
     3. ![](assets/markdown-img-paste-20210206121711853.png)
+4. 另一種 Optimal 的解法是使用剝掉使用的元素的概念
+    1. 此種解法與 pop 的想法類似，但此處不用 pop 的，而是使用陣列串接的方式
+    2. ![](assets/markdown-img-paste-20210217234800764.png)
+    3. 此種方法可以很巧妙的應用在處理當 nums 含有重複元素的時候，推推
+
+
+### 比較
+
+1. 與 combination, subset 題不一樣的地方在送進 recursive 的是 idx+1 而不是 i+1 !
 
 ### 思路
 
@@ -678,6 +687,24 @@ class Solution:
                 nums[start], nums[i] = nums[i], nums[start]
 
         backtrack(0)
+        return res
+```
+
+Optimal Strip
+```py
+class Solution:
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        n = len(nums)
+        res = []
+        def permute(nums, comb):
+            if len(comb) == n:
+                res.append(comb)
+                return
+
+            for i in range(len(nums)):
+                permute(nums[:i] + nums[i+1:], comb+[nums[i]])
+
+        permute(nums, [])
         return res
 ```
 
