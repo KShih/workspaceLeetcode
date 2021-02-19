@@ -1811,12 +1811,48 @@ Example:
 
 Input: "25525511135"
 Output: ["255.255.11.135", "255.255.111.35"]
+
+### 解題分析
+1. 求 combination 題優先使用 recursive 來解
+2. Goal 就是 "." 用完，且走到字串盡頭
+3. Choice 就是當前取 1, 2, 3 位
+4. Constraint 就是
+    1. 切割出來的字串要 > 0
+    2. 轉換成 value 要 < 256
+    3. 特殊處理 "010" 為不合法
+5. 在進 Choice 之前，可以先做剪枝
+    1. 剩餘的字串過少
+    2. 剩餘的字串過多
+
+
 ### 思路
 **1. 只要遇到字符串的子序列或配准問題首先考慮動態規劃DP**
 **2. 只要遇到需要求出所有可能情況首先考慮用遞歸。**
 
 這道題並非是求字符串的子序列或配准問題，更符闔第二種情況，所以我們要用遞歸來解。我們用k來表示當前還需要分的段數，如果k = 0，則表示三個點已經加入完成，四段已經形成，若這時字符串剛好為空，則將當前分好的結果保存。若k != 0, 則對於每一段，我們分別用一位，兩位，三位來嘗試，分別判斷其合不合法，如果合法，則調用遞歸繼續分剩下的字符串，最終和求出所有合法組合
 ### Code
+```py
+class Solution:
+    def restoreIpAddresses(self, s: str) -> List[str]:
+        res = []
+        n = len(s)
+        def backtrack(idx, comb, partition):
+            if partition == 4 and idx == n:
+                res.append(comb[:-1]) # strip the last "."
+                return
+
+            if (n-idx < 4-partition or n-idx > (4-partition)*3):
+                return
+            for digit in range(1, 4):
+                val_str = s[idx:idx+digit]
+                if len(val_str) > 0:
+                    val = int(val_str)
+                    if val < 256 and len(str(val)) == digit: # for case val_str = "010", val = 10
+                        backtrack(idx+digit, comb + s[idx:idx+digit] + ".", partition+1)
+        backtrack(0, "", 0)
+        return res
+```
+
 ``` c++
 
 class Solution {
@@ -1847,6 +1883,7 @@ private:
     }
 };
 ```
+### Tag: #Recursive
 ---
 ## 241. Different Ways to Add Parentheses(Medium)｜ 4/10
 Given a string of numbers and operators, return all possible results from computing all the different possible ways to group numbers and operators. The valid operators are +, - and *.
