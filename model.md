@@ -327,6 +327,8 @@ def DFS(tree):
         - b (base): 為一層的節點數, 也就是 choice的數量
         - n : 為每個節點內所需操作的時間(通常為 constant time)
         - d : 為此 recursion tree 的深度(最大)
+4. Recursive 加入 Memorization 的範例:
+    1. LC131
 
 ---
 

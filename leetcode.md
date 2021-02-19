@@ -18983,6 +18983,18 @@ Output:
   ["a","a","b"]
 ]
 
+### 解題分析
+1. Recursive
+    1. Goal: s 用光
+    2. Choice: s 的每個字元
+    3. Constraint: 是回文
+
+2. 優化 Memoization:
+    1. 可以優化的部分就是遇到相同的字串時直接回傳他能生成的組合
+    2. Base case 就是 length == 1 or 0 的時候
+    3. Backtrack 之後的結果可能會有多個解，就要把這些解串上本來的選擇然後塞進 res，然後寫入 memo
+    4. 可以關注一下怎麼從 recursive 轉換過來
+
 ### 技巧
 
 - Backtracking 時注意`reference`的問題
@@ -18995,6 +19007,56 @@ Output:
 Backtracking法: 直接看concise的解法
 
 ### Code
+Concise using index
+```py
+class Solution:
+    def partition(self, s: str) -> List[List[str]]:
+        res = []
+        def backtrack(s, comb):
+            if not s:
+                res.append(comb)
+                return
+
+            for i in range(1, len(s)+1):
+                if self.isPalin(s[:i]):
+                    backtrack(s[i:], comb + [s[:i]])
+        backtrack(s, [])
+        return res
+
+    def isPalin(self, s):
+        return s == s[::-1]
+```
+
+Memoization
+```py
+class Solution:
+    def partition(self, s: str) -> List[List[str]]:
+        res = []
+        memo = {}
+
+        def backtrack(s, comb):
+            if len(s) == 1:
+                return [[s]]
+            if not s:
+                return [[]]
+
+            res = []
+            if s not in memo:
+                for i in range(1, len(s)+1):
+                    if self.isPalin(s[:i]):
+                        results = backtrack(s[i:], comb + [s[:i]])
+
+                        for result in results:
+                            res.append([s[:i]] + result)
+                memo[s] = res
+            return memo[s]
+
+        return backtrack(s, [])
+
+    def isPalin(self, s):
+        return s == s[::-1]
+```
+
 Same idea, concise solution
 ```py
 class Solution:
@@ -19053,6 +19115,7 @@ class Solution:
                 end -= 1
         return True
 ```
+### Tag: #Recursive #Memoization
 ---
 ## 198. House Robber｜ 3/16 (DP 經典題！打通DP任督二脈)
 You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security system connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
