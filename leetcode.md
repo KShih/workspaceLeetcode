@@ -278,8 +278,7 @@ A solution set is:
 class Solution:
     def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:
         res = []
-        counter = Counter(candidates)
-        counter = [(c, counter[c]) for c in counter] # arrayfy counter
+        counter = list(Counter(candidates).items()) # {1:1, 2:2} => [(1,1), (2,2)]
         counter = sorted(counter, key=lambda k: k[0] )
 
         def backtrack(comb, idx, target):
@@ -526,24 +525,56 @@ Output:
   [1,2],
   []
 ]
+
+### 解題分析
+1. 重複元素的Choice, Combination 中卻不能重複
+    1. Sort + If
+    2. Counter + Frequency Backtrack
+    3. 相似題 LC40 Combination Sum II
+
 ### 思路
 求子集合還是單存dfs走訪且不用設限制，
 處理重複元素的處理，在pop_back後檢查下個元素重複的可能性
-### Code
 
+### Code
+Counter and Frequency Backtrack (Optimal)
+```py
+from collections import Counter
+class Solution:
+    def subsetsWithDup(self, nums: List[int]) -> List[List[int]]:
+        counter = list(Counter(nums).items())
+        n = len(counter)
+        res = []
+        def recur(idx, comb):
+            res.append(comb[:])
+
+            for i in range(idx, n):
+                num, freq = counter[i]
+                if freq == 0:
+                    continue
+                counter[i] = (num, freq-1)
+                recur(i, comb+[num])
+                counter[i] = (num, freq)
+        recur(0, [])
+        return res
+```
+
+Sort and Recursive
 ```py
 class Solution:
     def subsetsWithDup(self, nums: List[int]) -> List[List[int]]:
-        ret = []
-        self.dfs(sorted(nums), ret, [], 0)
-        return ret
+        n = len(nums)
+        res = []
+        def recur(idx, comb):
+            res.append(comb[:])
 
-    def dfs(self,nums, ret, cand, idx):
-        ret.append(cand)
-        for i in range(idx,len(nums)):
-            if i > idx and nums[i] == nums[i-1]:
-                continue
-            self.dfs(nums,ret, cand+[nums[i]], i+1)
+            for i in range(idx, n):
+                if i > idx and nums[i] == nums[i-1]:
+                    continue
+                recur(i+1, comb+[nums[i]])
+        nums = sorted(nums)
+        recur(0, [])
+        return res
 ```
 
 ``` c++

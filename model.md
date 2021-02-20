@@ -321,7 +321,14 @@ def DFS(tree):
                     helper(states + c)
     ```
 2. Combination 中不重複的 Trick
-    - 加入 idx 進 states 去遞迴, 在找 choice 時只往 idx 後面的看
+    1. <Basic> Choice 無重複:
+        - 加入 idx 進 states 去遞迴, 在找 choice 時只往 idx 後面的看
+    2. <Advance> Choice 會重複:
+        1. Counter + Frequency Backtrack *(Better)*
+        2. Sort + If
+        3. 例題:
+            1. LC40 Combination Sum II
+            2. LC90 Subsets II
 3. Time complexity:
     - O( (bn)^d ) *bn 的 d 次方*
         - b (base): 為一層的節點數, 也就是 choice的數量
