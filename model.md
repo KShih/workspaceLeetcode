@@ -329,6 +329,13 @@ def DFS(tree):
         - d : 為此 recursion tree 的深度(最大)
 4. Recursive 加入 Memorization 的範例:
     1. LC131
+        1. Goal 的狀況要先改成 base case
+        2. 在 Choice 中去拿 `子recursive` 的總結果
+        3. 把總結果加上 Choice 並更新到 res
+        4. 更新 Memo
+    2. LC140 (LC139 follow-up)
+        -  Memorization 的項目由單個結果轉換成 Combination
+        -  DP 儲存的內容由單個結果轉換成 Combination
 
 ---
 

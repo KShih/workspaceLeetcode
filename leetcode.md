@@ -17599,6 +17599,20 @@ wordDict = ["cats", "dog", "sand", "and", "cat"]
 
 Output:
 []
+
+### 解題分析
+1. 畢竟這題是屬於 follow up 的題型，那麼便比較推崇直接從上題的寫法改過來
+2. 解法1 TopDown:
+    1. 上題的 Memoization 是紀錄此 str 是否可被拼出來，那換到這題 memo 的項目要改成此 str可形成的 combination
+    2. 那麼根據 LC131 的轉換方式:
+        1. Goal 的狀況要先改成 base case
+        2. 在 Choice 中去拿子 recursive 的總結果
+        3. 把總結果加上 Choice 並更新到 res
+        4. 更新 Memo
+3. 解法2 BottonUp:
+    1. DP 裡面記錄的就是最後的所求，因此本來只是紀錄 True False, 現在要改成紀錄 List，即 dp[i] 為 s[:i] 所可產生的 combination 組
+    2. 本來只是從 dp[start] 裡面取 True False，現在要改成從裡面拿出所有結果並加上當前結果，然後更新到 dp[end]
+
 ### 思路
 
 找組合的題，十之八九使用遞迴解，並且可以使用cache來優化。
@@ -17624,6 +17638,45 @@ TLE 那個解法也挺好，比較容易想到，仍缺cache優化法。
 以此類推直到res = {cat sand dog}，此時繼續匹配下一個單字"cats"，並繼續剛剛的步驟直到最上層走完所有字典裡的字
 
 ### Code
+直接用上題的 Topdown 寫法改寫
+```py
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> List[str]:
+        memo = {}
+        def backtrack(s):
+            if not s:
+                return [""]
+            if s not in memo:
+                res = []
+                for word in wordDict:
+                    if s.startswith(word):
+                        results = backtrack(s[len(word):])
+                        for result in results:
+                            res.append(word + " "+ result) # Could simplified to: (word + " "+ result).strip()
+                memo[s] = res
+            return memo[s]
+        answers = backtrack(s)
+        return [answer[:-1] for answer in answers]
+```
+
+直接用上題的 BottonUp 改寫
+```py
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        dic = Counter(wordDict)
+        dp = [[] for _ in range(len(s)+1)]
+        dp[0] = [""]
+
+        for end in range(len(s)+1):
+            subList = []
+            for start in range(end):
+                if len(dp[start]) > 0 and dic[s[start:end]] == 1:
+                    for comb in dp[start]:
+                        subList.append((comb + " " + s[start:end]).strip())
+                    dp[end] = subList
+        return dp[-1]
+```
+
 ``` py
 class Solution:
     def wordBreak(self, s: str, wordDict: List[str]) -> List[str]:
@@ -17701,6 +17754,7 @@ class Solution:
                     break
         return dp[-1]
 ```
+### Tag: #Recursive #Memoization #DP
 ---
 ## 688. Knight Probability in Chessboard｜ 2/6
 On an NxN chessboard, a knight starts at the r-th row and c-th column and attempts to make exactly K moves. The rows and columns are 0 indexed, so the top-left square is (0, 0), and the bottom-right square is (N-1, N-1).
