@@ -17260,6 +17260,18 @@ Example 3:
 
 Input: s = "catsandog", wordDict = ["cats", "dog", "sand", "and", "cat"]
 Output: false
+
+### 解題分析
+1. Recursive with memo
+    1. Goal: str 用完
+    2. Choice: 所有 word 在 wordDict 中
+    3. Constraint: str 必須 startswith 此 word
+2. DP - BottonUp:
+    1. 每個字元都有個狀態 True or False
+    2. dp[i] = True
+        - 代表 s[0:i] 都存在於 wordDict
+    3. 用 Sliding Window 的方式去走訪所有可能
+
 ### 思路
 
 Recursive法:
@@ -17277,6 +17289,41 @@ DP 法:
 ![](assets/markdown-img-paste-20200129180122745.png)
 
 ### Code
+Concise
+```py
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        memo = {}
+        def backtrack(s):
+            if not s:
+                return True
+            if s in memo:
+                return memo[s]
+
+            for word in wordDict:
+                if s.startswith(word):
+                    if backtrack(s[len(word):]):
+                        memo[s] = True
+                        return True
+            memo[s] = False
+            return memo[s]
+        return backtrack(s)
+```
+
+DP with sliding window
+```py
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        dic = Counter(wordDict)
+        dp = [False for _ in range(len(s)+1)]
+        dp[0] = True
+
+        for end in range(len(s)+1):
+            for start in range(end):
+                if dp[start] and dic[s[start:end]] == 1:
+                    dp[end] = True
+        return dp[-1]
+```
 
 TLE, 且無法cached的方法
 ``` py
@@ -17340,6 +17387,7 @@ class Solution:
                     break
         return dp[-1]
 ```
+### Tag: #Recursive #DP #SlidingWindow
 ---
 ## 540. Single Element in a Sorted Array｜ 1/31
 You are given a sorted array consisting of only integers where every element appears exactly twice, except for one element which appears exactly once. Find this single element that appears only once.
