@@ -593,10 +593,31 @@ Example 2:
 
 Input: k = 3, n = 9
 Output: [[1,2,6], [1,3,5], [2,3,4]]
-### 思路
-
+### 解題分析
+1. 找 Combination 優先考慮使用 recursive 解
+2. Time:
+    3. ![](assets/markdown-img-paste-20210220173015589.png)
 
 ### Code
+```py
+class Solution:
+    def combinationSum3(self, k: int, n: int) -> List[List[int]]:
+        res = []
+        def recur(k, n, comb, start):
+            if k == 0 and n == 0:
+                if n == 0:
+                    res.append(comb)
+                else:
+                    return
+
+            for i in range(start, 10):
+                if n - i < 0:
+                    break
+                recur(k-1, n-i, comb+[i], i+1)
+        recur(k, n, [], 1)
+        return res
+```
+
 ``` c++
 class Solution {
 public:
@@ -626,7 +647,7 @@ private:
     }
 };
 ```
-
+### Tag: #Recursive
 ---
 
 
