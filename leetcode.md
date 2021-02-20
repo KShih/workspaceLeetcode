@@ -19779,6 +19779,25 @@ search("b..") -> true
 
 Note:
 You may assume that all words are consist of lowercase letters a-z.
+
+### 解題分析
+1. Trie
+    1. 談到高效的字串搜索, AutoComplete 就要想到 Trie
+    2. Time:
+        1. add:
+            - O(M)
+        2. search:
+            - O(M) if well-defined words without dot
+            - O(N * 26^M)
+                - case s = "....", len(s) = `M`
+                - there is `N` words being added
+2. Set of length
+    1. 當今天給定的搜索目標 "長度" 是固定的即可使用此法
+    2. 但此方法的局限性比較高，缺點:
+        1. 找符合的 Prefix
+        2. 如果相同長度的字過多到 set 會發生 collision
+        3. 插入的字重複 prefix 很多時， Trie 會比較省空間
+
 ### 思路
 使用字典樹實踐
 
@@ -19819,11 +19838,8 @@ class WordDictionary:
 
     def search_word(self, word, root):
         if not word:
-            if root.isWord:
-                return True
-            else:
-                return False
-        if word[0] == ".":
+            return root.isWord:
+        elif word[0] == ".":
             for entry in root.ch_list:
                 if self.search_word(word[1:], root.ch_list[entry]):
                     return True
@@ -19832,11 +19848,33 @@ class WordDictionary:
             return self.search_word(word[1:], root.ch_list[word[0]])
         else:
             return False
+```
 
-# Your WordDictionary object will be instantiated and called as such:
-# obj = WordDictionary()
-# obj.addWord(word)
-# param_2 = obj.search(word)
+Optimal Solution Using set:
+```py
+from collections import defaultdict
+class WordDictionary:
+
+    def __init__(self):
+        """
+        Initialize your data structure here.
+        """
+        self.leng_set = defaultdict(set)
+
+
+    def addWord(self, word: str) -> None:
+        self.leng_set[len(word)].add(word)
+
+
+    def search(self, word: str) -> bool:
+        m = len(word)
+        for dic_word in self.leng_set[m]:
+            i = 0
+            while i < m and word[i] in {dic_word[i], "."}:
+                i += 1
+            if i == m:
+                return True
+        return False
 ```
 
 土法煉鋼法:
@@ -19893,6 +19931,7 @@ class WordDictionary:
 # obj.addWord(word)
 # param_2 = obj.search(word)
 ```
+### Tag: #Trie #Recursive #Set
 ---
 ## 213. House Robber II｜ 3/27
 You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed. All houses at this place are arranged **in a circle.** That means the first house is the neighbor of the last one. Meanwhile, adjacent houses have security system connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
