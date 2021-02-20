@@ -14632,6 +14632,7 @@ class Solution:
         self.traverse(trie_node.children[board[r][c]], r , c-1 , found, visited, board)
         del visited[(r,c)]
 ```
+### Tag: #Trie #Recursive
 ---
 ## 16. 3Sum Closest｜ 11/20
 
