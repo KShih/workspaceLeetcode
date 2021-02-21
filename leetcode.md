@@ -1084,7 +1084,7 @@ Output: [""]
 ### 思路
 
 ### Code
-``` c++
+```java
 class Solution {
 public:
     vector<string> removeInvalidParentheses(string s) {
@@ -1098,7 +1098,7 @@ public:
 
 private:
     void getRemoveCount(string s, int& left, int& right){
-        // 計算總共要刪除多少個左右括號 前綴右括號&後綴左括號
+        // 計算總共要刪除多少個左右括號 & 前綴右括號後綴左括號
         for (char ch: s){
             if (ch == '('){
                 left ++;
@@ -1157,7 +1157,6 @@ private:
         }
     }
 };
-
 ```
 
 ---
@@ -1186,6 +1185,28 @@ Output: [
   ".Q.."]
 ]
 Explanation: There exist two distinct solutions to the 4-queens puzzle as shown above.
+
+### 解題分析
+
+1. 破題: 先了解皇后的特性
+    - 在某個點上放一個皇后會導致其 同行, 同列, 同對角線, 同逆對角線 不能放置皇后
+    - 此特性及為 recursive 的 Constraint
+2. Move: 我們以 Row 為基礎前進 (因為每 Row 只能擺一個皇后), 並嘗試著在此 row 上的每個 col 都擺擺看皇后
+3. Goal: 終止條件就是走完所有的 Row，此時便可以把 path 中紀錄的皇后所在的 col 賦予 "Q"，其餘為 "."
+    - 解釋 `["." * col + "Q" + "." * (n-col-1) for col in path]`
+        - 假設 col=0 為合法的皇后位置，則 "." *0 + "Q" 就可以表達此意思
+4. Choice: 此 row 上所有的 col，即為 `range(n)`
+5. Constraint: Q 必須被合法的放置
+    1. 檢查此col: 就檢查 cols[col] 即可
+    2. 檢查對角線:
+        1. 我們用向量的概念來解釋:
+            - 假設用 6*6 的方格, 由左下到右上的點分別為
+                - (5,0), (4,1), (3,2), (2,3), (1,4), (0,5)
+                - 發現了嗎? row + col = 5
+                - 因此我們可以用 row+col 來判別是否此對角線上已經有皇后了
+    3. 同理反對角線
+    4. 這個 Q 在三個陣列上的取值，若相加起來都是零，即可表示此 Q 為合法的放置
+
 ### 思路
 首先必須選擇以column或以role來當作遞迴的標準
 
@@ -1199,6 +1220,28 @@ Explanation: There exist two distinct solutions to the 4-queens puzzle as shown 
 4. 矩陣內135度方向元素(x,y)，x+y = x1+y1
 5. 矩陣內45度方向元素(x,y)，x-y = x1-y1
 ### Code
+
+Optimal Python
+```py
+class Solution:
+    def solveNQueens(self, n: int) -> List[List[str]]:
+        cols, diag, adiag = [0]*n, [0]*2*n, [0]*2*n
+        res = []
+        def recur(row, path, cols, diag, adiag):
+            if row == n:
+                res.append(["." * col + "Q" + "." * (n-col-1) for col in path])
+                return
+
+            for col in range(n):
+                if cols[col] + diag[row+col] + adiag[row-col] == 0:
+                    cols[col], diag[row+col], adiag[row-col] = 1, 1, 1
+                    recur(row+1, path+[col], cols, diag, adiag)
+                    cols[col], diag[row+col], adiag[row-col] = 0, 0, 0
+
+        recur(0, [], cols, diag, adiag)
+        return res
+```
+
 ``` c++
 class Solution {
 public:
@@ -1257,6 +1300,8 @@ private:
 
 };
 ```
+
+### Tag: #Recursive #Array
 ---
 
 ## 79. Word Search(Medium) ｜ 4/1
