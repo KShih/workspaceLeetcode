@@ -15021,85 +15021,63 @@ class Solution:
 
 保證有一解
 
-### 思路
+### 解題分析
 
-TODO: Debug The "ref" in isValid()
-
-iter 時也要return, 這樣才能把所有狀態串在一起
-
-把每個空格帶入數字, 並且視為一個狀態
-
-在遞迴這個狀態之前先去檢查是否Valid, 不Valid直接帶入下個數字
-
-成功走到終點的狀態會全部return True
-
-如果這個狀態在未來的某條路斷了,
-
-要把這個狀態還原成".",
-
-這樣其他狀態的人才能判斷他是".", 並修改他
-
-isValid() 也是一個厲害的寫法 記得看看
+1. Recursive 解, 此題最關鍵的是如何快速的判斷 此row, 此col, 此grid 此元素已經被用過
+2. 這邊可以用 set 解，但因為 num 只會介於 1~9 因此用 array 就可以處理了
+    1. 這邊用三個 array, r_used, c_used, grid_used
+    2. grid_used 用 row//3, col//3 去定位
+3. dfs 的部分
+    1. Goal: row 能走到 9 時
+    2. Choice: num 1 ~ 9
+    3. Constraint: 不能在那三個陣列被使用過
+    4. Move:
+        1. column: 向右走, 直到 c = 8 時歸零換下行
+        2. row: 維持同行, 直到 column 換下行時
+    5. 其他:
+        1. 若此位置已經有數字了, 就直接進下一位
+        2. dfs function 不要以為題目只需要改值不需要回傳就不回傳, 不然就算找到了最佳解, 還是會因為沒有適時回傳而又被還原了
 
 ### Code
 ``` py
 class Solution:
     def solveSudoku(self, board: List[List[str]]) -> None:
-        """
-        Do not return anything, modify board in-place instead.
-        """
-        self.recur(0, 0, board)
+        r_used = [[False for _ in range(10)] for _ in range(9)] # [row][num] -> used?
+        c_used = [[False for _ in range(10)] for _ in range(9)] # [col][num] -> used?
+        grid_used = [[[False for _ in range(10)] for _ in range(3)] for _ in range(3)] # [row//3][col//3][num] -> used?
 
-    # iter through column order(left2right, up2down)
-    def recur(self, r, c, board):
-        # Meet Line10, no longer need to validate
-        if r == 9:
-            return True
-        # Meet row end, next line iter
-        if c >= 9:
-            return self.recur(r+1, 0, board)
-        # Not ".", keep iter
-        if board[r][c] != ".":
-            return self.recur(r, c+1, board)
+        for r in range(9):
+            for c in range(9):
+                if board[r][c] != ".":
+                    num = int(board[r][c])
+                    r_used[r][num] = c_used[c][num] = grid_used[r//3][c//3][num] = True
 
-        # Is ".", Assign 1~9, validate, then iter
-        for i in range(1, 10):
-            if not self.isValid(r, c, i, board):    continue
-
-            board[r][c] = str(i)
-
-            if self.recur(r,c+1,board):
+        def dfs(r, c):
+            if r == 9:
                 return True
-            # If invalid clean-up and Assign another num
-            board[r][c] = "."
-        return False
 
-    def isValid(self, r, c, val, board):
-        val = str(val)
-        # row
-        for i in range(9):
-            if board[r][i] == val:
-                return False
+            next_c = c+1 if c < 8 else 0
+            next_r = r+1 if next_c == 0 else r
 
-        # column
-        for i in range(9):
-            if board[i][c] == val:
-                return False
-        # 3*3 box
-        # Use left corner as reference point
-        # Decide where is the section by mod
+            if board[r][c] != ".":
+                return dfs(next_r, next_c)
 
-        #ref = (r%3, c%3)
-        row = r - r % 3
-        col = c - c % 3
-        for i in range(3):
-            for j in range(3):
-                #if board[i+3*ref[0]][j+3*ref[1]] == val:
-                if board[i+row][j+col] == val:
-                     return False
-        return True
+            for num in range(1, 10):
+                if r_used[r][num] or c_used[c][num] or grid_used[r//3][c//3][num]:
+                    continue
 
+                board[r][c] = str(num)
+                r_used[r][num] = c_used[c][num] = grid_used[r//3][c//3][num] = True
+                if dfs(next_r, next_c):
+                    return True
+                board[r][c] = "."
+                r_used[r][num] = c_used[c][num] = grid_used[r//3][c//3][num] = False
+            return False
+
+        dfs(0, 0)
 ```
+
+### Tag: #Recursive
 ---
 ## 43. Multiply Strings｜ 11/23
 
