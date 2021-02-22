@@ -22360,6 +22360,19 @@ Output:
   [2, 4, 4],
   [4, 8]
 ]
+
+### 解題分析
+
+1. Goal: n == 1
+2. Constraint: n % i
+3. Choice:
+    - start 到 (n+1) 的開平方, +1 是為了處理完全平方的狀況
+    - 用 start 去往後看去掉重複的組合
+4. Move:
+    - 只要能整除，把當前解 push 進去 answer
+        - n=12, comb=[] -> res.append([2,6])
+        - 並往下遞迴 n=6, comb=[2]
+
 ### 思路
 
 方法一：backtracking 時只向後看避免重複，另外題目不允許 [[]], 與 [n]，所以我們在push進去res的時候要判斷一下
@@ -22394,21 +22407,20 @@ Faster backtracking
 ```py
 class Solution:
     def getFactors(self, n: int) -> List[List[int]]:
-        self.res = []
-        self.helper(n, 2, [])
-        return self.res
+        res = []
 
-    def helper(self, n, start, comb):
-        if n == 1:
-            if len(comb) > 1: # not allow empty or [n]
-                self.res.append(comb)
-            return
+        def recur(n, start, comb):
+            if n == 1:
+                return
 
-        for i in range(start, int(math.sqrt(n+1))+1): # 還有loop的數量
-            if n % i == 0:
-                self.res.append(comb + [i, n//i]) # 只有這裡不一樣！
-                self.helper( n//i, i, comb+[i])
+            for i in range(start, int((n+1) ** 0.5)+1):
+                if n % i == 0:
+                    res.append(comb + [i, n//i]) # push [2, 6]
+                    recur(n//i, i, comb+[i]) # recursive with n=6, comb=[2]
+        recur(n, 2, [])
+        return res
 ```
+### Tag: #Recursive
 ---
 ## 255. Verify Preorder Sequence in Binary Search Tree｜ 6/18
 Given an array of numbers, verify whether it is the correct preorder traversal sequence of a binary search tree.
