@@ -22861,6 +22861,13 @@ Example 2:
 Input: "abc"
 Output: []
 
+
+### 解題分析
+1. 這題用上題的 counter 解法去延伸
+2. 首先我們先取出一半邊的元素, 若是基奇數字串有可能會有個 mid
+3. 我們將這些元素去取得其 permutation (詳見 Palindrome Permutation II)
+4. 最後串上回文的結果極為所求
+
 ### 思路
 
 "aabbccc"
@@ -22873,6 +22880,41 @@ Output: []
 
 
 ### Code
+Optimal Clean code:
+```py
+class Solution:
+    def generatePalindromes(self, s: str) -> List[str]:
+        counter = Counter(s)
+        half_palin = []
+        is_odd, mid = False, ""
+
+        for k, v in counter.items():
+            if v % 2 == 0:
+                half_palin += [k] * (v//2)
+            else:
+                if is_odd:
+                    return []
+                is_odd, mid = True, k
+                half_palin += [k] * (v//2)
+
+        combs = self.permute(half_palin, "", len(half_palin))
+        if is_odd:
+            return [comb+mid+comb[::-1] for comb in combs]
+        else:
+            return [comb+comb[::-1] for comb in combs]
+
+    def permute(self, source, comb, n):
+        if len(comb) == n:
+            return [comb]
+
+        res = []
+        for i in range(len(source)):
+            if i > 0 and source[i] == source[i-1]:
+                continue
+            res += self.permute(source[:i]+source[i+1:], comb+source[i], n)
+        return res
+```
+
 ``` py
 from collections import Counter
 class Solution:
@@ -22920,6 +22962,7 @@ class Solution:
             li.insert(i, c)
         return res
 ```
+### Tag: #Recursive
 ---
 ## 268. Missing Number｜ 7/19
 
