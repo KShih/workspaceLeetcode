@@ -22833,19 +22833,29 @@ Output: true
 
 ### Code
 ``` py
-from collections import defaultdict
 class Solution:
     def canPermutePalindrome(self, s: str) -> bool:
-        counter = defaultdict(int)
+        myDict = {}
         for c in s:
-            if counter[c] == 0:
-                counter[c] += 1
+            if c in myDict:
+                del myDict[c]
             else:
-                counter[c] -= 1
-        sums = 0
-        for e in counter.values():
-            sums += e
-        return sums == 1 or sums == 0
+                myDict[c] = ""
+        return len(myDict) <= 1 # equal to zero or one
+```
+
+Counter 解法
+```py
+class Solution:
+    def canPermutePalindrome(self, s: str) -> bool:
+        counter = Counter(s)
+        is_odd = False
+        for k, v in counter.items():
+            if v % 2 != 0:
+                if is_odd:
+                    return False
+                is_odd = True
+        return True
 ```
 ---
 ## 267. Palindrome Permutation II｜ 7/19
