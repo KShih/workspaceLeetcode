@@ -24177,24 +24177,42 @@ class Solution:
 Optimal
 ```py
 class Solution:
-    def wordPattern(self, pattern: str, str: str) -> bool:
-        words = str.split(' ')
-        if len(words) != len(pattern):
+    def wordPattern(self, pattern: str, s: str) -> bool:
+        li = s.split(" ")
+        if len(li) != len(pattern):
             return False
-
-        dic, used = dict(), dict()
-        for word in words:
-            if word not in dic and pattern[0] not in used:
-                dic[word] = pattern[0]
-                used[pattern[0]] = word
-            elif word in dic and dic[word] == pattern[0]:
-                pattern = pattern[1:]
-                continue
-            else:
+        dicP = dict()
+        dicW = dict()
+        for i, p in enumerate(pattern):
+            word = li[i]
+            if p not in dicP and word not in dicW:
+                dicP[p] = word
+                dicW[word] = p
+            elif (p in dicP and dicP[p] != word) or (word in dicW and dicW[word] != p):
                 return False
-            pattern = pattern[1:]
         return True
 ```
+
+Optimal defaultdict
+```py
+class Solution:
+    def wordPattern(self, pattern: str, s: str) -> bool:
+        li = s.split(" ")
+        if len(li) != len(pattern):
+            return False
+        dicP = defaultdict(str)
+        dicW = defaultdict(str)
+        for i, p in enumerate(pattern):
+            word = li[i]
+            if p not in dicP and word not in dicW:
+                dicP[p] = word
+                dicW[word] = p
+            elif dicP[p] != word or dicW[word] != p:
+                return False
+
+        return True
+```
+
 ---
 ## 292. Nim Game｜ 8/23
 You are playing the following Nim Game with your friend: There is a heap of stones on the table, each time one of you take turns to remove 1 to 3 stones. The one who removes the last stone will be the winner. You will take the first turn to remove the stones.
