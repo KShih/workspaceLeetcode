@@ -24260,6 +24260,21 @@ Output: false
 Constraints:
 
 You may assume both pattern and str contains only lowercase letters.
+
+### 解題分析
+
+1. Goal:
+    1. s 跟 p 都用完 => return True
+    2. p 剩餘的比 s 還多 => return False
+2. Constraint and Choice:
+    1. use this char as word:
+        1. Constraint:
+            1. isMatch
+            2. isNew
+    2. extend more char:
+        1. Otherwise
+3. 如果想不到 Optimal 的那個長度限制剪枝，則應該要在在判斷 False 處加 len(p) > len(s) 的長度檢查
+
 ### 思路
 
 用遞歸解
@@ -24303,7 +24318,35 @@ class Solution:
             return False
 ```
 
-Simpler solution
+Little bit slower Optimal solution
+```py
+class Solution:
+    def wordPatternMatch(self, pattern: str, s: str) -> bool:
+        dic = dict()
+        n = len(s)
+        pn = len(pattern)
+
+        def recur(p, s):
+            if not s and not p:
+                return True
+            if s and not p or len(p) > len(s):
+                return False
+
+            for i in range(1, n+1):
+                word = s[:i]
+                if p[0] in dic and dic[p[0]] == word: # isMatch
+                    if recur(p[1:], s[i:]):
+                        return True
+                elif p[0] not in dic and word not in dic.values(): # isNew
+                    dic[p[0]] = word
+                    if recur(p[1:], s[i:]):
+                        return True
+                    del dic[p[0]]
+            return False
+        return recur(pattern, s)
+```
+
+Optimal solution
 ```py
 def wordPatternMatch(self, pattern, str):
     return self.dfs(pattern, str, {})
@@ -24330,6 +24373,8 @@ def dfs(self, pattern, str, dict):
                 return True
     return False
 ```
+
+### Tag: #Recursive
 ---
 ## 293. Flip Game｜ 8/24
 You are playing the following Flip Game with your friend: Given a string that contains only these two characters: + and -, you and your friend take turns to flip two consecutive "++" into "--". The game ends when a person can no longer make a move and therefore the other person will be the winner.
