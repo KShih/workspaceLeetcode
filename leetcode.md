@@ -24423,6 +24423,14 @@ Explanation: The starting player can guarantee a win by flipping the middle "++"
 Follow up:
 Derive your algorithm's runtime complexity.
 
+### 解題分析
+1. 解法如思路
+2. Time:
+    1. Without memorization
+        - T = N * T(N-2) = N * (N-2) * T(N-4) ... ~= N!
+    2. With memorization
+        - 每一種 s 的狀態都走過一次，因此總共可以產生 N^2 種狀態在 memo 裡
+
 ### 思路
 
 第一手下去後，就必須造成 p2 每一種下法都會輸，問有沒有這樣的一手。
@@ -24430,7 +24438,7 @@ Derive your algorithm's runtime complexity.
 讓我們判斷先手的玩家是否能贏，可以窮舉所有的情況，用回溯法來解題，思路跟上面那題類似，也是從第二個字母開始遍歷整個字符串，如果當前字母和之前那個字母都是+，那麼遞歸調用將這兩個位置變為--的字符串，如果返回 false，說明當前玩家可以贏，結束循環返回 false。這裡同時貼上熱心網友 iffalse 的解釋，這道題 **不是問 “1p是否會怎麼選都會贏”，而是 “如果1p每次都選特別的兩個+，最終他會不會贏”** 。所以 canWin 這個函數的意思是 “在當前這種狀態下，至少有一種選法，能夠讓他贏”。而 (!canWin) 的意思就變成了 “在當前這種狀態下，無論怎麼選，都不能贏”。所以 1p 要看的是，是否存在這樣一種情況，無論 2p 怎麼選，都不會贏。所以只要有一個 (!canWin)，1p 就可以確定他會贏。這道題從博弈論的角度會更好理解。每個 player 都想讓自己贏，所以每輪他們不會隨機選+。每一輪的 player 會選能夠讓對手輸的+。如果無論如何都選不到讓對手輸的+，那麼只能是當前的 player 輸了
 ### Code
 
-O(n!)?
+O(n!)
 ``` py
 class Solution:
     def canWin(self, s: str) -> bool:
@@ -24448,28 +24456,24 @@ class Solution:
 ```
 
 with memorization,
-O(n^2)?
+O(n^2)
 ```py
 class Solution:
     def canWin(self, s: str) -> bool:
-        self.memorize = dict()
-        if len(s) < 2:
-            return False
-        return self.getDerive(s)
-
-    def getDerive(self, s):
-        if self.memorize.get(s):
-            return self.memorize[s]
-
-        for i in range(len(s)-1):
-            if s[i:i+2] == '++':
-                temp = s[:i] + '--' + s[i+2:]
-                if not self.getDerive(temp):
-                    self.memorize[s] = True
-                    return True
-        self.memorize[s] = False
-        return False
+        memo = {}
+        def nextCanWin(s):
+            if s not in memo:
+                for i in range(len(s)-1):
+                    if s[i] == s[i+1] == "+":
+                        move = str(s[:i] + "--" + s[i+2:])
+                        if not nextCanWin(move):
+                            memo[s] = True
+                            return True
+                memo[s] = False
+            return memo[s]
+        return nextCanWin(s)
 ```
+### Tag: #Recursive #Memorization
 ---
 ## 298. Binary Tree Longest Consecutive Sequence｜ 8/31
 Given a binary tree, find the length of the longest consecutive sequence path.
