@@ -1303,6 +1303,56 @@ private:
 
 ### Tag: #Recursive #Array
 ---
+## 52. N-Queens II｜ 2/27
+
+The n-queens puzzle is the problem of placing n queens on an n x n chessboard such that no two queens attack each other.
+
+Given an integer n, return the number of distinct solutions to the n-queens puzzle.
+
+
+
+### 思路
+
+直接把上題 return 的部分簡化成 int ++ 就可以了
+
+### Code
+``` py
+class Solution:
+    def totalNQueens(self, n: int) -> int:
+        self.res = 0
+        def dfs(r,cols,diff,add):
+            if r==n:
+                self.res += 1
+                return
+            for c in range(n):
+                if c not in cols and r-c not in diff and r+c not in add:
+                    dfs(r+1,cols+[c],diff+[r-c],add+[r+c])
+        dfs(0,[],[],[])
+        return self.res
+```
+
+```py
+class Solution:
+    def totalNQueens(self, n: int) -> int:
+        cols, diag, adiag = [0]*n, [0]*2*n, [0]*2*n
+        self.res = 0
+        def recur(row, path, cols, diag, adiag):
+            if row == n:
+                self.res += 1
+                return
+
+            for col in range(n):
+                if cols[col] + diag[row+col] + adiag[row-col] == 0:
+                    cols[col], diag[row+col], adiag[row-col] = 1, 1, 1
+                    recur(row+1, path+[col], cols, diag, adiag)
+                    cols[col], diag[row+col], adiag[row-col] = 0, 0, 0
+
+        recur(0, [], cols, diag, adiag)
+        return self.res
+```
+
+### Tag: #Recursive
+---
 
 ## 79. Word Search(Medium) ｜ 4/1
 
