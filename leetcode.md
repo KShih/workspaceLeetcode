@@ -29282,3 +29282,100 @@ class Solution:
 
 ### Tag: #DP #Recursive #TopDown #BottonUp
 ---
+## 306. Additive Number｜ 2/28
+Additive number is a string whose digits can form additive sequence.
+
+A valid additive sequence should contain at least three numbers. Except for the first two numbers, each subsequent number in the sequence must be the sum of the preceding two.
+
+Given a string containing only digits '0'-'9', write a function to determine if it's an additive number.
+
+Note: Numbers in the additive sequence cannot have leading zeros, so sequence 1, 2, 03 or 1, 02, 3 is invalid.
+
+Example 1:
+
+Input: "112358"
+
+Output: true
+
+Explanation: The digits can form an additive sequence: 1, 1, 2, 3, 5, 8.
+             1 + 1 = 2, 1 + 2 = 3, 2 + 3 = 5, 3 + 5 = 8
+Example 2:
+
+Input: "199100199"
+
+Output: true
+
+Explanation: The additive sequence is: 1, 99, 100, 199.
+             1 + 99 = 100, 99 + 100 = 199
+
+
+Constraints:
+
+- num consists only of digits '0'-'9'.
+- 1 <= num.length <= 35
+- Follow up:
+- How would you handle overflow for very large input integers?
+
+### 解題分析
+1. Recursive
+    1. 一開始在思考這題的時候卡在 initial states of num1 and num2 不知道怎麼設
+    2. 因為此題的 Recursive 連 initial state 都有可能不一樣，因此做法是嘗試各種 initial state
+    3. 進了 recursive 後不需要一個一個去選 sum, 直接取跟 sum 一樣長的字串是否相同，不同就表示此種 initial states 不行
+    4. 因此這題有點像是在選 initial state, 那麼可以改寫成 iterative 的方法
+2. Iterative
+
+
+### Code
+Recursive
+``` py
+class Solution:
+    def isAdditiveNumber(self, num: str) -> bool:
+        def recur(num1, num2, num):
+            if (len(num1) > 1 and num1[0] == '0') or (len(num2) > 1 and num2[0] == '0'):
+                return False
+            sum_num = int(num1) + int(num2)
+            sum_str = str(sum_num)
+            if sum_str == num:
+                return True
+
+            sum_length = len(sum_str)
+            if sum_length > len(num) or num[:sum_length] != sum_str:
+                return False
+            return recur(num2, sum_str, num[sum_length:])
+
+        # cannot decide num1 and num2, therefore need to iterate over all possible initial states
+        n = len(num)
+        for i in range(1, n//2 + 1):
+            num1 = num[:i]
+            for j in range(i, n):
+                num2 = num[i: j+1]
+                if recur(num1, num2, num[j+1:]):
+                    return True
+        return False
+```
+
+Iterative
+```py
+class Solution:
+    def isAdditiveNumber(self, num: str) -> bool:
+        n = len(num)
+        for i in range(1, n//2 + 1):
+            for j in range(i, n):
+                num1, num2, others = num[:i], num[i: j+1], num[j+1:]
+
+                if len(num1) > 1 and num1[0] == '0' or len(num2) > 1 and num2[0] == '0':
+                    continue
+                while others:
+                    sum_num = int(num1) + int(num2)
+                    sum_str = str(sum_num)
+                    if sum_str == others:
+                        return True
+                    elif others.startswith(sum_str):
+                        num1, num2, others = num2, sum_str, others[len(sum_str):]
+                    else:
+                        break
+        return False
+```
+
+### Tag: #Recursive
+---
