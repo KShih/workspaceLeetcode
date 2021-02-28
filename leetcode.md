@@ -19647,6 +19647,111 @@ class Solution:
 ```
 ### Tag: #Recursive #Memoization
 ---
+## 132. Palindrome Partitioning II｜ 2/28
+Given a string s, partition s such that every substring of the partition is a palindrome.
+
+Return the minimum cuts needed for a palindrome partitioning of s.
+
+Example 1:
+
+Input: s = "aab"
+
+Output: 1
+
+Explanation: The palindrome partitioning ["aa","b"] could be produced using 1 cut.
+
+Example 2:
+
+Input: s = "a"
+
+Output: 0
+
+Example 3:
+
+Input: s = "ab"
+
+Output: 1
+
+
+Constraints:
+
+- 1 <= s.length <= 2000
+- s consists of lower-case English letters only.
+
+### 解題分析
+1. ![](assets/markdown-img-paste-20210228214313754.png)
+2. 定義 dp[i] 為 s[0~i] 的最小切割
+3. 狀態轉移:
+    - 如何更新dp[i]呢，前面說過了其表示子串 [0, i] 範圍內的最小分割數。那麼這個區間的每個位置都可以嘗試分割開來，所以就用一個變量j來從0遍歷到i，這樣就可以把區間 [0, i] 分為兩部分，[0, j-1] 和 [j, i]，那麼suppose我們已經知道區間 [0, j-1] 的最小分割數 dp[j-1]，因為我們是從前往後更新的，而 j 小於等於 i，所以 dp[j-1] 肯定在 dp[i] 之前就已經算出來了。這樣我們就只需要判斷區間 [j, i] 內的子串是否為回文串了，是的話，dp[i] 就可以用 1 + dp[j-1] 來更新了。
+4. Base case:
+    - dp[0] = -1 比較難解釋一點，可以說 s[:0] 是不合法，或者直接 initial 成最多切割數，每個 char 一刀
+
+### Code
+``` py
+class Solution:
+    def minCut(self, s: str) -> int:
+        if s == s[::-1]: return 0
+        for i in range(1, len(s)):
+            if s[:i]==s[:i][::-1] and s[i:]==s[i:][::-1]: return 1
+
+        dp = [maxPossible for maxPossible in range(-1, len(s))]
+        for i in range(0, len(s)):
+            for j in range(i, len(s)):
+                if s[i:j+1] == s[i:j+1][::-1]:
+                    dp[j+1] = min(dp[j+1], dp[i]+1)
+        return dp[-1]
+```
+
+嘗試從上題的改, TLE
+```py
+class Solution:
+    def minCut(self, s: str) -> int:
+        def recur(s, cut):
+            if len(s) == 1:
+                return cut
+
+            res = float(inf)
+            for i in range(1, len(s)+1):
+                if s[:i] == s[:i][::-1]:
+                    if not s[i:]:
+                        res = min(res, cut)
+                    else:
+                        res = min(res, recur(s[i:], cut+1))
+            return res
+
+        return recur(s, 0)
+```
+
+加入 Memorization, 但 WA
+
+- Case:
+    - Input: "cabababcbc"
+    - Output: 7
+    - Expected: 3
+```py
+class Solution:
+    def minCut(self, s: str) -> int:
+        memo = {}
+        def recur(s, cut):
+            if s not in memo:
+                if len(s) == 1:
+                    return cut
+
+                res = float(inf)
+                for i in range(1, len(s)+1):
+                    if s[:i] == s[:i][::-1]:
+                        if not s[i:]:
+                            res = min(res, cut)
+                        else:
+                            res = min(res, recur(s[i:], cut+1))
+                memo[s] = res
+            return memo[s]
+
+        return recur(s, 0)
+```
+
+### Tag: #DP
+---
 ## 198. House Robber｜ 3/16 (DP 經典題！打通DP任督二脈)
 You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security system connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
 
