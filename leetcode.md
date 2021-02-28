@@ -1482,6 +1482,8 @@ Explanation: The endWord "cog" is not in wordList, therefore no possible transfo
         1. at most M word in Queue
         2. traverse each word length N
         3. try 26 alphabetic
+    3. 這種方式可以用 Mask 去進行優化 <- 推薦使用這個方法
+    4. 要記得更新 wordSet 把拜訪過的 word 清掉
 2. 第二種把每一個字的字元都試著換成 " * ", 例如 dog -> {*og, d*g, do*}, 並維護一個字典去存如 {*og: [dog, jog]}, 並持續的 BFS 直到找到 endWord
     0. ![](assets/markdown-img-paste-20210228111723113.png)
     1. 缺點: wordList 太長
@@ -1520,6 +1522,38 @@ class Solution:
             count += 1
         return 0
 ```
+
+Optimize easy solution with mask (Used to extend to Word Ladder II)
+```py
+from collections import deque
+class Solution:
+    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
+        word_set = set(wordList)
+        lookup = defaultdict(list)
+        N = len(beginWord)
+        for w in wordList:
+            for i in range(N):
+                mask = w[:i] + "*" + w[i+1:]
+                lookup[mask].append(w)
+
+        count = 1
+        q = deque([beginWord])
+        while q:
+            qsize = len(q)
+            for _ in range(qsize):
+                word = q.popleft()
+                if word == endWord:
+                    return count
+                for i in range(N):
+                    mask = word[:i] + "*" + word[i+1:]
+                    for nextWord in lookup[mask]:
+                        if nextWord in word_set:
+                            q.append(nextWord)
+                            word_set.remove(nextWord)
+            count += 1
+        return 0
+```
+
 
 BFS with preprocessing
 ```py
@@ -1720,6 +1754,126 @@ public:
     }
 };
 ```
+### Tag: #BFS
+---
+## 126. Word Ladder II｜ 2/28
+A transformation sequence from word beginWord to word endWord using a dictionary wordList is a sequence of words such that:
+
+The first word in the sequence is beginWord.
+
+The last word in the sequence is endWord.
+
+Only one letter is different between each adjacent pair of words in the sequence.
+
+Every word in the sequence is in wordList.
+
+Given two words, beginWord and endWord, and a dictionary wordList, return all the shortest transformation sequences from beginWord to endWord, or an empty list if no such sequence exists.
+
+
+
+Example 1:
+
+Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
+
+Output: [["hit","hot","dot","dog","cog"],["hit","hot","lot","log","cog"]]
+
+Example 2:
+
+Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]
+
+Output: []
+
+Explanation: The endWord "cog" is not in wordList, therefore no possible transformation.
+
+
+Constraints:
+
+1 <= beginWord.length <= 10
+
+endWord.length == beginWord.length
+
+1 <= wordList.length <= 5000
+
+wordList[i].length == beginWord.length
+
+beginWord, endWord, and wordList[i] consist of lowercase English letters.
+
+beginWord != endWord
+
+All the strings in wordList are unique.
+### 解題分析
+1. 上題的 follow up，上題因為不需要追蹤路徑，因此可以只用 count 去紀錄 layer 就可以了，但這題我們需要紀錄每個字的路徑，因此用 queue 去紀錄每一層是不夠的
+    1. 需使用能夠存 path 的結構 -> dictionary
+    2. layer 為 dict: {string: list[string]}, word -> path
+2. 對於每一層我們去把當前這層所可以產生的 mask 底下的 word 都走過，並更新至新的一層
+3. 最後記得把走過的 word 從 wordSet 從移除
+4. 跟上題一樣可以優化 a-z 的方法 with preprocessing mask
+
+
+### Code
+traverse w/ a-z
+```py
+class Solution(object):
+    def findLadders(self, beginWord, endWord, wordList):
+
+        wordList = set(wordList)
+        res = []
+        layer = {}
+        layer[beginWord] = [[beginWord]]
+
+        while layer:
+            newlayer = collections.defaultdict(list)
+            for w in layer:
+                if w == endWord:
+                    res.extend(k for k in layer[w])
+                else:
+                    for i in range(len(w)):
+                        for c in string.ascii_lowercase:
+                            neww = w[:i]+c+w[i+1:]
+                            if neww in wordList:
+                                newlayer[neww]+=[j+[neww] for j in layer[w]]
+
+            wordList -= set(newlayer.keys())
+            layer = newlayer
+
+        return res
+```
+
+Optimize with mask
+``` py
+class Solution:
+    def findLadders(self, beginWord: str, endWord: str, wordList: List[str]) -> List[List[str]]:
+        wordSet = set(wordList)
+        if endWord not in wordSet:
+            return []
+
+        lookup = defaultdict(list)
+        N = len(beginWord)
+        for w in wordList:
+            for i in range(N):
+                mask = w[:i] + "*" + w[i+1:]
+                lookup[mask].append(w)
+
+        layer = defaultdict(list)
+        layer[beginWord] = [[beginWord]]
+
+        while layer:
+            newLayer = defaultdict(list)
+
+            for word in layer:
+                if word == endWord:
+                    return layer[endWord]
+                for i in range(N):
+                    mask = word[:i] + "*" + word[i+1:]
+                    for nextWord in lookup[mask]:
+                        if nextWord in wordSet:
+                            newLayer[nextWord] += [path + [nextWord] for path in layer[word]]
+
+            wordSet -= set(newLayer.keys())
+            layer = newLayer
+        return []
+```
+
 ### Tag: #BFS
 ---
 
