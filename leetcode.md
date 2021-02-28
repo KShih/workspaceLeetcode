@@ -1473,10 +1473,137 @@ wordList = ["hot","dot","dog","lot","log"]
 Output: 0
 
 Explanation: The endWord "cog" is not in wordList, therefore no possible transformation.
-### 思路
-
+### 解題分析
+0. ![](assets/markdown-img-paste-20210228111746475.png)
+    1. 使用 BFS 去解可以保證第一次 match 到 endWord 就是最佳解
+1. 第一種比較直覺的做法，從 beginWord 開始將每個字元都改成 a-z，若在 wordList 中有存在，表示此種變異為一種可能解，加進去 queue 裡到下一層拜訪
+    1. 缺點: 需要變異成多種 string 去試結果
+    2. Time: M * N*26
+        1. at most M word in Queue
+        2. traverse each word length N
+        3. try 26 alphabetic
+2. 第二種把每一個字的字元都試著換成 " * ", 例如 dog -> {*og, d*g, do*}, 並維護一個字典去存如 {*og: [dog, jog]}, 並持續的 BFS 直到找到 endWord
+    0. ![](assets/markdown-img-paste-20210228111723113.png)
+    1. 缺點: wordList 太長
+    2. Time: M * N^2
+3. 從兩頭去進行 BFS
+    0. ![](assets/markdown-img-paste-20210228140146381.png)
+    1. 一次選一邊進行，相遇在中間時就是目前這頭的 Level + 另一頭進行到的 Level
+    2. 若是沒有相遇則更新自己這邊該點的進度
 
 ### Code
+(Easy) BFS with Set
+```py
+from collections import deque
+class Solution:
+    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
+        q = deque([beginWord])
+        word_set = set(wordList)
+        count = 1
+
+        while q:
+            qsize = len(q)
+            for _ in range(qsize):
+                char_list = list(q.popleft())
+                for i in range(len(char_list)):
+                    temp = char_list[i]
+                    # try a-z and replace the i-st
+                    for c in list(string.ascii_lowercase):
+                        char_list[i] = c
+                        word = "".join(char_list)
+                        if word in word_set:
+                            if word == endWord:
+                                return count+1
+                            q.append(word)
+                            word_set.remove(word)
+                    char_list[i] = temp
+            count += 1
+        return 0
+```
+
+BFS with preprocessing
+```py
+from collections import defaultdict
+class Solution(object):
+    def ladderLength(self, beginWord, endWord, wordList):
+        if endWord not in wordList or not endWord or not beginWord or not wordList:
+            return 0
+
+        L = len(beginWord)
+        all_combo_dict = defaultdict(list)
+        for word in wordList:
+            for i in range(L):
+                all_combo_dict[word[:i] + "*" + word[i+1:]].append(word)
+
+        queue = collections.deque([(beginWord, 1)])
+        visited = {beginWord: True}
+        while queue:
+            current_word, level = queue.popleft()
+            for i in range(L):
+                intermediate_word = current_word[:i] + "*" + current_word[i+1:]
+
+                for word in all_combo_dict[intermediate_word]:
+                    if word == endWord:
+                        return level + 1
+                    if word not in visited:
+                        visited[word] = True
+                        queue.append((word, level + 1))
+                all_combo_dict[intermediate_word] = []
+        return 0
+```
+
+(Optimal) Double end BFS
+```py
+from collections import defaultdict
+class Solution(object):
+    def __init__(self):
+        self.length = 0
+        self.all_combo_dict = defaultdict(list)
+
+    def visitWordNode(self, queue, visited, others_visited):
+        current_word, level = queue.popleft()
+        for i in range(self.length):
+            intermediate_word = current_word[:i] + "*" + current_word[i+1:]
+
+            for word in self.all_combo_dict[intermediate_word]:
+                if word in others_visited:
+                    return level + others_visited[word]
+                if word not in visited:
+                    visited[word] = level + 1
+                    queue.append((word, level + 1))
+        return None
+
+    def ladderLength(self, beginWord, endWord, wordList):
+        if endWord not in wordList or not endWord or not beginWord or not wordList:
+            return 0
+
+        self.length = len(beginWord)
+
+        for word in wordList:
+            for i in range(self.length):
+                self.all_combo_dict[word[:i] + "*" + word[i+1:]].append(word)
+
+        queue_begin = collections.deque([(beginWord, 1)]) # BFS starting from beginWord
+        queue_end = collections.deque([(endWord, 1)]) # BFS starting from endWord
+
+        visited_begin = {beginWord: 1}
+        visited_end = {endWord: 1}
+        ans = None
+
+        while queue_begin and queue_end:
+
+            # One hop from begin word
+            ans = self.visitWordNode(queue_begin, visited_begin, visited_end)
+            if ans:
+                return ans
+            # One hop from end word
+            ans = self.visitWordNode(queue_end, visited_end, visited_begin)
+            if ans:
+                return ans
+
+        return 0
+```
+
 ``` c++
 class Solution {
 public:
@@ -1593,6 +1720,7 @@ public:
     }
 };
 ```
+### Tag: #BFS
 ---
 
 ## 752. Open the Lock(Medium)｜ 4/7
