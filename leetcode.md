@@ -22,7 +22,7 @@ Leetcode note
 4. how to initialize 2-D vector
 ---
 
-## 17. Letter Combinations of a Phone Number
+## 17. Letter Combinations of a Phone Number | [Review * 1]
 Given a string containing digits from 2-9 inclusive, return all possible letter combinations that the number could represent.
 
 A mapping of digit to letters (just like on the telephone buttons) is given below. Note that 1 does not map to any letters.
@@ -96,7 +96,7 @@ vector<string> letterCombinations(string digits) {
 ---
 
 
-## 39. Combination Sum
+## 39. Combination Sum | [Review * 1]
 Given a set of candidate numbers (candidates) (without duplicates) and a target number (target), find all unique combinations in candidates where the candidate numbers sums to target.
 
 The same repeated number may be chosen from candidates unlimited number of times.
@@ -222,7 +222,7 @@ class Solution:
 ### Tag: #Backtrack #Recursive
 ---
 
-## 40. Combination Sum II
+## 40. Combination Sum II | [Review * 1]
 
 Given a collection of candidate numbers (candidates) and a target number (target), find all unique combinations in candidates where the candidate numbers sums to target.
 
@@ -330,7 +330,7 @@ private:
 ### Tag: #Backtrack #Counter
 ---
 
-## 77. Combination
+## 77. Combination | [Review * 1]
 Given two integers n and k, return all possible combinations of k numbers out of 1 ... n.
 
 Example:
@@ -402,7 +402,7 @@ private:
 ### Tag: #Recursive
 ---
 
-## 78. Subsets
+## 78. Subsets | [Review * 1]
 Given a set of distinct integers, nums, return all possible subsets (the power set).
 
 Note: The solution set must not contain duplicate subsets.
@@ -508,7 +508,7 @@ private:
 ```
 ---
 
-## 90. Subsets II
+## 90. Subsets II | [Review * 1]
 Given a collection of integers that might contain duplicates, nums, return all possible subsets (the power set).
 
 Note: The solution set must not contain duplicate subsets.
@@ -603,7 +603,7 @@ private:
 ---
 
 
-## 216. Combination Sum III
+## 216. Combination Sum III | [Review * 1]
 Find all possible combinations of k numbers that add up to a number n, given that only numbers from 1 to 9 can be used and each combination should be a unique set of numbers.
 
 Note:
@@ -676,7 +676,7 @@ private:
 ---
 
 
-## 46. Permutations
+## 46. Permutations | [Review * 1]
 Given a collection of distinct integers, return all possible permutations.
 
 Example:
@@ -835,7 +835,7 @@ private:
 ### Tag: #Backtrack #Permutation #Set
 
 ---
-## 47. Permutations II｜ 2/17
+## 47. Permutations II｜ 2/17 | [Review * 1]
 Given a collection of numbers, nums, that might contain duplicates, return all possible unique permutations in any order.
 
 Example 1:
@@ -991,7 +991,7 @@ private:
 
 ---
 
-## 22. Generate Parentheses
+## 22. Generate Parentheses | [Review * 1]
 Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
 
 For example, given n = 3, a solution set is:
@@ -1161,7 +1161,7 @@ private:
 
 ---
 
-## 51. N-Queens
+## 51. N-Queens | [Review * 1]
 The n-queens puzzle is the problem of placing n queens on an n×n chessboard such that no two queens attack each other.
 
 
@@ -1354,7 +1354,7 @@ class Solution:
 ### Tag: #Recursive
 ---
 
-## 79. Word Search(Medium) ｜ 4/1
+## 79. Word Search(Medium) ｜ 4/1 | [Review * 1]
 
 Given a 2D board and a word, find if the word exists in the grid.
 
@@ -1439,7 +1439,7 @@ private:
 ### Tag: #Recursive
 ---
 
-## 127. Word Ladder(Medium) ｜ 4/1
+## 127. Word Ladder(Medium) ｜ 4/1 | [Review * 1]
 
 Given two words (beginWord and endWord), and a dictionary's word list, find the length of shortest transformation sequence from beginWord to endWord, such that:
 
@@ -2253,7 +2253,7 @@ public:
 ```
 
 ---
-## 93. Restore IP Addresses｜ 4/9
+## 93. Restore IP Addresses｜ 4/9 | [Review * 1]
 Given a string containing only digits, restore it by returning all possible valid IP address combinations.
 
 Example:
@@ -4573,7 +4573,7 @@ public:
 ```
 
 ---
-## 230. Kth Smallest Element in a BST｜ 6/3
+## 230. Kth Smallest Element in a BST｜ 6/3 | [Review * 1]
 Given a binary search tree, write a function kthSmallest to find the kth smallest element in it.
 
 Note:
@@ -4998,7 +4998,7 @@ public:
 };
 ```
 ---
-## 35. Search Insert Position｜ 6/14
+## 35. Search Insert Position｜ 6/14 | [Review * 1]
 Given a sorted array and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
 
 You may assume no duplicates in the array.
@@ -5081,7 +5081,7 @@ public:
 ```
 ### Tag: #BinarySearch
 ---
-## 34. Find First and Last Position of Element in Sorted Array｜ 6/15 (BS左右邊界)
+## 34. Find First and Last Position of Element in Sorted Array｜ 6/15 (BS左右邊界) | [Review * 1]
 Given an array of integers nums sorted in ascending order, find the starting and ending position of a given target value.
 
 Your algorithm's runtime complexity must be in the order of O(log n).
@@ -5342,7 +5342,7 @@ public:
 };
 ```
 ---
-## 33. Search in Rotated Sorted Array｜ 6/17
+## 33. Search in Rotated Sorted Array｜ 6/17 | [Review * 1]
 Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
 
 (i.e., [0,1,2,4,5,6,7] might become [4,5,6,7,0,1,2]).
@@ -5513,7 +5513,7 @@ public:
 ```
 ### Tag: #BinarySearch
 ---
-## 81. Search in Rotated Sorted Array II｜ 6/17
+## 81. Search in Rotated Sorted Array II｜ 6/17 | [Review * 1]
 Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
 
 (i.e., [0,0,1,2,2,5,6] might become [2,5,6,0,0,1,2]).
@@ -5597,7 +5597,7 @@ public:
 };
 ```
 ---
-## 153. Find Minimum in Rotated Sorted Array｜ 6/17
+## 153. Find Minimum in Rotated Sorted Array｜ 6/17 | [Review * 1]
 Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
 
 (i.e.,  [0,1,2,4,5,6,7] might become  [4,5,6,7,0,1,2]).
@@ -5699,7 +5699,7 @@ public:
 };
 ```
 ---
-## 162. Find Peak Element｜ 6/18
+## 162. Find Peak Element｜ 6/18 | [Review * 1]
 A peak element is an element that is greater than its neighbors.
 Given an input array nums, where nums[i] ≠ nums[i+1], find a peak element and return its index.
 The array may contain multiple peaks, in that case return the index to any one of the peaks is fine.
@@ -5827,7 +5827,7 @@ public:
 };
 ```
 ---
-## 74. Search a 2D Matrix｜ 7/2
+## 74. Search a 2D Matrix｜ 7/2 | [Review * 1]
 Write an efficient algorithm that searches for a value in an m x n matrix. This matrix has the following properties:
 
 Integers in each row are sorted from left to right.
@@ -5961,7 +5961,7 @@ Dummy node 的使用多針對單向鏈表沒有前向指標的問題，保證鏈
 所以，當鏈表的 head 有可能變化（被修改或者被刪除）時，使用 dummy node 可以簡化程式碼及很多邊界情況的處理，最終返回 dummy.next 即新的鏈表。
 
 ---
-## 2. Add Two Numbers｜ 7/3
+## 2. Add Two Numbers｜ 7/3 | [Review * 1]
 You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order and each of their nodes contain a single digit. Add the two numbers and return it as a linked list.
 
 You may assume the two numbers do not contain any leading zero, except the number 0 itself.
@@ -6038,7 +6038,7 @@ public:
 };
 ```
 ---
-## 445. Add Two Numbers II｜ 7/3
+## 445. Add Two Numbers II｜ 7/3 | [Review * 1]
 You are given two non-empty linked lists representing two non-negative integers.
 The most significant digit comes first and each of their nodes contain a single digit.
 Add the two numbers and return it as a linked list.
@@ -6139,7 +6139,7 @@ public:
 ```
 ### Tag: #LinkedList
 ---
-## 24. Swap Nodes in Pairs｜ 7/4
+## 24. Swap Nodes in Pairs｜ 7/4 | [Review * 1]
 Given a linked list, swap every two adjacent nodes and return its head.
 
 You may not modify the values in the list's nodes, only nodes itself may be changed.
@@ -6210,7 +6210,7 @@ public:
 ```
 ### Tag: #LinkedList
 ---
-## 206. Reverse Linked List｜ 8/13
+## 206. Reverse Linked List｜ 8/13 | [Review * 1]
 Reverse a singly linked list.
 ![](assets/markdown-img-paste-20190813130546783.png)
 
@@ -6326,7 +6326,7 @@ public:
 };
 ```
 ---
-## 142. Linked List Cycle II｜ 7/5
+## 142. Linked List Cycle II｜ 7/5 | [Review * 1]
 Given a linked list, return the node where the cycle begins. If there is no cycle, return null.
 
 To represent a cycle in the given linked list, we use an integer pos which represents the position (0-indexed) in the linked list where tail connects to. If pos is -1, then there is no cycle in the linked list.
@@ -6394,7 +6394,7 @@ public:
 };
 ```
 ---
-## 21. Merge Two Sorted Lists｜ 7/5
+## 21. Merge Two Sorted Lists｜ 7/5 | [Review * 1]
 Merge two sorted linked lists and return it as a new list.
 The new list should be made by splicing together the nodes of the first two lists.
 
@@ -6473,7 +6473,7 @@ public:
 ```
 ### Tag: #LinkedList
 ---
-## 23. Merge k Sorted Lists｜ 7/5
+## 23. Merge k Sorted Lists｜ 7/5 | [Review * 1]
 Merge k sorted linked lists and return it as one sorted list. Analyze and describe its complexity.
 ![](assets/markdown-img-paste-20190705142804335.png)
 
@@ -6704,7 +6704,7 @@ public:
 };
 ```
 ---
-## 148. Sort List｜ 7/9
+## 148. Sort List｜ 7/9 | [Review * 1]
 Sort a linked list in O(n log n) time using constant space complexity.
 ![](assets/markdown-img-paste-2019070911421222.png)
 
@@ -7753,7 +7753,7 @@ class Solution {
    };
 ```
 ---
-## 143. Reorder List(高頻難題!!)｜ 8/12
+## 143. Reorder List(高頻難題!!)｜ 8/12 | [Review * 1]
 Given a singly linked list L: L0→L1→…→Ln-1→Ln,
 reorder it to: L0→Ln→L1→Ln-1→L2→Ln-2→…
 
@@ -8030,7 +8030,7 @@ public:
 };
 ```
 ---
-## 349. Intersection of Two Arrays｜ 8/15
+## 349. Intersection of Two Arrays｜ 8/15 | [Review * 1]
 Given two arrays, write a function to compute their intersection.
 ![](assets/markdown-img-paste-20190815160421364.png)
 ### 思路
@@ -9308,7 +9308,7 @@ public:
 ---
 ## ***[Start to Leetcode with Python]***
 ---
-## 146. LRU Cache｜ 8/29
+## 146. LRU Cache｜ 8/29 | [Review * 1]
 Design and implement a data structure for Least Recently Used (LRU) cache. It should support the following operations: get and put.
 
 get(key) - Get the value (will always be positive) of the key if the key exists in the cache, otherwise return -1.
@@ -9439,7 +9439,7 @@ class LRUCache():
 ### Tag: #LinkedList #DoublyLinkedList
 ---
 
-## 4. Median of Two Sorted Arrays｜ 8/30
+## 4. Median of Two Sorted Arrays｜ 8/30 | [Review * 1]
 There are two sorted arrays nums1 and nums2 of size m and n respectively.
 
 Find the median of the two sorted arrays. The overall run time complexity should be O(log (m+n)).
@@ -10673,35 +10673,9 @@ class Solution(object):
         return res
 ```
 ---
-## 10. Regular Expression Matching (HARD)｜ 8/29
-Given an input string (s) and a pattern (p), implement regular expression matching with support for '.' and '*'.
-
-'.' Matches any single character.
-
-'*' Matches zero or more of the preceding element.
-
-The matching should cover the entire input string (not partial).
-
-Note:
-
-s could be empty and contains only lowercase letters a-z.
-
-p could be empty and contains only lowercase letters a-z, and characters like . or * .
-
-![](assets/markdown-img-paste-20190910114324984.png)
-![](assets/markdown-img-paste-20190910114345215.png)
-
-### 思路
-DP
-
-### Code
-``` py
-
-```
----
 ## ***[Start to LinkedIn High Freq]***
 ---
-## 380. Insert Delete GetRandom O(1)｜ 9/10
+## 380. Insert Delete GetRandom O(1)｜ 9/10 | [Review * 1]
 Design a data structure that supports all following operations in average O(1) time.
 
 insert(val): Inserts an item val to the set if not already present.
@@ -13740,7 +13714,7 @@ if __name__ == '__main__':
     dfs("heelllloo", lis, dic)
 ```
 ---
-## 167. Two Sum II - Input array is sorted｜ 10/21
+## 167. Two Sum II - Input array is sorted｜ 10/21 | [Review * 1]
 Given an array of integers that is already sorted in ascending order, find two numbers such that they add up to a specific target number.
 
 The function twoSum should return indices of the two numbers such that they add up to the target, where index1 must be less than index2.
@@ -13879,7 +13853,7 @@ def removeEnd(self,head):
     return prev.next
 ```
 ---
-## 19. Remove Nth Node From End of List｜ 10/21
+## 19. Remove Nth Node From End of List｜ 10/21 | [Review * 1]
 Given a linked list, remove the n-th node from the end of list and return its head.
 
 Example:
@@ -14142,7 +14116,7 @@ class Solution:
         return res
 ```
 ---
-## 25. Reverse Nodes in k-Group｜ 10/23
+## 25. Reverse Nodes in k-Group｜ 10/23 | [Review * 1]
 
 Given a linked list, reverse the nodes of a linked list k at a time and return its modified list.
 
@@ -14243,7 +14217,7 @@ def deleteNode(self, node):
     node.next = node.next.next
 ```
 ---
-## 92. Reverse Linked List II｜ 10/27
+## 92. Reverse Linked List II｜ 10/27 | [Review * 1]
 
 Reverse a linked list from position m to n. Do it in one-pass.
 
@@ -14820,7 +14794,7 @@ determine the building placement to minimize the distance of the most distant em
 
 ```
 ---
-## 300. Longest Increasing Subsequence｜ 11/14
+## 300. Longest Increasing Subsequence｜ 11/14 | [Review * 1]
 Given an unsorted array of integers, find the length of longest increasing subsequence.
 
 Example:
@@ -15011,7 +14985,7 @@ param_3 = obj.startsWith(prefix)
 
 ```
 ---
-## 212. Word Search II｜ 11/18
+## 212. Word Search II｜ 11/18 | [Review * 1]
 
 ### 技巧
 
@@ -15423,7 +15397,7 @@ class Solution:
         return True
 ```
 ---
-## 37. Sudoku Solver｜ 11/21
+## 37. Sudoku Solver｜ 11/21 | [Review * 1]
 
 解一個數獨
 
@@ -15737,7 +15711,7 @@ class Solution:
         return ret
 ```
 ---
-## 61. Rotate List｜ 11/24
+## 61. Rotate List｜ 11/24 | [Review * 1]
 
 Given a linked list, rotate the list to the right by k places, where k is non-negative.
 
@@ -16112,7 +16086,7 @@ class Solution:
 
 ```
 ---
-## 72. Edit Distance｜ 11/26
+## 72. Edit Distance｜ 11/26 | [Review * 1]
 
 Given two words word1 and word2, find the minimum number of operations required to convert word1 to word2.
 
@@ -16400,7 +16374,7 @@ class Solution:
                 cur += 1
 ```
 ---
-## 83. Remove Duplicates from Sorted List｜ 8/29
+## 83. Remove Duplicates from Sorted List｜ 8/29 | [Review * 1]
 Given the head of a sorted linked list, delete all duplicates such that each element appears only once. Return the linked list sorted as well.
 
 ![](assets/markdown-img-paste-20210124235919123.png)
@@ -16438,7 +16412,7 @@ class Solution:
 
 ### Tag: #LinkedList
 ---
-## 82. Remove Duplicates from Sorted List II｜ 12/2
+## 82. Remove Duplicates from Sorted List II｜ 12/2 | [Review * 1]
 Given a sorted linked list, delete all nodes that have duplicate numbers, leaving only distinct numbers from the original list.
 
 Example 1:
@@ -16640,7 +16614,7 @@ class Solution:
 
 ```
 ---
-## 86. Partition List｜ 12/3
+## 86. Partition List｜ 12/3 | [Review * 1]
 
 Given a linked list and a value x, partition it such that **all nodes less than x** come before **nodes greater than or equal to x**.
 
@@ -17163,7 +17137,7 @@ class Solution:
         return root
 ```
 ---
-## 109. Convert Sorted List to Binary Search Tree｜ 12/6
+## 109. Convert Sorted List to Binary Search Tree｜ 12/6 | [Review * 1]
 Given a singly linked list where elements are sorted in ascending order, convert it to a height balanced BST.
 
 For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of every node never differ by more than 1.
@@ -17693,7 +17667,7 @@ class Solution:
         return dp[max_day-1][max_trans][0]
 ```
 ---
-## 139. Word Break｜ 1/29
+## 139. Word Break｜ 1/29 | [Review * 1]
 Given a non-empty string s and a dictionary wordDict containing a list of non-empty words, determine if s can be segmented into a space-separated sequence of one or more dictionary words.
 
 Note:
@@ -18016,7 +17990,7 @@ def solve(self, board):
                 board[r][c] = "O"
 ```
 ---
-## 140. Word Break II(Solution 2 缺優化)｜ 2/5
+## 140. Word Break II｜ 2/5 | [Review * 1]
 Given a non-empty string s and a dictionary wordDict containing a list of non-empty words, add spaces in s to construct a sentence where each word is a valid dictionary word. Return all such possible sentences.
 
 Note:
@@ -18390,7 +18364,7 @@ class Solution:
 
 ```
 ---
-## 138. Copy List with Random Pointer｜ 3/2
+## 138. Copy List with Random Pointer｜ 3/2 | [Review * 1]
 
 A linked list is given such that each node contains an additional random pointer which could point to any node in the list or null.
 
@@ -19530,7 +19504,7 @@ class MinStack:
         return self.min_stack[-1]
 ```
 ---
-## 131. Palindrome Partitioning<Backtrack>｜ 3/16
+## 131. Palindrome Partitioning<Backtrack>｜ 3/16 | [Review * 1]
 Given a string s, partition s such that every substring of the partition is a palindrome.
 
 Return all possible palindrome partitioning of s.
@@ -20072,7 +20046,7 @@ class Solution:
         return detech
 ```
 ---
-## 209. Minimum Size Subarray Sum｜ 3/26
+## 209. Minimum Size Subarray Sum｜ 3/26 | [Review * 1]
 Given an array of n positive integers and a positive integer s, find the minimal length of a contiguous subarray of which the sum ≥ s. If there isn't one, return 0 instead.
 
 Example:
@@ -20316,7 +20290,7 @@ class Solution:
         return str1
 ```
 ---
-## 211. Add and Search Word - Data structure design｜ 3/27
+## 211. Add and Search Word - Data structure design｜ 3/27 | [Review * 1]
 Design a data structure that supports the following two operations:
 
 void addWord(word)
@@ -21019,7 +20993,7 @@ class Solution(object):
         - 什麼情況下可以 push
         - 什麼情況下要 pop
 ---
-## 222. Count Complete Tree Nodes｜ 4/8
+## 222. Count Complete Tree Nodes｜ 4/8 | [Review * 1]
 Given a complete binary tree, count the number of nodes.
 
 Note:
@@ -21882,7 +21856,7 @@ class Solution:
             return str(start) + "->" + str(end)
 ```
 ---
-## 352. Data Stream as Disjoint Intervals｜ 4/15 (Very good question)
+## 352. Data Stream as Disjoint Intervals｜ 4/15 (Very good question) | [Review * 1]
 Given a data stream input of non-negative integers a1, a2, ..., an, ..., summarize the numbers seen so far as a list of disjoint intervals.
 
 For example, suppose the integers from the data stream are 1, 3, 7, 2, 6, ..., then the summary will be:
@@ -22229,7 +22203,7 @@ class Solution:
         return pre
 ```
 ---
-## 240. Search a 2D Matrix II｜ 8/29
+## 240. Search a 2D Matrix II｜ 8/29 | [Review * 1]
 Write an efficient algorithm that searches for a value in an m x n matrix. This matrix has the following properties:
 
 Integers in each row are sorted in ascending from left to right.
@@ -22788,7 +22762,7 @@ class Solution:
         return res
 ```
 ---
-## 254. Factor Combinations｜ 6/18
+## 254. Factor Combinations｜ 6/18 | [Review * 1]
 Numbers can be regarded as product of its factors. For example,
 
 8 = 2 x 2 x 2;
@@ -23279,7 +23253,7 @@ def nthUglyNumber(self, n):
    return ugly[-1]
 ```
 ---
-## 266. Palindrome Permutation｜ 7/19
+## 266. Palindrome Permutation｜ 7/19 | [Review * 1]
 Given a string, determine if a permutation of the string could form a palindrome.
 
 Example 1:
@@ -23326,7 +23300,7 @@ class Solution:
         return True
 ```
 ---
-## 267. Palindrome Permutation II｜ 7/19
+## 267. Palindrome Permutation II｜ 7/19 | [Review * 1]
 
 Given a string s, return all the palindromic permutations (without duplicates) of it. Return an empty list if no palindromic permutation could be form.
 
@@ -23618,7 +23592,7 @@ class Solution:
                         self.order += end
 ```
 ---
-## 270. Closest Binary Search Tree Value｜ 8/1
+## 270. Closest Binary Search Tree Value｜ 8/1 | [Review * 1]
 Given a non-empty binary search tree and a target value, find the value in the BST that is closest to the target.
 
 Note:
@@ -24371,7 +24345,7 @@ class Solution:
                     queue.append((new_x, new_y))
 ```
 ---
-## 287. Find the Duplicate Number｜ 8/22
+## 287. Find the Duplicate Number｜ 8/22 | [Review * 1]
 Given an array nums containing n + 1 integers where each integer is between 1 and n (inclusive), prove that at least one duplicate number must exist. Assume that there is only one duplicate number, find the duplicate one.
 
 Example 1:
@@ -24588,7 +24562,7 @@ def isUnique(self, word):
     return len(self.dic[word]) == 0 or (len(self.dic[word]) == 1 and val == list(self.dic[word])[0])
 ```
 ---
-## 290. Word Pattern｜ 8/23
+## 290. Word Pattern｜ 8/23 | [Review * 1]
 Given a pattern and a string str, find if str follows the same pattern.
 
 Here follow means a full match, such that there is a bijection between a letter in pattern and a non-empty word in str.
@@ -24704,7 +24678,7 @@ class Solution:
         return ans[n%4]
 ```
 ---
-## 291. Word Pattern II｜ 8/23
+## 291. Word Pattern II｜ 8/23 | [Review * 1]
 Given a pattern and a string str, find if str follows the same pattern.
 
 Here follow means a full match, such that there is a bijection between a letter in pattern and a non-empty substring in str.
@@ -24844,7 +24818,7 @@ def dfs(self, pattern, str, dict):
 
 ### Tag: #Recursive
 ---
-## 293. Flip Game｜ 8/24
+## 293. Flip Game｜ 8/24 | [Review * 1]
 You are playing the following Flip Game with your friend: Given a string that contains only these two characters: + and -, you and your friend take turns to flip two consecutive "++" into "--". The game ends when a person can no longer make a move and therefore the other person will be the winner.
 
 Write a function to compute all possible states of the string after one valid move.
@@ -24878,7 +24852,7 @@ def generatePossibleNextMoves(self, s: str) -> List[str]:
 ```
 ---
 
-## 294. Flip Game II｜ 8/24
+## 294. Flip Game II｜ 8/24 | [Review * 1]
 You are playing the following Flip Game with your friend: Given a string that contains only these two characters: + and -, you and your friend take turns to flip two consecutive "++" into "--". The game ends when a person can no longer make a move and therefore the other person will be the winner.
 
 Write a function to determine if the starting player can guarantee a win.
@@ -26520,7 +26494,7 @@ class Solution:
 ```
 ### Tag: Math
 ---
-## 320. Generalized Abbreviation｜ 10/27
+## 320. Generalized Abbreviation｜ 10/27 | [Review * 1]
 Write a function to generate the generalized abbreviations of a word.
 
 Note: The order of the output does not matter.
@@ -26786,7 +26760,7 @@ class Solution:
 
 ### Tag: Accumulated Sum, HashMap
 ---
-## 328. Odd Even Linked List｜ 10/30
+## 328. Odd Even Linked List｜ 10/30 | [Review * 1]
 Given a singly linked list, group all odd nodes together followed by the even nodes. Please note here we are talking about the node number and not the value in the nodes.
 
 You should try to do it in place. The program should run in O(1) space complexity and O(nodes) time complexity.
@@ -29037,7 +29011,7 @@ class Solution:
 
 ### Tag: #Array #String
 ---
-## 10. Regular Expression Matching (TODO: DP解法)｜ 1/31
+## 10. Regular Expression Matching｜ 1/31 | [Review * 1]
 
 Given an input string (s) and a pattern (p), implement regular expression matching with support for '.' and '*' where:
 
