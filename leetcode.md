@@ -2475,7 +2475,7 @@ public:
 ```
 
 ---
-## !842. Split Array into Fibonacci Sequence(Medium)｜ 4/22
+## !842. Split Array into Fibonacci Sequence(Medium)｜ 4/22 | [Review*1]
 Given a string S of digits, such as S = "123456579", we can split it into a Fibonacci-like sequence [123, 456, 579].
 
 Formally, a Fibonacci-like sequence is a list F of non-negative integers such that:
@@ -2519,8 +2519,39 @@ S contains only digits.
 ### 思路
 符合題意的數列其實可能不止一種，但是本題就讓返回一個就行了。不管返回幾個，總之不是求極值，DP在這裡就不好使了，只能用遞歸了，由於不知道如何分割，所以肯定需要遍歷所有的情況。我們用一個數組out來記錄已經組成的序列，用結果res來保存結果。當out數組的個數大於等於3，並且已經遍歷完了字符串S，那麼此時就是可以把out數組中的內存賦值給結果res了，那麼之後只要檢測結果res不為空時，直接返回就可以了，這是個很好的剪枝操作，因為此題只需要一個正確答案即可
 
-現在來考慮遞歸函數的主體該怎麼寫，既然不知道要如何分割，那麼就要嘗試所有的情況，一個數字，兩個數字，一直到末尾，那麼就可以遍歷字符串S，然後取子串即可。但從什麼位置開始呢，每次都從頭嗎，這道題都數字不能重複使用，所以應該用個變量start來記錄當前遍歷到的位置，那麼我們從start位置起，每次取 i-start+1 長度的子串 cur，此時在轉為int之前，需要先處理leading zeros的情況，判斷若cur長度大於1，且首字符為0，直接break，還就是若cur的長度大於10，也break，為啥呢？因為整型的最大值是 2147483647，只有10位，所以當cur長度大於10時，一定會溢出。當cur長度為10時，也有可能溢出，這個在之後處理。好，現在將cur轉為長整型 long，因為長度為10也可能溢出，所以要先轉為長整型，然後在判斷若大於整型最大值 INT_MAX，直接break。接下來就要考慮是否要加入out數組了，當out數字的個數不到2個的時候，我們可以直接加入當前數字，若大於等於2個，需要考慮是否滿足斐波納切數列的性質，即當前數字是否等於前兩個數字之和，滿足的話才加入，不然就跳過，注意這裡不能直接break，因為之後的數字也許可能滿足要求。加入out數組之後，就可以調用遞歸了，此時起始位置傳入 i+1，之後再恢復out的狀態即可
+現在來考慮遞歸函數的主體該怎麼寫，既然不知道要如何分割，那麼就要嘗試所有的情況，一個數字，兩個數字，一直到末尾，那麼就可以遍歷字符串S，然後取子串即可。但從什麼位置開始呢，每次都從頭嗎，這道題都數字不能重複使用，所以應該用個變量start來記錄當前遍歷到的位置，那麼我們從start位置起，每次取 i-start+1 長度的子串 cur，此時在轉為int之前，需要先處理leading zeros的情況，判斷若cur長度大於1，且首字符為0，直接break，還就是 **若cur的長度大於10，也break，為啥呢？因為整型的最大值是 2147483647，只有10位，所以當cur長度大於10時，一定會溢出。** 當cur長度為10時，也有可能溢出，這個在之後處理。好，現在將cur轉為長整型 long，因為長度為10也可能溢出，所以要先轉為長整型，然後在判斷若大於整型最大值 INT_MAX，直接break。接下來就要考慮是否要加入out數組了，當out數字的個數不到2個的時候，我們可以直接加入當前數字，若大於等於2個，需要考慮是否滿足斐波納切數列的性質，即當前數字是否等於前兩個數字之和，滿足的話才加入，不然就跳過，注意這裡不能直接break，因為之後的數字也許可能滿足要求。加入out數組之後，就可以調用遞歸了，此時起始位置傳入 i+1，之後再恢復out的狀態即可
 ### Code
+與 306 的做法類似，這題多加了 overflow 的限制
+```py
+class Solution:
+    def splitIntoFibonacci(self, s: str) -> List[int]:
+        res = []
+        n = len(s)
+
+        for i in range(1, 11):
+            for j in range(i, i+11):
+                comb = []
+                num1, num2, other = s[:i], s[i:j+1], s[j+1:]
+
+                if len(num1) > 1 and num1[0] == '0' or len(num2) > 1 and num2[0] == '0':
+                    continue
+
+                while other:
+                    sum_num = int(num1) + int(num2)
+                    if sum_num > 2147483647:
+                        break
+                    sum_str = str(sum_num)
+                    if sum_str == other:
+                        res += comb + [num1] + [num2] + [other]
+                        return res
+                    elif other.startswith(sum_str):
+                        comb += [num1]
+                        num1, num2, other = num2, sum_str, other[len(sum_str):]
+                    else:
+                        break
+        return res
+```
+
 ``` c++
 class Solution {
 public:
@@ -2554,7 +2585,7 @@ private:
     }
 };
 ```
-
+### Tag: #Recursive
 ---
 ## !94. Binary Tree Inorder Traversal｜ 4/22
 Given a binary tree, return the inorder traversal of its nodes' values.
