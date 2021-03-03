@@ -9965,7 +9965,7 @@ class Solution(object):
         return [e[1] for e in heap]
 ```
 ---
-## 53. Maximum Subarray｜ 9/2
+## 53. Maximum Subarray｜ 9/2 | [Review *1]
 Given an integer array nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.
 
 Example:
@@ -10010,6 +10010,10 @@ T(n) = 2T(n/2) + O(n) => T(n) = O(nlogn)
 
 - 如果數列中含有負數元素，允許返回長度為零的子數列
 
+4. Follow up2:
+- 印出該最大值得所屬區間
+- 需用兩個 sliding window, local 跟 global, global 的跟著 global_max 一起更新
+
 ### Code
 Kadane
 ``` py
@@ -10031,6 +10035,28 @@ class Solution:
             max_current = max(0, num + max_current)
             max_global = max(max_current, max_global)
         return max_global
+```
+
+印出區間
+```py
+class Solution:
+    def maxSubArray(self, nums: List[int]) -> int:
+        local_max, global_max = nums[0], nums[0]
+        start, end, g_start, g_end = 0, 0, 0, 0
+        for i in range(1, len(nums)):
+            num = nums[i]
+            if num > local_max + num:
+                local_max = num
+                start, end = i, i
+            else:
+                local_max = local_max + num
+                end = i
+
+            if local_max > global_max:
+                global_max = local_max
+                g_start, g_end = start, end
+        print(g_start, g_end)
+        return global_max
 ```
 
 Divide and Conquer Way:
@@ -10063,6 +10089,7 @@ class Solution(object):
 
         return max(lmax, rmax, mmax)
 ```
+### Tag: #SlidingWindow #DivideAndConquer
 ---
 ## 20. Valid Parentheses｜ 9/2
 Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
