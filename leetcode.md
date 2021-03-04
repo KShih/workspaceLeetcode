@@ -29516,3 +29516,87 @@ class Solution:
 
 ### Tag: #Recursive
 ---
+## 169. Majority Element｜ 3/4
+Given an array nums of size n, return the majority element.
+
+The majority element is the element that appears more than ⌊n / 2⌋ times. You may assume that the majority element always exists in the array.
+
+Example 1:
+
+Input: nums = [3,2,3]
+
+Output: 3
+
+Example 2:
+
+Input: nums = [2,2,1,1,1,2,2]
+
+Output: 2
+
+Constraints:
+
+- n == nums.length
+- 1 <= n <= 5 * 104
+- -231 <= nums[i] <= 231 - 1
+
+
+- Follow-up: Could you solve the problem in linear time and in O(1) space?
+### 解題分析
+
+1. Sort
+2. HashMap
+3. Divide and Conquer
+    1. 切分的時候把 nums[mid] 給左邊
+    2. 若有共識則直接回傳該數字
+    3. 沒共識就必須全部數過一次
+        1. 這裡本來想說是不是可以將 majority count 一併傳回就可以不用全部數了
+        2. 但考慮此例子，此做法行不通: left = [1,1,2], right = [2,2,3]
+        3. 這兩邊回傳的 count 都一樣，不完整掃描根本找不出答案
+4. Voting Algorithm
+    1. 因為本題有說出現頻率最高的數，一定超過本身長度的一半
+        1. [2,2,1,1,1,2,2] 合法
+        2. [2,2,1,1,1,2,2,3] 不合法
+    2. 所以假設我們能知道出現最多的數是哪個，一遇到他就 +1, 遇到其他的就 -1, 這樣最後的結果一定可以保證是正的
+    3. 演算法核心，如何找出 candidate:
+        1. **只要遇到 count 為 0 時, 當前的數就是目前的候選人**
+
+### Code
+divideAndConquer
+``` py
+class Solution:
+    def majorityElement(self, nums: List[int]) -> int:
+        def dandc(l, r):
+            if l >= r:
+                return nums[l]
+
+            mid = l + (r-l)//2
+            numL = dandc(l, mid)
+            numR = dandc(mid+1, r)
+
+            # aggreement
+            if numL == numR:
+                return numL
+
+            # otherwise calculate the count
+            l_count = sum(1 for i in range(l, r+1) if nums[i] == numL)
+            r_count = sum(1 for i in range(l, r+1) if nums[i] == numR)
+
+            return numL if l_count > r_count else numR
+        return dandc(0, len(nums)-1)
+```
+
+Boyer-Moore majority voting
+```py
+class Solution:
+    def majorityElement(self, nums: List[int]) -> int:
+        candidate, count = None, 0
+        for num in nums:
+            if count == 0:
+                candidate = num
+
+            count += 1 if num == candidate else -1
+        return candidate
+```
+
+### Tag: #divideAndConquer #Boyer-Moore
+---
