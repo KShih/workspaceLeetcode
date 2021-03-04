@@ -2334,32 +2334,82 @@ private:
 ```
 ### Tag: #Recursive
 ---
-## 241. Different Ways to Add Parentheses(Medium)｜ 4/10
+## 241. Different Ways to Add Parentheses｜ 4/10 | [ Review * 1 ]
 Given a string of numbers and operators, return all possible results from computing all the different possible ways to group numbers and operators. The valid operators are +, - and *.
 
 Example 1:
 
-Input: "2-1-1"
+Input: "2 - 1 - 1"
+
 Output: [0, 2]
+
 Explanation:
+
 ((2-1)-1) = 0
+
 (2-(1-1)) = 2
+
 Example 2:
 
-Input: "2*3-4*5"
+Input: "2 * 3 - 4 * 5"
+
 Output: [-34, -14, -10, -10, 10]
+
 Explanation:
-(2*(3-(4*5))) = -34
-((2*3)-(4*5)) = -14
+
+(2 * ( 3 - ( 4 * 5 ) ) ) = -34
+
+((2 * 3 ) - ( 4 * 5 )) = -14
+
 ((2*(3-4))*5) = -10
+
 (2*((3-4)*5)) = -10
+
 (((2*3)-4)*5) = 10
-**
+
+### 解題分析
+
+1. 一個 expression 可以拆成左右兩邊求出所可產生的解
+2. 然後再把結果透過中間的 op 生成結果
+3. base case 就是 input 為存數字的時候
 
 ### 思路
 ![](assets/markdown-img-paste-2019062923384111.png)
 
 ### Code
+Optimal
+```py
+class Solution(object):
+    def diffWaysToCompute(self, input):
+        op = set("+-*")
+        memo = {}
+
+        def dandc(input):
+            if input not in memo:
+                if input.isdigit():
+                    memo[input] = [int(input)]
+                    return [int(input)]
+
+                res = []
+                for i, c in enumerate(input):
+                    if c in op:
+                        lNums = dandc(input[:i])
+                        rNums = dandc(input[i+1:])
+
+                        for lNum in lNums:
+                            for rNum in rNums:
+                                if c == "+":
+                                    res.append(lNum+rNum)
+                                elif c == "-":
+                                    res.append(lNum-rNum)
+                                elif c == "*":
+                                    res.append(lNum*rNum)
+                memo[input] = res
+            return memo[input]
+
+        return dandc(input)
+```
+
 ``` c
 class Solution {
 public:
@@ -2406,7 +2456,7 @@ public:
     }
 };
 ```
-
+### Tag: #DivideAndConquer #Recursive
 ---
 ## !95. Unique Binary Search Trees II(Medium)｜ 4/22
 
