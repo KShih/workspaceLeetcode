@@ -20912,7 +20912,7 @@ class Solution:
         return res**2
 ```
 ---
-## 218. The Skyline Problem｜ 3/31
+## 218. The Skyline Problem｜ 3/31 | [ Review * 1 ]
 A city's skyline is the outer contour of the silhouette formed by all the buildings in that city when viewed from a distance. Now suppose you are given the locations and height of all the buildings as shown on a cityscape photo (Figure A), write a program to output the skyline formed by these buildings collectively (Figure B).
 
 ![](assets/markdown-img-paste-20200331132617537.png)
@@ -20927,6 +20927,25 @@ The output list must be sorted by the x position.
 
 There must be no consecutive horizontal lines of equal height in the output skyline. For instance, [...[2 3], [4 5], [7 5], [11 5], [12 7]...] is not acceptable; the three lines of height 5 should be merged into one in the final output as such: [...[2 3], [4 5], [12 7], ...]
 
+### 解題分析
+1. 要求出天際線的點，首先必須先知道哪些位置有可能被畫出點來 -> building 的 start/end 位置
+2. 定義畫線的規則
+    1. 每個點位最多只畫一點，須符合規則
+        1. 需與前一個點位的高度不一樣
+            1. 因此 building 的隱沒位不會被畫，因為要馬與前一個點位一樣 (如 (7,15))
+            2. 要馬 有更高的點已經出現
+            3. 或者 直接落到地平面 (此時就會用到 defaut放在 heap 裡的點)
+3. 定義如何操作 heap
+    1. 放什麼?
+        1. building 的開始處
+    2. pop:
+        1. 當此 building 已經結束
+        2. 因此我們須在 event 中放入 building 的 ending place
+    3. push:
+        1. 當此 event 是有高度的 (非 ending event)
+    4. top:
+        1. 當此 position 時的高度與前一個點不一樣
+
 ### 思路
 
 1. Divide and conquer
@@ -20934,6 +20953,29 @@ There must be no consecutive horizontal lines of equal height in the output skyl
 2. Max Heap (Priority Queue)
     - ![](assets/markdown-img-paste-2020033113282766.png)
 ### Code
+Heap Cleaner Solution
+```py
+from heapq import heappush, heappop
+class Solution:
+    def getSkyline(self, buildings: List[List[int]]) -> List[List[int]]:
+        events = [(L, -H, R) for L, R, H in buildings]
+        events += [(R, 0, 0) for _, R, _ in buildings]
+        events = sorted(events)
+
+        res = [[0, 0]]
+        live = [(0, float(inf))]
+        for pos, negH, R in events:
+            while live[0][1] <= pos:
+                heappop(live)
+
+            if negH:
+                heappush(live, (negH, R))
+
+            if -live[0][0] != res[-1][1]:
+                res.append([pos, -live[0][0]])
+        return res[1:]
+```
+
 Heap
 ``` py
 class Solution:
@@ -21006,6 +21048,7 @@ class Solution(object):
             res += right
         return res
 ```
+### Tag: #Heap #DivideandConquer
 ---
 # *Heap 用途總結*
 - heap 這個資料結構適合處理

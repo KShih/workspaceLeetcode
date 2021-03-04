@@ -355,3 +355,37 @@ def DFS(tree):
     1. 需直接思考到`如何定義子問題`
     2. `子問題的狀態如何轉移`
     3. 大部分的題
+
+---
+
+## Heap
+
+```py
+# LeetCode 218
+from heapq import heappush, heappop
+class Solution:
+    def getSkyline(self, buildings: List[List[int]]) -> List[List[int]]:
+        # 1. define sources
+        events = [(L, -H, R) for L, R, H in buildings]
+        events += [(R, 0, 0) for _, R, _ in buildings]
+        events = sorted(events)
+
+        # 2. initialize heap -> try to keep at least one elem in heap, in order not to out of range in step4
+        live = [(0, float(inf))]
+
+        # 3. iterate over sources
+        for pos, negH, R in events:
+
+            # 4. pop-out useless elem in heap
+            while live[0][1] <= pos:
+                heappop(live)
+
+            # 5. push new elem into heap
+            if negH:
+                heappush(live, (negH, R))
+
+            # 6. decide if it's the right elem to output
+            if -live[0][0] != res[-1][1]:
+                res.append([pos, -live[0][0]])
+        return res[1:]
+```
