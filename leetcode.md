@@ -30106,3 +30106,93 @@ class Solution:
 
 ### Tag: #MergeSort #divideAndConquer
 ---
+## 426. Convert Binary Search Tree to Sorted Doubly Linked List｜ 3/7
+
+Convert a Binary Search Tree to a sorted Circular Doubly-Linked List in place.
+
+You can think of the left and right pointers as synonymous to the predecessor and successor pointers in a doubly-linked list. For a circular doubly linked list, the predecessor of the first element is the last element, and the successor of the last element is the first element.
+
+We want to do the transformation in place. After the transformation, the left pointer of the tree node should point to its predecessor, and the right pointer should point to its successor. You should return the pointer to the smallest element of the linked list.
+
+Example1:
+
+![](assets/markdown-img-paste-2021030701262289.png)
+
+Example2:
+
+![](assets/markdown-img-paste-20210307012647129.png)
+
+Constraints:
+
+- -1000 <= Node.val <= 1000
+- Node.left.val < Node.val < Node.right.val
+- All values of Node.val are unique.
+- 0 <= Number of Nodes <= 2000
+
+### 解題分析
+1. 由方便記憶的 traverse func 來改
+    ```py
+    def inorder(root):
+        return inorder(root.left) + [root.val] + inorder(root.right) if root else []
+    ```
+2. 方便記憶的部分拆開來後就是
+    ```py
+    def inorder(root):
+        if root:
+            left_list = inorder(root.left)
+            node_list = [root.val]
+            right_list = inorder(root.right)
+
+            return left_list + node_list + right_list
+        else:
+            return []
+    ```
+3. 而唯一差一就是針對 current node 需要做的處理
+4. 此題需要做的就是去連接上個點 (last) 跟這個點 (node)
+    - 如果 last 不存在 -> 表示此點是最左下的點，此時設定其為 first
+    - 如果存在: 與現在的點互相連接
+    - 更新 last 為 current node
+5. 最後再繼續往右走
+6. 當裡面的 Node 的連結好後，最後再把 last 跟 first 連一起形成一個環
+
+### Code
+``` py
+"""
+# Definition for a Node.
+class Node:
+    def __init__(self, val, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+"""
+
+class Solution:
+    def treeToDoublyList(self, root: 'Node') -> 'Node':
+        first, last = None, None
+        def traverse(node):
+            nonlocal first, last # using global var in enclosing
+            if node:
+                # traverse left
+                traverse(node.left)
+
+                # working node
+                if not last:
+                    first = node
+                else:
+                    last.right = node
+                    node.left = last
+                last = node
+
+                # traverse right
+                traverse(node.right)
+
+        if not root:
+            return None
+        traverse(root)
+        first.left = last
+        last.right = first
+        return first
+```
+
+### Tag: #DFS #BST
+---

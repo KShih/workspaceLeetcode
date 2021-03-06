@@ -231,7 +231,25 @@ class Solution:
 
 - One line python(Pretty useful!)
     - ![](assets/markdown-img-paste-2020090620195401.png)
-    -
+
+    精簡版
+    ```py
+    def inorder(root):
+        return inorder(root.left) + [root.val] + inorder(root.right) if root else []
+    ```
+
+    可拓展版 (可用於對於 node 需要進行的不同操作)
+    ```py
+    def inorder(root):
+        if root:
+            left_list = inorder(root.left)
+            node_list = [root.val]
+            right_list = inorder(root.right)
+
+            return left_list + node_list + right_list
+        else:
+            return []
+    ```
 
 ---
 
