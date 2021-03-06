@@ -29866,3 +29866,171 @@ class Solution:
 
 ### Tag: #divideAndConquer #Boyer-Moore
 ---
+## 315. Count of Smaller Numbers After Self｜ 3/6
+You are given an integer array nums and you have to return a new counts array. The counts array has the property where counts[i] is the number of smaller elements to the right of nums[i].
+
+
+
+Example 1:
+
+Input: nums = [5,2,6,1]
+
+Output: [2,1,1,0]
+
+Explanation:
+
+To the right of 5 there are 2 smaller elements (2 and 1).
+
+To the right of 2 there is only 1 smaller element (1).
+
+To the right of 6 there is 1 smaller element (1).
+
+To the right of 1 there is 0 smaller element.
+
+Example 2:
+
+Input: nums = [-1]
+
+Output: [0]
+
+Example 3:
+
+Input: nums = [-1,-1]
+
+Output: [0,0]
+
+
+Constraints:
+
+1 <= nums.length <= 105
+
+-104 <= nums[i] <= 104
+
+### 解題分析
+1. MergeSort
+    1. 我們可以透過 Merge Sort 在插入至新陣列時的 左右比較，去追蹤*比當前 left[i] 還小的 right[j] 有多少個 count*
+        1. 若是插入 right[j] (右邊比左邊小)，此時 count+1
+        2. 若是插入 left[i]  (左邊比右邊小)，此時就要把之前累積的 count 加回 result
+            1. 由於 mergeSort 的過程中數字會因被排序而移動，因此我們需額外用一個 tuple 去 binding 值與原始的 index，這樣才能夠 mapping 到正確的 index 上
+    2. 整個演算法的運作流程與 mergeSort 一模一樣，我們只多了:
+        1. 一個變數去追縱 右邊以插入的 count
+        2. 對每個值去 binding 其原始的 index，以作累加的 mapping
+    3. Time: O(nlogn)
+2. Binary Search
+    1. 把整個 nums 倒轉過來
+    2. 並試著依序插入到新的陣列裡
+    3. 插入的點的 index 即為小於此數的個數
+    4. 最後回傳時再轉回來
+    5. Time: O(n^2)
+        - 走訪所有元素 -> n
+        - 找到該 idx -> log(n)
+        - 插入到該位置 -> n
+3. Binary Search Tree
+    1. 建立一個 Binary Search Tree 但每個節點多一個資訊 *比她小的節點個數*
+    2. 隨著插入節點的過程中去更新沿途的節點的資訊
+
+### Code
+Merge Sort Solution
+``` py
+class Solution:
+    def countSmaller(self, nums: List[int]) -> List[int]:
+        res = [0] * len(nums)
+        nums = [(nums[i], i) for i in range(len(nums))] # for mapping back to original order after we did the merge sort
+
+        def mergeSort(l, r):
+            if l >= r:
+                return [nums[l]]
+            mid = l + (r-l) // 2
+            left = mergeSort(l, mid)
+            right = mergeSort(mid+1, r)
+            return merge(left, right)
+
+        def merge(left, right):
+            i, j = 0, 0
+            rightSmallerCnt = 0
+            merged = []
+
+            while i < len(left) or j < len(right):
+                if i == len(left):
+                    merged.append(right[j])
+                    j += 1
+                elif j == len(right):
+                    index = left[i][1]
+                    res[index] += rightSmallerCnt
+                    merged.append(left[i])
+                    i += 1
+                elif right[j][0] < left[i][0]:
+                    rightSmallerCnt += 1
+                    merged.append(right[j])
+                    j += 1
+                else:
+                    index = left[i][1]
+                    res[index] += rightSmallerCnt
+                    merged.append(left[i])
+                    i += 1
+            return merged
+        mergeSort(0, len(nums)-1)
+        return res
+```
+
+Binary Search
+```py
+def countSmaller(self, nums):
+    counts = []
+    done = []
+    for num in nums[::-1]:
+        idx = bisect.bisect_left(done, num)
+        counts.append(idx)
+        bisect.insort(done, num)
+    return counts[::-1]
+```
+
+Binary Search Tree:
+```py
+class BNode(object):
+    def __init__(self, val):
+        self.val = val
+        self.left = None
+        self.right = None
+        self.less_than_or_equal_count = 1
+
+
+def insert(node, val):
+    curr_count = 0
+    while True:
+        if val <= node.val:
+            node.less_than_or_equal_count += 1
+            if node.left:
+                node = node.left
+            else:
+                node.left = BNode(val)
+                break
+        else:
+            curr_count += node.less_than_or_equal_count
+            if node.right:
+                node = node.right
+            else:
+                node.right = BNode(val)
+                break
+    return curr_count
+
+
+class Solution(object):
+    def countSmaller(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        if not nums:
+            return []
+        n = len(nums)
+        root = BNode(nums[n - 1])
+        counts = [0]
+        for i in range(n-2, -1,  -1):
+            c = insert(root, nums[i])
+            counts.append(c)
+        return counts[::-1]
+```
+
+### Tag: #MergeSort #divideAndConquer #BST
+---
