@@ -8980,10 +8980,67 @@ public:
 };
 ```
 ---
-## 282. Expression Add Operators｜ 8/26
+## 282. Expression Add Operators｜ 8/26 | [ Review * 1 ]
 Given a string that contains only digits 0-9 and a target value, return all possibilities to add binary operators (not unary) +, -, or * between the digits so they evaluate to the target value.
 
-![](assets/markdown-img-paste-20190826180934956.png)
+Example 1:
+
+Input: num = "123", target = 6
+
+Output: ["1+2+3", "1*2*3"]
+
+Example 2:
+
+Input: num = "232", target = 8
+
+Output: ["2*3+2", "2+3*2"]
+
+Example 3:
+
+Input: num = "105", target = 5
+
+Output: ["1*0+5","10-5"]
+
+Example 4:
+
+Input: num = "00", target = 0
+
+Output: ["0+0", "0-0", "0*0"]
+
+Example 5:
+
+Input: num = "3456237490", target = 9191
+
+Output: []
+
+
+Constraints:
+
+- 0 <= num.length <= 10
+- num only contain digits.
+
+### 解題分析
+1. 如果這題只需要在兩個字中間插入運算元，這題會很簡單，但因為每個數字都可以選擇雨下個數字相連，因此此題 recursion 的部分需要多一個 for-loop
+2. 另外為了避免每次都要從 expression 計算 curSum 是否等於 target，我們在每次 recursion 的時候就計算
+3. 每個 recursion node 有四種選擇
+    1. 與下個數字連接 (繼續 loop)
+    2. 加
+    3. 減法
+    4. 乘法:
+        1. 此處更新 curSum 比較不同，需考慮到先乘除後加減的問題: preNum * int(num_str) < -需先計算
+        2. 例: 假設前面為 2 + 3, num_str 此時為 4, 並選擇了乘法 -> 2 + 3 * 4, 此時 curSum(=5) 需先減掉 preNum(=3) 再加上乘完的結果
+4. 再來就是需要注意過濾掉 leading zero 的部分
+5. Time: O(4^N)
+    - Explanation:
+    - T(N) = 3T(N - 1) + 3T(N - 2) + 3T(N - 3) + .... 3T(0)
+    - If we use first digit as an operand, total number of valid expressions would be T(N - 1) x 3. Three accounts
+for our three operations. If we use first two digits as an operand, total number of valid expressions would be T(N - 2) x 3 and so on.
+    - Now T(N - 1) = 3T(N - 2) + 3T(N - 3) + 3T(N - 4) + .... 3T(0)
+    - if we put T(N - 1) in T(N) we'll get
+        - T(N) = 3 x 4 ( T(N - 2) + T(N - 3) + T(N - 4) + .... T(0) )
+    - If we put T(N - 2) in T(N) we'll get
+        - T(N) = 3 x 4^2 ( T(N - 3) + T(N - 4) + T(N - 5) + .... T(0) )
+
 ### 思路
 
 Note: 需要注意的是，如果輸入為"000",0的話，容易出現以下的錯誤：
@@ -8995,6 +9052,63 @@ Should eliminate 00 + 00
 Correct：["0*0*0","0*0+0","0*0-0","0+0*0","0+0+0","0+0-0","0-0*0","0-0+0","0-0-0"]
 
 ### Code
+Optimal
+```py
+class Solution:
+    def addOperators(self, num: str, target: int) -> List[str]:
+        res = []
+        def recur(num, preNum, curSum, comb):
+            if not num:
+                if curSum == target:
+                    res.append(comb[:])
+                return
+
+            for i in range(1, len(num)+1):
+                num_str = num[:i]
+                if len(num_str) > 1 and num_str[0] == "0":
+                    continue
+
+                recur(num[i:], int(num_str), curSum+int(num_str), comb+"+"+num_str)
+                recur(num[i:], -int(num_str), curSum-int(num_str), comb+"-"+num_str)
+
+                # 2+3 -> next(*2) -> (2-3) + 3*2
+                recur(num[i:], preNum * int(num_str), curSum-preNum+preNum*int(num_str), comb+"*"+num_str)
+
+        for i in range(1, len(num)+1):
+            if i > 1 and num[0] == "0":
+                continue
+            recur(num[i:], int(num[:i]), int(num[:i]), num[:i])
+        return res
+```
+
+Another optimal solution
+```py
+class Solution:
+    def addOperators(self, num: str, target: int) -> List[str]:
+        res = []
+        def recur(num, preNum, curSum, comb):
+            if not num:
+                if curSum == target:
+                    res.append(comb[:])
+                return
+
+            for i in range(1, len(num)+1):
+                num_str = num[:i]
+                if len(num_str) > 1 and num_str[0] == "0":
+                    continue
+
+                if len(comb) == 0: #first int
+                    recur(num[i:], int(num_str), int(num_str), num_str)
+                else:
+                    recur(num[i:], int(num_str), curSum+int(num_str), comb+"+"+num_str)
+                    recur(num[i:], -int(num_str), curSum-int(num_str), comb+"-"+num_str)
+
+                    # 2+3 -> next(*2) -> (2-3) + 3*2
+                    recur(num[i:], preNum * int(num_str), curSum-preNum+preNum*int(num_str), comb+"*"+num_str)
+        recur(num, None, None, "")
+        return res
+```
+
 ``` c
 class Solution {
 public:
@@ -9029,6 +9143,7 @@ public:
     }
 };
 ```
+### Tag: #Recursive
 ---
 ## 898. LeftMost One (Lintcode) ｜ 8/26
 
