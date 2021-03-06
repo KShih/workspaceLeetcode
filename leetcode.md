@@ -29869,8 +29869,6 @@ class Solution:
 ## 315. Count of Smaller Numbers After Self｜ 3/6
 You are given an integer array nums and you have to return a new counts array. The counts array has the property where counts[i] is the number of smaller elements to the right of nums[i].
 
-
-
 Example 1:
 
 Input: nums = [5,2,6,1]
@@ -29907,6 +29905,7 @@ Constraints:
 -104 <= nums[i] <= 104
 
 ### 解題分析
+0. 類似題: LC493
 1. MergeSort
     1. 我們可以透過 Merge Sort 在插入至新陣列時的 左右比較，去追蹤*比當前 left[i] 還小的 right[j] 有多少個 count*
         1. 若是插入 right[j] (右邊比左邊小)，此時 count+1
@@ -29928,6 +29927,8 @@ Constraints:
 3. Binary Search Tree
     1. 建立一個 Binary Search Tree 但每個節點多一個資訊 *比她小的節點個數*
     2. 隨著插入節點的過程中去更新沿途的節點的資訊
+    3. Time:
+        - Worst Case: O(N^2) -> 傾斜樹
 
 ### Code
 Merge Sort Solution
@@ -30033,4 +30034,75 @@ class Solution(object):
 ```
 
 ### Tag: #MergeSort #divideAndConquer #BST
+---
+## 493. Reverse Pairs｜ 3/6
+Given an array nums, we call (i, j) an important reverse pair if i < j and nums[i] > 2*nums[j].
+
+You need to return the number of important reverse pairs in the given array.
+
+Example1:
+
+Input: [1,3,2,3,1]
+
+Output: 2
+
+Example2:
+
+Input: [2,4,3,5,1]
+
+Output: 3
+
+Note:
+- The length of the given array will not exceed 50,000.
+- All the numbers in the input array are in the range of 32-bit integer.
+
+### 解題分析
+1. MergeSort
+    1. 此題與 LC315 非常類似，都是要我們計算 arr 裡 element 之間的個數關係
+    2. 因此我們也透過 divide and conquer 的概念，在維持元素之間 index 關係的同時去進行驗證值
+        1. 注意 這邊我們沒辦法一邊進行 count 一邊去 merge，因為條件不一樣
+        2. 所以在這邊我們不再自己 implement merge sort 了，只使用其概念
+        3. 我們先過濾不合法的條件，篩到出現第一個合法的 l，此時此範圍內的剩餘 l 均會大於此 r ，因為剩餘的 l 均會大於此 l
+            - 因此我們將 count 加上此範圍內剩餘的 l => len(left) - l
+            - 並將 r ++
+        4. 最後我們還是要維持陣列的有序，因此進行 count 完還要再一個 sort
+    3. Time: O(nlogn)
+2. BST
+    1. Worst: O(N^2) will TLE
+3. BIT (Binary Indexed Tree)
+    1. 沒有涉略
+    2. Time: O(nlogn)
+
+
+### Code
+``` py
+class Solution:
+     def reversePairs(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if len(nums) <= 1:
+            return 0
+        count = [0]
+
+        def merge(nums):
+            if len(nums) <= 1: return nums
+
+            left, right = merge(nums[:len(nums)//2]), merge(nums[len(nums)//2:])
+            l = r = 0
+
+            while l < len(left) and r < len(right):
+                if left[l] <= 2 * right[r]:
+                    l += 1
+                else:
+                    count[0] += len(left) - l
+                    r += 1
+            return sorted(left+right)
+
+        merge(nums)
+        return count[0]
+```
+
+### Tag: #MergeSort #divideAndConquer
 ---
