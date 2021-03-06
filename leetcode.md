@@ -12659,16 +12659,38 @@ if __name__ == "__main__":
 
 ```
 ---
-## 215. Kth Largest Element in an Array｜ 10/11
+## 215. Kth Largest Element in an Array｜ 10/11 | [ Review * 1 ]
 Find the kth largest element in an unsorted array. Note that it is the kth largest element in the sorted order, not the kth distinct element.
 
-![](assets/markdown-img-paste-20191011162457145.png)
+Example 1:
+
+Input: [3,2,1,5,6,4] and k = 2
+
+Output: 5
+
+Example 2:
+
+Input: [3,2,3,1,2,4,5,5,6] and k = 4
+
+Output: 4
+
+Note:
+You may assume k is always valid, 1 ≤ k ≤ array's length.
+
+### 解題分析
+1. Sort
+2. Heap
+3. Partition Algorithm in quicksort
+    - ![](assets/markdown-img-paste-20210306122622205.png)
+    - Worst Case: O(N^2)
+    - Avg Case: O(N)
 ### 技巧
 - heap: import heapq
     - heapq.heapify(nums)
     - list = heapq.nlargest(k, list)
 
 ### Code
+Heap:
 ``` py
 import heapq
 class Solution:
@@ -12676,6 +12698,42 @@ class Solution:
         heapq.heapify(nums)
         return heapq.nlargest(k, nums)[-1]
 ```
+
+Partition algorithm in quicksort
+```py
+class Solution:
+    def findKthLargest(self, nums: List[int], k: int) -> int:
+        k_smallest = len(nums) - k
+
+        def partition(l, r, p):
+            pivot = nums[p]
+            nums[p], nums[r] = nums[r], nums[p]
+
+            rank = l
+            for i in range(l, r):
+                if nums[i] < pivot:
+                    nums[rank], nums[i] = nums[i], nums[rank]
+                    rank += 1
+            nums[r], nums[rank] = nums[rank], nums[r]
+            return rank
+
+        def select(l, r):
+            if l == r:
+                return nums[l]
+
+            p_idx = random.randint(l, r)
+            rank = partition(l, r, p_idx)
+
+            if rank == k_smallest:
+                return nums[rank]
+            elif rank > k_smallest:
+                return select(l, rank-1)
+            else:
+                return select(rank+1, r)
+
+        return select(0, len(nums)-1)
+```
+### Tag: #QuickSort #Recursive #DivideAndConquer
 ---
 ## Wayfair. Upsidedown the '6' and '9'｜ 10/11
 ![](assets/markdown-img-paste-20191011165552149.png)
