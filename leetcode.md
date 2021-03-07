@@ -30196,3 +30196,75 @@ class Solution:
 
 ### Tag: #DFS #BST
 ---
+## 417. Pacific Atlantic Water Flow｜ 3/7
+Given an m x n matrix of non-negative integers representing the height of each unit cell in a continent, the "Pacific ocean" touches the left and top edges of the matrix and the "Atlantic ocean" touches the right and bottom edges.
+
+Water can only flow in four directions (up, down, left, or right) from a cell to another one with height equal or lower.
+
+Find the list of grid coordinates where water can flow to both the Pacific and Atlantic ocean.
+
+Note:
+
+The order of returned grid coordinates does not matter.
+Both m and n are less than 150.
+
+
+Example:
+
+Given the following 5x5 matrix:
+
+  Pacific ~   ~   ~   ~   ~
+
+       ~  1   2   2   3  (5) *
+
+       ~  3   2   3  (4) (4) *
+
+       ~  2   4  (5)  3   1  *
+
+       ~ (6) (7)  1   4   5  *
+
+       ~ (5)  1   1   2   4  *
+
+          *   *   *   *   * Atlantic
+
+Return:
+
+[[0, 4], [1, 3], [1, 4], [2, 2], [3, 0], [3, 1], [4, 0]] (positions with parentheses in above matrix).
+
+### 解題分析
+
+1. 一開始看不懂題目，題目是指 grid coordinates 是否可以連到 both ocean
+2. 處理方式就是個別求出可以通到該 ocean 的點，然後再求出兩者的交集
+3. Trick 就是從邊界往內走，這樣就可以保證此點一定可以通到海
+
+### Code
+``` py
+class Solution:
+    def pacificAtlantic(self, matrix: List[List[int]]) -> List[List[int]]:
+        if not matrix:
+            return []
+        dirs = [(0,1), (1,0), (0,-1), (-1,0)]
+        R, C = len(matrix), len(matrix[0])
+
+        def dfs(row, col, reachable):
+            reachable.add((row, col))
+            for x, y in dirs:
+                new_row, new_col = row + x, col + y
+                if new_row not in range(0, R) or new_col not in range(0, C) or (new_row, new_col) in reachable or matrix[new_row][new_col] < matrix[row][col]:
+                    continue
+                dfs(new_row, new_col, reachable)
+
+        pacific_reachable, atlantic_reachable = set(), set()
+        for i in range(R):
+            dfs(i, 0, pacific_reachable)
+            dfs(i, C-1, atlantic_reachable)
+
+        for j in range(C):
+            dfs(0, j, pacific_reachable)
+            dfs(R-1, j, atlantic_reachable)
+
+        return list(pacific_reachable.intersection(atlantic_reachable))
+```
+
+### Tag: #DFS
+---
