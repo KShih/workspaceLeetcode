@@ -30268,3 +30268,39 @@ class Solution:
 
 ### Tag: #DFS
 ---
+## 1382. Balance a Binary Search Tree｜ 3/7
+Given a binary search tree, return a balanced binary search tree with the same node values.
+
+A binary search tree is balanced if and only if the depth of the two subtrees of every node never differ by more than 1.
+
+If there is more than one answer, return any of them.
+
+![](assets/markdown-img-paste-20210307225333741.png)
+
+### 解題分析
+1. 先用 inorder 把排序後的值取出來
+2. 那麼此題就變成 LC 108, convert sorted arr to BST
+3. Time: O(N)
+
+### Code
+``` py
+class Solution:
+    def balanceBST(self, root: TreeNode) -> TreeNode:
+        sorted_arr = self.inorder(root)
+        return self.sortedToBST(sorted_arr)
+
+    def inorder(self, root):
+        return self.inorder(root.left) + [root.val] + self.inorder(root.right) if root else []
+
+    def sortedToBST(self, arr):
+        if not arr:
+            return None
+        mid = len(arr)//2
+        root = TreeNode(arr[mid])
+        root.left = self.sortedToBST(arr[:mid])
+        root.right = self.sortedToBST(arr[mid+1:])
+        return root
+```
+
+### Tag: #BST 
+---
