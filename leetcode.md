@@ -29684,7 +29684,7 @@ class Solution:
 
 ### Tag: #DP #Recursive #TopDown #BottonUp
 ---
-## 306. Additive Number｜ 2/28
+## 306. Additive Number｜ 2/28 | [ Review * 1 ]
 Additive number is a string whose digits can form additive sequence.
 
 A valid additive sequence should contain at least three numbers. Except for the first two numbers, each subsequent number in the sequence must be the sum of the preceding two.
