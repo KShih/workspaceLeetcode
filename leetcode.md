@@ -10044,7 +10044,7 @@ class Solution(object):
         return ans
 ```
 ---
-## 973. K Closest Points to Origin｜ 9/1
+## 973. K Closest Points to Origin｜ 9/1 | [ Review * 1 ]
 We have a list of points on the plane.  Find the K closest points to the origin (0, 0).
 
 (Here, the distance between two points on a plane is the Euclidean distance.)
@@ -10129,6 +10129,7 @@ class Solution(object):
 
         return [e[1] for e in heap]
 ```
+### Tag: #Heap
 ---
 ## 53. Maximum Subarray｜ 9/2 | [Review *1]
 Given an integer array nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.
