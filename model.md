@@ -274,6 +274,22 @@ def bfs():
                 visited.add(next_node)
 ```
 
+1. 一次拜訪整層 => 可用於 BFS 求最短路徑 (LC126. Word Ladder II)
+2. p.s. 額外展示 Set 反向操作技巧，如果已經知道哪些點會出現在 set 時
+```py
+canVisit = set(wordList)
+while layer:
+    next_layer = []
+    for var in layer:
+        more_nodes = self.gen_more_node(var)
+        for next_node in more_nodes:
+            if next_node in canVisit:
+                next_layer.append(next_node)
+
+    canVisit -= set(next_layer)
+    layer = next_layer
+```
+
 ## DFS
 
 Recursive:

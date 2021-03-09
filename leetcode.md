@@ -1756,7 +1756,7 @@ public:
 ```
 ### Tag: #BFS
 ---
-## 126. Word Ladder II｜ 2/28
+## 126. Word Ladder II｜ 2/28 | [ Review * 1 ]
 A transformation sequence from word beginWord to word endWord using a dictionary wordList is a sequence of words such that:
 
 The first word in the sequence is beginWord.
