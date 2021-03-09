@@ -4460,7 +4460,7 @@ public:
 ```
 ---
 
-## 98. Validate Binary Search Tree｜ 5/30
+## 98. Validate Binary Search Tree｜ 5/30 | [ Review * 1 ]
 Given a binary tree, determine if it is a valid binary search tree (BST).
 
 Assume a BST is defined as follows:
@@ -4474,6 +4474,30 @@ Assume a BST is defined as follows:
 這道驗證二叉搜索樹有很多種解法，可以利用它本身的性質來做，即左<根<右，也可以通過利用中序遍歷結果為有序數列來做，下面我們先來看最簡單的一種，就是利用其本身性質來做，初始化時帶入系統最大值和最小值，在遞歸過程中換成它們自己的節點值，用long代替int就是為了包括int的邊界條件
 
 ### Code
+```py
+class Solution:
+    def isValidBST(self, root: TreeNode) -> bool:
+        def helper(min, max, root):
+            if not root:
+                return True
+            if root.val <= min or root.val >= max:
+                return False
+            return helper(min, root.val, root.left) and helper(root.val, max, root.right)
+        return helper(float(-inf), float(inf), root)
+```
+
+```py
+class Solution:
+    def isValidBST(self, root: TreeNode) -> bool:
+        arr = self.inorder(root)
+        for i in range(1, len(arr)):
+            if arr[i-1] >= arr[i]:
+                return False
+        return True
+    def inorder(self, root):
+        return self.inorder(root.left) + [root.val] + self.inorder(root.right) if root else []
+```
+
 runtime: 8ms
 ``` c++
 /**
@@ -4523,6 +4547,7 @@ public:
     }
 };
 ```
+### Tag: #Tree #DFS
 ---
 ## 530. Minimum Absolute Difference in BST｜ 5/30
 Given a binary search tree with non-negative values, find the minimum absolute difference between values of any two nodes.
