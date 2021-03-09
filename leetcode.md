@@ -26469,7 +26469,7 @@ class Solution(object):
         return C
 ```
 ---
-## 312. Burst Balloons｜ 10/20
+## 312. Burst Balloons｜ 10/20 | [ Review * 1 ]
 
 Given n balloons, indexed from 0 to n-1. Each balloon is painted with a number on it represented by array nums. You are asked to burst all the balloons. If the you burst balloon i you will get nums[left] * nums[i] * nums[right] coins. Here left and right are adjacent indices of i. After the burst, the left and right then becomes adjacent.
 
@@ -26507,15 +26507,13 @@ dp[i][j] = max(dp[i][j], nums[i - 1] * nums[k] * nums[j + 1] + dp[i][k - 1] + dp
 class Solution:
     def maxCoins(self, nums: List[int]) -> int:
         n = len(nums)
-        nums.insert(0, 1)
-        nums.append(1)
-
+        nums = [1] + nums + [1]
         dp = [[0 for _ in range(n+2)] for _ in range(n+2)]
 
-        for leng in range(1, n+1):
-            for i in range(1, n-leng+2):
+        for leng in range(n):
+            for i in range(1, n-leng+1):
 
-                j = i + leng - 1
+                j = i + leng
                 for k in range(i, j+1): # iterate over k ballon in range(i, j)
                     bk = nums[i-1]*nums[k]*nums[j+1]
                     dp[i][j] = max(dp[i][j], bk + dp[i][k-1] + dp[k+1][j])
@@ -26523,7 +26521,7 @@ class Solution:
         return dp[1][n]
 ```
 
-### Tag: 區間DP非常規走訪, DP
+### Tag: #區間DP非常規走訪, #DP
 ---
 ## 314. Binary Tree Vertical Order Traversal｜ 10/20
 Given a binary tree, return the vertical order traversal of its nodes' values. (ie, from top to bottom, column by column).
@@ -30302,5 +30300,5 @@ class Solution:
         return root
 ```
 
-### Tag: #BST 
+### Tag: #BST
 ---
