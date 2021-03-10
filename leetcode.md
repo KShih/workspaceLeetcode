@@ -13608,6 +13608,11 @@ preorder = [3,9,20,15,7]
 inorder = [9,3,15,20,7]
 
 ![](assets/markdown-img-paste-20191018122437209.png)
+
+### 解題分析
+
+1. 看了 106 的 Optimal 更新解法後，有了更高效的版本，先去看 106 的解法
+
 ### 思路
 
 解題方向：
@@ -13627,6 +13632,23 @@ inorder = [9,3,15,20,7]
 傳入inorder的時候也要跳過root (+1)
 
 ### Code
+高效
+```py
+class Solution:
+    def buildTree(self, preorder: List[int], inorder: List[int]) -> TreeNode:
+        inorder_map = {}
+        for i, val in enumerate(inorder): inorder_map[val] = i
+        def helper(l, r):
+            if l > r: return None
+            root = TreeNode(preorder.pop(0))
+            mid = inorder_map[root.val]
+            root.left = helper(l, mid-1)
+            root.right = helper(mid+1, r)
+            return root
+        return helper(0, len(inorder)-1)
+```
+
+簡單但效能差
 ``` py
 class Solution(object):
     def buildTree(self, preorder, inorder):
