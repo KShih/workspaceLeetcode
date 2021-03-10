@@ -17333,7 +17333,7 @@ class Solution:
         return res
 ```
 ---
-## 106. Construct Binary Tree from Inorder and Postorder Traversal｜ 12/6
+## 106. Construct Binary Tree from Inorder and Postorder Traversal｜ 12/6 | [ Review * 1 ]
 Given inorder and postorder traversal of a tree, construct the binary tree.
 
 Note:
@@ -17342,6 +17342,17 @@ You may assume that duplicates do not exist in the tree.
 For example, given
 
 ![](assets/markdown-img-paste-20191206114138219.png)
+
+### 解題分析
+0. 上題與此題都一樣，先把 list 切割的位置找出來，把圖畫出一切都一目瞭然了
+    - ![](assets/markdown-img-paste-20210310221203825.png)
+1. 簡單的解法, 但效能很差
+    1. 與上題一樣，先找到 root 的位置，然後 pop 掉
+    2. 剩下的 list range mapping 就是看著圖做了
+2. Optimal: left, right pointer 切法
+    1. 先建立 inorder {value:idx} 的 mapping 取代 .index()
+    2. 然後使用原始 post order 的訪問順序, 因此只要一直取 postorder 的最後 -> 不用做切割
+    3. left, right 的切割也可以適用上圖的位置概念 -> 用來終止遞迴
 
 ### 思路
 
@@ -17355,6 +17366,34 @@ For example, given
 ![](assets/markdown-img-paste-2019120611462847.png)
 
 ### Code
+與上題模板似的解法, 但效能太差了
+```py
+class Solution:
+    def buildTree(self, inorder: List[int], postorder: List[int]) -> TreeNode:
+        if inorder and postorder:
+            root_idx = inorder.index(postorder.pop())
+            root = TreeNode(inorder[root_idx])
+            root.left = self.buildTree(inorder[:root_idx], postorder[:root_idx])
+            root.right = self.buildTree(inorder[root_idx+1:], postorder[root_idx:])
+            return root
+```
+
+Optimal, 用 postorder 訪問順序, 與 left right pointer 取代 list 的切割
+```py
+class Solution:
+    def buildTree(self, inorder: List[int], postorder: List[int]) -> TreeNode:
+        inorder_map = dict()
+        for i, val in enumerate(inorder): inorder_map[val] = i
+        def helper(l, r):
+            if l > r: return None
+            root = TreeNode(postorder.pop())
+            mid = inorder_map[root.val]
+            root.right = helper(mid+1, r)
+            root.left = helper(l, mid-1)
+            return root
+        return helper(0, len(inorder)-1)
+```
+
 ``` py
 class Solution:
     def buildTree(self, inorder: List[int], postorder: List[int]) -> TreeNode:
@@ -17414,6 +17453,7 @@ class Solution:
 
         return root
 ```
+### Tag: #Tree #DFS
 ---
 ## 109. Convert Sorted List to Binary Search Tree｜ 12/6 | [Review * 1]
 Given a singly linked list where elements are sorted in ascending order, convert it to a height balanced BST.
