@@ -13595,7 +13595,7 @@ class Solution(object):
         return state[n]
 ```
 ---
-## 105. Construct Binary Tree from Preorder and Inorder Traversal｜ 10/18
+## 105. Construct Binary Tree from Preorder and Inorder Traversal｜ 10/18 | [ Review * 1 ]
 Given preorder and inorder traversal of a tree, construct the binary tree.
 
 Note:
@@ -13616,6 +13616,7 @@ inorder = [9,3,15,20,7]
 
 1. preorder的頭一定是root
 2. inorder中root以左是左子樹, 以右是右子數
+    1. 同理亦可套用到 preorder 上，但要注意用過的不能再用，因此需要 pop(0)
 
 ![](assets/markdown-img-paste-20191018122929410.png)
 ![](assets/markdown-img-paste-20191018123017508.png)
@@ -13642,6 +13643,7 @@ class Solution(object):
             root.right = self.buildTree(preorder[root_idx_in_inorder:], inorder[root_idx_in_inorder+1:])
             return root
 ```
+### Tag: #Tree #DFS
 ---
 ## Google. Compare Strings｜ 10/19 // TODO: More Testcase NEEDED
 ![](assets/markdown-img-paste-20191019030356827.png)
