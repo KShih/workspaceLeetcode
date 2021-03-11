@@ -3145,11 +3145,51 @@ public:
 
 ```
 ---
-## *110. Balanced Binary Tree｜ 4/24
-### 4/29 review
+## 110. Balanced Binary Tree｜ 4/24 | [ Review * 1 ]
+Given a binary tree, determine if it is height-balanced.
+
+For this problem, a height-balanced binary tree is defined as:
+
+a binary tree in which the left and right subtrees of every node differ in height by no more than 1.
+
+![](assets/markdown-img-paste-20210311160050381.png)
+
+Input: root = [3,9,20,null,null,15,7]
+
+Output: true
+
+![](assets/markdown-img-paste-2021031116010390.png)
+
+Input: root = [1,2,2,3,3,null,null,4,4]
+
+Output: false
+
+Input: root = []
+
+Output: true
+
 ### 思路
 
 ### Code
+```py
+class Solution:
+    def isBalanced(self, root: TreeNode) -> bool:
+        def maxDep(node):
+            if not node:
+                return 0
+            left_cnt = maxDep(node.left)
+            if left_cnt < 0: return -1
+            right_cnt = maxDep(node.right)
+            if right_cnt < 0: return -1
+
+            if abs(left_cnt - right_cnt) > 1:
+                return -1
+            else:
+                return max(left_cnt, right_cnt)+1
+
+        return maxDep(root) >= 0
+```
+
 Solution1: calculate all the nodes
 ``` c++
 /**
@@ -3206,6 +3246,7 @@ public:
     }
 };
 ```
+### Tag: #Tree
 ---
 ## @111. Minimum Depth of Binary Tree｜ 4/24
 Given a binary tree, find its minimum depth.
