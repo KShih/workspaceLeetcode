@@ -3248,7 +3248,7 @@ public:
 ```
 ### Tag: #Tree
 ---
-## @111. Minimum Depth of Binary Tree｜ 4/24
+## 111. Minimum Depth of Binary Tree｜ 4/24 | [ Review * 1 ]
 Given a binary tree, find its minimum depth.
 
 The minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.
@@ -3261,12 +3261,50 @@ Given binary tree [3,9,20,null,null,15,7],
 ![](assets/markdown-img-paste-20190629234550456.png)
 return its minimum depth = 2.
 
-### 4/29 review
-
+### 解題分析
+1. BFS
+    1. 直觀來說這題就是在考 BFS 的逐層掃描，掃到夜節點就回傳
+    2. 夜節點的定義就是沒有左子數跟右子數
+2. DFS
+    1. 這解法反而不好想到
+    2. 如果找不到左節點，就找找看其右節點
+    3. 如果找不到右節點，就找找看其左節點
+    4. 如果都存在就找他們兩個的最小 +1
 ### 思路
 Iterative的方法還是比Recursive快上不少
 我們迭代來做，層序遍歷，記錄遍歷的層數，一旦我們遍歷到第一個葉結點，就將當前層數返回，即為二叉樹的最小深度
 ### Code
+BFS
+```py
+from collections import deque
+class Solution:
+    def minDepth(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+        queue = deque([(0, root)])
+        while queue:
+            level, node = queue.popleft()
+            if not node.left and not node.right:
+                return level+1
+            if node.left:
+                queue.append((level+1, node.left))
+            if node.right:
+                queue.append((level+1, node.right))
+```
+
+DFS
+```py
+class Solution:
+    def minDepth(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+        if not root.left:
+            return 1 + self.minDepth(root.right)
+        if not root.right:
+            return 1 + self.minDepth(root.left)
+        return 1 + min(self.minDepth(root.left), self.minDepth(root.right))
+```
+
 Recursive
 ``` c++
 /**
@@ -3319,6 +3357,7 @@ public:
     }
 };
 ```
+### Tag: #BFS #DFS #Tree
 ---
 ## *572. Subtree of Another Tree｜ 4/24
 Given two non-empty binary trees s and t, check whether tree t has exactly the same structure and node values with a subtree of s. A subtree of s is a tree consists of a node in s and all of this node's descendants. The tree s could also be considered as a subtree of itself.
