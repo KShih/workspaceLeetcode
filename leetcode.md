@@ -4887,6 +4887,26 @@ Two elements of a binary search tree (BST) are swapped by mistake.
 Recover the tree without changing its structure.
 ![99](assets/markdown-img-paste-20190613182134171.png)
 
+### 解題分析
+1. 當然可以用 sort 的，但只有兩個位置被 misplaced 不需要用到 sort, O(nlogn)
+2. findSwapped 的方法不好想到
+    0. nums[i] > nums[i+1] 觸發錯位事件
+    1. 考慮以下 traverse 後的結果
+    2. [1,2,5,3,6,7]
+        1. 此為錯的位置是連續，我們必須用兩個變數 x, y 分別紀錄 5 跟 3
+    3. [1,6,3,5,2,7]
+        1. 但這個例子中 6 跟 2 錯位，錯位事件觸發在 i=1 時
+        2. 如果永遠都是紀錄先後兩個，那 x 豈不是在第二次觸發錯位事件時被取代掉了嗎
+        3. 因此我們需要針對 x 更新去設定條件
+        4. 觀察觸發時間為 {6,3}, {5,2}, 我們要娶的是 {6,2}, 可以寫出演算法
+            1. 當錯位事件發生時，永遠都要紀錄 y
+            2. 但只有在第一次發生錯位時紀錄 x
+3. 優化就是做 one pass, 一邊 traverse 一邊換
+    1. swap 為一樣的作法就不討論
+    2. Iterative 與 recursive 時多用一個 pred 去紀錄前一個 node
+    3. 也因為我們是用 inorder traverse, pred.val always less than root.val
+    4. 因此在 process current node 的階段時，若 pred.val > root.val -> 此時就觸發錯位事件
+
 ### 思路
 We aren't actually swapping the node, what contains in nodes is not only the val but also the link,
 the left and right pointer. At this point, we don't want to break the structure of the tree
@@ -4896,6 +4916,92 @@ the value of the tree's order. Just before the end of the program, we sort the v
 to the First list. And the first list is the final answer.
 
 ### Code
+Time: O(n), Space O(2n)
+```py
+class Solution:
+    def recoverTree(self, root: TreeNode) -> None:
+        node_arr, val_arr = [], []
+        self.inorder(root, node_arr, val_arr)
+        x, y = self.findSwap(val_arr)
+        for node in node_arr:
+            if node.val == x:
+                node.val = y
+            elif node.val == y:
+                node.val = x
+
+    def findSwap(self, nums):
+        x, y = -1, -1
+        for i in range(len(nums)-1):
+            if nums[i+1] < nums[i]:
+                y = nums[i+1]
+                if x == -1:
+                    x = nums[i]
+        return x, y
+
+    def inorder(self, root, node_arr, val_arr):
+        if not root:
+            return
+        self.inorder(root.left, node_arr, val_arr)
+        node_arr.append(root)
+        val_arr.append(root.val)
+        self.inorder(root.right, node_arr, val_arr)
+```
+
+Iterative, one pass:
+```py
+class Solution:
+    def recoverTree(self, root: TreeNode) -> None:
+        stack = []
+        x = y = pred = None
+        while stack or root:
+            while root:
+                stack.append(root)
+                root = root.left
+
+            # deal w/ cur node
+            root = stack.pop()
+            if pred and pred.val > root.val:
+                y = root
+                if x == None:
+                    x = pred
+                else:
+                    break # second time visited->exit, since there's only two node misplaced
+
+            pred = root
+            root = root.right
+        x.val, y.val = y.val, x.val
+```
+
+Recursive, one pass:
+```py
+class Solution:
+    def recoverTree(self, root):
+        """
+        :type root: TreeNode
+        :rtype: void Do not return anything, modify root in-place instead.
+        """
+        def find_two_swapped(root: TreeNode):
+            nonlocal x, y, pred
+            if root is None:
+                return
+
+            find_two_swapped(root.left)
+            if pred and root.val < pred.val:
+                y = root
+                # first swap occurence
+                if x is None:
+                    x = pred
+                # second swap occurence
+                else:
+                    return
+            pred = root
+            find_two_swapped(root.right)
+
+        x = y = pred = None
+        find_two_swapped(root)
+        x.val, y.val = y.val, x.val
+```
+
 ``` c
 class Solution {
 public:
@@ -4917,7 +5023,7 @@ public:
     }
 };
 ```
-
+### Tag: #DFS #Tree
 ---
 ## 108. Convert Sorted Array to Binary Search Tree｜ 6/12
 Given an array where elements are sorted in ascending order, convert it to a height balanced BST.

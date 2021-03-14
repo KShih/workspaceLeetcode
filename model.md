@@ -251,6 +251,23 @@ class Solution:
             return []
     ```
 
+    Iterative 版
+    ```py
+    def inorder(root):
+        stack = []
+        while stack or root:
+            while root:
+                stack.append(root)
+                root = root.left
+            root = stack.pop()
+
+            # process region
+
+            root = root.right
+    ```
+- Optimal Traversal strategy: Morris Traversal (not required)
+    - see article: https://leetcode.com/problems/recover-binary-search-tree/solution/
+
 ---
 
 ## BFS
