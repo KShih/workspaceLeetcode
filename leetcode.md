@@ -3161,7 +3161,7 @@ public:
 ```
 ### Tag: #Tree #BFS
 ---
-## @104. Maximum Depth of Binary Tree｜ 4/23
+## 104. Maximum Depth of Binary Tree｜ 4/23 | [ Review * 1 ]
 Given a binary tree, find its maximum depth.
 
 The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
@@ -3178,6 +3178,35 @@ return its depth = 3
 
 使用層序遍歷二叉樹，然後計數總層數，即為二叉樹的最大深度
 ### Code
+Recursive Post order
+```py
+class Solution:
+    def maxDepth(self, root: TreeNode) -> int:
+        if not root: return 0
+        l = self.maxDepth(root.left)
+        r = self.maxDepth(root.right)
+        return max(l, r) +1
+```
+
+Iterative BFS
+```py
+class Solution:
+    def maxDepth(self, root: TreeNode) -> int:
+        if not root: return 0
+        queue = deque([root])
+        cnt = 0
+        while queue:
+            cnt += 1
+            layer_size = len(queue)
+            for _ in range(layer_size):
+                node = queue.popleft()
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+        return cnt
+```
+
 Recursive
 ``` c++
 class Solution {
@@ -3220,6 +3249,7 @@ public:
 };
 
 ```
+### Tag: #Tree #BFS
 ---
 ## 110. Balanced Binary Tree｜ 4/24 | [ Review * 1 ]
 Given a binary tree, determine if it is height-balanced.
