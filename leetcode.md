@@ -3058,8 +3058,9 @@ public:
     }
 };
 ```
+### Tag: #Tree #BFS
 ---
-## @101. Symmetric Tree｜ 4/23
+## 101. Symmetric Tree｜ 4/23 | [ Review * 1 ]
 Given a binary tree, check whether it is a mirror of itself (ie, symmetric around its center).
 
 For example, this binary tree [1,2,2,3,4,4,3] is symmetric:
@@ -3072,6 +3073,45 @@ For example, this binary tree [1,2,2,3,4,4,3] is symmetric:
 實測:Queue的速度比Stack快很多
 
 ### Code
+Iterative
+```py
+class Solution:
+    def isSymmetric(self, root: TreeNode) -> bool:
+        que = deque([root.left, root.right])
+
+        while que:
+            layer_size = len(que)
+            while layer_size > 0:
+                p = que.pop()
+                q = que.pop()
+                layer_size -= 2
+                if not p and not q:
+                    continue
+
+                if (not p and q) or (p and not q) or (p.val != q.val):
+                    return False
+
+                que.append(p.left)
+                que.append(q.right)
+
+                que.append(p.right)
+                que.append(q.left)
+        return True
+```
+
+Recursive
+```py
+class Solution:
+    def isSymmetric(self, root: TreeNode) -> bool:
+        if not root: return True
+        return self.isSame(root.left, root.right)
+
+    def isSame(self, left, right):
+        if not left and not right: return True
+        if (not left and right) or (left and not right) or (left.val != right.val): return False
+        return self.isSame(left.left, right.right) and self.isSame(left.right, right.left)
+```
+
 Recursive
 ``` c++
 class Solution {
@@ -3119,6 +3159,7 @@ public:
     }
 };
 ```
+### Tag: #Tree #BFS
 ---
 ## @104. Maximum Depth of Binary Tree｜ 4/23
 Given a binary tree, find its maximum depth.
