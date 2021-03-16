@@ -2992,8 +2992,8 @@ class Solution:
             layer_size = len(queue)
             while layer_size > 0:
                 layer_size -= 2
-                p = queue.pop()
-                q = queue.pop()
+                p = queue.popleft()
+                q = queue.popleft()
 
                 if not p and not q:
                     continue
@@ -3082,8 +3082,8 @@ class Solution:
         while que:
             layer_size = len(que)
             while layer_size > 0:
-                p = que.pop()
-                q = que.pop()
+                p = que.popleft()
+                q = que.popleft()
                 layer_size -= 2
                 if not p and not q:
                     continue
