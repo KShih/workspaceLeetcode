@@ -2971,7 +2971,7 @@ public:
 ```
 
 ---
-## @100. Same Tree｜ 4/23
+## 100. Same Tree｜ 4/23 | [ Review * 1 ]
 Given two binary trees, write a function to check if they are the same or not.
 
 Two binary trees are considered the same if they are structurally identical and the nodes have the same value.
@@ -2982,6 +2982,41 @@ Two binary trees are considered the same if they are structurally identical and 
 iterative的手法，前中後序接可以應用來比較
 
 ### Code
+Iterative BFS
+```py
+from collections import deque
+class Solution:
+    def isSameTree(self, p: TreeNode, q: TreeNode) -> bool:
+        queue = deque([p, q])
+        while queue:
+            layer_size = len(queue)
+            while layer_size > 0:
+                layer_size -= 2
+                p = queue.pop()
+                q = queue.pop()
+
+                if not p and not q:
+                    continue
+
+                if (p and not q) or (not p and q) or p.val != q.val:
+                    return False
+
+                queue.append(p.left)
+                queue.append(q.left)
+                queue.append(p.right)
+                queue.append(q.right)
+        return True
+```
+
+Recursive
+```py
+class Solution:
+    def isSameTree(self, p: TreeNode, q: TreeNode) -> bool:
+        if not p and not q: return True
+        if (not p and q) or (p and not q) or p.val != q.val: return False
+        return self.isSameTree(p.left, q.left) and self.isSameTree(p.right, q.right)
+```
+
 Recursive
 ``` c++
 class Solution {
