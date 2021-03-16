@@ -17775,7 +17775,7 @@ def sortedListToBST(self, head):
 ```
 ### Tag: #LinkedList #BST
 ---
-## 114. Flatten Binary Tree to Linked List｜ 12/8
+## 114. Flatten Binary Tree to Linked List｜ 12/8 | [ Review * 1 ]
 Given a binary tree, flatten it to a linked list in-place.
 
 For example, given the following tree:
@@ -17848,6 +17848,7 @@ class Solution:
                 root.left = None
             root = root.right
 ```
+### Tag: #Tree
 ---
 ## 115. Distinct Subsequences｜ 12/9
 Given a string S and a string T, count the number of distinct subsequences of S which equals T.
