@@ -251,19 +251,69 @@ class Solution:
             return []
     ```
 
-    Iterative 版
+    Iterative 版 inorder (左中右)
     ```py
     def inorder(root):
         stack = []
+        inorder = []
         while stack or root:
             while root:
                 stack.append(root)
                 root = root.left
             root = stack.pop()
-
-            # process region
-
+            inorder.append(root.val)
             root = root.right
+        return inorder
+    ```
+
+    Iterative 版 preorder (中左右)
+    ```py
+    def preorderTraversal(self, root):
+        if root is None:
+            return []
+        stack = [root]
+        preorder = []
+        while stack:
+            node = stack.pop()
+            preorder.append(node.val)
+            if node.right:
+               stack.append(node.right)
+            if node.left:
+               stack.append(node.left)
+        return preorder
+    ```
+
+    Iterative 版 postorder (左右中)
+    ```py
+    # 1. Push root to first stack.
+    # 2. Loop while first stack is not empty
+    #    2.1 Pop a node from first stack and push it to second stack
+    #    2.2 Push left and right children of the popped node to first
+    #        stack
+    # 3. Print contents of second stack
+    def postOrder(self, root):
+        if root is None:
+            return
+
+        s1 = []
+        s2 = []
+        postOrder = []
+
+        s1.append(root)
+
+        while s1: # append 到 s2 的順序 中左右
+            node = s1.pop()
+            s2.append(node)
+
+            if node.left:
+                s1.append(node.left)
+            if node.right:
+                s1.append(node.right)
+
+        while s2:
+            node = s2.pop()
+            postOrder.append(node.val)
+        return postOrder
     ```
 - Optimal Traversal strategy: Morris Traversal (not required)
     - see article: https://leetcode.com/problems/recover-binary-search-tree/solution/
