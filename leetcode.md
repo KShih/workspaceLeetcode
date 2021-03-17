@@ -4021,7 +4021,7 @@ public:
 Iterative:
 ### Tag: #Tree #DFS
 ---
-## *437. Path Sum III｜ 5/1
+## 437. Path Sum III｜ 5/1 | [ Review * 1 ]
 You are given a binary tree in which each node contains an integer value.
 
 Find the number of paths that sum to a given value.
@@ -4031,15 +4031,77 @@ The path does not need to start or end at the root or a leaf, but it must go dow
 The tree has no more than 1,000 nodes and the values are in the range -1,000,000 to 1,000,000.
 ![](assets/markdown-img-paste-20190630235217339.png)
 
+### 解題分析
+1. 此題的最佳解是使用 Prefix Sum 的概念來解題，基礎題詳見 LC560
+    1. 維護一個 dict 紀錄之前走過的所有 accumulated sum
+    2. 有兩種 case 可以 match 到 target sum
+        1. 整條路徑的 match
+            - 直接看 curSum 是否為 target
+        2. 需截掉某段路的 match
+            - 去 curSumHistory 裡面找找看有沒有曾經出現 curSum - target
+            - 原理是，如果累積和中曾經出現過這個值，那我們把它截掉後，後半段就會等於 target 了
+    3. 注意:
+        1. 此題為 Tree 的結構，並且只能接受往下走，因此我們不希望左半邊的 curSum 被右半邊給使用到
+        2. 因此我們在走訪完一個子樹就必須把其 curSum 給清掉
+2. Naive 解法是紀錄從上到下的 path，每到一個新的點就依序把之前走過的依序拆掉去看值是否相等
+
 ### 思路
 我們可以用遞歸來做，相當於先序遍歷二叉樹，對於每一個節點都有記錄了一條從根節點到當前節點到路徑，同時用一個變量curSum記錄路徑節點總和，然後我們看curSum和sum是否相等，相等的話結果res加1，不等的話我們來繼續查看子路徑和有沒有滿足題意的，做法就是每次去掉一個節點，看路徑和是否等於給定值，注意最後必須留一個節點，不能全去掉了，因為如果全去掉了，路徑之和為0，而如果假如給定值剛好為0的話就會有問題
 __key: 維護一個從root到curNode的vector__
 
-### 5/6review
-錯誤：在寫的時候並沒有使用curSum去紀錄，而是直接對sum去做扣值
-直接對sum去做扣值並沒有辦法去進行每次去掉一個節點的動作
-
 ### Code
+
+(Optimal) Prefix Sum
+```py
+from collections import defaultdict
+class Solution:
+    def pathSum(self, root: TreeNode, sum: int) -> int:
+        self.res = 0
+        sumHist = defaultdict(int)
+        def recur(node, curSum):
+            if not node:
+                return
+
+            curSum += node.val
+            if curSum == sum:
+                self.res += 1
+
+            self.res += sumHist[curSum-sum]
+            sumHist[curSum] += 1
+
+            recur(node.left, curSum)
+            recur(node.right, curSum)
+
+            sumHist[curSum] -= 1 # don't mix the curSumCnts to different side of the tree
+        recur(root, 0)
+        return self.res
+```
+
+Naive Recursive
+```py
+class Solution:
+    def pathSum(self, root: TreeNode, sum: int) -> int:
+        self.res = 0
+        def recur(node, curSum, path):
+            if not node:
+                return
+
+            curSum += node.val
+            if curSum == sum:
+                self.res += 1
+
+            tempSum = curSum
+            for val in path:
+                tempSum -= val
+                if tempSum == sum:
+                    self.res += 1
+
+            recur(node.left, curSum, path+[node.val])
+            recur(node.right, curSum, path+[node.val])
+        recur(root, 0, [])
+        return self.res
+```
+
 ``` c++
 /**
  * Definition for a binary tree node.
@@ -4078,6 +4140,7 @@ public:
 };
 
 ```
+### Tag: #Tree #PrefixSum #DFS
 ---
 ## @543. Diameter of Binary Tree｜ 5/1 (W2D4)
 ![](assets/markdown-img-paste-20190630235236837.png)
