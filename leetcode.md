@@ -3890,7 +3890,7 @@ public:
 };
 ```
 ---
-## *112. Path Sum｜ 4/30
+## 112. Path Sum｜ 4/30 | [ Review * 1 ]
 Given a binary tree and a sum, determine if the tree has a root-to-leaf path such that adding up all the values along the path equals the given sum.
 
 Note: A leaf is a node with no children.
@@ -3900,6 +3900,36 @@ Note: A leaf is a node with no children.
 ### 思路
 
 ### Code
+Recursive:
+```py
+class Solution:
+    def hasPathSum(self, root: TreeNode, targetSum: int) -> bool:
+        if not root:
+            return False
+        if not root.left and not root.right and root.val == targetSum:
+            return True
+        return self.hasPathSum(root.left, targetSum-root.val) or self.hasPathSum(root.right, targetSum-root.val)
+```
+
+Iterative with Preorder-template:
+```py
+class Solution:
+    def hasPathSum(self, root: TreeNode, targetSum: int) -> bool:
+        if not root:
+            return False
+        stack = [(root, targetSum)]
+        while stack:
+            node, target = stack.pop()
+            if not node.left and not node.right and node.val == target:
+                return True
+
+            if node.left:
+                stack.append((node.left, target - node.val))
+            if node.right:
+                stack.append((node.right, target - node.val))
+        return False
+```
+
 Recursive:
 ``` c++
 /**
@@ -3922,6 +3952,7 @@ public:
 ```
 Iterative:
 
+### Tag: #Tree #DFS
 ---
 ## @113. Path Sum II｜ 4/30
 Given a binary tree and a sum, find all root-to-leaf paths where each path's sum equals the given sum.
