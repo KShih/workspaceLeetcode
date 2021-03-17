@@ -9633,7 +9633,7 @@ In interview: only need to one valid parentheses
 ``` c
 ```
 ---
-## 560. Subarray Sum Equals K｜ 8/27
+## 560. Subarray Sum Equals K｜ 8/27 | [ Review * 1 ]
 Given an array of integers and an integer k, you need to find the total number of continuous subarrays whose sum equals to k.
 
 Example 1:
@@ -9648,6 +9648,15 @@ The length of the array is in range [1, 20,000].
 
 The range of numbers in the array is [-1000, 1000] and the range of the integer k is [-1e7, 1e7].
 
+### 解題分析
+1. 此題的最佳解是使用 Prefix Sum 的概念來解題，基礎題詳見 LC560
+    1. 維護一個 dict 紀錄之前走過的所有 accumulated sum
+    2. 有兩種 case 可以 match 到 target sum
+        1. 整條路徑的 match
+            - 直接看 curSum 是否為 target
+        2. 需截掉某段路的 match
+            - 去 curSumHistory 裡面找找看有沒有曾經出現 curSum - target
+            - 原理是，如果累積和中曾經出現過這個值，那我們把它截掉後，後半段就會等於 target 了
 ### 思路
 反省：要把題目看完整，整數的範圍是什麼
 舉testcase的時候也要包含完整
@@ -9667,6 +9676,26 @@ The range of numbers in the array is [-1000, 1000] and the range of the integer 
 
 ![](assets/markdown-img-paste-20190827213353365.png)
 ### Code
+
+Prefix Sum
+```py
+from collections import defaultdict
+class Solution:
+    def subarraySum(self, nums: List[int], k: int) -> int:
+        sumHis = defaultdict(int)
+        curSum = 0
+        res = 0
+
+        for num in nums:
+            curSum += num
+            if curSum == k:
+                res += 1
+
+            res += sumHis[curSum - k]
+            sumHis[curSum] += 1
+        return res
+```
+
 ``` c
 class Solution {
 public:
@@ -9685,6 +9714,7 @@ public:
     }
 };
 ```
+### Tag: #PrefixSum #Array
 ---
 ## 54. Spiral Matrix｜ 8/28
 Given a matrix of m x n elements (m rows, n columns), return all elements of the matrix in spiral order.
