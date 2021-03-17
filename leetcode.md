@@ -5131,7 +5131,7 @@ public:
 ```
 ### Tag: #DFS #Tree
 ---
-## 108. Convert Sorted Array to Binary Search Tree｜ 6/12
+## 108. Convert Sorted Array to Binary Search Tree｜ 6/12 | [ Review * 1 ]
 Given an array where elements are sorted in ascending order, convert it to a height balanced BST.
 For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of every node never differ by more than 1.
 ![108](assets/markdown-img-paste-20190613213706352.png)
@@ -5165,15 +5165,12 @@ Save Space and Increase Time:
 class Solution:
     def sortedArrayToBST(self, nums: List[int]) -> TreeNode:
         def recur(l, r):
-            if l > r:
-                return None
-
-            mid = l + (r-l)//2
-            root = TreeNode(nums[mid])
-            root.left = recur(l, mid-1)
-            root.right = recur(mid+1, r)
-
-            return root
+            if l <= r:
+                mid = l + (r-l)//2
+                root = TreeNode(nums[mid])
+                root.left = recur(l, mid-1)
+                root.right = recur(mid+1, r)
+                return root
 
         return recur(0, len(nums)-1)
 ```
@@ -5193,6 +5190,7 @@ public:
     }
 };
 ```
+### Tag: #Tree
 ---
 ## 501. Find Mode in Binary Search Tree｜ 6/12
 Given a binary search tree (BST) with duplicates, find all the mode(s) (the most frequently occurred element) in the given BST.
