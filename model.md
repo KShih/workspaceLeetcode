@@ -262,7 +262,11 @@ class Solution:
             return []
     ```
 
-    Iterative 版 inorder (左中右)
+- 使用Iterative 避免 stackoverflow
+- Note:
+    - 遇到 preorder 可解的優先採用 iterative 寫法 (高效)
+
+1. Iterative 版 inorder (左中右)
     ```py
     def inorder(root):
         stack = []
@@ -277,7 +281,7 @@ class Solution:
         return inorder
     ```
 
-    Iterative 版 preorder (中左右)
+2. Iterative 版 preorder (中左右)
     ```py
     def preorderTraversal(self, root):
         if root is None:
@@ -294,7 +298,7 @@ class Solution:
         return preorder
     ```
 
-    Iterative 版 postorder (左右中)
+3. Iterative 版 postorder (左右中)
     ```py
     # 1. Push root to first stack.
     # 2. Loop while first stack is not empty

@@ -3954,7 +3954,7 @@ Iterative:
 
 ### Tag: #Tree #DFS
 ---
-## @113. Path Sum II｜ 4/30
+## 113. Path Sum II｜ 4/30 | [ Review * 1 ]
 Given a binary tree and a sum, find all root-to-leaf paths where each path's sum equals the given sum.
 
 Note: A leaf is a node with no children.
@@ -3964,6 +3964,26 @@ Note: A leaf is a node with no children.
 ### 思路
 找所有解，使用遞迴就對了！
 ### Code
+Iterative:
+```py
+class Solution:
+    def pathSum(self, root: TreeNode, targetSum: int) -> List[List[int]]:
+        if not root: return []
+        stack = [(root, targetSum, [])] # node, target, path
+        res = []
+
+        while stack:
+            node, target, path = stack.pop()
+            if not node.left and not node.right and node.val == target:
+                res.append(path + [node.val])
+
+            if node.left:
+                stack.append((node.left, target - node.val, path+[node.val]))
+            if node.right:
+                stack.append((node.right, target - node.val, path+[node.val]))
+        return res
+```
+
 Recursive:
 ``` c++
 /**
@@ -3999,7 +4019,7 @@ public:
 };
 ```
 Iterative:
-
+### Tag: #Tree #DFS
 ---
 ## *437. Path Sum III｜ 5/1
 You are given a binary tree in which each node contains an integer value.
