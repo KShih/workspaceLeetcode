@@ -181,7 +181,18 @@ class Solution:
     2. phase2: 另一個指針從起始點出發, 與慢指針一步步前進, 重合處即是環的開始
     3. 見 LC142, 287
 2. 快慢指針找 List 中點 <LC109>
-    1. head 多先走一步，就可以不需要用到 dum
+    1. 寫法1: head 多先走一步，就可以不需要用到 dum
+    2. 寫法2: 遇到需要切割 fast 宣告成 head.next.next，就可以直接用 slow.next 去切
+        ```py
+        slow, fast = head, head.next.next
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+
+        mid = slow.next # <- center
+        slow.next = None # <- cut the front
+        right = mid.next # <- new head of right
+        ```
 2. Doubly LinkedList
     1. Insert, Delete: O(1)
     2. Example: LRU cache <LC146>
