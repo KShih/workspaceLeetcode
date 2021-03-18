@@ -4333,12 +4333,23 @@ public:
 };
 ```
 ---
-## *124. Binary Tree Maximum Path Sum｜ 5/1
+## 124. Binary Tree Maximum Path Sum｜ 5/1 | [ Review * 1 ]
 Given a non-empty binary tree, find the maximum path sum.
 
 For this problem, a path is defined as any sequence of nodes from some starting node to any node in the tree along the parent-child connections. The path must contain at least one node and does not need to go through the root.
 
 ![](assets/markdown-img-paste-20190630235353117.png)
+
+### 解題分析
+0. 分析題目
+    1. 一開始破題時不曉得怎麼去定義 helper function 的回傳
+    2. 因為最大值可能會出現在 left+right+node，但這又不是一個合法的 path 回傳
+    3. 可以做的就是回傳 valid 的 path 但同時做全域變數的更新
+1. 我們用一個全域變數 res 去追蹤當前最大的 path
+    1. 而當前最大的 path 的求法是用 左子數的最大 path 結果 + 右邊的 + 本身，但此種寫法有可能會加到負數導致結果變小，
+    2. 因此在取各自最大的時候還要再與 0 去做比較，這樣做就可以直接放心加上去
+2. 因此需要先求出左右，才能更新本身的作法為使用後序遍歷
+3. 需要注意的是，更新此數值並不能作為回傳值，回傳值只能左邊、右邊選一邊加上自己的值
 
 ### 5/6review
 在宣告result時要宣告成INT_MIN來防止[-3] 這種testcase
@@ -4347,6 +4358,25 @@ For this problem, a path is defined as any sequence of nodes from some starting 
 ![](assets/markdown-img-paste-20190630235409853.png)
 
 ### Code
+```py
+class Solution:
+    def maxPathSum(self, root: TreeNode) -> int:
+        self.res = float(-inf)
+
+        def helper(node):
+            if not node:
+                return 0
+
+            left = max(helper(node.left), 0)
+            right = max(helper(node.right), 0)
+
+            self.res = max(self.res, left+right+node.val)
+            return node.val + max(left, right)
+
+        helper(root)
+        return self.res
+```
+
 ``` c++
 /**
  * Definition for a binary tree node
@@ -4375,6 +4405,7 @@ public:
     }
 };
 ```
+### Tag: #Tree #DFS
 ---
 ## @129. Sum Root to Leaf Numbers｜ 5/3
 Given a binary tree containing digits from 0-9 only, each root-to-leaf path could represent a number.
