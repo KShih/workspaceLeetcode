@@ -9152,7 +9152,7 @@ class Solution(object):
         return count
 ```
 ---
-## 116. Populating Next Right Pointers in Each Node｜ 8/24
+## 116. Populating Next Right Pointers in Each Node｜ 8/24 | [ Review * 1 ]
 You are given a perfect binary tree where all leaves are on the same level, and every parent has two children. The binary tree has the following definition:
 
 struct Node {
@@ -9166,6 +9166,16 @@ Populate each next pointer to point to its next right node. If there is no next 
 Initially, all next pointers are set to NULL.
 ![](assets/markdown-img-paste-20190824113249442.png)
 
+
+### 解題分析
+1. queue 的解法就是用逐層 BFS
+    - 注意連結的方式是當前 node 與 queue 中的下一個點做連結 (不能先 pop 否則迴圈進到下一次時會找錯點)
+2. 不用 queue 的方法
+    - 因為是完全二叉樹的關係，我們可以站在 parent 的位置往下去調整 node 的連結
+    - 最外層的 while 必須是去判斷是否還有下一層，而進入的 while 後把 parent 設為此層
+    - 然後就是站在此層，去調整下一層
+
+
 ### 思路
 完全二叉樹，所以若節點的左子結點存在的話，其右子節點必定存在，所以左子結點的next指針可以直接指向其右子節點，對於其右子節點的處理方法是，判斷其父節點的next是否為空，若不為空，則指向其next指針指向的節點的左子結點，若為空則指向NULL
 
@@ -9173,6 +9183,50 @@ p.s. level order should use queue, instead of stack
 
 
 ### Code
+queue
+```py
+from collections import deque
+class Solution:
+    def connect(self, root: 'Node') -> 'Node':
+        if not root: return None
+        queue = deque([root])
+        while queue:
+            level = len(queue)
+            for i in range(level):
+                curNode = queue.popleft()
+                if i < level-1:
+                    curNode.next = queue[0]
+                else:
+                    curNode.next = None
+
+                if curNode.left:
+                    queue.append(curNode.left)
+                if curNode.right:
+                    queue.append(curNode.right)
+        return root
+```
+
+without queue
+```py
+class Solution:
+    def connect(self, root: 'Node') -> 'Node':
+        if not root: return None
+        leftmost = root
+        parent = None
+        while leftmost.left:
+            parent = leftmost
+
+            while parent:
+                if parent.left:
+                    parent.left.next = parent.right
+                if parent.next:
+                    parent.right.next = parent.next.left
+                parent = parent.next
+
+            leftmost = leftmost.left
+        return root
+```
+
 ``` c
 class Solution {
 public:
@@ -9246,6 +9300,7 @@ public:
     }
 };
 ```
+### Tag: #Tree #BFS
 ---
 ## 117. Populating Next Right Pointers in Each Node II｜ 8/24
 Given a binary tree
