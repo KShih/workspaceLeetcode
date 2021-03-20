@@ -30879,7 +30879,7 @@ class Solution:
 
 ### Tag: #DFS
 ---
-## 1382. Balance a Binary Search Tree｜ 3/7
+## 1382. Balance a Binary Search Tree｜ 3/7 | [ Review * 1 ]
 Given a binary search tree, return a balanced binary search tree with the same node values.
 
 A binary search tree is balanced if and only if the depth of the two subtrees of every node never differ by more than 1.
@@ -30896,21 +30896,22 @@ If there is more than one answer, return any of them.
 ### Code
 ``` py
 class Solution:
-    def balanceBST(self, root: TreeNode) -> TreeNode:
-        sorted_arr = self.inorder(root)
-        return self.sortedToBST(sorted_arr)
+    def isBalanced(self, root: TreeNode) -> bool:
+        def maxDep(node):
+            if not node:
+                return 0
 
-    def inorder(self, root):
-        return self.inorder(root.left) + [root.val] + self.inorder(root.right) if root else []
+            left_cnt = maxDep(node.left)
+            if left_cnt < 0: return -1
+            right_cnt = maxDep(node.right)
+            if right_cnt < 0: return -1
 
-    def sortedToBST(self, arr):
-        if not arr:
-            return None
-        mid = len(arr)//2
-        root = TreeNode(arr[mid])
-        root.left = self.sortedToBST(arr[:mid])
-        root.right = self.sortedToBST(arr[mid+1:])
-        return root
+            if abs(left_cnt - right_cnt) > 1:
+                return -1
+            else:
+                return max(left_cnt, right_cnt)+1
+
+        return maxDep(root) >= 0
 ```
 
 ### Tag: #BST
