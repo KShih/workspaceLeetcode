@@ -30475,7 +30475,7 @@ class Solution:
 
 ### Tag: #divideAndConquer #Boyer-Moore
 ---
-## 315. Count of Smaller Numbers After Self｜ 3/6
+## 315. Count of Smaller Numbers After Self｜ 3/6 | [ Review * 2 ]
 You are given an integer array nums and you have to return a new counts array. The counts array has the property where counts[i] is the number of smaller elements to the right of nums[i].
 
 Example 1:
@@ -30516,6 +30516,7 @@ Constraints:
 ### 解題分析
 0. 類似題: LC493
 1. MergeSort
+    0. ![](assets/markdown-img-paste-20210320133651902.png)
     1. 我們可以透過 Merge Sort 在插入至新陣列時的 左右比較，去追蹤*比當前 left[i] 還小的 right[j] 有多少個 count*
         1. 若是插入 right[j] (右邊比左邊小)，此時 count+1
         2. 若是插入 left[i]  (左邊比右邊小)，此時就要把之前累積的 count 加回 result
