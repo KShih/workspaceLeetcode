@@ -22999,7 +22999,7 @@ def mincostTickets(self, days, costs):
     return dp[-1]
 ```
 ---
-## 229. Majority Element II｜ 5/28
+## 229. Majority Element II｜ 5/28 | [ Review * 1 ]
 Given an integer array of size n, find all elements that appear more than ⌊ n/3 ⌋ times.
 
 Note: The algorithm should run in linear time and in O(1) space.
@@ -23012,11 +23012,25 @@ Example 2:
 
 Input: [1,1,1,3,3,2,2,2]
 Output: [1,2]
+
+### 解題分析
+- KEY:
+    - There can be at most one majority element which is more than ⌊n/2⌋ times.
+    - There can be at most two majority elements which are more than ⌊n/3⌋ times.
+    - There can be at most three majority elements which are more than ⌊n/4⌋ times.
+
+- ![](assets/markdown-img-paste-20210320190730373.png)
+1. 此題問 n/3 以上，因此最多只有兩個可以達成，因此我們仿造上一題各用一個 cand, cnt 變數去追蹤
+2. 當與 cand 相同, 該 cnt 就 +1, 不同就 -1
+3. 當被扣到 0 了, 就重新指派 cand
+4. 注意: 每個 num 只會有上面的其中一個狀態, 因此全部用 if 串起
+5. 最後要記得去檢查是否有超過 1/3, 上一題是因為保證有一解所以可以跳過這個步驟, 但這個步驟在大部分的狀況都需要, 因為有可能會出現沒有多數的情況
+
 ### 思路
 
 摩爾投票法
 
-https://leetcode.com/problems/majority-element-ii/discuss/63520/Boyer-Moore-Majority-Vote-algorithm-and-my-elaboration
+https://leetcode.com/problems/majority-element-ii/solution/
 
 KEY: 最多只會有兩個candidate appear more than floor(n/3)
 
@@ -23025,7 +23039,7 @@ KEY: 最多只會有兩個candidate appear more than floor(n/3)
 class Solution:
     def majorityElement(self, nums: List[int]) -> List[int]:
         # at most two number will appear more than floor(n/3)
-        count1, count2, num1, num2 = 0, 0, 0, 1
+        count1, count2, num1, num2 = 0, 0, None, None
 
         # find candidate
         for n in nums:
@@ -23042,6 +23056,7 @@ class Solution:
         # check if quailfy more than 1/3
         return [n for n in (num1, num2) if nums.count(n) > len(nums)//3]
 ```
+### Tag: #Array
 ---
 ## 234. Palindrome Linked List｜ 5/29
 Given a singly linked list, determine if it is a palindrome.
