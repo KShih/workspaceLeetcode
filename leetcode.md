@@ -30720,7 +30720,7 @@ class Solution:
 
 ### Tag: #MergeSort #divideAndConquer
 ---
-## 426. Convert Binary Search Tree to Sorted Doubly Linked List｜ 3/7
+## 426. Convert Binary Search Tree to Sorted Doubly Linked List｜ 3/7 | [ Review * 2 ]
 
 Convert a Binary Search Tree to a sorted Circular Doubly-Linked List in place.
 
@@ -30762,7 +30762,7 @@ Constraints:
             return []
     ```
 3. 而唯一差一就是針對 current node 需要做的處理
-4. 此題需要做的就是去連接上個點 (last) 跟這個點 (node)
+4. 此題需要做的就是去連接上個點 (last) 跟這個點 (node), 難點在於想到用 last 在 inorder 過程中連結
     - 如果 last 不存在 -> 表示此點是最左下的點，此時設定其為 first
     - 如果存在: 與現在的點互相連接
     - 更新 last 為 current node
@@ -30782,30 +30782,27 @@ class Node:
 
 class Solution:
     def treeToDoublyList(self, root: 'Node') -> 'Node':
-        first, last = None, None
-        def traverse(node):
-            nonlocal first, last # using global var in enclosing
-            if node:
-                # traverse left
-                traverse(node.left)
-
-                # working node
-                if not last:
-                    first = node
-                else:
-                    last.right = node
-                    node.left = last
-                last = node
-
-                # traverse right
-                traverse(node.right)
-
         if not root:
             return None
-        traverse(root)
-        first.left = last
-        last.right = first
-        return first
+        self.last, self.first = None, None
+        def inorder(node):
+            if not node:
+                return
+            inorder(node.left)
+
+            if self.first == None:
+                self.first = node
+            else:
+                self.last.right = node
+                node.left = self.last
+            self.last = node
+
+            inorder(node.right)
+
+        inorder(root)
+        self.last.right = self.first
+        self.first.left = self.last
+        return self.first
 ```
 
 ### Tag: #DFS #BST
