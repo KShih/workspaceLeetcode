@@ -35,7 +35,13 @@
         - 後序遍歷 + global max update
 
 ## 在 array 中 count 符合條件的元素數量
-1. LC493
-    - 閹割版 Merge Sort (Divide and Conquer)
-2. LC315
+- 共通點:
+    1. 對於元素間的 index 關係有要求 (e.g. 後要比前的值小)
+    2. 若我們已經處理完各個半部，我們就能夠直接加上剩餘的部分 (因為我們知道剩下的都會符合)，前提是我們要確定剩餘的一定能符合 (with the help of sorted array)
+
+1. LC315
     - Classic Merge Sort
+    - 後要比前小
+2. LC493
+    - 閹割版 Merge Sort (Divide and Conquer)
+    - 前要比後的兩倍還大
