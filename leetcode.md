@@ -9302,7 +9302,7 @@ public:
 ```
 ### Tag: #Tree #BFS
 ---
-## 117. Populating Next Right Pointers in Each Node II｜ 8/24
+## 117. Populating Next Right Pointers in Each Node II｜ 8/24 | [ Review * 1 ]
 Given a binary tree
 
 struct Node {
@@ -9316,14 +9316,54 @@ Populate each next pointer to point to its next right node. If there is no next 
 Initially, all next pointers are set to NULL.
 ![](assets/markdown-img-paste-20190824170327983.png)
 
+### 解題分析
+1. 與上題 perfect tree 不一樣的地方在於
+    1. leftMost.left 不再保證是下一層的開頭
+    2. parent.left, parent.right 不一定存在
+2. 因此我們必須透過一個 pointer: `prev` 去找下一個 leftMost & 去串聯
+3. 解題
+    1. 首先與之前一樣，我們是站在 parent 的位置去調整 child
+    2. 我們先初始化 prev 跟 leftMost
+    3. 這對這層的每個 parent 我們都分別去處理他們的 left, right
+    4. leftMost 只會更新一次, 當 prev 還不存在時遇到的第一個合法的 child, 即為 leftMost
+    5. 若 prev 存在了，便開始去串聯 prev 與 current child node
+    6. 與上題需要改的地方也就只是更新 leftMost 的時機與 while parent 內的邏輯
+4. p.s. 用 queue 的方法詳見上題, 可無痛搬移
+
 ### 思路
 
 Non-recursive的方法很好解，並且是116&117的通解
 要符合題目要求的constant space，就不能用queue
-要用dummy node的概念，但我看不懂QAQ
-詳情參考 https://www.cnblogs.com/grandyang/p/4290148.html
 
 ### Code
+Constant Space
+```py
+class Solution:
+    def connect(self, root: 'Node') -> 'Node':
+        if not root: return None
+        self.leftMost = root
+
+        while self.leftMost:
+            parent = self.leftMost
+            self.prev = None # next level's prev node
+            self.leftMost = None # next level's leftMost
+
+            while parent:
+                self.processChild(parent.left)
+                self.processChild(parent.right)
+                parent = parent.next
+        return root
+
+    # processChild(): to set the next leftMost or connect prev to childNode
+    def processChild(self, childNode):
+        if childNode:
+            if not self.prev:
+                self.leftMost = childNode
+            else:
+                self.prev.next = childNode
+            self.prev = childNode
+```
+
 ``` c
 class Solution {
 public:
@@ -9353,6 +9393,7 @@ public:
     }
 };
 ```
+### Tag: #Tree
 ---
 ## 621. Task Scheduler(unsoloved follow up)｜ 8/26
 Given a char array representing tasks CPU need to do. It contains capital letters A to Z where different letters represent different tasks. Tasks could be done without original order. Each task could be done in one interval. For each interval, CPU could finish one task or just be idle.
