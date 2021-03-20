@@ -33,3 +33,9 @@
         - 因此前序已經不適用於此了，因為左右邊的值會影響我們的選擇
     3. 解法:
         - 後序遍歷 + global max update
+
+## 在 array 中 count 符合條件的元素數量
+1. LC493
+    - 閹割版 Merge Sort (Divide and Conquer)
+2. LC315
+    - Classic Merge Sort

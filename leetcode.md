@@ -30645,7 +30645,7 @@ class Solution(object):
 
 ### Tag: #MergeSort #divideAndConquer #BST
 ---
-## 493. Reverse Pairs｜ 3/6
+## 493. Reverse Pairs｜ 3/6 | [ Review * 1 ]
 Given an array nums, we call (i, j) an important reverse pair if i < j and nums[i] > 2*nums[j].
 
 You need to return the number of important reverse pairs in the given array.
@@ -30668,6 +30668,12 @@ Note:
 
 ### 解題分析
 1. MergeSort
+    0. ![](assets/markdown-img-paste-20210320151032805.png)
+        1. 破題:
+            1. naive 的解法是把每個 i 與其後 的 j 做比較
+            2. 但假設我們有 [30, 40, 50, 1, 2, 3]
+                1. 若能切割在中間
+                2. 那麼對於 1 我們得出 30, 40, 50 完全不用比較
     1. 此題與 LC315 非常類似，都是要我們計算 arr 裡 element 之間的個數關係
     2. 因此我們也透過 divide and conquer 的概念，在維持元素之間 index 關係的同時去進行驗證值
         1. 注意 這邊我們沒辦法一邊進行 count 一邊去 merge，因為條件不一樣
@@ -30692,9 +30698,7 @@ class Solution:
         :type nums: List[int]
         :rtype: int
         """
-        if len(nums) <= 1:
-            return 0
-        count = [0]
+        self.cnt = 0
 
         def merge(nums):
             if len(nums) <= 1: return nums
@@ -30706,12 +30710,12 @@ class Solution:
                 if left[l] <= 2 * right[r]:
                     l += 1
                 else:
-                    count[0] += len(left) - l
+                    self.cnt += len(left) - l
                     r += 1
             return sorted(left+right)
 
         merge(nums)
-        return count[0]
+        return self.cnt
 ```
 
 ### Tag: #MergeSort #divideAndConquer
