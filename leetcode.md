@@ -30973,3 +30973,104 @@ class Solution:
 
 ### Tag: #BST
 ---
+## 930. Binary Subarrays With Sum｜ 3/21
+In an array A of 0s and 1s, how many non-empty subarrays have sum S?
+
+Example 1:
+
+Input: A = [1,0,1,0,1], S = 2
+
+Output: 4
+
+Explanation:
+
+The 4 subarrays are bolded below:
+1. [1,0,1    ]
+2. [1,0,1,0  ]
+3. [ 0,1,0,1]
+4. [    1,0,1]
+
+Note:
+
+A.length <= 30000
+0 <= S <= A.length
+A[i] is either 0 or 1.
+
+### 解題分析
+1. 這題有許多種解法
+    1. 最容易懂的 prefixSum
+    2. Two Pointer
+        1. 第一種直接求出 sum = k 的解法, 需考慮的 case 比較多, 特別注意移動完 l 有可能還是不等於 S
+            1. 當 l == r, preSum != S 時
+            2. case: A = [0,0,0,0,0,0,1,0,0,0], S = 0
+        2. 第二種解法似乎處理起來相對容易而且可應用的地方比較多, 但較不直覺
+            1. 注意 preSum > S 那邊不該加 boundary
+            2. 不然在這個 case 還是會噴掉 A = [0,0,0,0,0,0,1,0,0,0], S = 0
+
+### Code
+Same approach with 437
+(could improve by using array instead of dict)
+``` py
+from collections import defaultdict
+class Solution:
+    def numSubarraysWithSum(self, A: List[int], S: int) -> int:
+        sumDict = defaultdict(int)
+        asum, cnt = 0, 0
+        for num in A:
+            asum += num
+            if asum == S:
+                cnt += 1
+
+            cnt += sumDict[asum - S]
+            sumDict[asum] += 1
+        return cnt
+```
+
+Two pointer direct solve
+(Lots of edge case needed to think of)
+```py
+class Solution:
+    def numSubarraysWithSum(self, A: List[int], S: int) -> int:
+        preSum, res, l = 0, 0, 0
+        for r in range(len(A)):
+            preSum += A[r]
+            while l < r and preSum > S:
+                preSum -= A[l]
+                l += 1
+
+            if preSum < S:
+                continue
+
+            if preSum == S: # Note should added! 因為有可能 l == r , preSum != S
+                res += 1
+
+            # count leading zero
+            for i in range(l, r):
+                if A[i] == 0:
+                    res += 1
+                else:
+                    break
+        return res
+```
+
+Two pointer with more general solution
+count of atMost(k) - count of atMost(k-1) = count of sum k
+```py
+class Solution:
+    def numSubarraysWithSum(self, A: List[int], S: int) -> int:
+        def atMost(S):
+            if S < 0:
+                return 0
+            preSum, res, l = 0, 0, 0
+            for r in range(len(A)):
+                preSum += A[r]
+                while preSum > S: # should not set the boundary of l < r
+                    preSum -= A[l]
+                    l += 1
+                res += r - l + 1
+            return res
+        return atMost(S) - atMost(S-1)
+```
+
+### Tag: #PrefixSum #TwoPointer #SlidingWindow
+---

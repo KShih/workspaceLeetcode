@@ -505,3 +505,15 @@ class Solution:
                 res.append([pos, -live[0][0]])
         return res[1:]
 ```
+
+---
+
+## Prefix Sum
+
+- Good question:
+    - LC930. Binary Subarrays With Sum
+    - LC437. Path Sum III
+    - LC560. Subarray Sum Equals K
+- Array 類型的可用 sliding window 來解
+
+https://leetcode.com/discuss/general-discussion/563022/prefix-sum-problems
