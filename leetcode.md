@@ -19678,7 +19678,7 @@ class Solution:
         return res
 ```
 ---
-## 159. Longest Substring with At Most Two Distinct Characters｜ 3/8
+## 159. Longest Substring with At Most Two Distinct Characters｜ 3/8 | [ Review * 1 ]
 Given a string s , find the length of the longest substring t  that contains at most 2 distinct characters.
 
 Example 1:
@@ -19754,6 +19754,7 @@ class Solution:
             max_len = max(max_len, r-l)
         return max_len
 ```
+### Tag: #SlidingWindow #TwoPointer
 ---
 ## 161. One Edit Distance｜ 3/9
 Given two strings s and t, determine if they are both one edit distance apart.
@@ -31073,4 +31074,96 @@ class Solution:
 ```
 
 ### Tag: #PrefixSum #TwoPointer #SlidingWindow
+---
+## 904. Fruit Into Baskets｜ 3/21
+In a row of trees, the i-th tree produces fruit with type tree[i].
+
+You start at any tree of your choice, then repeatedly perform the following steps:
+
+Add one piece of fruit from this tree to your baskets.  If you cannot, stop.
+Move to the next tree to the right of the current tree.  If there is no tree to the right, stop.
+Note that you do not have any choice after the initial choice of starting tree: you must perform step 1, then step 2, then back to step 1, then step 2, and so on until you stop.
+
+You have two baskets, and each basket can carry any quantity of fruit, but you want each basket to only carry one type of fruit each.
+
+What is the total amount of fruit you can collect with this procedure?
+
+Example 1:
+
+- Input: [1,2,1]
+- Output: 3
+- Explanation: We can collect [1,2,1].
+
+Example 2:
+
+- Input: [0,1,2,2]
+- Output: 3
+- Explanation: We can collect [1,2,2].
+- If we started at the first tree, we would only collect [0, 1].
+
+Example 3:
+
+- Input: [1,2,3,2,2]
+- Output: 4
+- Explanation: We can collect [2,3,2,2].
+- If we started at the first tree, we would only collect [1, 2].
+
+Example 4:
+
+- Input: [3,3,3,1,2,1,1,2,3,3,4]
+- Output: 5
+- Explanation: We can collect [1,2,1,1,2].
+- If we started at the first tree or the eighth tree, we would only collect 4 fruits.
+
+
+Note:
+
+1 <= tree.length <= 40000
+0 <= tree[i] < tree.length
+
+
+### 思路
+與 LC159 一模一樣，只是概念被題目隱藏起來而已
+
+### Code
+Better
+``` py
+class Solution:
+    def totalFruit(self, tree: List[int]) -> int:
+        if len(tree) < 3:
+            return len(tree)
+        left_most_map = {}
+        l, r, max_len = 0, 0, 2
+
+        for i, ch in enumerate(tree):
+            left_most_map[ch] = i
+            r += 1
+
+            if len(left_most_map) > 2:
+                del_idx = min(left_most_map.values())
+                del left_most_map[tree[del_idx]]
+                l = del_idx+1
+
+            max_len = max(max_len, r-l)
+        return max_len
+```
+
+Shrink the left
+```py
+class Solution:
+    def totalFruit(self, tree: List[int]) -> int:
+        count, l, res = {}, 0, 0
+        for r, t in enumerate(tree):
+            count[t] = count.get(t, 0) + 1
+            # above is short-cut of if t not in count: count[t] = 1 else count[t] += 1
+            while len(count) > 2:
+                count[tree[l]] -= 1
+                if count[tree[l]] == 0:
+                    del count[tree[l]]
+                l += 1
+            res = max(res, r-l+1)
+        return res
+```
+
+### Tag: #SlidingWindow #TwoPinter
 ---
