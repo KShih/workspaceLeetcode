@@ -31005,6 +31005,7 @@ A[i] is either 0 or 1.
             1. 當 l == r, preSum != S 時
             2. case: A = [0,0,0,0,0,0,1,0,0,0], S = 0
         2. 第二種解法似乎處理起來相對容易而且可應用的地方比較多, 但較不直覺
+            0. 參考 LC992 去理解為何 atMost 中 (為何要累加長度?)
             1. 注意 preSum > S 那邊不該加 boundary
             2. 不然在這個 case 還是會噴掉 A = [0,0,0,0,0,0,1,0,0,0], S = 0
 
@@ -31163,6 +31164,66 @@ class Solution:
                 l += 1
             res = max(res, r-l+1)
         return res
+```
+
+### Tag: #SlidingWindow #TwoPinter
+---
+## 992. Subarrays with K Different Integers｜ 3/21
+Given an array A of positive integers, call a (contiguous, not necessarily distinct) subarray of A good if the number of different integers in that subarray is exactly K.
+
+(For example, [1,2,3,1,2] has 3 different integers: 1, 2, and 3.)
+
+Return the number of good subarrays of A.
+
+Example 1:
+
+- Input: A = [1,2,1,2,3], K = 2
+- Output: 7
+- Explanation: Subarrays formed with exactly 2 different integers: [1,2], [2,1], [1,2], [2,3], [1,2,1], [2,1,2], [1,2,1,2].
+
+Example 2:
+
+- Input: A = [1,2,1,3,4], K = 3
+- Output: 3
+- Explanation: Subarrays formed with exactly 3 different integers: [1,2,1,3], [2,1,3], [1,3,4].
+
+Note:
+
+1 <= A.length <= 20000
+1 <= A[i] <= A.length
+1 <= K <= A.length
+
+### 解題分析
+0. ![](assets/markdown-img-paste-20210321182854120.png)
+1. SlidingWindow 求 exact 條件的典型題 -> 用 atMost 去解
+    1. 用 sliding window 可以提升時間複雜度, 但求 exact 的時候會漏掉
+    2. 然而 sliding window 求 atMost 的時候卻不會
+    3. 所以可以利用 atMost(n) - atMost(n-1) = exact(n)
+    4. **而在 atMost 裡 window 的意義是此次增加的長度可以多產生的 combination 數量**
+
+### 相似題
+- LC904
+    - 一模一樣解法
+- LC159
+    - 僅求 max
+
+### Code
+Same as LC930!!
+``` py
+class Solution:
+    def subarraysWithKDistinct(self, A: List[int], K: int) -> int:
+        def atMost(k):
+            count, l, res = {}, 0, 0
+            for r, num in enumerate(A):
+                count[num] = count.get(num, 0) + 1
+                while len(count) > k:
+                    count[A[l]] -= 1
+                    if count[A[l]] == 0:
+                        del count[A[l]]
+                    l += 1
+                res += r-l+1
+            return res
+        return atMost(K) - atMost(K-1)
 ```
 
 ### Tag: #SlidingWindow #TwoPinter
