@@ -25937,7 +25937,7 @@ class Solution:
         self.getDepth(cur.right, cur, dep)
 ```
 ---
-## 303. Range Sum Query - Immutable｜ 8/31
+## 303. Range Sum Query - Immutable｜ 8/31 | [ Review * 1 ]
 Given an integer array nums, find the sum of the elements between indices i and j (i ≤ j), inclusive.
 
 Example:
@@ -25975,6 +25975,7 @@ class NumArray:
     def sumRange(self, i: int, j: int) -> int:
         return self.sumList[j] - self.sumList[i-1]
 ```
+### Tag: #PrefixSum
 ---
 ## 1305. All Elements in Two Binary Search Trees｜ 9/6
 Given two binary search trees root1 and root2.
