@@ -31228,3 +31228,54 @@ class Solution:
 
 ### Tag: #SlidingWindow #TwoPinter
 ---
+## 485. Max Consecutive Ones｜ 3/22
+Given a binary array, find the maximum number of consecutive 1s in this array.
+
+Example 1:
+
+- Input: [1,1,0,1,1,1]
+- Output: 3
+- Explanation: The first two digits or the last three digits are consecutive 1s.
+    The maximum number of consecutive 1s is 3.
+Note:
+
+- The input array will only contain 0 and 1.
+- The length of input array is a positive integer and will not exceed 10,000
+
+### 思路
+
+
+### Code
+殺雞不需用牛刀
+``` py
+class Solution:
+    def findMaxConsecutiveOnes(self, nums: List[int]) -> int:
+        l = res = 0
+        for r, num in enumerate(nums):
+            if num == 1:
+                r += 1
+                res = max(res, r-l)
+            else:
+                l = r+1
+        return res
+```
+
+```py
+class Solution:
+    def findMaxConsecutiveOnes(self, nums: List[int]) -> int:
+        n = len(nums)
+        cnt = 0
+        _max = 0
+
+        for num in nums:
+            if num == 1:
+                cnt += 1
+            else:
+                # track longest consecutive 1s so far
+                _max = max(_max, cnt)
+                cnt = 0
+        return max(_max, cnt)
+```
+
+### Tag: #SlidingWindow #TwoPinter
+---
