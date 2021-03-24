@@ -4512,7 +4512,7 @@ public:
 ```
 ### Tag: #Tree #DFS
 ---
-## @257. Binary Tree Paths｜ 5/3
+## 257. Binary Tree Paths｜ 5/3 | [ Review * 1 ]
 Given a binary tree, return all root-to-leaf paths.
 
 Note: A leaf is a node with no children.
@@ -4524,17 +4524,24 @@ Can you do it with iterative way?
 ### 思路
 在遞歸函數中，當我們遇到葉結點的時候，即沒有左右子結點，那麼此時一條完整的路徑已經形成了，我們加上當前的葉結點後存入結果res中，然後回溯。注意這裡結果res需要reference，而out是不需要引用的，不然回溯回去還要刪除新添加的結點，很麻煩。為了減少判斷空結點的步驟，我們在調用遞歸函數之前都檢驗一下非空即可
 ### Code
+```py
+class Solution:
+    def binaryTreePaths(self, root: TreeNode) -> List[str]:
+        res = []
+        def recur(node, path):
+            if not node:
+                return
+            if not node.left and not node.right:
+                res.append(path + str(node.val))
+                return
+
+            recur(node.left, path + str(node.val) + "->")
+            recur(node.right, path + str(node.val) + "->")
+        recur(root, "")
+        return res
+```
 Recursive:
 ``` c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
 class Solution {
 public:
     vector<string> binaryTreePaths(TreeNode* root) {
@@ -4589,6 +4596,7 @@ public:
 
 };
 ```
+### Tag: #Tree #DFS
 ---
 ## 236. Lowest Common Ancestor of a Binary Tree｜ 5/28
 Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
