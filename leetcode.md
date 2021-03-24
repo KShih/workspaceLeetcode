@@ -18810,7 +18810,7 @@ class Solution:
         return nums[r]
 ```
 ---
-## 130. Surrounded Regions｜ 2/3
+## 130. Surrounded Regions｜ 2/3 | [ Review * 1 ]
 Given a 2D board containing 'X' and 'O' (the letter O), capture all regions surrounded by 'X'.
 
 A region is captured by flipping all 'O's into 'X's in that surrounded region.
@@ -18921,6 +18921,7 @@ def solve(self, board):
             elif board[r][c] == "$":
                 board[r][c] = "O"
 ```
+### Tag: #Tree #DFS #BFS
 ---
 ## 140. Word Break II｜ 2/5 | [Review * 1]
 Given a non-empty string s and a dictionary wordDict containing a list of non-empty words, add spaces in s to construct a sentence where each word is a valid dictionary word. Return all such possible sentences.
