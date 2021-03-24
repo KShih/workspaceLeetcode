@@ -10440,7 +10440,7 @@ class Solution(object):
 
 ```
 ---
-## 200. Number of Islands｜ 8/31
+## 200. Number of Islands｜ 8/31 | [ Review * 1 ]
 Given a 2d grid map of '1's (land) and '0's (water), count the number of islands. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
 
 ![](assets/markdown-img-paste-20190831231112890.png)
@@ -10537,6 +10537,7 @@ class Solution(object):
         self.dfs(grid, i, j+1)
         self.dfs(grid, i, j-1)
 ```
+### Tag: #DFS
 ---
 ## 42. Trapping Rain Water｜ 9/1
 Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it is able to trap after raining.
