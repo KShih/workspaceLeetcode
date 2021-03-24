@@ -462,6 +462,17 @@ def DFS(tree):
 
 ---
 
+## Graph
+1. 圖找環
+    1. 建立連結 (node -> list[node])
+    2. 走訪所有節點
+        1. backtrack 其子節點
+        2. 如果出現在 visited 中, 表示有走過了 -> 找到環
+    3. Note: 可用 cache 來剪枝
+    4. Example: LC207
+
+---
+
 ## DP
 1. TopDown
     1. 可以從 Recursive 的解法演化而來

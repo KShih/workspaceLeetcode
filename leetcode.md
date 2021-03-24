@@ -20905,7 +20905,7 @@ class Solution:
         return dum.next
 ```
 ---
-## 207. Course Schedule｜ 3/25
+## 207. Course Schedule｜ 3/25 | [ Review * 1 ]
 There are a total of numCourses courses you have to take, labeled from 0 to numCourses-1.
 
 Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
@@ -20936,6 +20936,14 @@ You may assume that there are no duplicate edges in the input prerequisites.
 
 ![](assets/markdown-img-paste-20200326132525643.png)
 
+### 解題分析
+- 基本的圖論找環
+    1. 建立連結 (node -> list[node])
+    2. 走訪所有節點
+        3. backtrack 其子節點
+        4. 如果出現在 visited 中, 表示有走過了 -> 找到環
+    3. Note: 可用 cache 來剪枝
+
 ### 思路
 
 Using `checked` as cache, if we don't use it we will encounter the worst case, chain,
@@ -20952,43 +20960,33 @@ Backtracking solution to find cycle in graph
 from collections import defaultdict
 class Solution:
     def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
-        courseDict = defaultdict(list)
+        self.order = defaultdict(list)
+        for cur, pre in prerequisites:
+            self.order[pre].append(cur)
 
-        for relation in prerequisites:
-            cur, prev = relation[0], relation[1]
-            courseDict[prev].append(cur)
-
-        path = [False] * numCourses
-        checked = [False] * numCourses # using the cache to memorize which node has no cycle
-
-        for course in range(numCourses):
-            if self.isCycle(course, path, checked, courseDict):
+        self.visited = set()
+        self.cache = dict()
+        for pre in range(numCourses):
+            if self.existCircle(pre):
                 return False
         return True
 
-
-    def isCycle(self, course, path, checked, courseDict):
-
-        if checked[course]:
-            return False # this node have been checked, no loop
-
-        # this node have been visited, -> is loop
-        if path[course]:
+    def existCircle(self, pre):
+        if pre in self.cache:
+            return self.cache[pre]
+        if pre in self.visited:
             return True
 
-        path[course] = True
-
-        # check if there's no cycle
-        detech = False
-        for child in courseDict[course]:
-            detech = self.isCycle(child, path, checked, courseDict)
-            if detech: # find cycle in one child
-                break
-
-        path[course] = False # reset back tracking
-        checked[course] = True
-        return detech
+        self.visited.add(pre)
+        for _next in self.order[pre]:
+            if self.existCircle(_next):
+                self.cache[pre] = True
+                return True
+        self.cache[pre] = False
+        self.visited.remove(pre)
+        return False
 ```
+### Tag: #Graph #DFS
 ---
 ## 209. Minimum Size Subarray Sum｜ 3/26 | [Review * 1]
 Given an array of n positive integers and a positive integer s, find the minimal length of a contiguous subarray of which the sum ≥ s. If there isn't one, return 0 instead.
