@@ -469,7 +469,13 @@ def DFS(tree):
         1. backtrack 其子節點
         2. 如果出現在 visited 中, 表示有走過了 -> 找到環
     3. Note: 可用 cache 來剪枝
-    4. Example: LC207
+    4. Example: LC207. Course Schedule I
+2. 拓樸排序
+    1. 從圖找環去改
+        1. 額外多增加一個狀態 `visited but not circle`
+        2. 額外多維護一個 stack 去 append path
+            - Note: 更新的時機是確定當前點的所有鄰居都不會產生環時
+    2. 差別詳見 LC210. Course Schedule II
 
 ---
 

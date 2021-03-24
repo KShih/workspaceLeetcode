@@ -20964,7 +20964,7 @@ class Solution:
         for cur, pre in prerequisites:
             self.order[pre].append(cur)
 
-        self.visited = set()
+        self.visited = [0 for i in range(numCourses)]
         self.cache = dict()
         for pre in range(numCourses):
             if self.existCircle(pre):
@@ -20974,20 +20974,111 @@ class Solution:
     def existCircle(self, pre):
         if pre in self.cache:
             return self.cache[pre]
-        if pre in self.visited:
+        if self.visited[pre] == 1:
             return True
 
-        self.visited.add(pre)
+        self.visited[pre] = 1
         for _next in self.order[pre]:
             if self.existCircle(_next):
                 self.cache[pre] = True
                 return True
         self.cache[pre] = False
-        self.visited.remove(pre)
+        self.visited[pre] = 0
         return False
 ```
 ### Tag: #Graph #DFS
 ---
+## 210. Course Schedule II｜ 3/25
+There are a total of n courses you have to take labelled from 0 to n - 1.
+
+Some courses may have prerequisites, for example, if prerequisites[i] = [ai, bi] this means you must take the course bi before the course ai.
+
+Given the total number of courses numCourses and a list of the prerequisite pairs, return the ordering of courses you should take to finish all courses.
+
+If there are many valid answers, return any of them. If it is impossible to finish all courses, return an empty array.
+
+Example 1:
+
+- Input: numCourses = 2, prerequisites = [[1,0]]
+- Output: [0,1]
+- Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0. So the correct course order is [0,1].
+
+Example 2:
+
+- Input: numCourses = 4, prerequisites = [[1,0],[2,0],[3,1],[3,2]]
+- Output: [0,2,1,3]
+- Explanation: There are a total of 4 courses to take. To take course 3 you should have finished both courses 1 and 2. Both courses 1 and 2 should be taken after you finished course 0.
+- So one correct course order is [0,1,2,3]. Another correct ordering is [0,2,1,3].
+
+Example 3:
+
+- Input: numCourses = 1, prerequisites = []
+- Output: [0]
+
+Constraints:
+
+- 1 <= numCourses <= 2000
+- 0 <= prerequisites.length <= numCourses * (numCourses - 1)
+- prerequisites[i].length == 2
+- 0 <= ai, bi < numCourses
+- ai != bi
+- All the pairs [ai, bi] are distinct.
+
+### 解題分析
+- 一秒恢復記憶的圖
+    - ![](assets/markdown-img-paste-20210325014733227.png)
+- 可以直接從找環的邏輯下去改
+    - 分析:
+        - 差別在走完 DFS 後的 set visited 部分!
+        - 找環:
+            - 確認每個 src 都不存在環, 因此只需要在確認沒環後, reset 就好
+        - 找路徑:
+            - 確定完當前不存在環不能 reset, 因為也許其他人也會連到他(這樣也不是環哦！只是連到不是繞一圈到自己)
+            - 因此我們針對先前走過的筆畫, 若這條筆畫都是合法的, 我們必須把這沿途的所有節點都 mark 上特別的記號, 若有人走到這我們可以直接回傳合法
+            - 那對於當前的此筆畫, 很遺憾的我們必須先把他 mark 上 visit, 若同一筆畫被我遇到, 直接 return 有環
+- 跟找環一樣我們 loop 所有的點, 並對此點找環
+    - 但這次我們傳入一個 stack, 去紀錄這筆畫畫過的點, 若此筆畫不存在環, 我們將其加入 res
+    - existCircle 需要改的內容:
+        1. 額外多增加一個狀態 `visited but not circle`
+        2. 額外多維護一個 stack 去 append path
+            - Note: 更新的時機是確定當前點的所有鄰居都不會產生環時
+### Code
+Modify from LC207 (Very Similar)
+``` py
+from collections import defaultdict
+class Solution:
+    def findOrder(self, numCourses: int, prerequisites: List[List[int]]) -> List[int]:
+        self.order = defaultdict(list)
+        for cur, pre in prerequisites:
+            self.order[pre].append(cur)
+
+        self.visited = [0 for i in range(numCourses)]
+        res = []
+        for pre in range(numCourses):
+            tempStack = []
+            if self.existCircle(pre, tempStack):
+                return []
+            res += tempStack
+        return res[::-1]
+
+    def existCircle(self, pre, tempStack):
+        if self.visited[pre] == 1: # backEdge -> circle found
+            return True
+        if self.visited[pre] == -1: # crossEdge, forwardEdge
+            return False
+
+        self.visited[pre] = 1 # assume it's backedge
+        for _next in self.order[pre]:
+            if self.existCircle(_next, tempStack):
+                return True
+        self.visited[pre] = -1 # if it does not contain circle, then it's safe(cross or forward edge)
+        tempStack.append(pre)
+        return False
+```
+
+### Tag: #Graph #DFS #TopologicalSort
+---
+
 ## 209. Minimum Size Subarray Sum｜ 3/26 | [Review * 1]
 Given an array of n positive integers and a positive integer s, find the minimal length of a contiguous subarray of which the sum ≥ s. If there isn't one, return 0 instead.
 
