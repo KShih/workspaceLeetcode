@@ -4407,7 +4407,7 @@ public:
 ```
 ### Tag: #Tree #DFS
 ---
-## @129. Sum Root to Leaf Numbers｜ 5/3
+## 129. Sum Root to Leaf Numbers｜ 5/3 | [ Review * 1 ]
 Given a binary tree containing digits from 0-9 only, each root-to-leaf path could represent a number.
 
 An example is the root-to-leaf path 1->2->3 which represents the number 123.
@@ -4420,17 +4420,55 @@ Note: A leaf is a node with no children.
 ### 思路
 這道求根到葉節點數字之和的題跟之前的求 Path Sum 很類似，都是利用DFS遞歸來解，這道題由於不是單純的把各個節點的數字相加，而是每遇到一個新的子結點的數字，要把父結點的數字擴大10倍之後再相加。
 ### Code
+```py
+class Solution:
+    def sumNumbers(self, root: TreeNode) -> int:
+        self.res = 0
+        def recur(root, path):
+            if not root:
+                return
+            if not root.left and not root.right:
+                self.res += path * 10 + root.val
+                return
+
+            recur(root.left, path*10+root.val)
+            recur(root.right, path*10+root.val)
+        recur(root, 0)
+        return self.res
+```
+
+```py
+class Solution:
+    def sumNumbers(self, root: TreeNode) -> int:
+        def recur(root, path):
+            if not root:
+                return 0
+            path = path*10 + root.val
+            if not root.left and not root.right:
+                return path
+            else:
+                return recur(root.left, path) + recur(root.right, path)
+        return recur(root, 0)
+```
+
+```py
+class Solution:
+    def sumNumbers(self, root: TreeNode) -> int:
+        stack = [(root, 0)]
+        res = 0
+
+        while stack:
+            node, path = stack.pop()
+            if not node.left and not node.right:
+                res += path*10 + node.val
+            if node.left:
+                stack.append((node.left, path*10 + node.val))
+            if node.right:
+                stack.append((node.right, path*10 + node.val))
+        return res
+```
 Recursive:
 ``` c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
 class Solution {
 public:
     int sumNumbers(TreeNode* root) {
@@ -4449,15 +4487,6 @@ public:
 ```
 Iterative:
 ``` c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
 class Solution {
 public:
     int sumNumbers(TreeNode* root) {
@@ -4481,6 +4510,7 @@ public:
     }
 };
 ```
+### Tag: #Tree #DFS
 ---
 ## @257. Binary Tree Paths｜ 5/3
 Given a binary tree, return all root-to-leaf paths.
