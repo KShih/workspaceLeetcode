@@ -21064,7 +21064,7 @@ class Solution:
     def existCircle(self, pre, tempStack):
         if self.visited.get(pre) == 1: # backEdge -> circle found
             return True
-        if self.visited.get(pre == -1: # crossEdge, forwardEdge
+        if self.visited.get(pre) == -1: # crossEdge, forwardEdge
             return False
 
         self.visited[pre] = 1 # assume it's backedge
@@ -24111,7 +24111,7 @@ class Solution:
         return delta
 ```
 ---
-## 261. Graph Valid Tree｜ 7/11
+## 261. Graph Valid Tree｜ 7/11 | [ Review * 1 ]
 Given n nodes labeled from 0 to n-1 and a list of undirected edges (each edge is a pair of nodes), write a function to check whether these edges make up a valid tree.
 
 Example 1:
@@ -24142,13 +24142,13 @@ Union Find 在這邊的應用就是找出共同的root 並assign給該root!
 
 比如: 0 <-> 1, 1 <-> 2 => 經過union find 之後會變成 0 <-> 1, 0 <-> 2
 
-root_x = Find(0) = 0
-root_y = Find(1) = 1
-Union( root_x, root_y ) => {1: 0}: (1的root是0)
+1. root_x = Find(0) = 0
+2. root_y = Find(1) = 1
+3. Union( root_x, root_y ) => {1: 0}: (1的root是0)
 
-root_x = Find(1) = 0
-root_y = Find(2) = 2
-Union( root_x, root_y ) => {1: 0, 2: 0}: (1的root是0, 2的root是0)
+1. root_x = Find(1) = 0
+2. root_y = Find(2) = 2
+3. Union( root_x, root_y ) => {1: 0, 2: 0}: (1的root是0, 2的root是0)
 
 
 ### Code
@@ -24224,6 +24224,7 @@ class Solution:
             node = self.roots[node] # recursively find the root
         return node
 ```
+### Tag: #Graph #UnionFind
 ---
 ## 263. Ugly Number｜ 7/13
 Write a program to check whether a given number is an ugly number.

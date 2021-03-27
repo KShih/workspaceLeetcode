@@ -481,22 +481,36 @@ def DFS(tree):
 ---
 
 ## Graph
-1. 圖找環
-    1. 建立連結 (node -> list[node])
-    2. 走訪所有節點
-        1. backtrack 其子節點
-        2. 如果出現在 visited 中, 表示有走過了 -> 找到環
-    3. Note: 可用 cache 來剪枝
-    4. Example: LC207. Course Schedule I
-2. 拓樸排序
-    1. 從圖找環去改
-        1. 額外多增加一個狀態 `visited but not circle`
-        2. 額外多維護一個 stack 去 append path
-            - Note: 更新的時機是確定當前點的所有鄰居都不會產生環時
-    2. 差別詳見 LC210. Course Schedule II
-    3. 視要求決定如何 loop (有可能出現孤島節點時):
-        1. 如 LC269 要求輸出所有出現過的 char, 但無法排序的話任何順序都可以, 此時我們 loop 的對象應該是 "所有節點"
-        2. 但像是如果單純找環, 那麼孤島節點肯定沒有環，因此也不需要去 loop 了
+1. 有向圖
+    1. 有向圖找環 (黑白大法)
+        1. 建立連結 (node -> list[node])
+        2. 走訪所有節點
+            1. backtrack 其子節點
+            2. 如果出現在 visited 中, 表示有走過了 -> 找到環
+        3. Note: 可用 cache 來剪枝
+        4. Example: LC207. Course Schedule I
+    2. 拓樸排序 (黑白灰大法)
+        1. 從圖找環去改
+            1. 額外多增加一個狀態 `visited but not circle`
+            2. 額外多維護一個 stack 去 append path
+                - Note: 更新的時機是確定當前點的所有鄰居都不會產生環時
+        2. 差別詳見 LC210. Course Schedule II
+        3. 視要求決定如何 loop (有可能出現孤島節點時):
+            1. 如 LC269 要求輸出所有出現過的 char, 但無法排序的話任何順序都可以, 此時我們 loop 的對象應該是 "所有節點"
+            2. 但像是如果單純找環, 那麼孤島節點肯定沒有環，因此也不需要去 loop 了
+2. 無向圖
+    1. 無向圖找環
+        1. UnionFind (找你爸法)
+            1. 初始化 root_map
+            2. 對每對 connected component, 分別找到其 root
+            3. 如果他們的 root 相同, (如圖 [2,3] 為 connected component, 他們的root 都是1) -> 表示有環存在
+                 ```
+                 1 - 2
+                   \ |
+                     3
+                 ```
+            4. 如果不同, 則進行 union 的動作(把 `y的root` 連到 `x的root` 下)
+            5. Example: LC261
 
 ---
 
