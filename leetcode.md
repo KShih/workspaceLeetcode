@@ -20964,9 +20964,9 @@ class Solution:
         for cur, pre in prerequisites:
             self.order[pre].append(cur)
 
-        self.visited = [0 for i in range(numCourses)]
+        self.visited = {}
         self.cache = dict()
-        for pre in range(numCourses):
+        for pre in list(self.order.keys()):
             if self.existCircle(pre):
                 return False
         return True
@@ -20974,7 +20974,7 @@ class Solution:
     def existCircle(self, pre):
         if pre in self.cache:
             return self.cache[pre]
-        if self.visited[pre] == 1:
+        if self.visited.get(pre) == 1:
             return True
 
         self.visited[pre] = 1
@@ -21052,9 +21052,9 @@ class Solution:
         for cur, pre in prerequisites:
             self.order[pre].append(cur)
 
-        self.visited = [0 for i in range(numCourses)]
+        self.visited = {}
         res = []
-        for pre in range(numCourses):
+        for pre in range(numCourses): # we could list(self.order.keys()), but testcase: (1, []), should return [0]
             tempStack = []
             if self.existCircle(pre, tempStack):
                 return []
@@ -21062,9 +21062,9 @@ class Solution:
         return res[::-1]
 
     def existCircle(self, pre, tempStack):
-        if self.visited[pre] == 1: # backEdge -> circle found
+        if self.visited.get(pre) == 1: # backEdge -> circle found
             return True
-        if self.visited[pre] == -1: # crossEdge, forwardEdge
+        if self.visited.get(pre == -1: # crossEdge, forwardEdge
             return False
 
         self.visited[pre] = 1 # assume it's backedge
@@ -24623,65 +24623,71 @@ Note:
 You may assume all letters are in lowercase.
 If the order is invalid, return an empty string.
 There may be multiple valid order of letters, return any one of them is fine.
-### 思路
-待完成
+### 解題分析
+1. 破題:
+    - 起初我認為這題是回傳 "知道的" order 就好，但其實題目是要你回傳所有`出現過字母`的順序，如果分辨不出來，任意順序都可以
+2. 討論 case:
+    1. ["ab", "abc"] -> ""
+    2. ["abcd", "efghi"] -> return any order, iff a 比 e 早出現
+    3. ["abbd", "dbba"] -> return any order, iff a 比 d 早出現
+    4. ["z", "x", "z"] -> ""  (無法判別)
+    5. ["z", "z"] -> "z"
+3. 那麼此題其實就是 topological sort
+    1. 建立 adjList:
+        - 當我們找到第一個不同的字，就可以 determined order 了 (兩兩只會得出一個 order)
+        - 當出現 ["ab", "abc"] 這種 case 直接回傳 "", 因為無法得出 order
+    2. 建立需拜訪的節點 list:
+        - 因為我們需回傳所有出現過字母的順序，因此我們 topo_sort 的對象應該要是所有節點，因此我們維護一個 node_set
+    3. 剩下的就是經典的 topo sort, 與 LC210 一樣的作法
+
 
 ### Code
 ``` py
-from collections import defaultdict
 class Solution:
     def alienOrder(self, words: List[str]) -> str:
-        queue, self.order = [], ""
-        degree = defaultdict(int)
-        graph = set()
-        ch = set()
+        self.adjList, ok = self.build_adjList(words)
+        if not ok:
+            return ""
 
-        # build the char set
-        for word in words:
-            for c in word:
-                ch.add(c)
+        node_set = {c for word in words for c in word} # Iterate over all possibility! but check in return part
+        res = ""
+        self.visited = {}
+        for node in node_set:
+            path = []
+            if self.existCircle(node, path):
+                return ""
+            res += "".join(path)
+        return res[::-1] if len(res) == len(node_set) else ""
 
-        base = words[0]
-        for word in words[1:]:
-            start, end = self.buildGraph(base, word)
-            graph.add((start, end))
-            base = word
+    def build_adjList(self, words):
+        adjList = defaultdict(list)
+        for i in range(len(words)-1):
+            word1, word2 = words[i], words[i+1]
+            if len(word1) > len(word2) and word1.startswith(word2): # not allow ["ab", "abc"]
+                return None, False
+            for j in range(len(word1)):
+                if word1[j] != word2[j]:
+                    adjList[word1[j]].append(word2[j])
+                    break
+                else:
+                    continue
+        return adjList, True
 
-        # calculate the degree
-        for start, end in graph:
-            degree[end] += 1
+    def existCircle(self, node, path):
+        if self.visited.get(node) == 1:
+            return True
+        if self.visited.get(node) == -1:
+            return False
 
-        # push head into queue
-        for c in ch:
-            if degree[c] == 0: # head
-                queue.append(c)
-                self.order += c
-
-        self.findPath(graph, queue, degree)
-
-        return self.order if len(self.order) == len(ch) else ""
-
-    def buildGraph(self, word1, word2):
-        while word1 and word2:
-            if word1[0] == word2[0]:
-                word1, word2 = word1[1:], word2[1:]
-            else:
-                break
-        if word1 != word2 and len(word1) != 0 and len(word2) != 0:
-            return word1[0], word2[0]
-        else:
-            return word1, word2
-
-    def findPath(self, graph, queue, degree):
-        while queue:
-            top = queue.pop(0)
-            for start, end in graph:
-                if start == top:
-                    degree[end] -= 1
-                    if degree[end] == 0:
-                        queue.append(end)
-                        self.order += end
+        self.visited[node] = 1
+        for _next in self.adjList[node]:
+            if self.existCircle(_next, path):
+                return True
+        self.visited[node] = -1
+        path += [node]
+        return False
 ```
+### Tag: #Graph #topologicalSort #DFS
 ---
 ## 270. Closest Binary Search Tree Value｜ 8/1 | [Review * 1]
 Given a non-empty binary search tree and a target value, find the value in the BST that is closest to the target.
