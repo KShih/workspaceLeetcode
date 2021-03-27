@@ -1,5 +1,23 @@
 Solution Model
 ===
+## Python Trick
+1. Dictionary
+    1. iterate over keys:
+        - `for k in list(dict.keys())`
+        - Note: should listify!
+    2. secure way to visit dict:
+        - `dict.get(k)`
+        - Benifit:
+            - no need to initialize dict
+            - no need to write `if k in dict: ...`
+    3. add two dict:
+        - `dict1.update(dict2)`
+        - Note: cannot use `+`
+    4. inline initialize:
+        - `dict = {c: True for c in boolTable}`
+2. Sort by key
+    1. `intervals = sorted(intervals, key=lambda x: x[0])`
+    2. `intervals = sorted(intervals, key=lambda x: (x[0], x[1], x[2], ...))`
 ## Calculator
 - for `224`, `227`, `772`, `770`
 - ![](assets/markdown-img-paste-20200414144532950.png)
