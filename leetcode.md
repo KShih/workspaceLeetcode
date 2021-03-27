@@ -31415,3 +31415,90 @@ class Solution:
 
 ### Tag: #SlidingWindow #TwoPinter
 ---
+## 133. Clone Graph｜ 3/27
+Given a reference of a node in a connected undirected graph.
+
+Return a deep copy (clone) of the graph.
+
+Each node in the graph contains a val (int) and a list (List[Node]) of its neighbors.
+
+class Node {
+    public int val;
+    public List<Node> neighbors;
+}
+
+
+Test case format:
+
+For simplicity sake, each node's value is the same as the node's index (1-indexed). For example, the first node with val = 1, the second node with val = 2, and so on. The graph is represented in the test case using an adjacency list.
+
+Adjacency list is a collection of unordered lists used to represent a finite graph. Each list describes the set of neighbors of a node in the graph.
+
+The given node will always be the first node with val = 1. You must return the copy of the given node as a reference to the cloned graph.
+
+![](assets/markdown-img-paste-20210327184328367.png)
+### 思路
+
+
+### Code
+DFS recursive:
+```py
+class Solution:
+    def cloneGraph(self, node: 'Node') -> 'Node':
+        if not node: return None
+        self.map = {}
+        newNode = self.clone(node)
+        return newNode
+
+    def clone(self, node):
+        if node in self.map:
+            return self.map[node]
+        newNode = Node(node.val, [])
+        self.map[node] = newNode
+        for neib in node.neighbors:
+            newNode.neighbors.append(self.clone(neib))
+        return newNode
+```
+
+DFS iterative
+``` py
+class Solution:
+    def cloneGraph(self, node: 'Node') -> 'Node':
+        if not node: return None
+        map = {}
+        stack = [node]
+        while stack:
+            _node = stack.pop()
+            if _node not in map:
+                map[_node] = Node(_node.val, [])
+                for neib in _node.neighbors:
+                    stack.append(neib)
+
+        for origin in list(map.keys()):
+            for neib in origin.neighbors:
+                map[origin].neighbors.append(map[neib])
+
+        return map[node]
+```
+
+BFS
+```py
+from collections import deque
+class Solution:
+    def cloneGraph(self, node: 'Node') -> 'Node':
+        if not node: return None
+        map = {node: Node(node.val, [])}
+        queue = deque([node])
+        while queue:
+            _node = queue.popleft()
+
+            for neib in _node.neighbors:
+                if neib not in map:
+                    map[neib] = Node(neib.val, [])
+                    queue.append(neib)
+                map[_node].neighbors.append(map[neib])
+        return map[node]
+```
+
+### Tag: #DFS #Graph #BFS
+---
