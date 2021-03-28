@@ -112,8 +112,34 @@ while i < len(s):
 
 ## Sliding Window
 
-1. Sliding 的對象 arrray 必須是非負陣列，否則會破壞 window
-2. 題型總和
+0. 模板
+    ```py
+    # LC904
+    for r, t in enumerate(tree):
+        dic[t] += 1 # update條件
+        while len(dic) > 2: # 檢查條件
+            dic[tree[l]] -= 1 # 縮左邊
+            if dic[tree[l]] == 0:
+                del dic[tree[l]] # 更新條件
+            l += 1
+        res = max(res, r-l+1)
+    ```
+1. Window 形成一個合法的狀態，我們透過其他資料結構 (如dict, 變數) 去協助我們伸縮子集合的長度，如果不用此方法變成我們必須要去先取得所有可能的組合
+2. Sliding window 求 subarray combination 的時候適合使用 atMost 的技巧, 如 LC930 求 =k 時, 用 atMost(k) - atMost(k-1)
+    ```py
+    def atMost(S):
+        cnt, _sum, l = 0, 0, 0
+
+        for r, a in enumerate(A):
+            _sum += a
+            while _sum > S:
+                _sum -= A[l]
+                l += 1
+            cnt += (r-l+1)
+        return cnt
+    ```
+3. Sliding 的對象 arrray 必須是非負陣列，否則會破壞 window
+4. 題型總和
     0. 209. Minimum Size Subarray Sum
     1. 1248. Count Number of Nice Subarrays
     2. 1234. Replace the Substring for Balanced String
