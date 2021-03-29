@@ -31365,7 +31365,7 @@ class Solution:
 
 ### Tag: #SlidingWindow #TwoPinter
 ---
-## 485. Max Consecutive Ones｜ 3/22
+## 485. Max Consecutive Ones｜ 3/22 | [ Review * 1 ]
 Given a binary array, find the maximum number of consecutive 1s in this array.
 
 Example 1:

@@ -51,6 +51,6 @@
     - 概念上就是: 如果求 exact 會漏, 那就全部取 atMost(n), 再去扣掉不合的 atMost(n-1)
 1. LC930, LC992
     - 這兩題在 atMost中 window 的意義是**本此增加的 combination 個數**
-2. 比較: 求極值的
-    1. LC159
+2. 比較: Sliding Window 求極值的
+    1. LC159, LC904
         1. 此題 window 的長度意義就是所求的長度

@@ -147,7 +147,7 @@ while i < len(s):
     4. 930. Binary Subarrays With Sum
     5. 992. Subarrays with K Different Integers
     6. 904. Fruit Into Baskets
-    7. 862. Shortest Subarray with Sum at Least K
+    7. 862. Shortest Subarray with Sum at Least K - too hard
 
 ---
 
