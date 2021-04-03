@@ -1071,94 +1071,107 @@ Note: The input string may contain letters other than the parentheses ( and ).
 
 Example 1:
 
-Input: "()())()"
-Output: ["()()()", "(())()"]
+- Input: "()())()"
+- Output: ["()()()", "(())()"]
+
 Example 2:
 
-Input: "(a)())()"
-Output: ["(a)()()", "(a())()"]
+- Input: "(a)())()"
+- Output: ["(a)()()", "(a())()"]
+
 Example 3:
 
-Input: ")("
-Output: [""]
-### 思路
+- Input: ")("
+- Output: [""]
+### 解題分析
+1. 基本的想法就是嘗試著去除左右瓜, 但要符合要求找到可以去除最少的括號所有的 combination
+    1. BFS 基本上就是合球這種最短路徑的組合解, 透過不停的更新 level 直到符合條件的 level 出現就回傳
+        1. 缺點: 必須嘗試去除所有括號
+    2. 有限的 DFS:
+        1. 我們可以先算出到底要去除多少個左右瓜, 並且用遞迴去更新剩餘需去除的數量
+            1. 在求的時候不能去扣 right, 因為遇到 ")(" 需得到 l=1, r=1, 而非 l=0, r=0
+                2. 因此我們先判斷右瓜, 左瓜一律+1
+        2. 先算出限制可以幫助我們達成用 DFS 求最短路徑, 並且改進 BFS 需嘗試所有括號的缺點
+        3. trick:
+            1. 用 idx 去避免重複計算
+            2. 用 s[i] != s[i-1] 去避免重複 recursive,
+                1. (() => 此時只有第一個左瓜會進遞迴
 
 ### Code
-```java
-class Solution {
-public:
-    vector<string> removeInvalidParentheses(string s) {
-        int left, right = 0;
-        vector<string> ans;
-        getRemoveCount(s, left, right);
-        dfs(ans, left, right, s, 0);
-        if(ans.size() == 0) ans.push_back("");
-        return ans;
-    }
+optimal DFS
+```py
+class Solution(object):
+    def removeInvalidParentheses(self, s):
+        left, right = 0, 0
+        for c in s:
+            if c == ')':
+                if left > 0:
+                    left -= 1
+                else:
+                    right += 1
+            elif c == '(':
+                left += 1
+        self.res = []
+        self.dfs(s, left, right, 0)
+        return self.res
 
-private:
-    void getRemoveCount(string s, int& left, int& right){
-        // 計算總共要刪除多少個左右括號 & 前綴右括號後綴左括號
-        for (char ch: s){
-            if (ch == '('){
-                left ++;
-            }
-            if (ch == ')'){
-                if (left == 0){ // 沒有左括號可以匹配
-                    right ++;
-                }
-                else{
-                    left --;
-                }
-            }
-        }
-        cout << left << " " << right << endl;
-    }
-    bool isValid(string comb){
-        int left, right = 0;
-        for (char ch: comb){
-            if (ch == '('){
-                left ++;
-            }
-            if (ch == ')'){
-                if (left == 0){ // 沒有左括號可以匹配
-                    right ++;
-                }
-                else{
-                    left --;
-                }
-            }
-        }
-        return (left == 0 && right == 0);
-    }
-    void dfs(vector<string>& ans, int left,int right, string comb, int status){
-        if (left == 0 && right == 0){
-            cout << comb << endl;
-            if (isValid(comb)){
-                ans.push_back(comb);
-            }
-            return;
-        }
+    def dfs(self, s, l, r, idx):
+        if l == 0 and r == 0:
+            if self.isValid(s):
+                self.res.append(s)
+            return
 
-        for (int i = status; i < comb.length(); ++i){
-            if (i > 0 && comb[i] == comb[i-1])    continue;
+        for i in range(idx, len(s)):
+            if i > 0 and s[i] == s[i-1]:
+                continue
+            elif s[i] == ')' and r > 0:
+                self.dfs(s[:i]+s[i+1:], l, r-1, i)
+            elif s[i] == '(' and l > 0:
+                self.dfs(s[:i]+s[i+1:], l-1, r, i)
 
-            if(comb[i] == '(' || comb[i] == ')'){
-                string curr = comb;
-                curr.erase(i,1);
-
-                if (comb[i] == ')' && right > 0){
-                    dfs(ans, left, right-1, curr, i);
-                }
-                else if (comb[i] == '(' && left > 0){
-                    dfs(ans, left-1, right, curr, i);
-                }
-            }
-        }
-    }
-};
+    def isValid(self, s):
+        cnt = 0
+        for e in s:
+            if e == '(':
+                cnt += 1
+            if e == ')':
+                if cnt == 0:
+                    return False
+                cnt -= 1
+        return cnt == 0
 ```
 
+short BFS (bad performance)
+```py
+class Solution:
+    def removeInvalidParentheses(self, s: str) -> List[str]:
+        level = {s}
+        while level:
+            valid = []
+            for elem in level:
+                if self.isValid(elem):
+                    valid.append(elem)
+            if valid:
+                return valid
+
+            next_level = set()
+            for elem in level:
+                for i in range(len(elem)):
+                    next_level.add(elem[:i] + elem[i+1:])
+            level = next_level
+
+    def isValid(self, s):
+        cnt = 0
+        for e in s:
+            if e == '(':
+                cnt += 1
+            if e == ')':
+                if cnt == 0:
+                    return False
+                cnt -= 1
+        return cnt == 0
+```
+### Tag: #DFS, #BFS
 ---
 
 ## 51. N-Queens | [Review * 1]

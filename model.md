@@ -400,7 +400,7 @@ def bfs():
                 visited.add(next_node)
 ```
 
-1. 一次拜訪整層 => 可用於 BFS 求最短路徑 (LC126. Word Ladder II)
+1. 一次拜訪整層 => 可用於 BFS 求最短路徑 (LC126. Word Ladder II), (LC301. Remove Invalid Parentheses)
 2. p.s. 額外展示 Set 反向操作技巧，如果已經知道哪些點會出現在 set 時
 ```py
 canVisit = set(wordList)
