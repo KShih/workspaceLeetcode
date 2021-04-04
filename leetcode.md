@@ -27366,12 +27366,16 @@ class Solution:
 
 ### Tag: #區間DP非常規走訪, #DP
 ---
-## 314. Binary Tree Vertical Order Traversal｜ 10/20
+## 314. Binary Tree Vertical Order Traversal｜ 10/20 | [ Review * 1 ]
 Given a binary tree, return the vertical order traversal of its nodes' values. (ie, from top to bottom, column by column).
 
 If two nodes are in the same row and column, the order should be from left to right.
 
 ![](assets/markdown-img-paste-20201020230640872.png)
+
+### 解題分析
+1. 類似題 LC987, 但這題規定 order 只需要是左, 右, 而不用是 value, 因此就用 queue 依序 中左右 拜訪就行.
+2. 而 987 要求的是同個 row跟 column時要用值排序, 因此高度資訊也需要被加入進去一起排序
 
 ### 思路
 
@@ -27402,6 +27406,7 @@ class Solution:
         dic_item = sorted(dic_item, key=lambda x:x[0])
         return [x[1] for x in dic_item]
 ```
+### Tag: #HashMap
 ---
 ## 316. Remove Duplicate Letters｜ 10/21
 
