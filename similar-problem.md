@@ -54,3 +54,18 @@
 2. 比較: Sliding Window 求極值的
     1. LC159, LC904
         1. 此題 window 的長度意義就是所求的長度
+
+## Union Find and DFS
+1. 找 Circle: LC261
+2. 找 Connected Graph 數量: LC323
+
+- Union Find:
+    1. 找 Circle
+        - 求 是否有共同 root
+    2. 找 Connected Graph
+        - 求 root 的數量
+- DFS:
+    1. 找 Circle
+        - 遞迴求 是否重複 visited, (必須 exclude back_edge, 因此需要多傳一個 pre 來避免錯誤判斷)
+    2. 找 Connected Graph
+        - 遞迴去把所有連結的 mark 起來, 並遞增 cnt
