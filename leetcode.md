@@ -28337,7 +28337,7 @@ class Solution:
 
 ### Tag: #LIS, #array, #bisect, #binarySearch
 ---
-## 329. Longest Increasing Path in a Matrix｜ 11/7
+## 329. Longest Increasing Path in a Matrix｜ 11/7 | [ Review * 1 ]
 
 Given an integer matrix, find the length of the longest increasing path.
 
@@ -28354,33 +28354,28 @@ O(mn)
 ``` py
 class Solution:
     def longestIncreasingPath(self, matrix: List[List[int]]) -> int:
-        if not matrix:
-            return 0
-        self.r, self.c = len(matrix), len(matrix[0])
-        self.matrix = matrix
-        self.direction = [(0,1), (1,0), (0,-1), (-1,0)]
-        self.dp = [[0 for _ in range(self.c)] for _ in range(self.r)]
+        if not matrix: return 0
+        R, C = len(matrix), len(matrix[0])
+        memo, res = [[0 for _ in range(C)] for _ in range(R)], 0
+        dirs = [(1,0), (0,1), (-1,0), (0, -1)]
 
-        res = 0
-        for i in range(self.r):
-            for j in range(self.c):
-                res = max(res, self.dfs(i,j))
+        def dfs(i, j):
+            if memo[i][j] == 0:
+                cnt = 1
+                for dx, dy in dirs:
+                    x, y = i+dx, j+dy
+                    if 0 <= x < R and 0 <= y < C and matrix[x][y] > matrix[i][j]:
+                        cnt = max(cnt, 1 + dfs(x, y))
+                memo[i][j] = cnt
+            return memo[i][j]
+
+        for i in range(R):
+            for j in range(C):
+                res = max(res, dfs(i, j))
         return res
-
-    def dfs(self, i, j):
-        if self.dp[i][j] != 0:
-            return self.dp[i][j]
-        maxCount = 1
-        for x, y in self.direction:
-            if 0 <= i+x < self.r and 0 <= j+y < self.c and self.matrix[i+x][j+y] > self.matrix[i][j]:
-                    pathCount = 1 + self.dfs(i+x, j+y)
-                    maxCount = max(maxCount, pathCount)
-
-        self.dp[i][j] = maxCount
-        return maxCount
 ```
 
-### Tag: DP, Memorization
+### Tag: #DP, #Memorization #DFS
 ---
 ## 338. Counting Bits｜ 11/7
 Given a non negative integer number num. For every numbers i in the range 0 ≤ i ≤ num calculate the number of 1's in their binary representation and return them as an array.
