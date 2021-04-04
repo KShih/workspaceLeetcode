@@ -29601,7 +29601,7 @@ class Solution:
 
 ### Tag: #BFS, #DFS
 ---
-## 366. Find Leaves of Binary Tree｜ 11/29
+## 366. Find Leaves of Binary Tree｜ 11/29 | [ Review * 1 ]
 
 Given a binary tree, collect a tree's nodes as if you were doing this: Collect and remove all leaves, repeat until the tree is empty.
 
@@ -29638,7 +29638,7 @@ Explanation:
 [[3,5,4],[2],[1]], [[3,4,5],[2],[1]], etc, are also consider correct answers since per each level it doesn't matter the order on which elements are returned.
 
 
-### 思路
+### 解題分析
 1. 撥洋蔥法:
     - main function 控制 level
     - remove function 去做遞迴 當掃描到跟節點的時候
@@ -29647,6 +29647,7 @@ Explanation:
         - 最後返回更新後的節點 node
 
 2. 相對高度:
+    - 後序走訪 <- 我們需要先知道左右子節點的高度我才能定調自己的高度
     - ![](assets/markdown-img-paste-20201129133808789.png)
     - 利用相對高度的原理來找到此leave應該放在哪個位置
 ### Code
@@ -29699,6 +29700,21 @@ class Solution:
         self.res[max_height-1].append(node.val)
 
         return max_height
+```
+
+相對高度 optimal
+```py
+class Solution:
+    def findLeaves(self, root: TreeNode) -> List[List[int]]:
+        level_map = collections.defaultdict(list)
+        def dfs(root):
+            if not root:
+                return 0
+            depth = max(dfs(root.left), dfs(root.right)) + 1
+            level_map[depth].append(root.val)
+            return depth
+        dfs(root)
+        return level_map.values()
 ```
 
 ### Tag: #DFS #BinaryTree
