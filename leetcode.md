@@ -15237,7 +15237,7 @@ class Solution:
 ```
 ### Tag: #LinkedList
 ---
-## 339. Nested List Weight Sum｜ 10/27
+## 339. Nested List Weight Sum｜ 10/27 | [ Review * 1 ]
 Given a nested list of integers, return the sum of all integers in the list weighted by their depth.
 
 Each element is either an integer, or a list -- whose elements may also be integers or other lists.
@@ -15317,6 +15317,7 @@ class Solution:
                     stack.append((ei, depth+1))
         return res
 ```
+### Tag: #Recursive, #DFS
 ---
 ## 70. Climbing Stairs｜ 10/28
 You are climbing a stair case. It takes n steps to reach to the top.
