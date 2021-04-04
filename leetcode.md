@@ -3730,7 +3730,7 @@ private:
 };
 ```
 ---
-## *987. Vertical Order Traversal of a Binary Tree｜ 4/25
+## 987. Vertical Order Traversal of a Binary Tree｜ 4/25 | [ Review * 1 ]
 Given a binary tree, return the vertical order traversal of its nodes values.
 
 For each node at position (X, Y), its left and right children respectively will be at positions (X-1, Y-1) and (X+1, Y-1).
@@ -3743,6 +3743,13 @@ Return an list of non-empty reports in order of X coordinate.  Every report will
 ![](assets/markdown-img-paste-20190629234827598.png)
 ![](assets/markdown-img-paste-20190629234847185.png)
 
+### 解題分析
+1. 將需要排序的資料依序整理起來
+    1. rank (左子數-1, 右+1)
+    2. height
+    3. value
+2. 因此選擇用字典作為資料結構 {rank: [(height, value)]}
+
 ### 5/6 review
 採用第二種寫法
 學習到：
@@ -3752,6 +3759,22 @@ Return an list of non-empty reports in order of X coordinate.  Every report will
 ### 思路
 利用map去紀錄所有資料
 ### Code
+```py
+class Solution(object):
+    def verticalTraversal(self, root):
+        stack = [(root, 0, 0)]
+        dic = {}
+
+        while stack:
+            node, rank, height = stack.pop()
+            dic[rank] = dic[rank] + [(height, node.val)] if rank in dic else [(height, node.val)]
+            if node.left:
+                stack.append((node.left, rank-1, height+1))
+            if node.right:
+                stack.append((node.right, rank+1, height+1))
+        return [[v for h, v in sorted(pair_list)] for rank, pair_list in sorted(dic.items())]
+```
+
 直覺的寫法
 ``` c++
 /**
@@ -3838,6 +3861,7 @@ public:
     }
 };
 ```
+### Tag: #DFS #HashMap
 ---
 ## *814. Binary Tree Pruning｜ 4/30
 We are given the head node root of a binary tree, where additionally every node's value is either a 0 or a 1.
