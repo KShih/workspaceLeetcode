@@ -69,3 +69,10 @@
         - 遞迴求 是否重複 visited, (必須 exclude back_edge, 因此需要多傳一個 pre 來避免錯誤判斷)
     2. 找 Connected Graph
         - 遞迴去把所有連結的 mark 起來, 並遞增 cnt
+
+## TopologicalSort
+1. LC269. Alien Dictionary, LC210. Course Schedule II, LC332. Reconstruct Itinerary
+2. 比較
+    - 269 與 210 只有在建立 adjList 不一樣而已
+    - 跟 332 的不同處是在 332 給定有限的拜訪路徑, 且次數可能 > 1, 換句話說可能出現有限的環
+        - 因此我們在處理時，不用 visited 去追蹤, 而是直接把用過的路徑 pop 掉

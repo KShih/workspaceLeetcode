@@ -28087,7 +28087,7 @@ class Solution:
 
 ### Tag: BinaryTree concept
 ---
-## 332. Reconstruct Itinerary| 10/30
+## 332. Reconstruct Itinerary| 10/30 | [ Review * 1 ]
 
 Given a list of airline tickets represented by pairs of departure and arrival airports [from, to], reconstruct the itinerary in order. All of the tickets belong to a man who departs from JFK. Thus, the itinerary must begin with JFK.
 
@@ -28116,6 +28116,18 @@ Output: ["JFK","ATL","JFK","SFO","ATL","SFO"]
 Explanation: Another possible reconstruction is ["JFK","SFO","ATL","JFK","ATL","SFO"].
              But it is larger in lexical order.
 
+### 解題分析
+1. 拓樸排序
+    0. 求各節點 visit 的順序就是使用拓樸排序
+    1. 與 Course Schedule II 不同處:
+        1. 此題確定有一條路, 可以走到底
+        2. 此題有指定一個開始點
+            - 1+2 -> 可以不用 check existCircle
+        3. 此題有可能會回到同一個點再出發
+            - 不能用 visited 去紀錄走過的點, 否則就無法處理 JFK -> ATL -> JFK -> SFO
+            - 用一個 queue 去 pop 掉已經用掉的機票
+2. Heap
+
 ### 思路
 
 1. getNextStop 中要使用 while 而不是 if
@@ -28126,6 +28138,27 @@ Explanation: Another possible reconstruction is ["JFK","SFO","ATL","JFK","ATL","
 
 2. Iterative 要注意在拿stack裡的元素的時候不能直接 pop(), 否則就無法將先拜訪的元素插入到res當中了
 ### Code
+Topological sort
+```py
+from collections import deque, defaultdict
+class Solution:
+    def findItinerary(self, tickets: List[List[str]]) -> List[str]:
+        tickets = sorted(tickets, key=lambda k: k[1])
+        self.order = defaultdict(deque)
+        for f, t in tickets:
+            self.order[f].append(t)
+
+        path = []
+        self.existCircle("JFK", path)
+        return path[::-1]
+
+    def existCircle(self, start, path):
+        while self.order[start]:
+            _next = self.order[start].popleft()
+            self.existCircle(_next, path)
+        path.append(start)
+```
+
 Recursive:
 ```py
 import heapq
@@ -28174,7 +28207,7 @@ class Solution:
         return res
 ```
 
-### Tag: Backtrack, Heap, Hash,
+### Tag: #Backtrack, #Heap, #Hash, #TopologicalSort
 ---
 ## 333. Largest BST Subtree｜ 11/5
 Given the root of a binary tree, find the largest subtree, which is also a Binary Search Tree (BST), where the largest means subtree has the largest number of nodes.
