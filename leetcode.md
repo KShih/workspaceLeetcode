@@ -24164,6 +24164,15 @@ Input: n = 5, and edges = [[0,1], [1,2], [2,3], [1,3], [1,4]]
 Output: false
 
 Note: you can assume that no duplicate edges will appear in edges. Since all edges are undirected, [0,1] is the same as [1,0] and thus will not appear together in edges.
+
+### 解題分析
+1. Union Find w/ Path Compress
+    - Time: O(N⋅α(N))
+2. Union Find
+    - Time: O(N^2)
+3. DFS
+    - Time: O(N+E)
+
 ### 思路
 
 用 DFS 來做，根據 pair 來建立一個圖的結構，用鄰接鏈表來表示，還需要一個一位數組v來記錄某個結點是否被訪問過，然後用 DFS 來搜索結點0，遍歷的思想是，當 DFS 到某個結點，先看當前結點是否被訪問過，如果已經被訪問過，說明環存在，直接返回 false，如果未被訪問過，現在將其狀態標記為已訪問過，然後到鄰接鏈表裡去找跟其相鄰的結點繼續遞歸遍歷，注意還需要一個變量 pre 來記錄上一個結點，以免回到上一個結點，這樣遍歷結束後，就把和結點0相鄰的節點都標記為 true，然後再看v裡面是否還有沒被訪問過的結點，如果有，則說明圖不是完全連通的，返回 false，反之返回 true
@@ -24217,7 +24226,7 @@ class Solution:
         return True
 ```
 
-dfs with iterative:
+dfs with iterative O(N+E):
 ```py
 from collections import defaultdict
 class Solution:
@@ -24240,7 +24249,7 @@ class Solution:
         return True if len(visit) == n else False
 ```
 
-Union Find:
+Union Find O(n^2):
 ```py
 class Solution:
     def validTree(self, n: int, edges: List[List[int]]) -> bool:
@@ -24260,6 +24269,45 @@ class Solution:
         while self.roots[node] != -1:
             node = self.roots[node] # recursively find the root
         return node
+```
+
+Union Find w/ Path Compression O(N⋅α(N)) <Optimal>
+```py
+class Solution:
+    def validTree(self, n: int, edges: List[List[int]]) -> bool:
+        if len(edges) != n-1:
+            return False
+
+        self.root_map = [i for i in range(n)]
+        self.sizes = [1] * n
+        for x, y in edges:
+            root_x = self.find_root(x)
+            root_y = self.find_root(y)
+            if root_x == root_y:
+                return False
+
+            # 3. phase3: largerSet remains root
+            if self.sizes[root_x] < self.sizes[root_y]:
+                self.root_map[root_x] = root_y
+                self.sizes[root_y] += self.sizes[root_x]
+            else:
+                self.root_map[root_y] = root_x
+                self.sizes[root_x] += self.sizes[root_y]
+
+        return True
+
+    def find_root(self, x):
+        # 1. phase1: find root
+        root = x
+        while self.root_map[x] != root:
+            root = self.root_map[x]
+
+        # 2. phase2: path compress
+        while x != root:
+            path = self.root_map[x]
+            self.root_map[x] = root
+            x = path
+        return root
 ```
 ### Tag: #Graph #UnionFind
 ---

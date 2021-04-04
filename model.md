@@ -527,7 +527,10 @@ def DFS(tree):
 2. 無向圖
     1. 無向圖找環
         1. UnionFind (找你爸法)
-            1. 初始化 root_map
+            0. Time:
+                1. Naive: O(N^2)
+                2. Path Compression: O(N⋅α(N)) ~= O(N)
+            1. 初始化 root_map (每個點的root都是自己)
             2. 對每對 connected component, 分別找到其 root
             3. 如果他們的 root 相同, (如圖 [2,3] 為 connected component, 他們的root 都是1) -> 表示有環存在
                  ```
@@ -537,6 +540,10 @@ def DFS(tree):
                  ```
             4. 如果不同, 則進行 union 的動作(把 `y的root` 連到 `x的root` 下)
             5. Example: LC261
+            6. 優化: 此種簡單版，會變成 LinkedList, 但我們可以讓樹不要長這麼高
+                1. Path Compression
+                2. 在 找到 root 後, 多做一個 phase2, 把路途中的所有節點全部修正指向 root
+                3. 在 union 的階段, 不直接 hard-code root_map[root_y] = root_x, 而是 phase3 先判斷各自樹的大小, 再把小的依附到大的下
 
 ---
 
