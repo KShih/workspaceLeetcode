@@ -24297,10 +24297,11 @@ class Solution:
         return True
 
     def find_root(self, x):
-        # 1. phase1: find root
-        while self.root_map[x] != x:
-            x = self.find_root(self.root_map[x]) # path compression
-        return x
+        if self.root_map[x] == x:
+            return x
+
+        self.root_map[x] = self.find_root(self.root_map[x]) # path compression
+        return self.root_map[x]
 
     def find_root_iterative(self, x):
         # 1. phase1: find root
