@@ -543,8 +543,27 @@ def DFS(tree):
             6. 優化: 此種簡單版，會變成 LinkedList, 但我們可以讓樹不要長這麼高
                 1. Path Compression
                 2. 在 找到 root 後, 多做一個 phase2, 把路途中的所有節點全部修正指向 root
+                    - 精簡版用遞迴
+                        ```py
+                        def find(self, x):
+                            if self.root_map[x] == x:
+                                return x
+
+                            self.root_map[x] = self.find(self.root_map[x]) # path compression
+                            return self.root_map[x]
+                        ```
+
                 3. 在 union 的階段, 不直接 hard-code root_map[root_y] = root_x, 而是 phase3 先判斷各自樹的大小, 再把小的依附到大的下
 
+    2. 無向圖找 connected component
+        1. Union Find
+            1. 可利用 UnionFind 找, **去算有多少節點的 root 還是本身** (LC323)
+                    ```
+                    1 - 2       1 - 2
+                        |       |
+                        3       3
+                    ```
+            2. 這兩種 connect 都是 1, 但是左邊的 root_map.values() 數是2, 右邊是1
 ---
 
 ## DP

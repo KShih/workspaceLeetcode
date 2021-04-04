@@ -24298,6 +24298,12 @@ class Solution:
 
     def find_root(self, x):
         # 1. phase1: find root
+        while self.root_map[x] != x:
+            x = self.find_root(self.root_map[x]) # path compression
+        return x
+
+    def find_root_iterative(self, x):
+        # 1. phase1: find root
         root = x
         while self.root_map[x] != root:
             root = self.root_map[x]
@@ -27804,7 +27810,7 @@ class Solution:
 
 ### Tag: DP
 ---
-## 323. Number of Connected Components in an Undirected Graph｜ 10/28
+## 323. Number of Connected Components in an Undirected Graph｜ 10/28 | [ Review * 1 ]
 Given n nodes labeled from 0 to n - 1 and a list of undirected edges (each edge is a pair of nodes), write a function to find the number of connected components in an undirected graph.
 
 ![](assets/markdown-img-paste-20201028230708405.png)
@@ -27864,6 +27870,36 @@ class Solution:
         return self.rootMap[i]
 ```
 
+Union Find Path Compression:
+```py
+class Solution:
+    def countComponents(self, n: int, edges: List[List[int]]) -> int:
+        self.root_map = [i for i in range(n)]
+        self.sizes = [1] * n
+
+        for x, y in edges:
+            root_x = self.find(x)
+            root_y = self.find(y)
+            if root_x == root_y:
+                continue
+
+            if self.sizes[root_x] < self.sizes[root_y]:
+                self.root_map[root_x] = root_y
+                self.sizes[root_y] += self.sizes[root_x]
+            else:
+                self.root_map[root_y] = root_x
+                self.sizes[root_x] += self.sizes[root_y]
+
+        return len([i for i in range(len(self.root_map)) if i == self.root_map[i]])
+
+    def find(self, x):
+        if self.root_map[x] == x:
+            return x
+
+        self.root_map[x] = self.find(self.root_map[x]) # path compression
+        return self.root_map[x]
+```
+
 BFS:
 ```py
 class Solution:
@@ -27894,7 +27930,7 @@ class Solution:
                     queue.append(neibor)
 ```
 
-### Tag: Graph, DFS, UnionFind, BFS
+### Tag: #Graph, #DFS, #UnionFind, #BFS
 ---
 ## 325. Maximum Size Subarray Sum Equals k｜ 8/29
 
