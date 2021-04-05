@@ -525,6 +525,29 @@ def DFS(tree):
             1. 如 LC269 要求輸出所有出現過的 char, 但無法排序的話任何順序都可以, 此時我們 loop 的對象應該是 "所有節點"
             2. 但像是如果單純找環, 那麼孤島節點肯定沒有環，因此也不需要去 loop 了
 2. 無向圖
+    0. Union Find
+        ```py
+        def init(self, node_cnt):
+            self.root_map = [id for id in range(node_cnt)] # each node points to itself
+            self.sizes = [1 for id in range(node_cnt)]
+
+        def union(self, x, y):
+            self.root_map[self.find(y)] = self.find(x) # for simplicity, didn't compare the size
+            # # Size compare optimize:
+            # root_x, root_y = self.find(x), self.find(y)
+            # if self.sizes(root_x) < self.sizes(root_y):
+            #     if self.sizes[root_x] < self.sizes[root_y]:
+            #         self.root_map[root_x] = root_y
+            #         self.sizes[root_y] += root_x
+            #     else:
+            #         self.root_map[root_y] = root_x
+            #         self.sizes[root_x] += root_y
+
+        def find(self, x):
+            if self.root_map[x] != x:
+                self.root_map[x] = self.find(self.root_map[x])
+            return self.root_map[x]
+        ```
     1. 無向圖找環
         1. UnionFind (找你爸法)
             0. Time:
@@ -543,28 +566,13 @@ def DFS(tree):
             5. Example: LC261
             6. 優化: 此種簡單版，會變成 LinkedList, 但我們可以讓樹不要長這麼高
                 1. Path Compression
-                2. 在 找到 root 後, 多做一個 phase2, 把路途中的所有節點全部修正指向 root
-                    - 精簡版用遞迴
-                        ```py
-                        def find(self, x):
-                            if self.root_map[x] == x:
-                                return x
-
-                            self.root_map[x] = self.find(self.root_map[x]) # path compression
-                            return self.root_map[x]
-                        ```
-
+                2. 在 找到 root 後, 把路途中的所有節點全部修正指向 root
                 3. 在 union 的階段, 不直接 hard-code root_map[root_y] = root_x, 而是 phase3 先判斷各自樹的大小, 再把小的依附到大的下
 
     2. 無向圖找 connected component
         1. Union Find
             1. 可利用 UnionFind 找, **去算有多少節點的 root 還是本身** (LC323)
-                    ```
-                    1 - 2       1 - 2
-                        |       |
-                        3       3
-                    ```
-            2. 這兩種 connect 都是 1, 但是左邊的 root_map.values() 數是2, 右邊是1
+                `len([i for i in range(len(self.root_map)) if i == self.root_map[i]])`
 ---
 
 ## DP

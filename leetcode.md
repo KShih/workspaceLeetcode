@@ -31833,3 +31833,113 @@ class Solution:
 
 ### Tag: #Stack
 ---
+## 721. Accounts Merge｜ 4/5
+Given a list of accounts where each element accounts[i] is a list of strings, where the first element accounts[i][0] is a name, and the rest of the elements are emails representing emails of the account.
+
+Now, we would like to merge these accounts. Two accounts definitely belong to the same person if there is some common email to both accounts. Note that even if two accounts have the same name, they may belong to different people as people could have the same name. A person can have any number of accounts initially, but all of their accounts definitely have the same name.
+
+After merging the accounts, return the accounts in the following format: the first element of each account is the name, and the rest of the elements are emails in sorted order. The accounts themselves can be returned in any order.
+
+Example 1:
+
+- Input: accounts = [["John","johnsmith@mail.com","john_newyork@mail.com"],["John","johnsmith@mail.com","john00@mail.com"],["Mary","mary@mail.com"],["John","johnnybravo@mail.com"]]
+- Output: [["John","john00@mail.com","john_newyork@mail.com","johnsmith@mail.com"],["Mary","mary@mail.com"],["John","johnnybravo@mail.com"]]
+- Explanation:
+
+The first and third John's are the same person as they have the common email "johnsmith@mail.com".
+The second John and Mary are different people as none of their email addresses are used by other accounts.
+We could return these lists in any order, for example the answer [['Mary', 'mary@mail.com'], ['John', 'johnnybravo@mail.com'],
+['John', 'john00@mail.com', 'john_newyork@mail.com', 'johnsmith@mail.com']] would still be accepted.
+
+Example 2:
+
+- Input: accounts = [["Gabe","Gabe0@m.co","Gabe3@m.co","Gabe1@m.co"],["Kevin","Kevin3@m.co","Kevin5@m.co","Kevin0@m.co"],["Ethan","Ethan5@m.co","Ethan4@m.co","Ethan0@m.co"],["Hanzo","Hanzo3@m.co","Hanzo1@m.co","Hanzo0@m.co"],["Fern","Fern5@m.co","Fern1@m.co","Fern0@m.co"]]
+- Output: [["Ethan","Ethan0@m.co","Ethan4@m.co","Ethan5@m.co"],["Gabe","Gabe0@m.co","Gabe1@m.co","Gabe3@m.co"],["Hanzo","Hanzo0@m.co","Hanzo1@m.co","Hanzo3@m.co"],["Kevin","Kevin0@m.co","Kevin3@m.co","Kevin5@m.co"],["Fern","Fern0@m.co","Fern1@m.co","Fern5@m.co"]]
+
+Constraints:
+
+- 1 <= accounts.length <= 1000
+- 2 <= accounts[i].length <= 10
+- 1 <= accounts[i][j] <= 30
+- accounts[i][0] consists of English letters.
+- accounts[i][j] (for j > 0) is a valid email.
+
+### 解題分析
+0. 對於每個 email 都看作一個圖的節點, 那麼此題就變成『找出所有 connected component』
+1. DFS
+    1. 我們將所有的 email 都與第一個email (acc[1])連接
+    2. em_to_name: 儲存 email 與 accountName 的對應
+    3. 再來就是用 dfs 把屬於相同 component 的 email 加在 combined 裡
+2. UnionFind
+    1. 因為我們習慣用 int 去操作 UnionFind, 所以我們額外用一個 map 去儲存 email -> id 的對應
+    2. UnionFind 的建立圖的步驟就是在建立 root_map, 我們這邊一樣用第一個 email 作為連接點
+    3. 都 Union 完後此時 root_map 已經被正確匹配, 再來就是在訪問過所有的 email, 找出其 email_root, 並用這個 email_root 去整理 {emailID: [emails]}
+    4. 最後再把 id 換成名稱就能輸出了
+
+
+### Code
+DFS
+``` py
+class Solution:
+    def accountsMerge(self, accounts: List[List[str]]) -> List[List[str]]:
+        em_to_name = {}
+        self.graph = collections.defaultdict(list)
+        self.seen = set()
+        for acc in accounts:
+            for email in acc[1:]:
+                self.graph[email].append(acc[1])
+                self.graph[acc[1]].append(email)
+                em_to_name[email] = acc[0]
+
+        res = []
+        for email in self.graph.keys():
+            if email not in self.seen:
+                combined = []
+                self.dfs(email, combined)
+                res.append([em_to_name[email]] + sorted(combined))
+        return res
+
+    def dfs(self, email, combined):
+        self.seen.add(email)
+        combined.append(email)
+        for neig in self.graph[email]:
+            if neig not in self.seen:
+                self.dfs(neig, combined)
+        return
+```
+
+UnionFind
+```py
+class Solution:
+    def accountsMerge(self, accounts: List[List[str]]) -> List[List[str]]:
+        id_to_name = {}
+        em_to_id = {}
+        self.root_map = []
+        id = 0
+        for acc in accounts:
+            for email in acc[1:]:
+                if email not in em_to_id:
+                    # build new node in graph
+                    em_to_id[email] = id
+                    id_to_name[id] = acc[0]
+                    self.root_map.append(id)
+                    id += 1
+                self.union(em_to_id[acc[1]], em_to_id[email]) # always union w/ first email
+
+        res = collections.defaultdict(list)
+        for email, id in em_to_id.items(): # iterate over all nodes and assign to its master
+            master = self.find(id)
+            res[master].append(email)
+        return [ [id_to_name[master]] + sorted(emails) for master, emails in res.items()]
+
+    def union(self, x, y):
+        self.root_map[self.find(y)] = self.find(x) # for simplicity, didn't compare the size
+
+    def find(self, x):
+        if self.root_map[x] != x:
+            self.root_map[x] = self.find(self.root_map[x])
+        return self.root_map[x]
+```
+
+### Tag: #UnionFind #DFS #Graph
+---
