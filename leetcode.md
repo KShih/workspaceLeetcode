@@ -13166,7 +13166,7 @@ class Solution(object):
         return [float(n) for n in res]
 ```
 ---
-## 695. Max Area of Island｜ 10/8
+## 695. Max Area of Island｜ 10/8 | [ Review * 1 ]
 Given a non-empty 2D array grid of 0's and 1's, an island is a group of 1's (representing land) connected 4-directionally (horizontal or vertical.) You may assume all four edges of the grid are surrounded by water.
 
 Find the maximum area of an island in the given 2D array. (If there is no island, the maximum area is 0.)
@@ -13178,35 +13178,32 @@ Find the maximum area of an island in the given 2D array. (If there is no island
 
 注意可以用同個矩陣去省去visited的空間
 
+與 Longest Increasing Path in a Matrix 的不同處是在:
+
+此題符合遞迴開始條件的 pathCount 都要加上去, 而不是用 max.
+
 ### Code
 ``` py
 class Solution:
     def maxAreaOfIsland(self, grid: List[List[int]]) -> int:
-        def findIsland(i, j, count):
-            if grid[i][j] != 1:
-                return count
-            else:
-                count += 1
-                grid[i][j] *= -1
-                for k in range(4):
-                    if 0 <= i+dx[k] < col and 0 <= j+dy[k] < row:
-                        count = findIsland(i+dx[k], j+dy[k], count)
-                return count
-
+        def findIsland(i, j):
+            count = 1
+            grid[i][j] *= -1
+            for dx, dy in [(0,1), (1,0), (0,-1), (-1,0)]:
+                x, y = i+dx, j+dy
+                if 0 <= x < col and 0 <= y < row and grid[x][y] == 1:
+                    count += findIsland(x, y)
+            return count
 
         if len(grid) == 0 or len(grid[0]) == 0:
             return 0
-        dx = [1,-1,0,0]
-        dy = [0,0,1,-1]
         row, col = len(grid[0]), len(grid)
-
         maxCount = 0
         for i in range(col):
             for j in range(row):
                 if grid[i][j] == 1:
-                    maxCount = max(maxCount, findIsland(i,j,0))
+                    maxCount = max(maxCount, findIsland(i,j))
         return maxCount
-
 ```
 
 Iterative:
@@ -13251,6 +13248,7 @@ def maxAreaOfIsland(self, grid):
     areas = [dfs(i, j) for i in range(m) for j in range(n) if grid[i][j]]
     return max(areas) if areas else 0
 ```
+### Tag: #DFS
 ---
 
 ## ***[Start Wayfair pre-OA]***
