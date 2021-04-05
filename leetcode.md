@@ -1982,7 +1982,7 @@ public:
 
 ---
 
-## 542. 01 Matrix (Medium)｜ 4/7
+## 542. 01 Matrix (Medium)｜ 4/7 | [ Review * 1 ]
 Given a matrix consists of 0 and 1, find the distance of the nearest 0 for each cell.
 
 The distance between two adjacent cells is 1.
@@ -2010,41 +2010,80 @@ Note:
 The number of elements of the given matrix will not exceed 10,000.
 There are at least one 0 in the given matrix.
 The cells are adjacent in only four directions: up, down, left and right.
+### 解題分析
+1. BFS
+    1. 此種最短路徑題型一律從已知去拜訪未知, 而不要去 scan 整個 matrix
+    2. 此題的已知為那些 0, 他們的 dis 為 0
+    3. 用一個 queue 專門記錄這些已經知道的點, 並且同時加入到 visited 中以避免重複拜訪
+    4. 每次 pop (i, j) 出來更新四周，這四周的點被更新為 m[i][j] + 1, 即是其的最短路徑 (因為 queue 會先放距離短的)
+        1. 距離 0 (初始化) -> 距離 1 -> 距離 2 ...
+2. DP
+    1. 對於每個 1 節點，如果我們知道此點的『前』一個節點, 那麼我們就能知道這個點的最短路徑 -> 此種想法就是 DP
+    2. 對於『前』的定義跟我們掃描的順序有關係
+        1. 從左上到右下的掃描，其『前』為 左節點、上節點
+        2. 相反的，從右下到左上
+    3. 而此題的點是可以由四週去求得，因此我們必須從左上掃到右下，在從右下到左上
+    4. 從左上到右下，我們將非0的節點先初始化為 10000 (因為01矩陣的 size不會超過10000)
+    5. 我們將其跟其左上節點做 min, 即為此節點的值 (暫時)
+    6. 再由右下掃到左上，此時不需要初始化為10000了，直接拿來跟右下節點比較
+
+
 ### 思路
 1. 比較直覺的方式：使用BFS去尋找最短路徑
 2. 透過已知去拜訪未知, 從0的觀點去看1
     - 用queue將已知的距離記錄起來
         - 先將0記錄起來, 距離為0
-        - 將拜訪過的距離放入queue中, 以供後續使用
+        - 將拜訪過的距離放入queue中, 以供後續用來更新其他未被更新過的點
     - 並且記錄為拜訪過
 ### Code
 bfs
 ```py
 class Solution:
-    def updateMatrix(self, matrix: List[List[int]]) -> List[List[int]]:
-        r_b, c_b = len(matrix), len(matrix[0])
-        queue, visited = [], set()
-        for i in range(r_b):
-            for j in range(c_b):
-                if matrix[i][j] == 0:
+    def updateMatrix(self, m: List[List[int]]) -> List[List[int]]:
+        dirs = [(0,1), (1,0), (0,-1), (-1,0)]
+        r, c = len(m), len(m[0])
+        queue, visited = deque(), set()
+
+        for i in range(r):
+            for j in range(c):
+                if m[i][j] == 0:
                     queue.append((i,j))
-                    visited.add((i,j))
-
-        for row, col in queue:
-            distance = matrix[row][col] + 1
-
-            for dx, dy in [(1,0), (-1,0), (0,1), (0,-1)]:
-                n_x, n_y = row + dx, col + dy # take a look at its neighborhood
-
-                # not in visited means is 1 and not visit before
-                if 0 <= n_x < r_b and 0 <= n_y < c_b and (n_x, n_y) not in visited:
-                    matrix[n_x][n_y] = distance
-                    queue.append((n_x, n_y)) # keep the record of already calculated distance
-                    visited.add((n_x, n_y))
-        return matrix
-
+                    visited.add((i, j))
+        while queue:
+            new_layer = deque()
+            while queue:
+                i, j = queue.popleft()
+                for dx, dy in [(0,1), (1,0), (0,-1), (-1,0)]:
+                    x, y = i+dx, j+dy
+                    if 0 <= x < r and 0 <= y < c and (x,y) not in visited:
+                        m[x][y] = m[i][j] + 1
+                        new_layer.append((x,y))
+                        visited.add((x,y))
+            queue = new_layer
+        return m
 ```
 
+DP
+```py
+class Solution:
+    def updateMatrix(self, matrix: List[List[int]]) -> List[List[int]]:
+        n=len(matrix)
+        m=len(matrix[0]) if n else 0
+        for i in range(n):
+            for j in range(m):
+                if matrix[i][j]!=0:
+                    matrix[i][j]=10000
+                    upmin=matrix[i-1][j]+1 if i>0 else matrix[i][j]
+                    leftmin=matrix[i][j-1]+1 if j>0 else matrix[i][j]
+                    matrix[i][j]=min(matrix[i][j],upmin,leftmin)
+        for i in range(n-1,-1,-1):
+            for j in range(m-1,-1,-1):
+                if matrix[i][j]!=0:
+                    downmin=matrix[i+1][j]+1 if i<n-1 else matrix[i][j]
+                    rightmin=matrix[i][j+1]+1 if j<m-1 else matrix[i][j]
+                    matrix[i][j]=min(matrix[i][j],downmin,rightmin)
+        return matrix
+```
 
 dfs TLE
 ```py
@@ -2074,7 +2113,7 @@ class Solution:
 ```
 
 用BFS找最短路徑
-``` c++
+``` c
 class Solution {
 public:
     vector<vector<int>> updateMatrix(vector<vector<int>>& matrix) {
@@ -2115,7 +2154,8 @@ public:
 ```
 
 使用兩階段比較法(牛B):
-```class Solution {
+```c
+class Solution {
 public:
     vector<vector<int>> updateMatrix(vector<vector<int>>& matrix) {
         int m = matrix.size(), n = matrix[0].size();
@@ -2144,7 +2184,7 @@ public:
     }
 };
 ```
-
+### Tag: #BFS #Queue #DFS #DP
 ---
 
 ## 934. Shortest Bridge(Medium)｜ 4/7
