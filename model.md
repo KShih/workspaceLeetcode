@@ -529,7 +529,8 @@ def DFS(tree):
         1. UnionFind (找你爸法)
             0. Time:
                 1. Naive: O(N^2)
-                2. Path Compression: O(N⋅α(N)) ~= O(N)
+                2. Path Compression: O(N⋅α) ~= O(N)
+                3. Find 本身 ~= O(α(N)) ~= O(1)
             1. 初始化 root_map (每個點的root都是自己)
             2. 對每對 connected component, 分別找到其 root
             3. 如果他們的 root 相同, (如圖 [2,3] 為 connected component, 他們的root 都是1) -> 表示有環存在

@@ -12531,7 +12531,7 @@ def ReachingPoint(sx, sy, tx, ty):
     return False;
 ```
 ---
-## 547. Friend Circles｜ 10/2   //TODO Union Find解法
+## 547. Friend Circles｜ 10/2  | [ Review * 1 ]
 There are N students in a class. Some of them are friends, while some are not. Their friendship is transitive in nature. For example, if A is a direct friend of B, and B is a direct friend of C, then A is an indirect friend of C. And we defined a friend circle is a group of students who are direct or indirect friends.
 
 Given a N*N matrix M representing the friend relationship between students in the class. If M[i][j] = 1, then the ith and jth students are direct friends with each other, otherwise not. And you have to output the total number of friend circles among all the students.
@@ -12546,6 +12546,55 @@ Given a N*N matrix M representing the friend relationship between students in th
 
 還沒有學習並查集(Union Find)解法
 ### Code
+Union Find
+```py
+class Solution:
+    def findCircleNum(self, isConnected: List[List[int]]) -> int:
+        r, c = len(isConnected), len(isConnected[0])
+        self.root_map = [n for n in range(r)]
+        sizes = [1 for _ in range(r)]
+
+        for x in range(r):
+            for y in range(c):
+                if isConnected[x][y] == 1:
+                    root_x = self.find(x)
+                    root_y = self.find(y)
+                    if root_x != root_y:
+                        if sizes[root_x] < sizes[root_y]:
+                            self.root_map[root_x] = root_y
+                            sizes[root_y] += root_x
+                        else:
+                            self.root_map[root_y] = root_x
+                            sizes[root_x] += root_y
+        return len([i for i in range(len(self.root_map)) if i == self.root_map[i]])
+
+    def find(self, x):
+        while self.root_map[x] != x:
+            x = self.find(self.root_map[x])
+        return x
+```
+
+Iterative DFS:
+```py
+class Solution:
+    def findCircleNum(self, isConnected: List[List[int]]) -> int:
+        r = len(isConnected)
+        visited = set()
+        res = 0
+        for i in range(r):
+            if i not in visited:
+                stack = [i]
+                visited.add(i)
+                while stack:
+                    n = stack.pop()
+                    for neig, isConn in enumerate(isConnected[n]):
+                        if isConn and neig not in visited:
+                            stack.append(neig)
+                            visited.add(neig)
+                res += 1
+        return res
+```
+
 Recursive:
 會超過遞迴限制
 ``` py
@@ -12625,7 +12674,7 @@ public:
     }
 };
 ```
-
+### Tag: #UnionFind #DFS
 ---
 ## 256. Paint House｜ 10/3
 There are a row of n houses, each house can be painted with one of the three colors: red, blue or green. The cost of painting each house with a certain color is different. You have to paint all the houses such that no two adjacent houses have the same color.
