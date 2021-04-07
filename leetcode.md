@@ -3727,7 +3727,7 @@ public:
 };
 ```
 ---
-## @872. Leaf-Similar Trees｜ 4/25
+## 872. Leaf-Similar Trees｜ 4/25 | [ Review * 1 ]
 Consider all the leaves of a binary tree.  From left to right order, the values of those leaves form a leaf value sequence.
 ![](assets/markdown-img-paste-20190629234808182.png)
 For example, in the given tree above, the leaf value sequence is (6, 7, 4, 9, 8).
@@ -3740,6 +3740,19 @@ Return true if and only if the two given trees with head nodes root1 and root2 a
 ### 思路
 
 ### Code
+```py
+class Solution:
+    def leafSimilar(self, root1: TreeNode, root2: TreeNode) -> bool:
+        return self.getLeaf(root1, []) == self.getLeaf(root2, [])
+
+    def getLeaf(self, node, res):
+        if not node: return res
+        if not node.left and not node.right:
+            res.append(node.val)
+        self.getLeaf(node.left, res)
+        self.getLeaf(node.right, res)
+        return res
+```
 ``` c++
 /**
  * Definition for a binary tree node.
@@ -3769,6 +3782,7 @@ private:
     }
 };
 ```
+### Tag: #DFS
 ---
 ## 987. Vertical Order Traversal of a Binary Tree｜ 4/25 | [ Review * 1 ]
 Given a binary tree, return the vertical order traversal of its nodes values.
