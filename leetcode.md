@@ -19372,7 +19372,7 @@ class Solution:
         return recur(0, r, c, 1.0)
 ```
 ---
-## 863. All Nodes Distance K in Binary Tree｜ 2/27
+## 863. All Nodes Distance K in Binary Tree｜ 2/27 | [ Review * 1 ]
 We are given a binary tree (with root node root), a target node, and an integer value K.
 
 Return a list of the values of all nodes that have a distance K from the target node.  The answer can be returned in any order.
@@ -19380,6 +19380,12 @@ Return a list of the values of all nodes that have a distance K from the target 
 Example 1:
 
 ![](assets/markdown-img-paste-20200227174317797.png)
+
+### 解題分析
+1. 除了向下走之外，還有可能可以往 parent 走，因此首要做的事就是建立 parent map
+2. 剩下的任務就是遞迴去走了
+3. 注意: 此處為了避免重複拜訪還需要多一個 set 去紀錄已經拜訪過的點
+
 ### 思路
 對於這種還能往parent方向走的tree題，最快的方法就是建立一個跟parent的連結
 
@@ -19390,46 +19396,66 @@ Example 1:
 並且在dfs的步驟中多一個走訪parent的步驟
 
 ### Code
+DFS
 ``` py
-# Definition for a binary tree node.
-# class TreeNode:
-#     def __init__(self, x):
-#         self.val = x
-#         self.left = None
-#         self.right = None
-
 class Solution:
     def distanceK(self, root: TreeNode, target: TreeNode, K: int) -> List[int]:
-        if not root:    return []
-        parent_map = {root: None}
-        self.build_parent(root, None, parent_map) # build the map {node: node.parent}
+        if not root or not target: return []
+        stack = [(root, None)]
+        parents = {}
+        while stack:
+            node, parent = stack.pop()
+            parents[node] = parent
+            if node.left: stack.append((node.left, node))
+            if node.right: stack.append((node.right, node))
+        self.res = []
+        self.parents = parents
+        self.seen = set()
+        self.helper(target, K)
+        return self.res
 
-        res, seen = [], []
-        self.dfs(target, K, res, seen, parent_map)
-
-        return res
-
-    def dfs(self, root, k, res, seen, parent_map):
-        if root in seen or not root:
-            return
-        else:
-            seen.append(root)
-
-        if k == 0:
-            res.append(root.val)
-        else:
-            self.dfs(root.left, k-1, res, seen, parent_map)
-            self.dfs(root.right, k-1, res, seen, parent_map)
-            self.dfs(parent_map[root], k-1, res, seen, parent_map) # also traverse its parent
-
-    def build_parent(self, root, parent, parent_map):
-        if not root:
-            return
-        parent_map[root] = parent
-        self.build_parent(root.left, root, parent_map)
-        self.build_parent(root.right, root, parent_map)
-
+    def helper(self, target, k):
+        if target and target not in self.seen:
+            self.seen.add(target)
+            if k == 0:
+                self.res.append(target.val)
+                return
+            self.helper(self.parents[target], k-1)
+            self.helper(target.left, k-1)
+            self.helper(target.right, k-1)
 ```
+
+bfs
+```py
+class Solution:
+    def distanceK(self, root: TreeNode, target: TreeNode, K: int) -> List[int]:
+        if K == 0:
+            return [target.val]
+        self.markParents(root)
+        queue = deque()
+        queue.appendleft(target)
+        visited = set()
+        while len(queue):
+            currentLevel = len(queue)
+            for _ in range(currentLevel):
+                currentNode = queue.pop()
+                visited.add(currentNode)
+                for node in [currentNode.parent, currentNode.left, currentNode.right]:
+                    if node and node not in visited:
+                        queue.appendleft(node)
+            K -= 1
+            if K == 0:
+                return [node.val for node in queue]
+        return []
+
+    def markParents(self, root, parent = None):
+        if root is None:
+            return
+        root.parent = parent
+        self.markParents(root.left, root)
+        self.markParents(root.right, root)
+```
+### Tag: #DFS #BFS #Tree
 ---
 ## 138. Copy List with Random Pointer｜ 3/2 | [Review * 1]
 
