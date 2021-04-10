@@ -2187,7 +2187,7 @@ public:
 ### Tag: #BFS #Queue #DFS #DP
 ---
 
-## 934. Shortest Bridge(Medium)｜ 4/7
+## 934. Shortest Bridge｜ 4/7 | [ Review * 1 ]
 In a given 2D binary array A, there are two islands.  (An island is a 4-directionally connected group of 1s not connected to any other 1s.)
 
 Now, we may change 0s to 1s so as to connect the two islands together to form 1 island.
@@ -2214,50 +2214,66 @@ Note:
 
 1 <= A.length = A[0].length <= 100
 A[i][j] == 0 or A[i][j] == 1
+
+### 解題分析
+1. 先找出一座島嶼的起點
+2. 再 dfs 找出那座島嶼的邊界，並且把整座島嶼都 mark 成 visited
+3. 最後 bfs boundary 不停的向外擴展，直到撞到第二座島嶼直接回傳
+
 ### 思路
 
-![](assets/markdown-img-paste-20190629233739668.png)
+- 概念供參考，但不會這樣實作
+    - ![](assets/markdown-img-paste-20190629233739668.png)
+    -
 ### Code
-``` c++
-class Solution {
-public:
-    int shortestBridge(vector<vector<int>>& A) {
-        // identify the other island
-        for (int i=0, found=0; !found && i<A.size(); i++){
-            for (int j=0; !found && j<A[0].size(); j++){
-                found = paint(A, i, j);
-            }
-        }
+``` py
+class Solution:
+    def shortestBridge(self, A: List[List[int]]) -> int:
+        if not A: return 0
 
-        for (int cl=2; ;cl++){
-            for (int i=0, found=0; !found && i<A.size(); i++){
-                for (int j=0; !found && j<A[0].size(); j++){
-                    if (cl == A[i][j] && (expand(A, i-1, j, cl) || expand(A, i, j-1, cl)
-                                    || expand(A, i+1, j, cl) || expand(A, i, j+1, cl)) )
-                    {
-                        return cl-2;
-                    }
-                }
-            }
-        }
-    }
+        startPoint = self.findFirst(A)
+        boundary = self.getAndMarkBoundary(A, startPoint)
+        return self.getSteps(A, boundary)
 
-private:
-    int paint(vector<vector<int>>& A, int i, int j){
-        if (i<0 || j<0 || i>= A.size() || j>= A[0].size() || A[i][j] != 1)   return 0;
-        A[i][j] = 2;
-        return 1 + paint(A, i-1, j) + paint(A, i, j-1) + paint(A, i+1, j) + paint(A, i, j+1);
-    }
+    def findFirst(self, A):
+        for i in range(len(A)):
+            for j in range(len(A[0])):
+                if A[i][j] == 1:
+                    return (i, j)
 
-    bool expand(vector<vector<int>>& A, int i, int j, int cl){
-        if (i<0 || j<0 || i>= A.size() || j>= A[0].size())
-            return false;
-        if (A[i][j] == 0)
-            A[i][j] = cl+1;
-        return A[i][j] == 1;
-    }
-};
+    def getAndMarkBoundary(self, A, startPoint):
+        n = len(A)
+        stack = [startPoint]
+        boundary = []
+        while stack:
+            i, j = stack.pop()
+            A[i][j] = -1
+            for x, y in ((i-1, j), (i, j-1), (i+1, j), (i, j+1)):
+                if 0 <= x < n and 0 <= y < n:
+                    if A[x][y] == 0:
+                        boundary.append((i, j))
+                    elif A[x][y] == 1:
+                        stack.append((x, y))
+        return boundary
+
+    def getSteps(self, A, boundary):
+        n = len(A)
+        steps = 0
+        while boundary:
+            new_layer = []
+            for i, j in boundary:
+                for x, y in ((i-1, j), (i, j-1), (i+1, j), (i, j+1)):
+                    if 0 <= x < n and 0 <= y < n:
+                        if A[x][y] == 1:
+                            return steps
+                        elif A[x][y] == 0:
+                            A[x][y] = -1 # mark as visited
+                            new_layer.append((x,y))
+            boundary = new_layer
+            steps += 1
+        return -1
 ```
+### Tag: #BFS #DFS
 ---
 ## 698. Partition to K Equal Sum Subsets(Medium)｜ 4/8
 Given an array of integers nums and a positive integer k, find whether it's possible to divide this array into k non-empty subsets whose sums are all equal.
