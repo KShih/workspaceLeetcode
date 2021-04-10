@@ -17571,6 +17571,28 @@ Given n non-negative integers representing the histogram's bar height where the 
 
 ![](assets/markdown-img-paste-20191202155614474.png)
 
+### 解題分析
+1. 如何想到 mono-stack 的方法的?
+    1. 對於兩個以上的 pair 其最高有可能發生在 較小那個的高 * 寬度
+    2. 因此我們推廣這個想法，對於每個 a[i], 假設此 a[i] 是某個 range 的最小, 那麼最大的面積有可能是什麼?
+        1. a[i] * (R - L - 1)
+            1. R 為 i 的右邊遇到的第一個比 a[i] 還小的位置
+            2. L 為 i 的左邊遇到的第一個比 a[i] 還小的位置
+    3. 如果此元素大於頂端元素，我們就把元素加入到 stack 中，因為我們的目標是要找到 R，持續地走直到我們找到了 R
+    4. 那同時也代表我們同時找到了 a[i] (R的前一個數)，我們先把她 pop 出來，並取他的高
+    5. OK，那現在要開始找 L 了，我們先嘗試第一個(pop掉後的第一個位置)，並且計算一次他的面積，然後持續地 pop 直到終於找到真正的 L，好停止
+    6. 這邊解釋一下為什麼可以持續的 pop，因為依據我們的定義 `L 為 i 的左邊遇到的第一個比 a[i] 還小的位置`, 假設我們今天要把 a[i] 放到頂端那麼對於後面大於 a[i] 的樹，他們都肯定會大於這些的，因此我們不需要把這些已經確定大於 a[i] 的留在 stack 裡，我們只需要紀錄再前一個比較小的就行了 (到時候計算面積的時候，直接把那個比較小的 index 叫出來，那這段 range 一樣包含那些大於 a[i] 的路徑呀)
+2. 過程
+    - ![](assets/markdown-img-paste-20210408232348406.png)
+    - ![](assets/markdown-img-paste-20210408232403520.png)
+    - ![](assets/markdown-img-paste-20210408232510854.png)
+    - ![](assets/markdown-img-paste-2021040823254745.png)
+    - ![](assets/markdown-img-paste-20210408232600154.png)
+    - ![](assets/markdown-img-paste-20210408232619149.png)
+    - ![](assets/markdown-img-paste-20210408233428227.png)
+    - ![](assets/markdown-img-paste-20210408233447116.png)
+
+
 ### 技巧
 
 mono-stack, increase-stack/decrease-stack:
