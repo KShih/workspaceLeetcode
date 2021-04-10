@@ -19,80 +19,79 @@ Solution Model
     1. `intervals = sorted(intervals, key=lambda x: x[0])`
     2. `intervals = sorted(intervals, key=lambda x: (x[0], x[1], x[2], ...))`
 ## Calculator
-- for `224`, `227`, `772`, `770`
+- for `224`, `227`, `772`
+- 對於負整數也能解
 - ![](assets/markdown-img-paste-20200414144532950.png)
 
 ### model
 ```py
+    def __init__(self):
+        self.i = 0
 
-while i < len(s):
-    c = s[i]
-    if isdigit():
-        # build-digit()
-    elif c == '(':
-        cnt = 0
-        for j in range(i, len(s)):
-            if s[j] == '(':
-                cnt += 1
-            if s[j] == ')':
-                cnt -= 1
-            if cnt == 0:
-                break
-        num = self.calculate(s[i+1:j])
-        i = j
+    def calculate(self, s: str) -> int:
+        num, op, curSum, globalSum = 0, "+", 0, 0
+        while self.i < len(s):
+            c = s[self.i]
+            self.i += 1 # note increase i here
+            if c.isnumeric():
+                num = num*10 + int(c)
+            elif c == '(':
+                num = self.calculate(s) # use global i to track progress
+            elif c == ')':
+                break # simply break and rely on return to update the correct global
+            if c in ["+", "-", "*", "/"]:
+                # update curSum
+                # update globalSum and reset curSum if c is + or -
+                # reset num and update op
+        return globalSum + self.cal(curSum, num, op)
 
-    if c is not digit or i is last digit:
-        switch(op) to update curRes
-        update res if c is + or -
-            init curRes
-        update op and init num
-    inc i
+    def cal(self, curSum, num, op):
+        if op == "+":
+            curSum += num
+        elif op == "-":
+            curSum -= num
+        elif op == "*":
+            curSum *= num
+        elif op == "/":
+            curSum = int(curSum / num)
+        return curSum
 ```
 
 ### example:
 ```py
-    def calculate(self, s: str) -> int:
-        res, curRes, num, op = 0, 0, 0, '+'
-        i = 0
+class Solution:
+    def __init__(self):
+        self.i = 0
 
-        while i < len(s):
-            c = s[i]
-            if c.isdigit():
+    def calculate(self, s: str) -> int:
+        num, op, curSum, globalSum = 0, "+", 0, 0
+        while self.i < len(s):
+            c = s[self.i]
+            self.i += 1
+            if c.isnumeric():
                 num = num*10 + int(c)
             elif c == '(':
-                cnt = 0
-                for j in range(i, len(s)):
-                    if s[j] == '(':
-                        cnt += 1
-                    if s[j] == ')':
-                        cnt -= 1
-                    if cnt == 0:
-                        break
-                num = self.calculate(s[i+1:j])
-                i = j
+                num = self.calculate(s)
+            elif c == ')':
+                break
+            if c in ["+", "-", "*", "/"]:
+                curSum = self.cal(curSum, num, op)
+                if c in ["+", "-"]:
+                    globalSum += curSum
+                    curSum = 0
+                num, op = 0, c
+        return globalSum + self.cal(curSum, num, op)
 
-
-            if c in ['+', '-', '*', '/'] or i == len(s)-1:
-                # update curRes
-                if op == '+':
-                    curRes += num
-                elif op == '-':
-                    curRes -= num
-                elif op == '*':
-                    curRes *= num
-                elif op == '/':
-                    curRes = int(curRes / num)
-
-                # determine whether update res from curRes
-                if c in ['+', '-'] or i == len(s)-1:
-                    res += curRes
-                    curRes = 0
-
-                # update
-                op, num = c, 0
-
-            i += 1
-        return res
+    def cal(self, curSum, num, op):
+        if op == "+":
+            curSum += num
+        elif op == "-":
+            curSum -= num
+        elif op == "*":
+            curSum *= num
+        elif op == "/":
+            curSum = int(curSum / num)
+        return curSum
 ```
 
 ---

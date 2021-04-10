@@ -22954,7 +22954,7 @@ General solution
 ``` py
 class Solution:
     def __init__(self):
-        self.i = 0 # 在此處可以不用使用到 global i, 因為沒有 括號產生的 recursive call 
+        self.i = 0 # 在此處可以不用使用到 global i, 因為沒有 括號產生的 recursive call
 
     def calculate(self, s: str) -> int:
         num, op, curSum, globalSum = 0, "+", 0, 0
@@ -22984,7 +22984,7 @@ class Solution:
 ```
 ### Tag: #Recursive #Stack
 ---
-## 772. Basic Calculator III｜ 4/14
+## 772. Basic Calculator III｜ 4/14 | [ Review * 1 ]
 mplement a basic calculator to evaluate a simple expression string.
 
 The expression string may contain open ( and closing parentheses ), the plus + or minus sign -, non-negative integers and empty spaces .
@@ -23011,6 +23011,8 @@ Some examples:
 
 並使用遞歸將( ) 視為子程序來處理
 
+**此種寫法也可以處理負整數的情況！！**
+
 ### 類似題
 
 Leetcode 1597
@@ -23018,48 +23020,40 @@ Leetcode 1597
 ### Code
 ``` py
 class Solution:
-    def calculate(self, s: str) -> int:
-        res, curRes, num, op = 0, 0, 0, '+'
-        i = 0
+    def __init__(self):
+        self.i = 0
 
-        while i < len(s):
-            c = s[i]
-            if c.isdigit():
+    def calculate(self, s: str) -> int:
+        num, op, curSum, globalSum = 0, "+", 0, 0
+        while self.i < len(s):
+            c = s[self.i]
+            self.i += 1
+            if c.isnumeric():
                 num = num*10 + int(c)
             elif c == '(':
-                cnt = 0
-                for j in range(i, len(s)):
-                    if s[j] == '(':
-                        cnt += 1
-                    if s[j] == ')':
-                        cnt -= 1
-                    if cnt == 0:
-                        break
-                num = self.calculate(s[i+1:j])
-                i = j
+                num = self.calculate(s)
+            elif c == ')':
+                break
+            if c in ["+", "-", "*", "/"]:
+                curSum = self.cal(curSum, num, op)
+                if c in ["+", "-"]:
+                    globalSum += curSum
+                    curSum = 0
+                num, op = 0, c
+        return globalSum + self.cal(curSum, num, op)
 
-            if c in ['+', '-', '*', '/'] or i == len(s)-1:
-                # update curRes
-                if op == '+':
-                    curRes += num
-                elif op == '-':
-                    curRes -= num
-                elif op == '*':
-                    curRes *= num
-                elif op == '/':
-                    curRes = int(curRes / num)
-
-                # determine whether update res from curRes
-                if c in ['+', '-'] or i == len(s)-1:
-                    res += curRes
-                    curRes = 0
-
-                # update
-                op, num = c, 0
-
-            i += 1
-        return res
+    def cal(self, curSum, num, op):
+        if op == "+":
+            curSum += num
+        elif op == "-":
+            curSum -= num
+        elif op == "*":
+            curSum *= num
+        elif op == "/":
+            curSum = int(curSum / num)
+        return curSum
 ```
+### Tag: #Recursive #Stack
 ---
 ## 228. Summary Ranges｜ 4/15
 Given a sorted integer array without duplicates, return the summary of its ranges.
