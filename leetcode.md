@@ -10989,7 +10989,7 @@ class Solution(object):
 ```
 ### Tag: #SlidingWindow #DivideAndConquer
 ---
-## 20. Valid Parentheses｜ 9/2
+## 20. Valid Parentheses｜ 9/2 | [ Review * 1 ]
 Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
 
 An input string is valid if:
@@ -11060,21 +11060,18 @@ class Solution(object):
 大神版：
 ```py
 class Solution:
-    # @return a boolean
-    def isValid(self, s):
+    def isValid(self, s: str) -> bool:
+        mapp = {'{':'}', '(':')', '[':']'}
         stack = []
-        dict = {"]":"[", "}":"{", ")":"("}
-        for char in s:
-            if char in dict.values():
-                stack.append(char)
-            elif char in dict.keys():
-                if stack == [] or dict[char] != stack.pop():
-                    return False
+        for c in s:
+            if c in mapp.keys():
+                stack.append(c)
             else:
-                return False
-        return stack == []
+                if not stack or c != mapp[stack.pop()]:
+                    return False
+        return len(stack) == 0
 ```
-
+### Tag: #Stack
 ---
 ## 937. Reorder Log Files｜ 9/2
 You have an array of logs.  Each log is a space delimited string of words.
