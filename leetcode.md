@@ -22706,7 +22706,7 @@ class Solution:
         return (r-l)*(t-b) != 0
 ```
 ---
-## 224. Basic Calculator ｜ 4/10
+## 224. Basic Calculator ｜ 4/10 | [ Review * 1 ]
 
 Implement a basic calculator to evaluate a simple expression string.
 
@@ -22737,6 +22737,21 @@ Do not use the eval built-in library function.
 2. 遇到右括號相當於結束子程序，將當前的結果與之前存起來的做運算
 3. 利用operand 與 +/- 來維持當前結果
 
+### 解題分析
+0. 分析
+    1. 操作符
+        1. 遇到 + - 操作符視同這個操作符前面一個表達式的結束, 因此我們可以根據先前的操作符(注意不是當前的), 把 num 的結果更新到 curSum 裡面, 然後把 num 初始為零, op 更新為當前的操作符然後繼續循環
+        2. 更新 global 的時機:
+            - 因為 + - 是表達式的結束，因此此題我們不需要判斷就可以把 curSum 更新到 global 裡, 如果遇到的是 *, /, 就不行, 因為也許後面還有可能有更多的 * / 式子
+    2. 左括號
+        1. 左瓜可以視為新的子狀態，我們這邊用 recursive 去簡化
+        2. 並且搭配 global 的 index 去 track 當前以 parse 的 char
+    3. 右括號
+        1. 遇到右瓜可以視為表達式的結束, 在我們的演算法裡就直接 break 並交由最後的 cal 去更新結果
+    4. 數字，就直接累加到 num 裡面就可了
+1. 時間複雜度
+    1. 均為 O(n), 但 通解的方式會有 recursive call 產生
+
 ### 思路
 
 思考這個例子: 33 - (2+4) + 5
@@ -22752,7 +22767,7 @@ Do not use the eval built-in library function.
     2. 將新的res的結果 乘上 left旁的 sign
     3. 將上一部更新的res 加上 stack中的先前結果
 
-- Solution2: 通解寫法, 非optimal
+- Solution2 通解, O(n), 但會有 recursive call
 
 ### Code
 ``` py
@@ -22793,42 +22808,34 @@ class Solution:
 General Solution
 ```py
 class Solution:
-    def calculate(self, s: str) -> int:
-        res, curRes, num, op = 0, 0, 0, '+'
-        i = 0
+    def __init__(self):
+        self.i = 0
 
-        while i < len(s):
-            c = s[i]
-            if c.isdigit():
+    def calculate(self, s: str) -> int:
+        num, op, curSum, globalSum = 0, "+", 0, 0
+        while self.i < len(s):
+            c = s[self.i]
+            self.i += 1
+            if c.isnumeric():
                 num = num*10 + int(c)
             elif c == '(':
-                cnt = 0
-                for j in range(i, len(s)):
-                    if s[j] == '(':
-                        cnt += 1
-                    if s[j] == ')':
-                        cnt -= 1
-                    if cnt == 0:
-                        break
-                num = self.calculate(s[i+1:j])
-                i = j
+                num = self.calculate(s) # use global i to track parsing index
+            elif c == ')':
+                break
+            if c in ["+", "-"]:
+                curSum = self.cal(curSum, num, op)
+                globalSum += curSum
+                num, op, curSum = 0, c, 0
+        return globalSum + self.cal(curSum, num, op)
 
-
-            if c in ['+', '-'] or i == len(s)-1:
-                # update curRes
-                if op == '+':
-                    curRes += num
-                elif op == '-':
-                    curRes -= num
-                res += curRes
-                curRes = 0
-
-                # update
-                op, num = c, 0
-
-            i += 1
-        return res
+    def cal(self, curSum, num, op):
+        if op == "+":
+            curSum += num
+        elif op == "-":
+            curSum -= num
+        return curSum
 ```
+### Tag: #Recursive #Stack
 ---
 ## 227. Basic Calculator II｜ 4/14
 Implement a basic calculator to evaluate a simple expression string.
