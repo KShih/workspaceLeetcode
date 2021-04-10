@@ -22837,7 +22837,7 @@ class Solution:
 ```
 ### Tag: #Recursive #Stack
 ---
-## 227. Basic Calculator II｜ 4/14
+## 227. Basic Calculator II｜ 4/14 | [ Review * 1 ]
 Implement a basic calculator to evaluate a simple expression string.
 
 The expression string contains only non-negative integers, +, -, *, / operators and empty spaces . The integer division should truncate toward zero.
@@ -22953,33 +22953,36 @@ class Solution:
 General solution
 ``` py
 class Solution:
+    def __init__(self):
+        self.i = 0 # 在此處可以不用使用到 global i, 因為沒有 括號產生的 recursive call 
+
     def calculate(self, s: str) -> int:
-        res, curRes, num, op = 0, 0, 0, '+'
-
-        for i, c in enumerate(s):
-            if c.isdigit():
+        num, op, curSum, globalSum = 0, "+", 0, 0
+        while self.i < len(s):
+            c = s[self.i]
+            self.i += 1
+            if c.isnumeric():
                 num = num*10 + int(c)
+            if c in ["+", "-", "*", "/"]:
+                curSum = self.cal(curSum, num, op)
+                if c in ["+", "-"]:
+                    globalSum += curSum
+                    curSum = 0
+                num, op = 0, c
+        return globalSum + self.cal(curSum, num, op)
 
-            if c in ['+', '-', '*', '/'] or i == len(s)-1:
-                # update curRes
-                if op == '+':
-                    curRes += num
-                elif op == '-':
-                    curRes -= num
-                elif op == '*':
-                    curRes *= num
-                elif op == '/':
-                    curRes = int(curRes / num)
-
-                # determine whether update res from curRes
-                if c in ['+', '-'] or i == len(s)-1:
-                    res += curRes
-                    curRes = 0
-
-                # update
-                op, num = c, 0
-        return res
+    def cal(self, curSum, num, op):
+        if op == "+":
+            curSum += num
+        elif op == "-":
+            curSum -= num
+        elif op == "*":
+            curSum *= num
+        elif op == "/":
+            curSum = int(curSum / num)
+        return curSum
 ```
+### Tag: #Recursive #Stack
 ---
 ## 772. Basic Calculator III｜ 4/14
 mplement a basic calculator to evaluate a simple expression string.
