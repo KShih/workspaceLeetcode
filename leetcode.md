@@ -17904,7 +17904,7 @@ class Solution:
 ```
 ### Tag: #LinkedList
 ---
-## 85. Maximal Rectangle｜ 12/4
+## 85. Maximal Rectangle｜ 12/4 | [ Review * 1 ]
 Given a 2D binary matrix filled with 0's and 1's, find the largest rectangle containing only 1's and return its area.
 
 Example:
@@ -17951,6 +17951,7 @@ class Solution(object):
             stack.append(i)
         return max_a
 ```
+### Tag: #Stack #MonoStack 
 ---
 ## 88. Merge Sorted Array｜ 12/5
 Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.

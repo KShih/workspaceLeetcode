@@ -470,7 +470,7 @@ def DFS(tree):
 1. 可以透過維持/破壞 stack 單調性來解題
 2. 例題: LC42 trapping water
     - ![](assets/markdown-img-paste-20210411173458150.png)
-        - 維持 遞減 stack
+        - 兩邊高、中間低，而我們對中間低窪的地區有興趣 -> 可以維持 遞減 stack
         - 當暴增的元素出現時，我們就可以把頂端元素弄出來處理了，因為我們找到右邊的封口了 (左邊的封口由遞減 stack 所自然形成)
     ```py
     class Solution:
@@ -488,7 +488,7 @@ def DFS(tree):
                 stack.append(i)
             return res
     ```
-3. 所有例題: LC42,
+3. 所有例題: LC42, LC84, LC85
 
 
 ---
