@@ -10687,7 +10687,7 @@ Given n non-negative integers representing an elevation map where the width of e
     3. 用兩個 ptr left, right 分別指向第一個元素及倒數第二個元素
     4. 如果 l_max 比較小, 我們就可以用其來算出該點的高
     5. 更新 l_max, 及 move left ptr
-    
+
 ### 思路
 
 我們觀察其中的一個位置，單獨考慮這個位置的容量是多少？
@@ -17649,7 +17649,7 @@ class Solution:
 ```
 ### Tag: #LinkedList
 ---
-## 84. Largest Rectangle in Histogram｜ 12/2
+## 84. Largest Rectangle in Histogram｜ 12/2 | [ Review * 1 ]
 Given n non-negative integers representing the histogram's bar height where the width of each bar is 1, find the area of largest rectangle in the histogram.
 
 ![](assets/markdown-img-paste-20191202155614474.png)
@@ -17663,7 +17663,7 @@ Given n non-negative integers representing the histogram's bar height where the 
             2. L 為 i 的左邊遇到的第一個比 a[i] 還小的位置
     3. 如果此元素大於頂端元素，我們就把元素加入到 stack 中，因為我們的目標是要找到 R，持續地走直到我們找到了 R
     4. 那同時也代表我們同時找到了 a[i] (R的前一個數)，我們先把她 pop 出來，並取他的高
-    5. OK，那現在要開始找 L 了，我們先嘗試第一個(pop掉後的第一個位置)，並且計算一次他的面積，然後持續地 pop 直到終於找到真正的 L，好停止
+    5. OK，那 L 其實不用找, 因為遞增 stack 保證了 stack 的遞增性, 因此 pop 後的 stack 其頂端元素一定會比 pop 的還小, 而我們就持續的走到新進來的元素可以符合單調性為止
     6. 這邊解釋一下為什麼可以持續的 pop，因為依據我們的定義 `L 為 i 的左邊遇到的第一個比 a[i] 還小的位置`, 假設我們今天要把 a[i] 放到頂端那麼對於後面大於 a[i] 的樹，他們都肯定會大於這些的，因此我們不需要把這些已經確定大於 a[i] 的留在 stack 裡，我們只需要紀錄再前一個比較小的就行了 (到時候計算面積的時候，直接把那個比較小的 index 叫出來，那這段 range 一樣包含那些大於 a[i] 的路徑呀)
 2. 過程
     - ![](assets/markdown-img-paste-20210408232348406.png)
@@ -17674,6 +17674,9 @@ Given n non-negative integers representing the histogram's bar height where the 
     - ![](assets/markdown-img-paste-20210408232619149.png)
     - ![](assets/markdown-img-paste-20210408233428227.png)
     - ![](assets/markdown-img-paste-20210408233447116.png)
+3. 比較
+    1. 與 LC42 不同的地方在於
+        1. 此題 stack 中的每個元素都有可能是解, 因此需要 push dum 元素以利最後再 stack 的元素也有被計算到
 
 
 ### 技巧
@@ -17699,7 +17702,6 @@ def process():
 ```
 
 [Grandyang總結](https://www.cnblogs.com/grandyang/p/8887985.html)
-
 
 ### 思路
 1. find Local max
@@ -17742,13 +17744,13 @@ class Solution:
         stack = [-1]
         heights.append(0)
 
-        for i in range(len(heights)):
-            while stack and heights[stack[-1]] > heights[i]:
-                h = heights[stack.pop()]
-                res = self.process(res, h, i, stack[-1])
-                # h = heights[stack.pop()]
-                # w = i - stack[-1] - 1  # stack[-1] is the height before the one just pop()
-                # max_a = max(max_a, h*w)
+        for i, h in enumerate(heights):
+            while stack and h < heights[stack[-1]]:
+                deal = stack.pop()
+                if stack:
+                    _width = i - stack[-1] - 1
+                    _height = heights[deal]
+                    res = max(res, _width * _height)
             stack.append(i)
         return res
 
@@ -17757,6 +17759,7 @@ class Solution:
         return res
 
 ```
+### Tag: #Stack #MonoStack
 ---
 ## 86. Partition List｜ 12/3 | [Review * 1]
 
