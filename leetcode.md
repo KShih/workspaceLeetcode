@@ -2706,7 +2706,7 @@ private:
 ```
 ### Tag: #Recursive
 ---
-## !94. Binary Tree Inorder Traversal｜ 4/22
+## 94. Binary Tree Inorder Traversal｜ 4/22 | [ Review * 1 ]
 Given a binary tree, return the inorder traversal of its nodes' values.
 
 Example:
@@ -2746,6 +2746,22 @@ while(p||!stack.empty()){
 
 空間複雜度更低的方法：Morris Traversal(不使用stack全部使用pointer)
 ### Code
+```py
+class Solution:
+    def inorderTraversal(self, root: TreeNode) -> List[int]:
+        if not root:
+            return []
+        stack, res = [], []
+        while root or stack:
+            while root:
+                stack.append(root)
+                root = root.left
+            root = stack.pop()
+            res.append(root.val)
+            root = root.right
+        return res
+```
+
 ```py
 class Solution:
     def inorderTraversal(self, root: TreeNode) -> List[int]:
@@ -17951,7 +17967,7 @@ class Solution(object):
             stack.append(i)
         return max_a
 ```
-### Tag: #Stack #MonoStack 
+### Tag: #Stack #MonoStack
 ---
 ## 88. Merge Sorted Array｜ 12/5
 Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.
