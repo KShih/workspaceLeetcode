@@ -465,6 +465,34 @@ def DFS(tree):
 
 ---
 
+## Mono Stack
+
+1. 可以透過維持/破壞 stack 單調性來解題
+2. 例題: LC42 trapping water
+    - ![](assets/markdown-img-paste-20210411173458150.png)
+        - 維持 遞減 stack
+        - 當暴增的元素出現時，我們就可以把頂端元素弄出來處理了，因為我們找到右邊的封口了 (左邊的封口由遞減 stack 所自然形成)
+    ```py
+    class Solution:
+        def trap(self, height: List[int]) -> int:
+            stack = []
+            res = 0
+            for i, h in enumerate(height):
+                while stack and h > height[stack[-1]]:
+                    deal = stack.pop()
+                    if stack:
+                        # processing w/ deal, could be any logic
+                        _height = min(h, height[stack[-1]]) - height[deal]
+                        _width = i - stack[-1] -1
+                        res += _height * _width
+                stack.append(i)
+            return res
+    ```
+3. 所有例題: LC42,
+
+
+---
+
 ## Backtrack
 1. 先得到三要素
     1. Goal (終止條件)

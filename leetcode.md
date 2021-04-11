@@ -10654,7 +10654,7 @@ class Solution(object):
 ```
 ### Tag: #DFS
 ---
-## 42. Trapping Rain Water｜ 9/1
+## 42. Trapping Rain Water｜ 9/1 | [ Review * 1 ]
 Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it is able to trap after raining.
 
 ![](assets/markdown-img-paste-2019090112165990.png)
@@ -10663,6 +10663,31 @@ Given n non-negative integers representing an elevation map where the width of e
 
 從後面loop回來 for(i in range(n-1, -1, -1)) -> 從 arr[n-1] ~ arr[0]
 
+### 解題分析
+1. MonoStack
+    1. ![](assets/markdown-img-paste-20210411173458150.png)
+        0. 求水平蓄水量
+        1. 維護遞減 stack 因為是當此 bar 被『包』起來的時候才能求面積
+        2. 左邊包的條件就由遞減 stack 來幫我們維護, 右邊的則是當偵測到暴增元素時
+        3. deal 邏輯:
+            1. 求長方形面積:
+                1. 寬: (L, R) 也就是兩個把中間包起來的 bar 的長度 (均不包括自己)
+                    - the length of [l, r] is r - l + 1, thus that of (l, r) is r - l + 1 - 2
+                    - if you wanted to figure out how many bars are in between 1 and 4 (exclusively), we have indexes 2 and 3 (for a total of 2 bars) or 4 - 1 - 1 = 2.
+                2. 高: min(height[L], height[R]) - height[stack.top()]
+
+2. Scan
+    1. ![](assets/markdown-img-paste-20210411174404838.png)
+    2. 求垂直蓄水量
+        1. 求出每個位置往左看到的最高, 往右看到的最高, 並求兩者其小, 再減去自身的高度, 即可求出該位置的垂直蓄水量
+
+3. Two Pointer
+    1. 與 Scan 相同的概念, 左右邊求其小 - height, 但這種做法不用 new list
+    2. 初始化 l_max 與 r_max 為頭尾元素
+    3. 用兩個 ptr left, right 分別指向第一個元素及倒數第二個元素
+    4. 如果 l_max 比較小, 我們就可以用其來算出該點的高
+    5. 更新 l_max, 及 move left ptr
+    
 ### 思路
 
 我們觀察其中的一個位置，單獨考慮這個位置的容量是多少？
@@ -10680,6 +10705,49 @@ Given n non-negative integers representing an elevation map where the width of e
 ![](assets/markdown-img-paste-20190901121750340.png)
 
 ### Code
+Mono Stack:
+```py
+class Solution:
+    def trap(self, height: List[int]) -> int:
+        stack = []
+        res = 0
+        for i, h in enumerate(height):
+            while stack and h > height[stack[-1]]:
+                deal = stack.pop()
+                if stack:
+                    _height = min(h, height[stack[-1]]) - height[deal]
+                    _width = i - stack[-1] -1
+                    res += _height * _width
+            stack.append(i)
+        return res
+```
+
+Two Pointer
+```py
+class Solution:
+    def trap(self, height: List[int]) -> int:
+        if not height or len(height) == 1:
+            return 0
+
+        l_max, r_max = height[0], height[-1]
+        left, right = 1, len(height) - 2 # since we've finish the first and the last elem (by initiate with l_max, r_max)
+        res = 0
+
+        while left <= right:
+            if l_max < r_max: # means l_max is smaller -> we could cal the height w/ l_max
+                h = l_max - height[left]
+                res += h if h > 0 else 0
+                l_max = max(l_max, height[left]) # update the new l_max
+                left += 1 # move the left and keep process with the rest element
+            else:
+                h = r_max - height[right]
+                res += h if h > 0 else 0
+                r_max = max(r_max, height[right])
+                right -= 1
+        return res
+```
+
+Scan:
 ``` py
 class Solution(object):
     def trap(self, height):
@@ -10706,6 +10774,7 @@ class Solution(object):
 
         return res
 ```
+### Tag: #Stack #MonoStack #TwoPointer
 ---
 ## 3. Longest Substring Without Repeating Characters｜ 9/1
 Given a string, find the length of the longest substring without repeating characters.
