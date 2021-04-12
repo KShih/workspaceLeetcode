@@ -32112,3 +32112,96 @@ class Solution:
 
 ### Tag: #UnionFind #DFS #Graph
 ---
+## 128. Longest Consecutive Sequence｜ 4/12
+Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.
+
+Example 1:
+
+- Input: nums = [100,4,200,1,3,2]
+- Output: 4
+- Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. Therefore its length is 4.
+
+Example 2:
+
+- Input: nums = [0,3,7,2,5,8,4,6,0,1]
+- Output: 9
+
+Constraints:
+
+- 0 <= nums.length <= 104
+- -109 <= nums[i] <= 109
+
+### 解題分析
+1. Two Pointer
+    - 最 Naive 的方法, 由每個點向其左右邊持續發展, 然後去求出區間的長度 (兩邊都不包含, 所以是 r-l-1)
+    - 透過從 set 移除來處理重複的狀況
+2. UnionFind
+    - 由每個點都向其兩旁的數圈地盤 (union), 這邊不能把左右兩旁的 remove掉, 因為會造成斷了連結,
+        - e.g.: union(3,2), union(1,2), 2如果在一式就被清掉, 那麼也不會進到二式了(因為 `nxt not in num_set`)
+    - 但是還是必須處理重複的狀況,
+        - e.g. union(1,2), union(2,1)
+            - 在一式中已經把 2 加給 1 了, 二式 root_x = root_y = 1, 不應該再加一次
+
+### Code
+Two Pointer + Set
+``` py
+class Solution:
+    def longestConsecutive(self, nums: List[int]) -> int:
+        if not nums: return 0
+        num_set = set(nums)
+        res = 1
+        for num in nums:
+            if num not in num_set:
+                continue
+            pre, nxt = num-1, num+1
+            while pre in num_set:
+                num_set.remove(pre)
+                pre -= 1
+            while nxt in num_set:
+                num_set.remove(nxt)
+                nxt += 1
+            res = max(res, nxt - pre - 1) # find range (pre, nxt)
+        return res
+```
+
+UnionFind
+```py
+class Solution:
+    def longestConsecutive(self, nums: List[int]) -> int:
+        if not nums:
+            return 0
+
+        num_set = set(nums)
+        self.root_map = {num: num for num in nums}
+        self.sizes = {num: 1 for num in nums}
+
+        for num in nums:
+            if num-1 in num_set:
+                self.union(num, num-1)
+
+            if num+1 in num_set:
+                self.union(num, num+1)
+        return max(self.sizes.values())
+
+    def union(self, x, y):
+        root_x, root_y = self.find(x), self.find(y)
+
+        if root_x == root_y:
+            # Should not process with this condition since we've process w/ it before and it will make the size go wrong e.g. union(1, 2) and union(2, 1)
+            return
+
+        if self.sizes[root_x] >= self.sizes[root_y]:
+            self.root_map[root_y] = root_x
+            self.sizes[root_x] += self.sizes[root_y]
+        else:
+            self.root_map[root_x] = root_y
+            self.sizes[root_y] += self.sizes[root_x]
+
+    def find(self, x):
+        if self.root_map[x] != x:
+            self.root_map[x] = self.find(self.root_map[x])
+        return self.root_map[x]
+```
+
+### Tag: #UnionFind #Set
+---

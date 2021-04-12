@@ -199,7 +199,7 @@ class Solution:
 
 ---
 
-## LIS
+## LIS (Longest Increasing Subsequence)
 
 ```py
 class Solution:
@@ -555,7 +555,7 @@ def DFS(tree):
     0. Union Find
         ```py
         def init(self, node_cnt):
-            self.root_map = [id for id in range(node_cnt)] # each node points to itself
+            self.root_map = [id for id in range(node_cnt)] # each node points to itself, (could also use dict)
             self.sizes = [1 for id in range(node_cnt)]
 
         def union(self, x, y):
@@ -581,7 +581,7 @@ def DFS(tree):
                 1. Naive: O(N^2)
                 2. Path Compression: O(N⋅α) ~= O(N)
                 3. Find 本身 ~= O(α(N)) ~= O(1)
-            1. 初始化 root_map (每個點的root都是自己)
+            1. 初始化 root_map (每個點的root都是自己), 連續的點用 arr, 不連續的點用 dict
             2. 對每對 connected component, 分別找到其 root
             3. 如果他們的 root 相同, (如圖 [2,3] 為 connected component, 他們的root 都是1) -> 表示有環存在
                  ```
