@@ -2762,6 +2762,7 @@ class Solution:
         return res
 ```
 
+Model 版推推
 ```py
 class Solution:
     def inorderTraversal(self, root: TreeNode) -> List[int]:
@@ -2779,7 +2780,6 @@ class Solution:
                 p = top.right
 
         return res
-
 ```
 ``` c++
 /**
@@ -2813,7 +2813,7 @@ public:
 };
 ```
 ---
-## @144. Binary Tree Preorder Traversal｜ 4/22
+## 144. Binary Tree Preorder Traversal｜ 4/22 | [ Review * 1 ]
 Given a binary tree, return the preorder traversal of its nodes' values.
 
 Example:
@@ -2834,16 +2834,26 @@ children是vector型態直接用for迴圈走訪
 與#589 的比較：589這題最大的不同是我們必須一次將所有的children全部放進stack裡，因此程式與輸出value的順序必須顛倒(因為stack的性質)
 而#144: 一次push一個節點進stack，在下一次的迴圈我們希望輸出的value就是top，因此程式與輸出value的順序要一樣
 ### Code
+```py
+# 中左右
+class Solution:
+    def preorderTraversal(self, root: TreeNode):
+        stack = []
+        res = []
+        p = root
+
+        while p or stack:
+            if p:
+                res.append(p.val) # 中
+                stack.append(p)   # 左
+                p = p.left        # 左
+            else:
+                top = stack.pop()
+                p = top.right
+        return res
+```
+
 ``` c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
 class Solution {
 public:
     vector<int> preorderTraversal(TreeNode* root) {
@@ -2866,7 +2876,7 @@ public:
 };
 ```
 ---
-## @145. Binary Tree Postorder Traversal｜ 4/22
+## 145. Binary Tree Postorder Traversal｜ 4/22 | [ Review * 1 ]
 Given a binary tree, return the postorder traversal of its nodes' values.
 
 Example:
@@ -2890,7 +2900,7 @@ post traversal order: left->right->root
 ![](assets/markdown-img-paste-20190629234237723.png)
 
 ### Code
-
+模板版
 ```py
 class Solution:
     def preorderTraversal(self, root: TreeNode) -> List[int]:

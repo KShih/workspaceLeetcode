@@ -284,7 +284,7 @@ class Solution:
 ## Binary Tree Traversal
 
 - One line python(Pretty useful!)
-    - ![](assets/markdown-img-paste-2020090620195401.png)
+    - ![one line python recursive](assets/markdown-img-paste-2020090620195401.png)
 
     精簡版
     ```py
@@ -306,10 +306,31 @@ class Solution:
     ```
 
 - 使用Iterative 避免 stackoverflow
+    - ![model iterative for all](assets/markdown-img-paste-20210413082305301.png)
 - Note:
     - 遇到 preorder 可解的優先採用 iterative 寫法 (高效)
 
 1. Iterative 版 inorder (左中右)
+    ```py
+    # 左中右
+    class Solution:
+        def inorderTraversal(self, root: TreeNode):
+            stack = []
+            res = []
+            p = root
+
+            while p or stack:
+                if p:
+                    stack.append(p)
+                    p = p.left
+                else:
+                    top = stack.pop()
+                    res.append(top.val)
+                    p = top.right
+            return res
+    ```
+
+    一般版
     ```py
     def inorder(root):
         stack = []
@@ -325,6 +346,26 @@ class Solution:
     ```
 
 2. Iterative 版 preorder (中左右)
+    ```py
+    # 中左右
+    class Solution:
+        def preorderTraversal(self, root: TreeNode):
+            stack = []
+            res = []
+            p = root
+
+            while p or stack:
+                if p:
+                    res.append(p.val) # 中
+                    stack.append(p)   # 左
+                    p = p.left        # 左
+                else:
+                    top = stack.pop()
+                    p = top.right
+            return res
+    ```
+
+    一般版
     ```py
     def preorderTraversal(self, root):
         if root is None:
@@ -342,6 +383,26 @@ class Solution:
     ```
 
 3. Iterative 版 postorder (左右中)
+    ```py
+    # 左右中 -> 中右左 -> return 時再反轉
+    class Solution:
+        def postorderTraversal(self, root: TreeNode):
+            stack = []
+            res = []
+            p = root
+
+            while p or stack:
+                if p:
+                    res.append(p.val)  # 中
+                    stack.append(p)    # 右
+                    p = p.right        # 右
+                else:
+                    top = stack.pop()  # 左
+                    p = top.left       # 左
+            return res[::-1]           # 反轉
+    ```
+
+    two stack version
     ```py
     # 1. Push root to first stack.
     # 2. Loop while first stack is not empty
