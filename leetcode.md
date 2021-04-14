@@ -18209,24 +18209,51 @@ level order精簡版:
 ```py
 class Solution:
     def zigzagLevelOrder(self, root: TreeNode) -> List[List[int]]:
-        queue, res = [], []
+        queue, res = deque([]), []
 
         queue.append((root, 0));
 
         while queue:
-            top, level = queue.pop(0)
+            top, level = queue.popleft()
 
             if top:
                 if len(res) < level+1: # new a room for this level
-                    res.append([])
+                    res.append(deque([]))
 
                 if level % 2 == 0:
                     res[level].append(top.val)
                 else:
-                    res[level].insert(0,top.val)
+                    res[level].appendleft(top.val)
                 queue.append((top.left, level+1))
                 queue.append((top.right, level+1))
         return res
+```
+
+Recursive without queue
+```py
+from collections import deque
+
+class Solution:
+    def zigzagLevelOrder(self, root: TreeNode) -> List[List[int]]:
+        levels = []
+
+        if not root:
+            return levels
+
+        def helper(node, level):
+            if len(levels) <= level:
+                levels.append(deque([node.val]))
+            else:
+                if level % 2 == 0:
+                    levels[level].append(node.val)
+                else:
+                    levels[level].appendleft(node.val)
+            if node.left:
+                helper(node.left, level + 1)
+            if node.right:
+                helper(node.right, level + 1)
+        helper(root, 0)
+        return levels
 ```
 ### Tag: #BFS #Tree
 ---
