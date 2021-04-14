@@ -22592,7 +22592,7 @@ class Solution:
         return i
 ```
 ---
-## 844. Backspace String Compare｜ 4/10 (W2D2)
+## 844. Backspace String Compare｜ 4/10 (W2D2) | [ Review * 1 ]
 Given two strings S and T, return if they are equal when both are typed into empty text editors. # means a backspace character.
 
 Example 1:
