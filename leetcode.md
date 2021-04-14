@@ -18140,18 +18140,18 @@ def isInterleave4(self, s1, s2, s3):
     return False
 ```
 ---
-## 103. Binary Tree Zigzag Level Order Traversal｜ 12/5
+## 103. Binary Tree Zigzag Level Order Traversal｜ 12/5 | [ Review * 1 ]
 Given a binary tree, return the zigzag level order traversal of its nodes' values. (ie, from left to right, then right to left for the next level and alternate between).
 
 For example:
 Given binary tree [3,9,20,null,null,15,7],
-
+```
     3
    / \
   9  20
     /  \
    15   7
-
+```
 return its zigzag level order traversal as:
 [
   [3],
@@ -18228,6 +18228,7 @@ class Solution:
                 queue.append((top.right, level+1))
         return res
 ```
+### Tag: #BFS #Tree
 ---
 ## 106. Construct Binary Tree from Inorder and Postorder Traversal｜ 12/6 | [ Review * 1 ]
 Given inorder and postorder traversal of a tree, construct the binary tree.
