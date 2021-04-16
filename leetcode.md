@@ -2835,7 +2835,7 @@ children是vector型態直接用for迴圈走訪
 而#144: 一次push一個節點進stack，在下一次的迴圈我們希望輸出的value就是top，因此程式與輸出value的順序要一樣
 ### Code
 ```py
-# 中左右
+    # 中左右
 class Solution:
     def preorderTraversal(self, root: TreeNode):
         stack = []
@@ -13610,7 +13610,7 @@ class Solution:
 ## Wayfair. Upsidedown the '6' and '9'｜ 10/11
 ![](assets/markdown-img-paste-20191011165552149.png)
 
-## 技巧
+### 技巧
 python 不能支援string assignment
 - astr[i] = "9"    <- Wrong
     - astr = astr[:i] + "9" + astr[i+1:]    <- Correct!
@@ -14226,7 +14226,7 @@ if __name__ == '__main__':
 ## Roblox. Distinct Pairs｜ 10/14
 ![](assets/markdown-img-paste-20191014213330537.png)
 
-## 技巧
+### 技巧
 - get the index of specific item in list:
     - list.index(item,{start}, {end})
 
@@ -17395,7 +17395,7 @@ And recursively bind them in main function until no braces, e.g.:
 ### Code
 Wonderful Solution:
 ```py
-# from functools import lru_cache
+    # from functools import lru_cache
 class Solution:
     def expand(self, S: str) -> List[str]:
         #self.helper.cache_clear()
@@ -18469,7 +18469,7 @@ class Solution:
 
 精簡寫法:
 ``` py
-# recursively
+    # recursively
 def sortedListToBST(self, head):
     if not head:
         return
@@ -19737,7 +19737,7 @@ class Solution:
 Dictionary 解法:
 ``` py
 """
-# Definition for a Node.
+    # Definition for a Node.
 class Node:
     def __init__(self, val, next, random):
         self.val = val
@@ -19764,7 +19764,7 @@ class Solution:
 O(1) space
 ```py
 """
-# Definition for a Node.
+    # Definition for a Node.
 class Node:
     def __init__(self, val, next, random):
         self.val = val
@@ -20235,7 +20235,7 @@ The read4 API is already defined for you.
     @return an integer
     def read4(buf):
 
-# Below is an example of how the read4 API can be called.
+        # Below is an example of how the read4 API can be called.
 file = File("abcdefghijk") # File is "abcdefghijk", initially file pointer (fp) points to 'a'
 buf = [' '] * 4 # Create buffer with enough space to store characters
 read4(buf) # read4 returns 4. Now buf = ['a','b','c','d'], fp points to 'e'
@@ -20348,7 +20348,7 @@ The read4 API is already defined for you.
     @return an integer
     def read4(buf):
 
-# Below is an example of how the read4 API can be called.
+        # Below is an example of how the read4 API can be called.
 file = File("abcdefghijk") # File is "abcdefghijk", initially file pointer (fp) points to 'a'
 buf = [' '] * 4 # Create buffer with enough space to store characters
 read4(buf) # read4 returns 4. Now buf = ['a','b','c','d'], fp points to 'e'
@@ -21827,10 +21827,10 @@ class WordDictionary:
                 new_cand.append(entry)
         return self.find(word, new_cand, idx+1)
 
-# Your WordDictionary object will be instantiated and called as such:
-# obj = WordDictionary()
-# obj.addWord(word)
-# param_2 = obj.search(word)
+        # Your WordDictionary object will be instantiated and called as such:
+        # obj = WordDictionary()
+        # obj.addWord(word)
+        # param_2 = obj.search(word)
 ```
 ### Tag: #Trie #Recursive #Set
 ---
@@ -22386,7 +22386,7 @@ class Solution(object):
 ```
 ### Tag: #Heap #DivideandConquer
 ---
-# *Heap 用途總結*
+## *Heap 用途總結*
 - heap 這個資料結構適合處理
     - 動態 新增/移除 的資料, Sweep
     - 同時又必須維持一定的順序
@@ -22561,7 +22561,7 @@ class Solution:
 ```
 ### Tag: #BinarySearch #BinaryTree #DividandConquer
 ---
-# Leetcode 30 days challenge
+## Leetcode 30 days challenge
 ---
 ## 876. Middle of the Linked List｜ 4/9 (W2D1)
 Given a non-empty, singly linked list with head node head, return a middle node of linked list.
@@ -25594,26 +25594,26 @@ Follow up: How would you extend your design to be generic and work with all type
 
 ### Code
 ``` py
-# Below is the interface for Iterator, which is already defined for you.
-#
-# class Iterator:
-#     def __init__(self, nums):
-#         """
-#         Initializes an iterator object to the beginning of a list.
-#         :type nums: List[int]
-#         """
-#
-#     def hasNext(self):
-#         """
-#         Returns true if the iteration has more elements.
-#         :rtype: bool
-#         """
-#
-#     def next(self):
-#         """
-#         Returns the next element in the iteration.
-#         :rtype: int
-#         """
+    # Below is the interface for Iterator, which is already defined for you.
+    #
+    # class Iterator:
+    #     def __init__(self, nums):
+    #         """
+    #         Initializes an iterator object to the beginning of a list.
+    #         :type nums: List[int]
+    #         """
+    #
+    #     def hasNext(self):
+    #         """
+    #         Returns true if the iteration has more elements.
+    #         :rtype: bool
+    #         """
+    #
+    #     def next(self):
+    #         """
+    #         Returns the next element in the iteration.
+    #         :rtype: int
+    #         """
 
 class PeekingIterator:
     def __init__(self, iterator):
@@ -25656,11 +25656,11 @@ class PeekingIterator:
         """
         return True if self.peekElem != None else self.it.hasNext()
 
-# Your PeekingIterator object will be instantiated and called as such:
-# iter = PeekingIterator(Iterator(nums))
-# while iter.hasNext():
-#     val = iter.peek()   # Get the next element but not advance the iterator.
-#     iter.next()         # Should return the same value as [val].
+    # Your PeekingIterator object will be instantiated and called as such:
+    # iter = PeekingIterator(Iterator(nums))
+    # while iter.hasNext():
+    #     val = iter.peek()   # Get the next element but not advance the iterator.
+    #     iter.next()         # Should return the same value as [val].
 ```
 ---
 ## 285. Inorder Successor in BST｜ 8/17
@@ -28331,13 +28331,13 @@ class Solution:
 
 One way to serialize a binary tree is to use pre-order traversal. When we encounter a non-null node, we record the node's value. If it is a null node, we record using a sentinel value such as #.
 
-     _9_
-    /   \
-   3     2
-  / \   / \
- 4   1  #  6
-/ \ / \   / \
-# # # #   # #
+         _9_
+        /   \
+       3     2
+      / \   / \
+     4   1  #  6
+    / \ / \   / \
+    # # # #   # #
 For example, the above binary tree can be serialized to the string "9,3,4,#,#,1,#,#,2,#,6,#,#", where # represents a null node.
 
 Given a string of comma separated values, verify whether it is a correct preorder traversal serialization of a binary tree. Find an algorithm without reconstructing the tree.
@@ -28870,31 +28870,31 @@ Explanation: By calling next repeatedly until hasNext returns false,
              the order of elements returned by next should be: [1,4,6].
 
 ```py
-# """
-# This is the interface that allows for creating nested lists.
-# You should not implement it, or speculate about its implementation
-# """
-#class NestedInteger:
-#    def isInteger(self) -> bool:
-#        """
-#        @return True if this NestedInteger holds a single integer, rather than a nested list.
-#        """
-#
-#    def getInteger(self) -> int:
-#        """
-#        @return the single integer that this NestedInteger holds, if it holds a single integer
-#        Return None if this NestedInteger holds a nested list
-#        """
-#
-#    def getList(self) -> [NestedInteger]:
-#        """
-#        @return the nested list that this NestedInteger holds, if it holds a nested list
-#        Return None if this NestedInteger holds a single integer
-#        """
+    # """
+    # This is the interface that allows for creating nested lists.
+    # You should not implement it, or speculate about its implementation
+    # """
+    #class NestedInteger:
+    #    def isInteger(self) -> bool:
+    #        """
+    #        @return True if this NestedInteger holds a single integer, rather than a nested list.
+    #        """
+    #
+    #    def getInteger(self) -> int:
+    #        """
+    #        @return the single integer that this NestedInteger holds, if it holds a single integer
+    #        Return None if this NestedInteger holds a nested list
+    #        """
+    #
+    #    def getList(self) -> [NestedInteger]:
+    #        """
+    #        @return the nested list that this NestedInteger holds, if it holds a nested list
+    #        Return None if this NestedInteger holds a single integer
+    #        """
 
-# Your NestedIterator object will be instantiated and called as such:
-# i, v = NestedIterator(nestedList), []
-# while i.hasNext(): v.append(i.next())
+    # Your NestedIterator object will be instantiated and called as such:
+    # i, v = NestedIterator(nestedList), []
+    # while i.hasNext(): v.append(i.next())
 ```
 
 ### 思路
@@ -30673,11 +30673,11 @@ class Solution:
         # use for the rest match, assume p has matched all it can
         return self.isMatch(s, p[2:])
 
-# ("ab", "c*ab")
-# ("a*b", "ab")
-# ("a*", "aa")
-# ("a*", "ab")
-# ("a", "*")
+    # ("ab", "c*ab")
+    # ("a*b", "ab")
+    # ("a*", "aa")
+    # ("a*", "ab")
+    # ("a", "*")
 ```
 
 Recursive, concise:
@@ -31435,7 +31435,7 @@ Constraints:
 ### Code
 ``` py
 """
-# Definition for a Node.
+    # Definition for a Node.
 class Node:
     def __init__(self, val, left=None, right=None):
         self.val = val
