@@ -20730,7 +20730,7 @@ class Solution:
         return res
 ```
 ---
-## 155. Min Stack｜ 3/16
+## 155. Min Stack｜ 3/16 | [ Review * 1 ]
 
 Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.
 
@@ -20775,6 +20775,7 @@ class MinStack:
     def getMin(self) -> int:
         return self.min_stack[-1]
 ```
+### Tag: #Stack
 ---
 ## 131. Palindrome Partitioning<Backtrack>｜ 3/16 | [Review * 1]
 Given a string s, partition s such that every substring of the partition is a palindrome.
