@@ -19863,7 +19863,7 @@ class Solution:
         return seen_once
 ```
 ---
-## 150. Evaluate Reverse Polish Notation｜ 3/3
+## 150. Evaluate Reverse Polish Notation｜ 3/3 | [ Review * 1 ]
 Evaluate the value of an arithmetic expression in Reverse Polish Notation.
 
 Valid operators are +, -, *, /. Each operand may be an integer or another expression.
@@ -19909,6 +19909,7 @@ class Solution:
             print("error")
         return stack[0]
 ```
+### Tag: #Stack
 ---
 ## 151. Reverse Words in a String｜ 3/3
 Given an input string, reverse the string word by word.
