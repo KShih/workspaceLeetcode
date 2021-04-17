@@ -32302,3 +32302,78 @@ class Solution:
 
 ### Tag: #UnionFind #Set
 ---
+## 1192. Critical Connections in a Network｜ 4/17
+
+There are n servers numbered from 0 to n-1 connected by undirected server-to-server connections forming a network where connections[i] = [a, b] represents a connection between servers a and b. Any server can reach any other server directly or indirectly through the network.
+
+A critical connection is a connection that, if removed, will make some server unable to reach some other server.
+
+Return all critical connections in the network in any order.
+
+Example 1:
+
+![](assets/markdown-img-paste-20210417172459803.png)
+
+- Input: n = 4, connections = [[0,1],[1,2],[2,0],[1,3]]
+- Output: [[1,3]]
+- Explanation: [[3,1]] is also accepted.
+
+- Constraints:
+
+- 1 <= n <= 10^5
+- n-1 <= connections.length <= 10^5
+- connections[i][0] != connections[i][1]
+- There are no repeated connections.
+
+
+### 解題分析
+0. ![](assets/markdown-img-paste-20210417170607547.png)
+1. 由圖中我們可以推論出，除了環中的邊之外，其餘的邊都是屬於 critical edges
+2. 因此我們可以用一個 set 去紀錄所有的 edge, 當這個 node 發現這 connection to its neibor, 是屬於 cycle 的, 那麼就把這條 conn 移除, 最後在 set 中存活的就都是屬於 critical edges
+    - 這裡用了一個 trick (min(u, v), max(u, v)) -> 這樣能夠幫助我們一致化, 刪到正確的邊
+3. 那現在問題剩下，我們如何發現環的存在？我們聯想到有向圖 detect cycle 的方法，當重複 visit 的時候就是出現 cycle，然而這種做法只能把當前的線段給移除，我們需要告訴整條路徑上的人說 hey, 你是屬於 cycle 的一部分你必須被移除！
+4. 我們透過 rank 來幫助, 隨著拜訪鄰居讓 cur_rank+1, 當拜訪到重複的時, 表示 cycle出現, 此時此 neib 的 rank 肯定會比當前還低, 因此我們就知道這個邊必須移除
+5. 那麼如何刪除整條路徑呢？我們透過 recursive call 去 trace `min_rank in its neibor`, 當他發現他的neib傳了一個很小的 rank 回來, 他就知道他的鄰居出事了, 那他也必須被移除
+    - ![](assets/markdown-img-paste-20210417172204691.png)
+6. Time: O(V+E)
+7. Space: 2E + E + V ~= O(E)
+
+### Code
+``` py
+class Solution:
+    def criticalConnections(self, n: int, connections: List[List[int]]) -> List[List[int]]:
+        self.adj_map = defaultdict(list)
+        self.conn_set = set()
+        self.rank = [None] * n
+        self.build_graph(connections)
+
+        self.dfs(0, 0)
+        return list(self.conn_set)
+
+
+    def build_graph(self, connections):
+        for x, y in connections:
+            self.adj_map[x].append(y)
+            self.adj_map[y].append(x)
+
+            self.conn_set.add((min(x, y), max(x,y)))
+
+    def dfs(self, node, cur_rank):
+        if self.rank[node] != None:
+            return self.rank[node]
+
+        self.rank[node] = cur_rank
+        min_rank = float(inf)
+        for neib in self.adj_map[node]:
+            if self.rank[neib] == cur_rank - 1:
+                continue # skip direct parent
+
+            neib_rank = self.dfs(neib, cur_rank+1)
+            if neib_rank <= cur_rank: # cycle detected
+                self.conn_set.remove((min(node, neib), max(node, neib)))
+            min_rank = min(min_rank, neib_rank) # to notify ancestor
+        return min_rank
+```
+
+### Tag: #Graph #Recursive
+---
