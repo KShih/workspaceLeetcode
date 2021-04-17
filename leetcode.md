@@ -9133,7 +9133,7 @@ public:
 };
 ```
 ---
-## 173. Binary Search Tree Iterator｜ 8/21
+## 173. Binary Search Tree Iterator｜ 8/21 | [ Review * 1 ]
 Implement an iterator over a binary search tree (BST). Your iterator will be initialized with the root node of a BST.
 
 Calling next() will return the next smallest number in the BST.
@@ -9144,6 +9144,53 @@ Calling next() will return the next smallest number in the BST.
 Way 1, 參考 https://leetcode.com/problems/binary-tree-inorder-traversal/ 的做法
 Way 2, 更加快速
 ### Code
+
+利用 inorder 的模板
+```py
+class BSTIterator:
+
+    def __init__(self, root: TreeNode):
+        self.stack = []
+        self.cur = root
+
+    def next(self) -> int:
+        while self.cur:
+            self.stack.append(self.cur)
+            self.cur = self.cur.left
+
+        top = self.stack.pop()
+        self.cur = top.right
+        return top.val
+
+    def hasNext(self) -> bool:
+        return self.cur or self.stack
+```
+
+Intuitive
+```py
+class BSTIterator:
+
+    def __init__(self, root: TreeNode):
+        self.stack = []
+        while root:
+            self.stack.append(root)
+            root = root.left
+
+    def next(self) -> int:
+        if not self.stack:
+            return
+        top = self.stack.pop()
+        ret = top.val
+        node = top.right
+        while node:
+            self.stack.append(node)
+            node = node.left
+        return ret
+
+    def hasNext(self) -> bool:
+        return len(self.stack) != 0
+```
+
 ``` c
 class BSTIterator {
 private:
@@ -9209,6 +9256,7 @@ public:
     }
 };
 ```
+### Tag: #Tree
 ---
 ## 101 Symmetric tree
 follow up: use iterative to do
