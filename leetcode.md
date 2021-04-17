@@ -28909,7 +28909,7 @@ class Solution:
 
 ### Tag: #BitManipulate
 ---
-## 341. Flatten Nested List Iterator｜ 11/9
+## 341. Flatten Nested List Iterator｜ 11/9 | [ Review * 1 ]
 
 Given a nested list of integers, implement an iterator to flatten it.
 
@@ -28956,6 +28956,11 @@ Explanation: By calling next repeatedly until hasNext returns false,
     # while i.hasNext(): v.append(i.next())
 ```
 
+### 解題分析
+1. 記得在 hasNext 的時候就要整理好 call next 的時候要回傳的東西, 不然如果只是用 stack 的長度去判斷的話會在 `[[]]` 這種 testcase fail 掉
+    - 因為遇到這種 testcase 理當 hasNext 就要回傳 false 了！
+    - 其餘就是不停的對頂端去做檢查是否為數字, 不停的解偶到出現數字為止
+
 ### 思路
 
 1. 巢狀、有序地走訪想到使用DFS，可以用 Recursive 或者 stack 解
@@ -28963,56 +28968,21 @@ Explanation: By calling next repeatedly until hasNext returns false,
 3. 加完所有int之後再把list反轉
 
 ### Code
-Iterative:
-``` py
-class NestedIterator:
-    def __init__(self, nestedList: [NestedInteger]):
-        def push2StackFromList(nestedList):
-            for ni in nestedList:
-                if ni.isInteger():
-                    stack.append(ni.getInteger())
-                else:
-                    stack.append(ni.getList())
-
-        flatList, stack = [], []
-        push2StackFromList(nestedList)
-
-        while stack:
-            top = stack.pop()
-            if type(top) == int:
-                flatList.append(top)
-            else:
-                push2StackFromList(top)
-
-        self.flatList = flatList[::-1]
-        self.cur = 0
-
-    def next(self) -> int:
-        nextVal = self.flatList[self.cur]
-        self.cur += 1
-        return nextVal
-
-    def hasNext(self) -> bool:
-        if self.cur == len(self.flatList):
-            return False
-        return True
-```
-
-More concise iterative
+More concise iterative (Beat 98%)
 ```py
 class NestedIterator(object):
     def __init__(self, nestedList):
-        self.stack = nestedList[::]
+        self.queue = nestedList[::]
 
     def next(self):
-        return self.stack.pop(0).getInteger()
+        return self.queue.pop(0).getInteger()
 
     def hasNext(self):
-        while self.stack:
-            top = self.stack[0]
-            if top.isInteger():
+        while self.queue:
+            peek = self.queue[0]
+            if peek.isInteger():
                 return True
-            self.stack = top.getList() + self.stack[1:]
+            self.queue = peek.getList() + self.queue[1:] # pop and appendleft
         return False
 ```
 
@@ -29037,7 +29007,7 @@ class NestedIterator:
     def hasNext(self) -> bool:
         return self._position + 1 < len(self._integers)
 ```
-### Tag: DFS, stack
+### Tag: #DFS, #Stack #Queue
 ---
 ## 348. Design Tic-Tac-Toe｜ 11/10
 
