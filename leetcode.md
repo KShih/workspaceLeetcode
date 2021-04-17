@@ -24337,7 +24337,7 @@ class Solution:
 ```
 ### Tag: #Recursive
 ---
-## 255. Verify Preorder Sequence in Binary Search Tree｜ 6/18
+## 255. Verify Preorder Sequence in Binary Search Tree｜ 6/18 | [ Review * 1 ]
 Given an array of numbers, verify whether it is the correct preorder traversal sequence of a binary search tree.
 
 You may assume each number in the sequence is unique.
@@ -24345,6 +24345,15 @@ You may assume each number in the sequence is unique.
 Consider the following binary search tree:
 
 ![](assets/markdown-img-paste-20200618131734462.png)
+
+### 解題分析
+0. ![](assets/markdown-img-paste-20210417114032130.png)
+1. PreOrder 的性質是 中左右, 大小順序是 中小大，那麼我們首先先不斷地壓入左節點，直到遇到了第一個右點後，就可以開始來做處理了
+2. 遇到右點後，我們必須先從剛剛被我們壓入的左點中找到右點的 parent, 所以必須先把其以下的左點全部 pop 出來
+3. 在此 pop 的過程我們可以把 pop 出來的看成是當前的 lowerbound, 往後的點都不能比他小(因為我們已經把最小的都押進去了), pop 到最後的點就是 parent 了
+4. 此時的 lowerbound 也就提升到 parent's value, stack的頂端, 也是放上 right, 並且繼續往上處理
+5. 這種概念就可以透過 mono stack 來處理, 我們維繫一個 decreasing stack, 並且在破壞單調處理的時候去更新 lb 為此 right 的 parent, 往後的過程中的節點都不能比這個 lb 還小
+
 ### 思路
 
 當前節點的值一定大於其左子樹中任何一個節點值，而且其右子樹中的任何一個節點值都不能小於當前節點值，可以用這個性質來驗證，
@@ -24357,18 +24366,16 @@ Using stack
 ``` py
 class Solution:
     def verifyPreorder(self, preorder: List[int]) -> bool:
-        if not preorder:
-            return True
-        low = -float(inf)
-        stack = [preorder[0]] # we keep the root and its left child in the stack
+        if not preorder: return True
 
-        for i in range(1, len(preorder)):
-            num = preorder[i]
-            if num < low:
+        lb = -float(inf) # initial lowerbound
+        stack = [preorder[0]]
+
+        for num in preorder[1:]:
+            if num < lb:
                 return False
-
-            while stack and stack[-1] < num:
-                low = stack.pop()
+            while stack and num > stack[-1]: # encounter right node
+                lb = stack.pop() # try to find right's parent
             stack.append(num)
         return True
 ```
@@ -24379,18 +24386,19 @@ class Solution:
     def verifyPreorder(self, preorder: List[int]) -> bool:
         if not preorder:
             return True
-        low, ptr = -float(inf), -1 # ptr is for implement the top of the stack
+        lb, ptr = -float(inf), -1 # ptr is for implement the top of the stack
 
         for num in preorder:
-            if low > num:
+            if lb > num:
                 return False
             while ptr >= 0 and num > preorder[ptr]:
-                low = preorder[ptr]
+                lb = preorder[ptr]
                 ptr -= 1
             ptr += 1
             preorder[ptr] = num # will be different when going to different sub tree
         return True
 ```
+### Tag: #MonoStack #Stack
 ---
 ## 258. Add Digits｜ 6/18
 Given a non-negative integer num, repeatedly add all its digits until the result has only one digit.
@@ -32123,6 +32131,7 @@ Constraints:
 
 ### 解題分析
 0. 對於每個 email 都看作一個圖的節點, 那麼此題就變成『找出所有 connected component』
+    - ![](assets/markdown-img-paste-20210417100217644.png)
 1. DFS
     1. 我們將所有的 email 都與第一個email (acc[1])連接
     2. em_to_name: 儲存 email 與 accountName 的對應
