@@ -27816,7 +27816,7 @@ class Solution:
 ```
 ### Tag: #HashMap
 ---
-## 316. Remove Duplicate Letters｜ 10/21
+## 316. Remove Duplicate Letters｜ 10/21 | [ Review * 1 ]
 
 Given a string s, remove duplicate letters so that every letter appears once and only once. You must make sure your result is the smallest in lexicographical order among all possible results.
 
@@ -27840,6 +27840,11 @@ Constraints:
 
 s consists of lowercase English letters.
 
+### 解題分析
+1. 我們思考，對於一個已建立好的字串，如何去讓字串最小？
+    - 必要條件之一就是後面還會出現此字
+    - 目前字串的最後字元小於當前字元
+
 ### 思路
 
 這道題讓我們移除重複字母，使得每個字符只能出現一次，而且結果要按字母順序排，前提是不能打亂其原本的相對位置。
@@ -27858,25 +27863,23 @@ s consists of lowercase English letters.
 
 ### Code
 ``` py
-from collections import Counter
-
 class Solution:
     def removeDuplicateLetters(self, s: str) -> str:
-        counter = Counter(s)
-        visited = {k: False for k in counter.keys()}
-
-        res = "0" # trick: since "0" < "a"
+        counters = collections.Counter(s)
+        visited = set()
+        res = "0" # dummy, since 'a-z' > '0'
         for c in s:
-            counter[c] -= 1
-            if visited[c]:
+            counters[c] -= 1
+            if c in visited:
                 continue
 
-            # compare with that char
-            while c < res[-1] and counter[res[-1]] > 0:
-                visited[res[-1]] = False
+            #Recursively to pop and find the smallest, if the poped item will show later
+            while c < res[-1] and counters[res[-1]] > 0:
+                visited.remove(res[-1])
                 res = res[:-1]
+
             res += c
-            visited[c] = True
+            visited.add(c)
         return res[1:]
 ```
 ### Tag: Greedy
