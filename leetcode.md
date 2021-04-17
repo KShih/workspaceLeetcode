@@ -27882,7 +27882,7 @@ class Solution:
             visited.add(c)
         return res[1:]
 ```
-### Tag: Greedy
+### Tag: #Greedy
 ---
 ## 318. Maximum Product of Word Lengths | 10/21
 
@@ -28386,7 +28386,7 @@ class Solution:
 ```
 ### Tag: Linkedlist
 ---
-## 331. Verify Preorder Serialization of a Binary Tree｜ 10/30
+## 331. Verify Preorder Serialization of a Binary Tree｜ 10/30 | [ Review * 1 ]
 
 One way to serialize a binary tree is to use pre-order traversal. When we encounter a non-null node, we record the node's value. If it is a null node, we record using a sentinel value such as #.
 
@@ -28423,7 +28423,7 @@ Output: false
 ### 思路
 
 1. 每讀一個元素 capacity - 1
-2. 每多一個數字 capacity + 1
+2. 每多一個數字 capacity + 2
 3. 不可多不可少一定要填滿
 
 ### Code
@@ -28441,7 +28441,7 @@ class Solution:
         return capacity == 0
 ```
 
-### Tag: BinaryTree concept
+### Tag: #BinaryTree concept
 ---
 ## 332. Reconstruct Itinerary| 10/30 | [ Review * 1 ]
 
