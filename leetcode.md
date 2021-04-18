@@ -32900,3 +32900,50 @@ class Solution:
 
 ### Tag: #DFS, #BFS
 ---
+## 529. Minesweeper｜ 4/18
+
+Let's play the minesweeper game (Wikipedia, online game)!
+
+You are given a 2D char matrix representing the game board. 'M' represents an unrevealed mine, 'E' represents an unrevealed empty square, 'B' represents a revealed blank square that has no adjacent (above, below, left, right, and all 4 diagonals) mines, digit ('1' to '8') represents how many mines are adjacent to this revealed square, and finally 'X' represents a revealed mine.
+
+Now given the next click position (row and column indices) among all the unrevealed squares ('M' or 'E'), return the board after revealing this position according to the following rules:
+
+- If a mine ('M') is revealed, then the game is over - change it to 'X'.
+- If an empty square ('E') with no adjacent mines is revealed, then change it to revealed blank ('B') and all of its adjacent unrevealed squares should be revealed recursively.
+- If an empty square ('E') with at least one adjacent mine is revealed, then change it to a digit ('1' to '8') representing the number of adjacent mines.
+- Return the board when no more squares will be revealed.
+
+![](assets/markdown-img-paste-20210418214126840.png)
+
+![](assets/markdown-img-paste-2021041821414164.png)
+
+### 解題分析
+
+
+### Code
+``` py
+class Solution:
+    def updateBoard(self, board, click):
+        rows, cols = len(board), len(board[0])
+        dirs = [(0, 1), (1, 0), (0, -1), (-1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+        def DFS(r, c):
+            count = 0
+            for i, j in dirs:
+                if (0 <= r+i < rows) and (0 <= c+j < cols) and board[r+i][c+j] == "M":
+                    count += 1
+            if count != 0:
+                board[r][c] = str(count)
+            else:
+                board[r][c] = "B"
+                for i, j in dirs:
+                    if (0 <= r+i < rows) and (0 <= c+j < cols) and board[r+i][c+j] == "E":
+                        DFS(r+i, c+j)
+        if board[click[0]][click[1]] == "M":
+            board[click[0]][click[1]] = "X"
+        else:
+            DFS(click[0], click[1])
+        return board
+```
+
+### Tag: #DFS
+---
