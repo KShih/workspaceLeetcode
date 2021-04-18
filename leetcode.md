@@ -32506,3 +32506,95 @@ class Solution:
 
 ### Tag: #Thread
 ---
+## 1153. String Transforms Into Another String｜ 8/29
+
+Given two strings str1 and str2 of the same length, determine whether you can transform str1 into str2 by doing zero or more conversions.
+
+In one conversion you can convert all occurrences of one character in str1 to any other lowercase English character.
+
+Return true if and only if you can transform str1 into str2.
+
+Example 1:
+
+- Input: str1 = "aabcc", str2 = "ccdee"
+- Output: true
+- Explanation: Convert 'c' to 'e' then 'b' to 'd' then 'a' to 'c'. Note that the order of conversions matter.
+
+Example 2:
+
+- Input: str1 = "leetcode", str2 = "codeleet"
+- Output: false
+- Explanation: There is no way to transform str1 to str2.
+
+Constraints:
+
+- 1 <= str1.length == str2.length <= 104
+- str1 and str2 contain only lowercase English letters.
+
+### 解題分析
+1. 這題並不能使用 encode 的方式去做 mapping, 如以下例子
+    - "abcdefghijklmnopqrstuvwxyz"
+    - "bcadefghijklmnopqrstuvwxzz"
+    - Should return True
+        - *關鍵: 要從後面換回來*
+        - y -> z (wxzz)
+        - c -> y (aby)
+        - b -> c (acy)
+        - a -> b (bcy)
+        - y -> a (bca)
+    - 但我們的 encode 會得到
+        - 1234567891011121314151617181920212223242526
+        - 1234567891011121314151617181920212223242525
+2. Solution with bridge
+    - 這題的轉換是需要 "橋" 的, 我們來看看什麼事 bridge 的概念
+    - 例子 ("ab", "ba")
+        - 錯誤示範: a 直接變 b, bb -> 這樣 b在變a 的時候會變成 aa
+        - 相當於 swap 時需要一個 tmp 來暫存: a->x, b->a, x->b
+    - 例子 ("abc", "bca")
+        - c->x, b->c, a->b, x->a
+        - 把 c 放到 tmp 之後, *要從後面往回做*
+    - 結論: 只要存在一個 tmp 可以讓我們當暫存, 就可以保證轉換過程中不被潑及
+    - 那麼我們就可以用 greedy 的方法去強制把當前的 str1 map 到 str2 的元素, 如果當中出現 1要對多的 mapping 就直接回錯
+    - 但最後要對這個 mapping 去做檢查, 檢查是否還有空間給這個 bridge
+3. Good Testcase
+    1. ab, ba
+    2. abc, bca
+    3. return True
+        - str1 = "abcdefghijklmnopqrstuvwxyz"
+        - str2 = "bcadefghijklmnopqrstuvwxzz"
+    4. return False (因為 str2 並沒有 tmp 的空間給 str1)
+        - str1 = "bcadefghijklmnopqrstuvwxzz"
+        - str2 = "abcdefghijklmnopqrstuvwxyz"
+### Code
+```py
+class Solution:
+    def canConvert(self, str1: str, str2: str) -> bool:
+        mapp = {}
+        for char1, char2 in zip(str1, str2):
+            if char1 not in mapp:
+                mapp[char1] = char2
+            elif mapp[char1] != char2:
+                return False
+        return len(set(str2)) < 26 or str1 == str2 # str1 == str2 的時候不用 bridge 也沒關係
+```
+
+encode way (not passed)
+``` py
+class Solution:
+    def canConvert(self, str1: str, str2: str) -> bool:
+        return self.encode(str1) == self.encode(str2)
+
+    def encode(self, s):
+        d = 0
+        m = {}
+        res = ""
+        for i, c in enumerate(s):
+            if c not in m:
+                d += 1
+                m[c] = d
+            res += str(d)
+        return res
+```
+
+### Tag: #Greedy #Graph
+---
