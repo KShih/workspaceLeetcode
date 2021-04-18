@@ -32598,3 +32598,73 @@ class Solution:
 
 ### Tag: #Greedy #Graph
 ---
+## 785. Is Graph Bipartite?｜ 4/18
+There is an undirected graph with n nodes, where each node is numbered between 0 and n - 1. You are given a 2D array graph, where graph[u] is an array of nodes that node u is adjacent to.
+
+More formally, for each v in graph[u], there is an undirected edge between node u and node v. The graph has the following properties:
+
+- There are no self-edges (graph[u] does not contain u).
+- There are no parallel edges (graph[u] does not contain duplicate values).
+- If v is in graph[u], then u is in graph[v] (the graph is undirected).
+- The graph may not be connected, meaning there may be two nodes u and v such that there is no path between them.
+A graph is bipartite if the nodes can be partitioned into two independent sets A and B such that every edge in the graph connects a node in set A and a node in set B.
+
+Return true if and only if it is bipartite.
+
+### 解題分析
+0. ![](assets/markdown-img-paste-20210418162744530.png)
+1. 題目要求求出給定的圖是否可以形成兩個 set, 而且每一個 edge 都是連到對方 set 的
+2. 換個角度想，每個在 setA 中的點, 其edge所連出去的 neibor 都要是屬於別的 set
+3. 因此我們可以用 1, -1 去給每個點上色，這層上完去上其鄰居，如果下一層的點已經被上過，而且還是上相反的，那就表示有其他同 set 的點也連到他，return False
+4. 注意，因為每個點都有可能不含 edge, 所以我們必須把每個點都看作起點去走走看
+
+### Code
+BFS
+``` py
+class Solution:
+    def isBipartite(self, graph: List[List[int]]) -> bool:
+        visited = {}
+        for i in range(len(graph)):
+            if i not in visited:
+                if not self.check([(i, 1)], visited, graph):
+                    return False
+        return True
+
+    def check(self, layer, visited, graph):
+        while layer:
+            new_layer = []
+            for node, color in layer:
+                if node in visited:
+                    if visited[node] != color:
+                        return False
+                    continue
+
+                visited[node] = color
+                for neib in graph[node]:
+                    new_layer.append((neib, color * -1))
+            layer = new_layer
+        return True
+```
+
+DFS
+```py
+class Solution:
+    def isBipartite(self, graph: List[List[int]]) -> bool:
+        color = {}
+        for node in range(len(graph)):
+            if node not in color:
+                color[node] = 1
+                stack = [node]
+                while stack:
+                    cur = stack.pop()
+                    for nei in graph[cur]:
+                        if nei not in color:
+                            stack.append(nei)
+                            color[nei] = color[cur] * -1
+                        elif color[nei] == color[cur]:
+                            return False
+        return True
+```
+
+### Tag: #Graph, #DFS, #BFS
+---
