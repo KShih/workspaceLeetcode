@@ -3627,7 +3627,7 @@ public:
 };
 ```
 ---
-## @102. Binary Tree Level Order Traversal｜ 4/25
+## 102. Binary Tree Level Order Traversal｜ 4/25 | [ Review * 1 ]
 Given a binary tree, return the level order traversal of its nodes' values. (ie, from left to right, level by level).
 
 For example:
@@ -3636,17 +3636,27 @@ For example:
 ### 思路
 Level order BFS
 ### Code
+```py
+def levelOrder(self, root):
+    ret = []
+    level = [root]
+
+    while root and level:
+        currentNodes = []
+        nextLevel = []
+        for node in level:
+            currentNodes.append(node.val)
+            if node.left:
+                nextLevel.append(node.left)
+            if node.right:
+                nextLevel.append(node.right)
+        ret.append(currentNodes)
+        level = nextLevel
+
+    return ret
+```
 Iterative
 ``` c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
 class Solution {
 public:
     vector<vector<int>> levelOrder(TreeNode* root) {
@@ -3672,15 +3682,6 @@ public:
 
 Recursive:
 ``` c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
 class Solution {
 public:
     vector<vector<int>> levelOrder(TreeNode* root) {
@@ -3698,7 +3699,7 @@ private:
     }
 };
 ```
-
+### Tag: #BFS
 ---
 ## @107. Binary Tree Level Order Traversal II｜ 4/25
 Given a binary tree, return the bottom-up level order traversal of its nodes' values. (ie, from left to right, level by level from leaf to root).
