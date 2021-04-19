@@ -25390,7 +25390,7 @@ class Solution:
         return res
 ```
 ---
-## 279. Perfect Squares｜ 8/12
+## 279. Perfect Squares｜ 8/12 | [ Review * 1 ]
 Given a positive integer n, find the least number of perfect square numbers (for example, 1, 4, 9, 16, ...) which sum to n.
 
 Example 1:
@@ -25404,21 +25404,69 @@ Input: n = 13
 Output: 2
 Explanation: 13 = 4 + 9.
 
+### 解題分析
+1. 本題的最佳解為使用 BFS
+    - ![](assets/markdown-img-paste-20210419224525229.png)
+2. 從 n 開始往下用平方數去扣 parent node, BFS 求最短路徑, 只要第一個相遇的極為最短路徑
+3. 用 set 去存可以避免重複元素出現
+4. 時間複雜度為 N 的 二分之樹高次方
+    - ![](assets/markdown-img-paste-20210419225815405.png)
+
 ### 思路
 dp[i] 可以去更新 dp[i + j*j]
 
 ### Code
+(Optimal) BFS, O(N^(h/2))
+```py
+class Solution:
+    def numSquares(self, n: int) -> int:
+        squares = [i*i for i in range(1, int(n**0.5)+1)]
+        queue = set([n])
+        res = 1
+        while queue:
+            next_layer = set()
+            for elem in queue:
+                for square in squares:
+                    if elem == square:
+                        return res
+                    elif elem > square:
+                        next_layer.add(elem-square)
+            queue = next_layer
+            res += 1
+        return res
+```
+
+DP BottonUP, O(N log N)
 ``` py
 class Solution:
     def numSquares(self, n: int) -> int:
         dp = [float("inf") for _ in range(n+1)]
-        dp[0], dp[1] = 0, 1
-        for i in range(n):
+        dp[0] = 0
+        for i in range(n): # 記得從0開始 iterate
             for j in range(1, n):
                 if i + j*j > n:
                     break
                 dp[i+j*j] = min(dp[i+j*j], dp[i]+1)
         return dp[n]
+```
+
+Better DP BottonUp, O(N log N)
+```py
+class Solution(object):
+    def numSquares(self, n):
+        square_nums = [i**2 for i in range(0, int(n**0.5)+1)]
+
+        dp = [float('inf')] * (n+1)
+        # bottom case
+        dp[0] = 0
+
+        for i in range(1, n+1):
+            for square in square_nums:
+                if i < square:
+                    break
+                dp[i] = min(dp[i], dp[i-square] + 1)
+
+        return dp[-1]
 ```
 
 數學解法(參考):
@@ -25438,6 +25486,7 @@ public:
     }
 };
 ```
+### Tag: #DP #BFS
 ---
 ## 280. Wiggle Sort｜ 8/12
 Given an unsorted array nums, reorder it in-place such that nums[0] <= nums[1] >= nums[2] <= nums[3]....
