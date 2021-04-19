@@ -3701,7 +3701,7 @@ private:
 ```
 ### Tag: #BFS
 ---
-## @107. Binary Tree Level Order Traversal II｜ 4/25
+## 107. Binary Tree Level Order Traversal II｜ 4/25 | [ Review * 1 ]
 Given a binary tree, return the bottom-up level order traversal of its nodes' values. (ie, from left to right, level by level from leaf to root).
 
 For example:
@@ -3711,6 +3711,27 @@ Given binary tree [3,9,20,null,null,15,7],
 ### 思路
 
 ### Code
+Without using reverse
+```py
+class Solution:
+    def levelOrderBottom(self, root: TreeNode) -> List[List[int]]:
+        if not root: return []
+        res, queue = deque(), deque([(root, 1)])
+
+        while queue:
+            node, level = queue.popleft()
+            if level > len(res):
+                res.appendleft([])
+
+            res[-(level)].append(node.val)
+
+            if node.left:
+                queue.append((node.left, level+1))
+            if node.right:
+                queue.append((node.right, level+1))
+        return res
+```
+
 Iterative:
 
 ``` c++
@@ -3721,6 +3742,7 @@ Recursive:
 ``` c++
 // 參考 #102 在return res之前將vector reverse
 ```
+### Tag: #BFS
 ---
 ## @429. N-ary Tree Level Order Traversal｜ 4/25
 Given an n-ary tree, return the level order traversal of its nodes' values. (ie, from left to right, level by level).
