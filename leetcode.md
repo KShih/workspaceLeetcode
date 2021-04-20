@@ -25863,7 +25863,7 @@ def inorderSuccessor(self, root: 'TreeNode', p: 'TreeNode') -> 'TreeNode':
     return res
 ```
 ---
-## 286. Walls and Gates｜ 8/22
+## 286. Walls and Gates｜ 8/22 | [ Review * 1 ]
 You are given a m x n 2D grid initialized with these three possible values.
 
 -1 - A wall or an obstacle.
@@ -25876,14 +25876,21 @@ Example:
 Given the 2D grid:
 
 INF  -1  0  INF
+
 INF INF INF  -1
+
 INF  -1 INF  -1
+
   0  -1 INF INF
+
 After running your function, the 2D grid should be:
 
   3  -1   0   1
+
   2   2   1  -1
+
   1  -1   2  -1
+
   0  -1   3   4
 
 ### 思路
@@ -25936,7 +25943,7 @@ class Solution:
                     queue.append(((new_x, new_y), depth+1))
 ```
 
-BFS 不記錄深度值，把自己當深度
+(Optimal) BFS 不記錄深度值，把自己當深度
 ```py
 class Solution:
     def wallsAndGates(self, rooms: List[List[int]]) -> None:
@@ -25959,6 +25966,7 @@ class Solution:
                     rooms[new_x][new_y] = rooms[x][y]+1
                     queue.append((new_x, new_y))
 ```
+### Tag: #DFS, #BFS
 ---
 ## 287. Find the Duplicate Number｜ 8/22 | [Review * 1]
 Given an array nums containing n + 1 integers where each integer is between 1 and n (inclusive), prove that at least one duplicate number must exist. Assume that there is only one duplicate number, find the duplicate one.
