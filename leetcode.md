@@ -27602,7 +27602,7 @@ class Solution:
 ```
 
 ---
-## 310. Minimum Height Tree｜ 10/15
+## 310. Minimum Height Tree｜ 10/15 | [ Review * 1 ]
 A tree is an undirected graph in which any two vertices are connected by exactly one path. In other words, any connected graph without simple cycles is a tree.
 
 Given a tree of n nodes labelled from 0 to n - 1, and an array of n - 1 edges where edges[i] = [ai, bi] indicates that there is an undirected edge between the two nodes ai and bi in the tree, you can choose any node of the tree as the root. When you select a node x as the root, the result tree has height h. Among all possible rooted trees, those with minimum height (i.e. min(h))  are called minimum height trees (MHTs).
@@ -27612,6 +27612,12 @@ Return a list of all MHTs' root labels. You can return the answer in any order.
 The height of a rooted tree is the number of edges on the longest downward path between the root and a leaf.
 
 ![](assets/markdown-img-paste-20201015114043656.png)
+
+### 解題分析
+1. Solution2
+    1. 先思考樹的定義，葉節點就是只有連結一邊的點，因此我們可以用 adjMap 先找出葉節點
+    2. 然後使用撥洋蔥法 BFS, 從葉節點開始除去, 然後再去葉節點的鄰居(用 `set.pop()` ) 中把自己給除掉, 如果鄰居的連接也只剩一邊，那他就是下一層的葉節點
+    3. 直到去除掉所有的節點的時候, 最後那層就是 root
 
 ### 思路
 
@@ -27653,6 +27659,33 @@ class Solution:
             leaves = newLeaves
         return leaves
 ```
+
+Solution2
+```py
+class Solution:
+    def findMinHeightTrees(self, n, edges):
+        graph = [set() for _ in range(n)]
+        layer = []
+        for x, y in edges:
+            graph[x].add(y)
+            graph[y].add(x)
+        layer = [i for i in range(len(graph)) if len(graph[i]) == 1]
+        while layer:
+            new_layer = []
+            for node in layer:
+                if len(graph[node]) > 0:
+                    neib = graph[node].pop()
+                    graph[neib].remove(node)
+                    if len(graph[neib]) == 1:
+                        new_layer.append(neib)
+
+            if len(new_layer) == 0:
+                return layer # the last layer
+            else:
+                layer = new_layer
+        return [0]
+```
+### Tag: #BFS
 ---
 ## 309. Best Time to Buy and Sell Stock with Cooldown｜ 10/19
 Say you have an array for which the ith element is the price of a given stock on day i.
