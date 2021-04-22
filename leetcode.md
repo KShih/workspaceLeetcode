@@ -12614,18 +12614,16 @@ if __name__ == '__main__':
 
 ```
 ---
-## 739. Daily Temperatures｜ 9/26
+## 739. Daily Temperatures｜ 9/26  | [ Review * 1 ]
 Given a list of daily temperatures T, return a list such that, for each day in the input, tells you how many days you would have to wait until a warmer temperature. If there is no future day for which this is possible, put 0 instead.
 
 For example, given the list of temperatures T = [73, 74, 75, 71, 69, 72, 76, 73], your output should be [1, 1, 4, 2, 1, 1, 0, 0].
 
 Note: The length of temperatures will be in the range [1, 30000]. Each temperature will be an integer in the range [30, 100].
 
-### 技巧
-- Stack in python:
-    - push: stack.insert(0,elem)
-    - pop: stack.pop(0)
-    - top: stack[0]
+### 解題分析
+1. 這種遇到破壞單一性要處理的，適合用 MonoStack 來解
+2. MonoStack 裡只需要存 index 就好
 
 ### 思路
 
@@ -12639,23 +12637,18 @@ Note: The length of temperatures will be in the range [1, 30000]. Each temperatu
 
 ### Code
 ``` py
-def findWarmday(temperature):
-    nextWarmday = [0 for _ in range(len(temperature))]
-    stack = [] # stack for looking for next warmer day
-
-    for i in range(len(temperature)):
-        print stack
-        while len(stack)!= 0 and temperature[i] > temperature[stack[0]]:
-            print("tem[i] > tem[top]", temperature[i], temperature[stack[0]])
-            top = stack.pop(0)
-            nextWarmday[top] = i - top
-        stack.insert(0,i)
-
-    return nextWarmday
-
-if __name__ == "__main__":
-    print(findWarmday([73, 74, 75, 71, 69, 72, 76, 73]), [1, 1, 4, 2, 1, 1, 0, 0])
+class Solution:
+    def dailyTemperatures(self, T: List[int]) -> List[int]:
+        res = [0 for _ in range(len(T))]
+        stack = []
+        for i, t in enumerate(T):
+            while stack and t > T[stack[-1]]:
+                idx = stack.pop()
+                res[idx] = i - idx
+            stack.append(i)
+        return res
 ```
+### Tag: #Stack #MonoStack
 ---
 ## 780. Reaching Point｜ 9/27
 
