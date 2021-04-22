@@ -15949,7 +15949,7 @@ if __name__ == '__main__':
 
 ```
 ---
-## 1130. Minimum Cost Tree From Leaf Values｜ 11/13
+## 1130. Minimum Cost Tree From Leaf Values｜ 11/13 | [ Review * 1 ]
 
 Given an array arr of positive integers, consider all binary trees such that:
 
@@ -15960,33 +15960,74 @@ Among all possible binary trees considered, return the smallest possible sum of 
 
 ![](assets/markdown-img-paste-20191113005827775.png)
 
-### 技巧
-
-透過index去操作list，
-
-如果牽涉到移除該陣列元素時會很好用！
-
-取得陣列中最小元素：arr.index(min(arr))
-
-操作完後pop掉：arr.pop(idx)
-
-### 思路
-
-最小兩數相乘會有最小結果
+### 解題分析
+1. 分析題目
+    - 我們可以把題目看作，給訂一個 arr, 選擇兩個鄰居 a 和 b, 我們可以選擇一個小的移除掉, 大的則保留在 arr 裡, 但我們必須付出 a * b 的代價, 求最小的代價
+    - 假設 b > a, a 要必須被一個比她大的數給移除, 如果我們想得到最小的 cost, 最大的那個數就是要被最晚給拜訪 (否則他會是一直用來移除節點的 b)
+    - b 有兩種選擇, a的左邊最大 及 右邊最大, 我們要選一邊來 build tree, 我們要選小的那個以免大的重複被一直用
+2. 第一種比較 naive 的解法
+    1. 從最小的開始移除, 分別找他的正左右的最小與其相乘後pop掉
+    2. 這正是 find min and pop 的邏輯
+3. 在上一種中, 我們不斷地去找最小, 這太耗時了, 如果我們能保證上一個數一定比他大, 然後下一個數也一定比他大, 那我們也就可以解題了
+    1. 我們希望最大的那個數越晚被處理越好, 那這個想法正是 mono stack 的概念, 我們維繫一個遞減 stack -> 滿足了上一個數一定比他大, 當遇到下一個數比他大的時候, 就處理
+    2. 而這個處理也就跟 cur_min * min(left, right) 一樣, 只是這邊的 min 是 stack.pop(), left 是 stack.pop()後的top(), right 就是新遇到的數
+    3. 而最後 stack 可能還會有剩, 我們就從後面依序處理就行了(因為遞減stack保證了由大到小)
+4. 類似題:
+    1. LC503
 ### Code
+
+Naive: O(N^2)
 ``` py
 class Solution:
     def mctFromLeafValues(self, arr: List[int]) -> int:
         res = 0
-        while len(arr) > 1:
-            min_idx = arr.index(min(arr))
-            if 0 < min_idx < len(arr)-1:
-                res += min(arr[min_idx-1], arr[min_idx+1]) * arr[min_idx]
-            else:
-                res += arr[1 if min_idx == 0 else min_idx-1] * arr[min_idx]
+        for a in sorted(arr)[:-1]:
+            min_idx = arr.index(a)
+            left = arr[min_idx-1] if min_idx > 0 else float(inf)
+            right = arr[min_idx+1] if min_idx+1 < len(arr)  else float(inf)
+            res += min(left, right) * arr[min_idx]
             arr.pop(min_idx)
         return res
 ```
+
+MonoStack: O(N)
+```py
+class Solution:
+    def mctFromLeafValues(self, arr: List[int]) -> int:
+        res = 0
+        stack = [float(inf)]
+        for a in arr:
+            while stack[-1] < a:
+                cur_min = stack.pop()
+                res += cur_min * min(stack[-1], a) # cur_min * min(left, right)
+            stack.append(a)
+        while len(stack) > 2:
+            res += stack.pop() * stack[-1]
+        return res
+```
+
+DP: O(N^3)
+```py
+class Solution:
+    def mctFromLeafValues(self, arr: List[int]) -> int:
+        return self.helper(arr, 0, len(arr) - 1, {})
+
+    def helper(self, arr, l, r, cache):
+        if (l, r) in cache:
+            return cache[(l, r)]
+        if l >= r:
+            return 0
+
+        res = float('inf')
+        for i in range(l, r):
+            rootVal = max(arr[l:i+1]) * max(arr[i+1:r+1])
+            res = min(res, rootVal + self.helper(arr, l, i, cache) + self.helper(arr, i + 1, r, cache))
+
+        cache[(l, r)] = res
+        return res
+```
+
+### Tag: #MonoStack #Stack #DP
 ---
 ## Mathwork. Max Value Among Shortest Distance in a Matrix｜ 11/13
 
