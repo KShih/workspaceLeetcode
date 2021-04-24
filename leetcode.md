@@ -8153,13 +8153,20 @@ bool canJump(vector<int>& nums) {
 }
 ```
 ---
-## 45. Jump Game II｜ 8/10
+## 45. Jump Game II｜ 8/10 | [ Review * 1 ]
 Given an array of non-negative integers, you are initially positioned at the first index of the array.
 
 Each element in the array represents your maximum jump length at that position.
 
 Your goal is to reach the last index in the minimum number of jumps.
 ![](assets/markdown-img-paste-20190810080533792.png)
+
+### 解題分析
+1. 我們用兩個 ptr, left 跟 riht, left 初始為0, right 初始化為第一個元素
+2. 每個 step 我們都去尋找 left right 這個區間內最大的 step
+3. 把 left 更新為 right, right 則更新為這個區間內找到最大的 step
+4. r 每次都跨最大步的那步 + l 的持續檢查 window 就可以保證我們用最短的步伐到達終點
+
 ### 思路
 We should use the Greedy's opinion to solve this question.
 Predict the farthest destination this step can be (if not reach the goal).
@@ -8169,7 +8176,22 @@ If there is not, we still can find the farthest position we can reach.
 ![](assets/markdown-img-paste-20190810080432649.png)
 
 ### Code
-``` c
+```py
+class Solution:
+    def jump(self, nums: List[int]) -> int:
+        if len(nums) <= 1: return 0
+
+        l, r, step = 0, nums[0], 1
+        while r < len(nums)-1:
+            farthest = 0
+            for i in range(l, r+1):
+                farthest = max(farthest, i+nums[i])
+            l, r = r, farthest
+            step += 1
+        return step
+```
+
+``` c++
 class Solution {
 public:
     int jump(vector<int>& nums) {
@@ -8187,6 +8209,7 @@ public:
     }
 };
 ```
+### Tag: #Greedy #TwoPointer #SlidingWindow
 ---
 ## ***[Start to preparing for FB interview]***
 src 1: https://docs.google.com/document/d/1dlUOwN6ybeFb6PVMJdQF0QXoV6XYgchRhajNgu_LaRs/
