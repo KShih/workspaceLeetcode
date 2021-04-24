@@ -33205,3 +33205,70 @@ class Solution:
 
 ### Tag: #DFS
 ---
+## 694. Number of Distinct Islands｜ 4/24
+representing land) connected 4-directionally (horizontal or vertical.) You may assume all four edges of the grid are surrounded by water.
+
+Count the number of distinct islands. An island is considered to be the same as another if and only if one island can be translated (and not rotated or reflected) to equal the other.
+
+Example 1:
+```py
+11000
+11000
+00011
+00011
+```
+
+Given the above grid map, return 1.
+
+Example 2:
+```py
+11011
+10000
+00001
+11011
+```
+
+Given the above grid map, return 3.
+
+Notice that:
+```py
+11
+1
+```
+and
+```py
+ 1
+11
+```
+are considered different island shapes, because we do not consider reflection / rotation.
+Note: The length of each dimension in the given grid does not exceed 50.
+
+### 解題分析
+1. 利用相對位置的概念去新增的到 set 裡面, 這邊用了一個 trick `tuplize`, 因為 list 是 unhashable type, 所以要加到 set 裡面必須要 tuplize first
+
+### Code
+``` py
+class Solution:
+    def numDistinctIslands(self, grid: List[List[int]]) -> int:
+        islands = set()
+        R, C = len(grid), len(grid[0])
+
+        def dfs(x0, y0, x, y, island):
+            grid[x][y] = -1
+            island.append((x0-x, y0-y))
+            for dx, dy in [(0,1), (1,0), (0,-1), (-1,0)]:
+                newX, newY = x+dx, y+dy
+                if 0 <= newX < R and 0 <= newY < C and grid[newX][newY] == 1:
+                    dfs(x0, y0, newX, newY, island)
+
+        for i in range(R):
+            for j in range(C):
+                if grid[i][j] == 1:
+                    island = []
+                    dfs(i, j, i, j, island)
+                    islands.add(tuple(island))
+        return len(islands)
+```
+
+### Tag: #DFS
+---

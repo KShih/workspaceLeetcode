@@ -18,6 +18,9 @@ Solution Model
 2. Sort by key
     1. `intervals = sorted(intervals, key=lambda x: x[0])`
     2. `intervals = sorted(intervals, key=lambda x: (x[0], x[1], x[2], ...))`
+3. 利用 tuple 的性質讓 unhashable type 變成 hashable
+    1. `set.add(tuple(list))`
+
 ## Calculator
 - for `224`, `227`, `772`
 - 對於負整數也能解
