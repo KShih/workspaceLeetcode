@@ -33272,3 +33272,54 @@ class Solution:
 
 ### Tag: #DFS
 ---
+## 994. Rotting Oranges｜ 4/24
+
+You are given an m x n grid where each cell can have one of three values:
+
+0 representing an empty cell,
+
+1 representing a fresh orange, or
+
+2 representing a rotten orange.
+
+Every minute, any fresh orange that is 4-directionally adjacent to a rotten orange becomes rotten.
+
+Return the minimum number of minutes that must elapse until no cell has a fresh orange. If this is impossible, return -1.
+
+![](assets/markdown-img-paste-20210424110801797.png)
+
+Constraints:
+
+- m == grid.length
+- n == grid[i].length
+- 1 <= m, n <= 10
+- grid[i][j] is 0, 1, or 2.
+
+### 思路
+
+必須要去追蹤 fresh 的剩餘狀況
+
+### Code
+``` py
+class Solution:
+    def orangesRotting(self, grid: List[List[int]]) -> int:
+        R, C = len(grid), len(grid[0])
+        rotting, fresh = set(), set()
+        for i in range(R):
+            for j in range(C):
+                if grid[i][j] == 1:
+                    fresh.add((i,j))
+                if grid[i][j] == 2:
+                    rotting.add((i,j))
+
+        timer = 0
+        while fresh:
+            if not rotting: return -1
+            rotting = {(i+di, j+dj) for i, j in rotting for di, dj in [(0, 1), (1, 0), (0, -1), (-1, 0)] if (i+di, j+dj) in fresh}
+            fresh -= rotting
+            timer += 1
+        return timer
+```
+
+### Tag: #BFS #Set
+---
