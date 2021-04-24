@@ -681,7 +681,7 @@ def DFS(tree):
 ## Heap
 
 ```py
-# LeetCode 218
+    # LeetCode 218
 from heapq import heappush, heappop
 class Solution:
     def getSkyline(self, buildings: List[List[int]]) -> List[List[int]]:
@@ -708,6 +708,61 @@ class Solution:
             if -live[0][0] != res[-1][1]:
                 res.append([pos, -live[0][0]])
         return res[1:]
+```
+
+---
+
+## QuickSelect
+
+1. QuickSelect k smallest
+    1. 從 l, r 隨機找出一個 index 當 pivot
+    2. 去進行 partition algorithm
+    3. 如果回傳的 perfect pivot 位置 == k -> 即為所求
+    4. 位置 < k -> 還需要補入更多數 -> 對右半邊運算, 反之左半邊
+2. Partion Algorithm
+    1. Work for unique elem
+        1. 先紀錄 pivot index 所代表的意義 (frequency or sth)
+        2. 把 p 跟 r 交換
+        3. 初始化 store_idx 為 l
+        4. 對區間 (l, r) 去 for-loop
+            1. 如果 freq[i] < freq_p -> swap(i, store_idx++)
+        5. 最後再把 r 跟 store_idx 調換 (p換回到 perfect index)
+        6. return store_idx
+
+```py
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        count = Counter(nums)
+        unique = list(count.keys())
+
+        def partition(l, r, p):
+            pivot_freq = count[unique[p]]
+            unique[r], unique[p] = unique[p], unique[r]
+
+            idx = l
+            for i in range(l, r):
+                if count[unique[i]] < pivot_freq:
+                    unique[idx], unique[i] = unique[i], unique[idx]
+                    idx += 1
+
+            unique[r], unique[idx] = unique[idx], unique[r]
+            return idx
+
+        def quickselect(l, r, k_smallest):
+            if l == r:
+                return
+            p = random.randint(l, r)
+            p = partition(l, r, p)
+            if p == k_smallest:
+                return
+            elif p < k_smallest:
+                quickselect(p+1, r, k_smallest)
+            else:
+                quickselect(l, p-1, k_smallest)
+
+        n = len(unique)
+        quickselect(0, n-1, n-k)
+        return unique[n-k: ]
 ```
 
 ---

@@ -13868,7 +13868,7 @@ class Solution:
         return min(single, double//2)
 ```
 ---
-## 347. Top K Frequent Elements(Heap用法經典題)｜ 10/12
+## 347. Top K Frequent Elements(Heap用法經典題)｜ 10/12 | [ Review * 1 ]
 Given a non-empty array of integers, return the k most frequent elements.
 
 ![](assets/markdown-img-paste-20191012110213208.png)
@@ -13882,12 +13882,48 @@ Given a non-empty array of integers, return the k most frequent elements.
 - Counter(arr).most_common(k)
     - heapq.nlargest(k, arr)
 
-### 思路
-
+### 解題分析
+1. 求前 k 大, 就要想到 quick select, Implement 詳見模板
 
 ### Code
+QuickSelect O(N) in average case, O(N^2) in worst case
+```py
+class Solution:
+    def topKFrequent(self, nums: List[int], k: int) -> List[int]:
+        count = Counter(nums)
+        unique = list(count.keys())
 
-真的練習到heap! 不使用sort, O(n)
+        def partition(l, r, p):
+            pivot_freq = count[unique[p]]
+            unique[r], unique[p] = unique[p], unique[r]
+
+            idx = l
+            for i in range(l, r):
+                if count[unique[i]] < pivot_freq:
+                    unique[idx], unique[i] = unique[i], unique[idx]
+                    idx += 1
+
+            unique[r], unique[idx] = unique[idx], unique[r]
+            return idx
+
+        def quickselect(l, r, k_smallest):
+            if l == r:
+                return
+            p = random.randint(l, r)
+            p = partition(l, r, p)
+            if p == k_smallest:
+                return
+            elif p < k_smallest:
+                quickselect(p+1, r, k_smallest)
+            else:
+                quickselect(l, p-1, k_smallest)
+
+        n = len(unique)
+        quickselect(0, n-1, n-k)
+        return unique[n-k: ]
+```
+
+heap O(n log k)
 ``` py
 from collections import Counter
 import heapq
@@ -13930,6 +13966,7 @@ class Solution(object):
     def topKFrequent(self, nums, k):
         return [item[0] for item in collections.Counter(nums).most_common(k)]
 ```
+### Tag: #Heap #QuickSelect
 ---
 ## 239. Sliding Window Maximum(Deque經典題)｜ 10/12
 Given an array nums, there is a sliding window of size k which is moving from the very left of the array to the very right. You can only see the k numbers in the window. Each time the sliding window moves right by one position. Return the max sliding window.
