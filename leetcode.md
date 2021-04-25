@@ -33536,3 +33536,165 @@ class MyQueue:
 
 ### Tag: #Stack
 ---
+## 272. Closest Binary Search Tree Value II (Very good question)｜ 4/25
+Given the root of a binary search tree, a target value, and an integer k, return the k values in the BST that are closest to the target. You may return the answer in any order.
+
+You are guaranteed to have only one unique set of k values in the BST that are closest to the target.
+
+![](assets/markdown-img-paste-20210425113057491.png)
+
+Example1
+
+- Input: root = [4,2,5,1,3], target = 3.714286, k = 2
+- Output: [4,3]
+
+Example 2:
+
+- Input: root = [1], target = 0.000000, k = 1
+- Output: [1]
+
+Constraints:
+
+The number of nodes in the tree is n.
+- 1 <= k <= n <= 104.
+- 0 <= Node.val <= 109
+- -109 <= target <= 109
+
+
+Follow up: Assume that the BST is balanced. Could you solve it in less than O(n) runtime (where n = total nodes)?
+
+1. hint1: Consider implement these two helper functions:
+    - getPredecessor(N), which returns the next smaller node to N.
+    - getSuccessor(N), which returns the next larger node to N.
+2. hint2: Try to assume that each node has a parent pointer, it makes the problem much easier.
+3. hint3: Without parent pointer we just need to keep track of the path from the root to the current node using a stack.
+4. hint4: You would need two stacks to track the path in finding predecessor and successor node separately.
+
+### 解題分析
+1. Heap
+    - 最簡單的方式當然就是維持固定大小的 heap, 但注意必須 traverse all tree 不能跟上題一樣只盡可能網 target 靠近, 因為你不知道 k 要求多少
+    - Time: O(n log k)
+2. QuickSelect
+    - 這種取前 k sth 的提最適合用 quick select 來做
+    - 基本上就跟單純的 QuickSelect 一樣, 只要先把 tree 轉成 array 格式
+    - Time: O(n)
+3. Two Stack
+    - ![](assets/markdown-img-paste-20210425114618223.png)
+    - 可以優化的地方就在不要一次 traverse 整個 tree, 所以我們仿造上一提的 traverse 方式不斷靠近 target
+    - 但這題要求 k 個最小, 因此我們必須要用兩個 stack去紀錄比 target 小跟比 target大的 node, 這兩個 stack 的頂端存的是當前最靠近 target 的點
+    - 藉由每次比較兩個 stack 的 top 來決定誰要先放進 result 裡面 (先放的一定是最小的！)
+    - 但我們的 initial traverse 方式會有漏掉的節點(diff 可能更小), 這邊就要靠在 pop 頂端出來後繼續去 extend
+    - Time: O(k + log(n))
+
+
+### Code
+(Optimal) Tree Traversal + two stack, O(k + log(n))
+```py
+class Solution:
+    def closestKValues(self, root: TreeNode, target: float, k: int) -> List[int]:
+        res = []
+        succStack, predStack = [], []
+
+        # 1. initialize two stack, in both stack's top are the closest node to target
+        while root:
+            if root.val < target:
+                predStack.append(root)
+                root = root.right # to get closer to target val
+            else:
+                succStack.append(root)
+                root = root.left
+
+        # 2. however, we don't know the size of k, therefore we have to have the helper function to extend the stack once the top get poped out.
+        while k > 0:
+            if not succStack and not predStack:
+                break
+            elif not succStack:
+                res.append(self.getAndExtendPred(predStack))
+            elif not predStack:
+                res.append(self.getAndExtendSucc(succStack))
+            elif abs(succStack[-1].val - target) < abs(predStack[-1].val - target):
+                res.append(self.getAndExtendSucc(succStack))
+            else:
+                res.append(self.getAndExtendPred(predStack))
+            k -= 1
+        return res
+
+    def getAndExtendPred(self, predStack):
+        pred = predStack.pop()
+        node = pred.left # go to other side(compare to initialize)
+        while node:
+            predStack.append(node)
+            node = node.right # getting closer
+        return pred.val
+
+    def getAndExtendSucc(self, succStack):
+        succ = succStack.pop()
+        node = succ.right
+        while node:
+            succStack.append(node)
+            node = node.left
+        return succ.val
+```
+
+Quick Select, O(N) on avg, O(N^2) on worst
+``` py
+class Solution:
+    def closestKValues(self, root: TreeNode, target: float, k: int) -> List[int]:
+        def inorder(r: TreeNode):
+            return inorder(r.left) + [r.val] + inorder(r.right) if r else []
+
+        def partition(pivot_idx, left, right):
+            pivot_dist = dist(pivot_idx)
+
+            nums[right], nums[pivot_idx] = nums[pivot_idx], nums[right]
+
+            store_idx = left
+            for i in range(left, right):
+                if dist(i) < pivot_dist:
+                    nums[i], nums[store_idx] = nums[store_idx], nums[i]
+                    store_idx += 1
+
+            nums[right], nums[store_idx] = nums[store_idx], nums[right]
+
+            return store_idx
+
+        def quickselect(left, right):
+            if left == right:
+                return
+
+            pivot_idx = randint(left, right)
+            true_idx = partition(pivot_idx, left, right)
+            if true_idx == k:
+                return
+
+            if true_idx < k:
+                quickselect(true_idx, right)
+            else:
+                quickselect(left, true_idx)
+
+        nums = inorder(root)
+        dist = lambda idx : abs(nums[idx] - target)
+        quickselect(0, len(nums) - 1)
+        return nums[:k]
+```
+
+Heap
+```py
+class Solution:
+    def closestKValues(self, root: TreeNode, target: float, k: int) -> List[int]:
+        heap = []
+        def preorder(node):
+            if not node:
+                return
+            diff = abs(node.val - target)
+            heappush(heap, (-diff, node.val))
+            if len(heap) > k:
+                heappop(heap)
+            preorder(node.left)
+            preorder(node.right)
+        preorder(root)
+        return [v for _, v in heap]
+```
+
+### Tag: #Heap #QuickSelect #Tree #Stack
+---

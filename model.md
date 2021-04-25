@@ -714,6 +714,9 @@ class Solution:
 
 ## QuickSelect
 
+- 針對尋找前 k sth 的題
+- 快速回憶: divideAndConquer -> partition -> pivot -> swap with back -> iterate to find perfect index for pivot -> swap it back -> decide we need to add more elem in front or delete some -> divideAndConquer ...
+
 1. QuickSelect k smallest
     1. 從 l, r 隨機找出一個 index 當 pivot
     2. 去進行 partition algorithm
