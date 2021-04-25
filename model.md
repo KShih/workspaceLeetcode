@@ -576,7 +576,7 @@ def DFS(tree):
                 stack.append(i)
             return res
     ```
-3. 所有例題: LC42, LC84, LC85, LC255, LC739(典型), LC1130
+3. 所有例題: LC42, LC84, LC85, LC255, LC739(典型), LC1130, LC496
 
 
 ---
