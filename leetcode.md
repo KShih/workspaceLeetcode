@@ -8125,13 +8125,25 @@ public:
     }
 };
 ---
-## 55. Jump Game｜ 8/8
+## 55. Jump Game｜ 8/8 | [ Review * 1 ]
 Given an array of non-negative integers, you are initially positioned at the first index of the array.
 
 Each element in the array represents your maximum jump length at that position.
 
 Determine if you are able to reach the last index.
 ![](assets/markdown-img-paste-20190808110729107.png)
+
+### 解題分析
+0. 可以去看 leetcode 的 solution, 演示了整個 thinking process (包含從 DP 的想法)
+    - https://leetcode.com/problems/jump-game/solution/
+1. 先思考, 如何定義 fail case?
+    - 當當前的 index > max_jump that you can make from begin
+2. 在思考, 如何定義 success?
+    - 一種, 走完所有元素都沒有 fail
+    - 一種, 當 max_jump 已經 > 陣列最後元素index時
+3. 如何更新 max_jump?
+    - i + nums[i]
+
 ### 思路
 1. We care about the farthest distance we can reach.
 2. the goal distance is n-1
@@ -8142,6 +8154,39 @@ we can stop looping if 1. we reach the goal, or 2. we can't move.
 we keep updating the farthest position in every iteration.
 
 ### Code
+```py
+class Solution:
+    def canJump(self, nums: List[int]) -> bool:
+        max_jump = 0
+        for i, jump in enumerate(nums):
+            if i > max_jump: # the max_jump from begin cannot reach this index
+                return False
+            max_jump = max(max_jump, i+jump)
+        return True
+```
+
+寫的複雜一點的 DP
+```py
+class Solution(object):
+    def canJump(self, nums):
+        length = len(nums)
+        dp = [0] * length
+
+        dp[0] = nums[0]
+
+        for i in range(1, length - 1):
+
+            if dp[i - 1] < i:
+                return False
+
+            dp[i] = max(i + nums[i], dp[i - 1])
+
+            if dp[i] >= length - 1:
+                return True
+
+        return dp[length - 2] >= length - 1
+```
+
 ``` c
 bool canJump(vector<int>& nums) {
     int n = nums.size(), reach = 0;
@@ -8152,6 +8197,7 @@ bool canJump(vector<int>& nums) {
     return reach >= n-1;
 }
 ```
+### Tag: #Greedy
 ---
 ## 45. Jump Game II｜ 8/10 | [ Review * 1 ]
 Given an array of non-negative integers, you are initially positioned at the first index of the array.
