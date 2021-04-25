@@ -479,6 +479,30 @@ while layer:
     layer = next_layer
 ```
 
+3. Two-ends BFS
+    - 適用於終點也能擴展的題目 e.g.: LC752
+    - 概念:
+        - 用兩個 set, 每次選擇用小的去 extend 進 new_front
+        - 檢查這個 extend 的有沒有存在 back 裡面, 有就找到了, 沒有就繼續
+        - 整層都沒找到後, 判斷現在的 back 跟new_front誰小, 如果 back 比較小, 則做 swap
+    - 模板:
+        ```py
+        seen = set()
+        front, back = set(), set()
+        while front:
+            new_front = set()
+            for e in front:
+                new_e = process(e)
+                if new_e in back:
+                    return res
+                elif new_e not in seen:
+                    seen.add(new_e)
+                    new_front.add(new_e)
+            if len(back) < len(new_front):
+                back, new_front = new_front, back
+            front = new_front
+        ```
+
 ## DFS
 
 Recursive:
