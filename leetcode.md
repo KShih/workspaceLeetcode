@@ -32661,7 +32661,7 @@ class Solution:
         self.rank = [None] * n
         self.build_graph(connections)
 
-        self.dfs(0, 0)
+        self.dfs(0, 0) # 只需要從 0 開始就好, 因為 len(connections) >= n-1 -> 表示沒有孤立節點
         return list(self.conn_set)
 
 
