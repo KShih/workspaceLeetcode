@@ -33125,6 +33125,28 @@ Constraints:
 找 path 的問題 -> backtrack
 
 ### Code
+BFS
+```py
+class Solution:
+    def allPathsSourceTarget(self, graph):
+        res = []
+        q = deque([(0,[])])
+        n = len(graph)
+
+        while q:
+            tempNode, route = q.popleft()
+
+            if tempNode == n - 1:
+                res.append(route + [tempNode])
+                continue
+
+            for neighbor in graph[tempNode]:
+                q.append([neighbor, route + [tempNode]])
+
+        return res
+```
+
+Backtrack
 ``` py
 class Solution:
     def allPathsSourceTarget(self, graph: List[List[int]]) -> List[List[int]]:
