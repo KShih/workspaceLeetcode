@@ -7916,7 +7916,7 @@ public:
 };
 ```
 ---
-## 134. Gas Station｜ 7/16
+## 134. Gas Station｜ 7/16 | [ Review * 1 ]
 There are N gas stations along a circular route, where the amount of gas at station i is gas[i].
 
 You have a car with an unlimited gas tank and it costs cost[i] of gas to travel from station i to its next station (i+1). You begin the journey with an empty tank at one of the gas stations.
@@ -7930,6 +7930,15 @@ Both input arrays are non-empty and have the same length.
 Each element in the input arrays is a non-negative integer.
 
 ![](assets/markdown-img-paste-20190716114058104.png)
+
+### 解題分析
+1. 什麼是最可能的起點?
+    - **累積損失最多的節點之後的那個點**
+    - why? 因為我們不希望我們中途就壞掉, 因此我們要期待從這點開始往後走之後能得到更多的油
+2. 技巧:
+    - 使用 `idx+1 % length` 來去做到 circular indexing. i.e. last index+1 % length == 0
+
+
 ### 思路
 Assumed that we walk from station 0 to 3, then blocked at 4,
 We don't have to try to start from point 1 or 2 or 3, CUZ:
@@ -7946,6 +7955,23 @@ if it is true, then sure the circuit is true; otherwise is false.
 ![](assets/markdown-img-paste-20190716114422417.png)
 
 ### Code
+Python Easy Understand Solution
+```py
+class Solution:
+    def canCompleteCircuit(self, gas: List[int], cost: List[int]) -> int:
+        minimum, minimumIndex = float(inf), -1
+        total = 0
+
+        for i in range(len(gas)):
+            total += gas[i] - cost[i]
+
+            if total < minimum:
+                minimum = total
+                minimumIndex = i
+
+        return -1 if total < 0 else (minimumIndex + 1) % len(gas) # to perform circular index
+```
+
 ``` c
 class Solution {
 public:
@@ -7965,6 +7991,7 @@ public:
     }
 };
 ```
+### Tag: #Greedy #Array
 ---
 ## 274. H-Index｜ 7/16
 Given an array of citations (each citation is a non-negative integer) of a researcher, write a function to compute the researcher's h-index.
