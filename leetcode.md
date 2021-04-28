@@ -34086,7 +34086,7 @@ Constraints:
     - Heap pop -> O(n) * n 次操作
 2. 我們也可以專注更新其中一側, 然後左到右掃描, 再右到左掃一次, 這樣同樣也可以找出正確的糖果數 -> 即 Line Sweep 法
     - Thinking process:
-        - 如果 ratings 是持續遞增 ratings = [1,2,3,4,5  ... n] 那麼糖果也就可以很簡單的知道是 [1,2,3,4,5 ... n], 
+        - 如果 ratings 是持續遞增 ratings = [1,2,3,4,5  ... n] 那麼糖果也就可以很簡單的知道是 [1,2,3,4,5 ... n],
         - 相反的如果是 ratings = [n, n-1, n-2 ... 1], 那麼我們就必須從最後面開始往前掃去甜如 [... 5, 4, 3, 2, 1]
         - 那麼這種想法就可以聯想到左右掃描, 每次只關注一邊的遞增趨勢
     - 注意一下有沒有類似題
@@ -34169,4 +34169,103 @@ class Solution:
 ```
 
 ### Tag: #Greedy #LineSweep #Heap
+---
+## 767. Reorganize String｜ 4/28
+iven a string S, check if the letters can be rearranged so that two characters that are adjacent to each other are not the same.
+
+If possible, output any possible result.  If not possible, return the empty string.
+
+Example 1:
+
+Input: S = "aab"
+Output: "aba"
+
+Example 2:
+
+Input: S = "aaab"
+Output: ""
+
+Note:
+S will consist of lowercase letters and have length in range [1, 500].
+
+### 解題分析
+1. 很直覺的是用穿插字元去解
+    1. 取最大
+        1. 我們先取出最大的當隊長
+        2. 再依序將剩下的隊員分配下去給隊長
+        3. 最後再把所有隊伍串起來
+    2. 排序
+        1. 我們必須要先擺字元出現最高的, 因此必須用到排序
+        2. 這邊先將字元排序過: "abb" -> ['a', 'b', 'b']
+        3. 最後輸出前再重新變換位置到 ans 中, 後半段的(字元多) 放在偶數位, 前半段的隨便放在基數位
+        4. Time: O(N + AlogA) ~= O(N) 因為 A 是字母數量 which 最多 26位
+    2. Heap
+        1. 每次取出最多及次多的來加入到 ans 裡面, 然後 cnt-1 (-cnt+1) for Max Heap
+        2. Time: O(N + AlogA) ~= O(N) 因為 A 是字母數量 which 最多 26位
+
+### Code
+Max Solution
+```py
+class Solution:
+    def reorganizeString(self, S: str) -> str:
+        n = len(S)
+        counters = collections.Counter(list(S))
+        max_char, max_cnt = max(counters.items(), key = lambda x: x[1])
+        if max_cnt > (n+1)//2: return ""
+
+        res_arr = [max_char for _ in range(max_cnt)]
+        idx = 0
+        for ch, cnt in counters.items():
+            if ch != max_char:
+                for _ in range(cnt):
+                    res_arr[idx % max_cnt] += ch
+                    idx += 1
+        return "".join(res_arr)
+```
+
+Sort Solution
+``` py
+class Solution:
+    def reorganizeString(self, S: str) -> str:
+        n = len(S)
+        counters = [(S.count(ch), ch) for ch in set(S)]
+
+        arr = []
+        for counts, ch in sorted(counters):
+            if counts > (n+1) // 2:
+                return ""
+            arr.extend(ch*counts) # ['b', 'a', 'a']
+
+        ans = [None] * n
+        ans[::2], ans[1::2] = arr[n//2:], arr[:n//2]
+        return "".join(ans)
+```
+
+Heap
+```py
+class Solution:
+    def reorganizeString(self, S: str) -> str:
+        n = len(S)
+        heap = []
+        for ch in set(S):
+            counts = S.count(ch)
+            if counts > (n+1)//2:
+                return ""
+            heapq.heappush(heap, [-counts, ch])
+
+        ans = ""
+        while len(heap) >= 2:
+            cnt1, ch1 = heapq.heappop(heap)
+            cnt2, ch2 = heapq.heappop(heap)
+
+            ans += ch1+ch2
+            if cnt1+1 != 0:
+                heapq.heappush(heap, [cnt1+1, ch1])
+            if cnt2+1 != 0:
+                heapq.heappush(heap, [cnt2+1, ch2])
+
+        return ans + heap[0][1] if heap else ans
+```
+
+### Tag: #Heap #Greedy
 ---

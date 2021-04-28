@@ -15,9 +15,12 @@ Solution Model
         - Note: cannot use `+`
     4. inline initialize:
         - `dict = {c: True for c in boolTable}`
+    5. get key:value pair
+        - `pairs = dic.itmes()`
 2. Sort by key
     1. `intervals = sorted(intervals, key=lambda x: x[0])`
     2. `intervals = sorted(intervals, key=lambda x: (x[0], x[1], x[2], ...))`
+    3. max 也可用: `max(counters.items(), key = lambda x: x[1])`
 3. 利用 tuple 的性質讓 unhashable type 變成 hashable
     1. `set.add(tuple(list))`
 
