@@ -34051,3 +34051,122 @@ class Solution:
 
 ### Tag: #MonoStack
 ---
+## 135. Candy(待理解 Tricky O(1)Space Version)｜ 4/28
+There are n children standing in a line. Each child is assigned a rating value given in the integer array ratings.
+
+You are giving candies to these children subjected to the following requirements:
+
+Each child must have at least one candy.
+Children with a higher rating get more candies than their neighbors.
+Return the minimum number of candies you need to have to distribute the candies to the children.
+
+Example 1:
+
+- Input: ratings = [1,0,2]
+- Output: 5
+- Explanation: You can allocate to the first, second and third child with 2, 1, 2 candies respectively.
+
+Example 2:
+
+- Input: ratings = [1,2,2]
+- Output: 4
+- Explanation: You can allocate to the first, second and third child with 1, 2, 1 candies respectively.
+The third child gets 1 candy because it satisfies the above two conditions.
+
+Constraints:
+
+- n == ratings.length
+- 1 <= n <= 2 * 104
+- 0 <= ratings[i] <= 2 * 104
+
+### 解題分析
+1. 首先要先思考如何手動找出解, 我們可以發現要依序由最小拜訪到最大, 每次去檢查他左右鄰居手上的糖果數是不是符合條件
+    - 這邊就可以用 heap 解, 詳見 Solution2
+    - 注意鄰居必須跟他自己取max, 不能直接+1 因為也許他已經被另一側的鄰居給更新到更大
+    - Heap pop -> O(n) * n 次操作
+2. 我們也可以專注更新其中一側, 然後左到右掃描, 再右到左掃一次, 這樣同樣也可以找出正確的糖果數 -> 即 Line Sweep 法
+    - Thinking process:
+        - 如果 ratings 是持續遞增 ratings = [1,2,3,4,5  ... n] 那麼糖果也就可以很簡單的知道是 [1,2,3,4,5 ... n], 
+        - 相反的如果是 ratings = [n, n-1, n-2 ... 1], 那麼我們就必須從最後面開始往前掃去甜如 [... 5, 4, 3, 2, 1]
+        - 那麼這種想法就可以聯想到左右掃描, 每次只關注一邊的遞增趨勢
+    - 注意一下有沒有類似題
+3. 無法用 MonoStack 解
+
+### Code
+Line Sweep
+Time: O(n), Space: O(n)
+``` py
+class Solution:
+    def candy(self, ratings: List[int]) -> int:
+        n = len(ratings)
+        candies = [1] * n
+
+        for i in range(n):
+            if i+1 < n and ratings[i+1] > ratings[i]:
+                candies[i+1] = candies[i] + 1
+
+        for i in range(n-1, -1, -1):
+            if i-1 >= 0 and ratings[i-1] > ratings[i]:
+                candies[i-1] = max(candies[i-1], candies[i] + 1)
+
+        return sum(candies)
+```
+
+Heap
+Time: n log n
+Space: n
+```py
+class Solution:
+    def candy(self, ratings: List[int]) -> int:
+        n = len(ratings)
+        candies = [1] * n
+        heap = [(elem, idx) for idx, elem in enumerate(ratings)]
+        heapq.heapify(heap)
+
+        while heap:
+            min_elem, i = heapq.heappop(heap)
+            if i + 1 < n and ratings[i+1] > ratings[i]:
+                candies[i+1] = max(candies[i+1], candies[i]+1)
+            if i - 1 >= 0 and ratings[i-1] > ratings[i]:
+                candies[i-1] = max(candies[i-1], candies[i]+1)
+
+        return sum(candies)
+```
+
+
+Time: O(N), Space: O(1)
+解釋參考官方 solution 或者 CNBlog
+```py
+class Solution:
+    def candy(self, ratings: List[int]) -> int:
+        up = 1
+        down = 0
+        rat = 1
+        peak = 0
+
+        for i in range(1,len(ratings)):
+
+            if ratings[i]>ratings[i-1]:
+                up+=1
+                down =  0
+                rat+=up
+                peak = up
+
+            elif ratings[i]==ratings[i-1]:
+                down = 0
+                peak = 0
+                up = 1
+                rat+=1
+
+            else:
+                down+=1
+                up = 1
+                rat+=down
+                if peak<=down:
+                    rat+=1
+
+        return rat
+```
+
+### Tag: #Greedy #LineSweep #Heap
+---
