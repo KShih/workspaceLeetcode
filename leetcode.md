@@ -24421,7 +24421,7 @@ class Vector2D:
         return False
 ```
 ---
-## 252. Meeting Rooms｜ 6/17
+## 252. Meeting Rooms｜ 6/17 | [ Review * 1 ]
 Given an array of meeting time intervals consisting of start and end times [[s1,e1],[s2,e2],...] (si < ei), determine if a person could attend all meetings.
 
 Example 1:
@@ -24440,12 +24440,34 @@ Output: true
 ``` py
 class Solution:
     def canAttendMeetings(self, intervals: List[List[int]]) -> bool:
-        intervals = sorted(intervals, key=lambda x: x[0])
-        for i in range(1, len(intervals)):
-            if intervals[i-1][1] > intervals[i][0]:
+        prev = 0
+        for start, end in sorted(intervals):
+            if prev > start:
+                return False
+            prev = max(prev, end)
+        return True
+```
+
+Heap
+```py
+import heapq
+
+class Solution:
+    def canAttendMeetings(self, intervals: List[List[int]]) -> bool:
+        if not intervals:
+            return True
+        heapq.heapify(intervals)
+        first = heapq.heappop(intervals)
+
+        while intervals:
+            current = heapq.heappop(intervals)
+            if current[0] >= first[1]:
+                first = current
+            else:
                 return False
         return True
 ```
+### Tag: #Heap, #Sort, #Greedy
 ---
 ## 253. Meeting Rooms II｜ 6/17
 
