@@ -27429,7 +27429,7 @@ class Solution:
             self.maxTime = max(self.maxTime, hour*60 + minute)
 ```
 ---
-## 763. Partition Labels｜ 9/20
+## 763. Partition Labels｜ 9/20 | [ Review * 1 ]
 A string S of lowercase English letters is given. We want to partition this string into as many parts as possible so that each letter appears in at most one part, and return a list of integers representing the size of these parts.
 
 
@@ -27458,24 +27458,19 @@ S will consist of lowercase English letters ('a' to 'z') only.
 ### Code
 clean code, two pointer, O(n)
 ``` py
-from collections import defaultdict
 class Solution:
     def partitionLabels(self, S: str) -> List[int]:
-        if not S:
-            return []
-        dic = defaultdict(int)
+        last_idx = {c: i for i, c in enumerate(S)}
+        l, r = 0, 0
+        res = []
         for i, c in enumerate(S):
-            dic[c] = i
-
-        left, right = 0, dic[S[0]]
-        while i < len(S):
-            right = max(right, dic[S[i]])
-            if i == right: # no elem in this range is out of this range
-                res.append(right-left+1)
-                left = right + 1
-            i += 1
+            r = max(r, last_idx[c])
+            if i == r:
+                res.append(r-l+1)
+                l = i+1
         return res
 ```
+### Tag: #Greedy
 ---
 ## 304. Range Sum Query 2D - Immutable｜ 10/9
 Given a 2D matrix matrix, find the sum of the elements inside the rectangle defined by its upper left corner (row1, col1) and lower right corner (row2, col2).
