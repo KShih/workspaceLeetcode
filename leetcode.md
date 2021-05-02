@@ -27689,15 +27689,13 @@ class TwoSum:
         return value in self._sum
 ```
 ---
-## 452. Minimum Number of Arrows to Burst Balloons｜ 10/10
+## 452. Minimum Number of Arrows to Burst Balloons(Proof of work 如何證明?)｜ 10/10 | [ Review * 1 ]
 
 There are some spherical balloons spread in two-dimensional space. For each balloon, provided input is the start and end coordinates of the horizontal diameter. Since it's horizontal, y-coordinates don't matter, and hence the x-coordinates of start and end of the diameter suffice. The start is always smaller than the end.
 
 An arrow can be shot up exactly vertically from different points along the x-axis. A balloon with xstart and xend bursts by an arrow shot at x if xstart ≤ x ≤ xend. There is no limit to the number of arrows that can be shot. An arrow once shot keeps traveling up infinitely.
 
 Given an array points where points[i] = [xstart, xend], return the minimum number of arrows that must be shot to burst all balloons.
-
-
 
 Example 1:
 
@@ -27730,9 +27728,25 @@ Input: points = [[2,3],[2,3]]
 
 Output: 1
 
+### 解題分析
+1. Greedy problems usually look like "Find minimum number of something to do something" or "Find maximum number of something to fit in some conditions", and typically propose an unsorted input.
+
+2. The idea of greedy algorithm is to pick the locally optimal move at each step, that will lead to the globally optimal solution.
+
+3. proof of work:
+    - use contradiction method
+
+1. 我們第一支箭要怎麼射？
+    - 我們希望這支箭越靠越中間越好因為可以 cover 越多的氣球 -> 因此我們遠永瞄準氣球的最右邊射
+2. 如何知道我們需要新的劍？ (Traverse 的順序)
+    - 必須 sort by end position 因為當我們在 traverse 的過程，我們必須確保這支箭已經沒有氣球可以被破了(start > arrow)，然後將 arrow 更新為新的 end，如果不 sort 的話，萬一後面遇到新的 end 是比目前新更新的還小的話，那我們就更新錯了
+3. 如何 proof of work?
+    - 假設我們的不是最小，而且你可以找到更少的劍去設完所有氣球
+    - 把區間畫出來，把其中一支箭擦掉，發現會有漏掉的氣球 -> 不存在更少得劍
+
 ### 思路
 
-arrow 為 區間的 y 值，下一個區間想要被這個 arrow 穿過 其區間必須包含此 arrow，
+arrow 為 區間的 end 值，下一個區間想要被這個 arrow 穿過 其區間必須包含此 arrow，
 
 否則就必須 new 一隻新的arrow
 
@@ -27742,17 +27756,14 @@ arrow 為 區間的 y 值，下一個區間想要被這個 arrow 穿過 其區�
 ``` py
 class Solution:
     def findMinArrowShots(self, points: List[List[int]]) -> int:
-        arrowList = []
-        points = sorted(points, key=lambda x: x[1])
-        for x, y in points:
-            if len(arrowList) == 0:
-                arrowList.append(y)
-                continue
-            lastArr = arrowList[-1]
-            if x > lastArr or y < lastArr:
-                arrowList.append(y)
-        return len(arrowList)
+        arrow, res = None, 0
+        for start, end in sorted(points, key = lambda k: k[1]):
+            if not arrow or start > arrow:
+                res += 1
+                arrow = end
+        return res
 ```
+### Tag: #Sort #Greedy
 ---
 ## 307. Range Sum Query - Mutable｜ 10/11
 Given an integer array nums, find the sum of the elements between indices i and j (i ≤ j), inclusive.

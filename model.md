@@ -24,6 +24,15 @@ Solution Model
 3. 利用 tuple 的性質讓 unhashable type 變成 hashable
     1. `set.add(tuple(list))`
 
+## Greedy
+1. Greedy problems usually look like "Find minimum number of something to do something" or "Find maximum number of something to fit in some conditions", and typically propose an unsorted input.
+
+2. The idea of greedy algorithm is to pick the locally optimal move at each step, that will lead to the globally optimal solution.
+3. How to provide Proof of Work?
+    - 通常是使用反證法
+        - 假設我的事並不是最佳解, (假設此題是找用最少的 ... 去做到 ...)
+        - 那就把答案 -1, 然後想辦法去證明真的沒辦法用這個數量去找到解 -> 因此我們的是最佳解
+
 ## Calculator
 - for `224`, `227`, `772`
 - 對於負整數也能解
