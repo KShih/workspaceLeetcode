@@ -9821,12 +9821,36 @@ public:
 ```
 ### Tag: #Tree
 ---
-## 621. Task Scheduler(unsoloved follow up)｜ 8/26
+## 621. Task Scheduler｜ 8/26 | [ Review * 1 ]
 Given a char array representing tasks CPU need to do. It contains capital letters A to Z where different letters represent different tasks. Tasks could be done without original order. Each task could be done in one interval. For each interval, CPU could finish one task or just be idle.
 
 However, there is a non-negative cooling interval n that means between two same tasks, there must be at least n intervals that CPU are doing different tasks or just be idle.
 
 You need to return the least number of intervals the CPU will take to finish all the given tasks.
+
+### 解題分析
+1. Greedy
+    0. ![](assets/markdown-img-paste-20210502201901878.png)
+    1. 首先我們先找出出現次數最多的那個數的次數, 其 (f-1) * n 及為所至多需要的 idle time
+    2. 那麼 task 總數 + idle time 極為所求, 但 idle time 可以被其他的 task 所填入
+        - idle -= min( max_cnt -1, freq_n )
+            - 這邊之所以要跟 max_cnt-1 比是因為我們最多只有 max_cnt -1 個slot可以填
+    3. 最後在 return 時在判斷一下 idle是否大於 0, 決定是否要加即可
+2. Math
+    0. ![](assets/markdown-img-paste-2021050220193147.png)
+    1. 可以分成兩種情況來討論這題
+        1. slots 都被填滿
+            - 這樣就直接 return len(tasks)
+        2. slots 沒填滿
+            - interval 長度 * interval 數量 + 剩餘的
+            - 一樣由頻率最大的去分配 slot, 每個 interval 的長度為 (n+1)
+            - 總共有 max_cnt - 1 個 slot
+            - 最後加上 max_cnt 的數量
+3. Follow Up: task 的順序不能變, 且需印出 result
+    1. 用 map 去紀錄當前 task 上次出現的時間
+    2. print result 用 prev 去比較下個 task 之間要填入多少個 E
+
+
 ### 思路
 1.
 [AAABBB]
@@ -9857,9 +9881,72 @@ edge case:
 Equation: 1*2+2 = 4
 
 
-- Follow up: return the string
-  - https://www.1point3acres.com/bbs/thread-492747-2-1.html
+- Follow up: return the string and keep the task order
+    - https://www.1point3acres.com/bbs/forum.php?mod=viewthread&tid=323827
+    - https://www.1point3acres.com/bbs/thread-492747-2-1.html
 ### Code
+Greedy
+```py
+class Solution:
+    def leastInterval(self, tasks: List[str], n: int) -> int:
+        sorted_cnter = sorted(Counter(tasks).items(), key=lambda k: k[1])
+        max_cnt = sorted_cnter.pop()[1]
+        slots = (max_cnt-1) * n
+
+        while sorted_cnter:
+            if slots <= 0:
+                break
+            slots -= min(max_cnt-1, sorted_cnter.pop()[1])
+        return len(tasks) + slots if slots > 0 else len(tasks)
+```
+
+Math
+```py
+class Solution:
+    def leastInterval(self, tasks: List[str], n: int) -> int:
+        cnter = Counter(tasks).items()
+        max_cnt = max(cnter, key=lambda k: k[1])[1]
+        max_elem_cnt = sum([1 for _, v in cnter if v == max_cnt])
+
+        return max(len(tasks), (n+1) * (max_cnt-1) + max_elem_cnt)
+```
+
+FollowUP
+```py
+class Solution:
+    def leastInterval(self, tasks: List[str], n: int) -> int:
+        lastUsed = {}
+        cur = 0
+        for task in tasks:
+            if task in lastUsed:
+                cur = max(cur+1, lastUsed.get(task) + n)
+            else:
+                cur += 1
+            lastUsed[task] = cur
+        return cur
+```
+
+FollowUp and print result
+```py
+class Solution:
+    def leastInterval(self, tasks: List[str], n: int) -> int:
+        lastUsed = {}
+        cur = 0
+        res = ""
+        for task in tasks:
+            prev = cur
+            if task in lastUsed:
+                cur = max(cur+1, lastUsed.get(task) + n)
+            else:
+                cur += 1
+            lastUsed[task] = cur
+            res += (cur - prev - 1) * 'E'
+            res += task
+        print(res)
+        return cur
+```
+
+
 ``` c
 class Solution {
 public:
@@ -9886,34 +9973,7 @@ public:
     }
 };
 ```
-
-Follow-up:
-Without changing the order:
-```c
-class Solution {
-public:
-    int leastInterval(vector<char>& tasks, int n) {
-        // count the char
-        vector<int> count(26,0);
-        for (char task: tasks){
-            count[task-'A'] ++;
-        }
-
-        int max_count = 0;
-        int many_max = 0;
-        int lens = tasks.size();
-        // get the max_count
-        for (int i=0; i<26; i++){
-            max_count = max(max_count, count[i]);
-        }
-        // get how many max_count are there in the count
-        for (int i=0; i<26; i++){
-            if (count[i] == max_count)  many_max++;
-        }
-        return max(lens, (n+1) * (max_count - 1) + many_max);   // max() is used to deal with edge case (n=0)
-    }
-};
-```
+### Tag: #Greedy
 ---
 ## 136. Single Number｜ 8/26
 Given a non-empty array of integers, every element appears twice except for one. Find that single one.
