@@ -24469,7 +24469,7 @@ class Solution:
 ```
 ### Tag: #Heap, #Sort, #Greedy
 ---
-## 253. Meeting Rooms II｜ 6/17
+## 253. Meeting Rooms II｜ 6/17 | [ Review * 1 ]
 
 Given an array of meeting time intervals consisting of start and end times [[s1,e1],[s2,e2],...] (si < ei), find the minimum number of conference rooms required.
 
@@ -24499,21 +24499,35 @@ heap 裡面放此meeting 的結束時間，
 ### Code
 min Heap:
 ``` py
-import heapq
 class Solution:
     def minMeetingRooms(self, intervals: List[List[int]]) -> int:
-        if not intervals:
-            return 0
-        intervals = sorted(intervals, key=lambda x: x[0])
-        room = 1
+        intervals = sorted(intervals)
         heap = [intervals[0][1]]
-        for i in range(1, len(intervals)):
-            if intervals[i][0] < heap[0]:
-                room += 1
-            else:
+        res = 1
+        for start, end in intervals[1:]:
+            while heap and start >= heap[0]:
                 heapq.heappop(heap)
-            heapq.heappush(heap,intervals[i][1])
-        return room
+            heapq.heappush(heap, end)
+            res = max(res, len(heap))
+        return res
+```
+
+Line Sweep
+```py
+class Solution:
+    def minMeetingRooms(self, intervals: List[List[int]]) -> int:
+        OPEN, END = 1, 0 # [[[13,15],[1,13]]] ans=1 -> end meeting priority greater than open
+        events = []
+        for start, end in intervals:
+            events.append((start, OPEN))
+            events.append((end, END))
+
+        res = 0
+        balance = 0
+        for _, cmd in sorted(events):
+            balance += 1 if cmd == OPEN else -1
+            res = max(res, balance)
+        return res
 ```
 
 self implement TreeMap:
@@ -24534,6 +24548,7 @@ class Solution:
             res = max(res, room)
         return res
 ```
+### Tag: #Heap, #Greedy #LineSweep
 ---
 ## 254. Factor Combinations｜ 6/18 | [Review * 1]
 Numbers can be regarded as product of its factors. For example,
