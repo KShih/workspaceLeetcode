@@ -8248,18 +8248,18 @@ If there is, then the solution is don't go that far in this step, shorten it the
 If there is not, we still can find the farthest position we can reach.
 ![](assets/markdown-img-paste-20190810080432649.png)
 
+### 類似題
+LC 1326
+
 ### Code
 ```py
 class Solution:
     def jump(self, nums: List[int]) -> int:
         if len(nums) <= 1: return 0
 
-        l, r, step = 0, nums[0], 1
+        l, r, step = 0, 0, 0
         while r < len(nums)-1:
-            farthest = 0
-            for i in range(l, r+1):
-                farthest = max(farthest, i+nums[i])
-            l, r = r, farthest
+            l, r = r, max(i+nums[i] for i in range(l, r+1))
             step += 1
         return step
 ```
@@ -34461,4 +34461,89 @@ class Solution:
 ```
 
 ### Tag: #Greedy #Heap #LineSweep
+---
+## 1326. Minimum Number of Taps to Open to Water a Garden｜ 5/3
+
+There is a one-dimensional garden on the x-axis. The garden starts at the point 0 and ends at the point n. (i.e The length of the garden is n).
+
+There are n + 1 taps located at points [0, 1, ..., n] in the garden.
+
+Given an integer n and an integer array ranges of length n + 1 where ranges[i] (0-indexed) means the i-th tap can water the area [i - ranges[i], i + ranges[i]] if it was open.
+
+Return the minimum number of taps that should be open to water the whole garden, If the garden cannot be watered return -1.
+
+Example 1:
+
+![](assets/markdown-img-paste-20210503081059626.png)
+
+- Input: n = 5, ranges = [3,4,1,1,0,0]
+- Output: 1
+- Explanation: The tap at point 0 can cover the interval [-3,3]
+- The tap at point 1 can cover the interval [-3,5]
+- The tap at point 2 can cover the interval [1,3]
+- The tap at point 3 can cover the interval [2,4]
+- The tap at point 4 can cover the interval [4,4]
+- The tap at point 5 can cover the interval [5,5]
+- Opening Only the second tap will water the whole garden [0,5]
+
+Example 2:
+
+- Input: n = 3, ranges = [0,0,0,0]
+- Output: -1
+- Explanation: Even if you activate all the four taps you cannot water the whole garden.
+
+Example 3:
+
+- Input: n = 7, ranges = [1,2,1,0,2,1,0,1]
+- Output: 3
+
+Example 4:
+
+- Input: n = 8, ranges = [4,0,0,0,0,0,0,0,4]
+- Output: 2
+
+Example 5:
+
+- Input: n = 8, ranges = [4,0,0,0,4,0,0,0,4]
+- Output: 1
+
+Constraints:
+
+- 1 <= n <= 10^4
+- ranges.length == n + 1
+- 0 <= ranges[i] <= 100
+
+
+Hints:
+1. Create intervals of the area covered by each tap, sort intervals by the left end.
+2. We need to cover the interval [0, n]. we can start with the first interval and out of all intervals that intersect with it we choose the one that covers the farthest point to the right.
+3. What if there is a gap between intervals that is not covered ? we should stop and return -1 as there is some interval that cannot be covered.
+
+### 解題分析
+1. 我們可以算出每個 interval 的 leftmost 跟 rightmost, 並且把他們正規劃 left 不小於 0, right 不大於 n
+2. 然後用一個 arr 去紀錄每個位置, 可以透過一個 tap 去 reach 到其右邊幾個位置
+3. 那麼這個問題就變成了 Jump Game II
+    - 唯一不一樣的是, jump game ii 保證了我們一定可以到底, 那這題就加上個檢查 l == r 時表示這個區間內沒有可以進展的
+
+
+### Code
+``` py
+class Solution:
+    def minTaps(self, n, ranges):
+        max_reach = [0] * (n+1)
+        for i, r in enumerate(ranges):
+            leftmost, rightmost = max(0, i-r), min(n, i+r)
+            max_reach[leftmost] = max(max_reach[leftmost], rightmost-leftmost) # max more steps from leftmost idx
+
+        # jump game II start
+        l, r, step = 0, 0, 0
+        while r < n:
+            step += 1
+            l, r = r, max(i + max_reach[i] for i in range(l, r+1))
+            if l == r:
+                return -1 # cant reach more
+        return step
+```
+
+### Tag: #Greedy
 ---
