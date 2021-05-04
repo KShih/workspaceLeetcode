@@ -34622,3 +34622,172 @@ class Solution:
 
 ### Tag: #Greedy
 ---
+## 295. Find Median from Data Stream｜ 5/3
+The median is the middle value in an ordered integer list. If the size of the list is even, there is no middle value and the median is the mean of the two middle values.
+
+For example, for arr = [2,3,4], the median is 3.
+
+For example, for arr = [2,3], the median is (2 + 3) / 2 = 2.5.
+
+Implement the MedianFinder class:
+
+- MedianFinder() initializes the MedianFinder object.
+- void addNum(int num) adds the integer num from the data stream to the data structure.
+- double findMedian() returns the median of all elements so far. Answers within 10^-5 of the actual answer will be accepted.
+
+Example 1:
+
+Input
+
+- ["MedianFinder", "addNum", "addNum", "findMedian", "addNum", "findMedian"]
+- [[], [1], [2], [], [3], []]
+
+Output
+- [null, null, null, 1.5, null, 2.0]
+
+Explanation
+- MedianFinder medianFinder = new MedianFinder();
+- medianFinder.addNum(1);    // arr = [1]
+- medianFinder.addNum(2);    // arr = [1, 2]
+- medianFinder.findMedian(); // return 1.5 (i.e., (1 + 2) / 2)
+- medianFinder.addNum(3);    // arr[1, 2, 3]
+- medianFinder.findMedian(); // return 2.0
+
+Constraints:
+
+- -10^5 <= num <= 10^5
+- There will be at least one element in the data structure before calling findMedian.
+- At most 5 * 104 calls will be made to addNum and findMedian.
+
+Follow up:
+
+1. If all integer numbers from the stream are in the range [0, 100], how would you optimize your solution?
+    - We can maintain an integer array of length 100 to store the count of each number along with a total count. Then, we can iterate over the array to find the middle value to get our median.
+    - Time and space complexity would be O(100) = O(1).
+
+2. If 99% of all integer numbers from the stream are in the range [0, 100], how would you optimize your solution?
+
+3. What if the data is very very large. How would you handle it?
+    - sampling/statistical methods?
+    - solution similar to #3, but using two TreeMaps storing "histograms": how many times each element has been encountered.
+    - bucket sort, Reservoir Sampling?
+
+### 解題分析
+1. Two Heap
+    1. 左小半部用 max_heap 存
+    2. 右大半部用 min_heap 存
+    3. size property: 左半部不能小於右半部
+    4. findMed:
+        - 奇數個時 (左半部比右半部多1): return 左半部
+        - 偶數個時: return (top(左) + top(右)) / 2
+    5. addNum:
+        - 每次新增都先放進左半部
+        - 然後進行平衡
+        - 若破壞了 size property, 再平衡一次
+    6. complexity:
+        - Time: O(5log(n)) + O(1)
+            - worst case: 5 heap operation
+        - Space: O(n)
+2. Follow Up:
+    1. If all integer numbers from the stream are in the range [0, 100], how would you optimize your solution?
+        1. 用一個大小為100的陣列存
+        2. 紀錄 total count
+        3. 取的時候用 total count 去算出中位數
+    2. If 99% of all integer numbers from the stream are in the range [0, 100], how would you optimize your solution?
+        0. 有兩種說法
+        1. 中位數並不會存在 out of [0,100] range 的地方 (一直add, 然後才取中位數)
+            0. 原理: 因為中位數不會出現在 out of range 的地方, 所以我們只在意到底有多少而已, 至於大於100的也不用存, 因為不會數到那邊
+            1. 用一個大小為100 的陣列存
+            2. 紀錄 total count
+            3. 紀錄 小於 0 的 count
+            4. 取的時候先加上 less_than_0 count 後再去找出中位數
+        2. 中位數可能存在 out of range 的地方 (在前面幾次 add < 0 的數的時候就去 getMed)
+            - 用 c++ 的 multiset 特別存 less_than_0 and greater_than_100 的 (O(logn))
+            - 且因為這些數的數量相對小, 所以overhead 效能不會太差
+    3. What if the data is very very large. How would you handle it?
+        1. 如果要回傳 exact number, 那我們就必須儲存所有數字, 因此我們只能依靠寫入 disk 之類的方法來完成
+        2. 如果可以回傳 approximate number, 那我們就可以存到 bucket 裡面, 存到滿的時候就紀錄一下該 bucket 的 metadata
+            - bucket_range, bucket_count
+
+### Code
+Two Heap
+``` py
+class MedianFinder:
+
+    def __init__(self):
+        self.max_heap = []
+        self.min_heap = []
+
+    def addNum(self, num):
+        heapq.heappush(self.max_heap, -num)
+        heapq.heappush(self.min_heap, -heapq.heappop(self.max_heap)) # balance
+        if len(self.max_heap) < len(self.min_heap): # maintain size property
+            heapq.heappush(self.max_heap, -(heapq.heappop(self.min_heap)))
+
+    def findMedian(self):
+        if len(self.max_heap) > len(self.min_heap):
+            return -(self.max_heap[0])
+        else:
+            return (-(self.max_heap[0]) + self.min_heap[0]) / 2
+```
+
+FollowUp 1
+```java
+class MedianFinder {
+    int A[] = new int[101], n = 0;
+
+    // O(1)
+    public void addNum(int num) {
+        A[num]++;
+        n++;
+    }
+
+    // O(100) = O(1)
+    public double findMedian() {
+
+        // find 1st median number
+        int count = 0, i = 0;
+        while (count < n/2) count += A[i++];
+
+        // find 2nd median number
+        int j = i;
+        while (count < n/2+1) count += A[j++];
+
+        return (n%2 == 1) ? i : (i-1+j-1) / 2.0;
+    }
+}
+```
+
+FollwUp 2-1
+```java
+class MedianFinder {
+    int A[] = new int[101], n = 0;
+    int countLessZero = 0;
+    // int countGreater100 = 0; // not needed
+
+    // O(1)
+    public void addNum(int num) {
+        if (num < 0) countLessZero++;
+        // else if (num > 100) countGreater100++;
+        else A[num]++;
+        n++;
+    }
+
+    // O(100) = O(1)
+    public double findMedian() {
+
+        // find 1st median number
+        int count = countLessZero, i = 0;
+        while (count < /2) count += A[i++];
+
+        // find 2nd median number
+        int j = i;
+        while (count < n/2+1) count += A[j++];
+
+        return (n%2 == 1) ? i : (i-1+j-1) / 2.0;
+    }
+}
+```
+
+### Tag: #Heap
+---
