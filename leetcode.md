@@ -34698,3 +34698,84 @@ class MedianFinder {
 
 ### Tag: #Heap
 ---
+## 692. Top K Frequent Words｜ 5/5
+Given a non-empty list of words, return the k most frequent elements.
+
+Your answer should be sorted by frequency from highest to lowest. If two words have the same frequency, then the word with the lower alphabetical order comes first.
+
+Example 1:
+
+- Input: ["i", "love", "leetcode", "i", "love", "coding"], k = 2
+- Output: ["i", "love"]
+- Explanation: "i" and "love" are the two most frequent words.
+- Note that "i" comes before "love" due to a lower alphabetical order.
+
+Example 2:
+- Input: ["the", "day", "is", "sunny", "the", "the", "the", "sunny", "is", "is"], k = 4
+- Output: ["the", "is", "sunny", "day"]
+- Explanation: "the", "is", "sunny" and "day" are the four most frequent words, with the number of occurrence being 4, 3, 2 and 1 respectively.
+
+Note:
+- You may assume k is always valid, 1 ≤ k ≤ number of unique elements.
+- Input words contain only lowercase letters.
+
+Follow up:
+- Try to solve it in O(n log k) time and O(n) extra space.
+
+### 解題分析
+1. Max-heap
+    - 用 max heap 依據 count 押入 heap, output 前 k 個就是答案, 但這樣複雜度是 n log n => 押入 heap 的count要取負
+        - 且針對相同 count 的不需要去重新定義排序規則, 因為 python heap 的實作適用 min-heap, 因此預設的規則就是小字母的先出
+2. Min-Heap
+    - 相反過來我們要維持 k 大小的 heap, 裡面撐到最後的就是我們的答案, 因此這樣就是要維持 min heap (小的會先被 pop 掉) => 押入 heap 的count不用取負
+        - 針對相同 count 的就需要去重新定義排序規則了, 因為 min heap 小的會先出掉
+            - ["i", "love", "leetcode", "i", "love", "coding"],  k=1
+            - 當 i 跟 love count 都是 2 的時候, 此時 heap 爆掉了, 要先 pop 掉一個, 那此時若沒有重新定義排序, i 在頂端會先被出掉
+            - 因此我們必須重新定義 `__lt__`: 去告訴 heap, self 何時會小於 other
+                1. self.count < other .count 的時候
+                2. self.word > other.word 的時候
+    - 那麼對於答案的輸出我們就是 pop 出 k 個 element, 並且 reverse, 即為所求
+
+
+### Code
+(optimal) Min-Heap (n log k)
+``` py
+class Element:
+    def __init__(self, count, word):
+        self.count = count
+        self.word = word
+
+    def __lt__(self, other):
+        if self.count == other.count:
+            return self.word > other.word
+        return self.count < other.count
+
+    def __eq__(self, other):
+        return self.count == other.count and self.word == other.word
+
+class Solution(object):
+    def topKFrequent(self, words, k):
+        counts = collections.Counter(words)
+
+        freqs = []
+        for word, count in counts.items():
+            heapq.heappush(freqs, (Element(count, word), word))
+            if len(freqs) > k:
+                heapq.heappop(freqs)
+
+        res = [heapq.heappop(freqs)[1] for _ in range(k)]
+        return res[::-1]
+```
+
+MaxHeap (n log n)
+```py
+class Solution(object):
+    def topKFrequent(self, words, k):
+        count = collections.Counter(words)
+        heap = [(-freq, word) for word, freq in count.items()]
+        heapq.heapify(heap)
+        return [heapq.heappop(heap)[1] for _ in range(k)]
+```
+
+### Tag: #Heap
+---
