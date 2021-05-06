@@ -34750,21 +34750,17 @@ class Element:
             return self.word > other.word
         return self.count < other.count
 
-    def __eq__(self, other):
-        return self.count == other.count and self.word == other.word
-
 class Solution(object):
     def topKFrequent(self, words, k):
-        counts = collections.Counter(words)
+        counts = Counter(words)
 
-        freqs = []
+        heap = []
         for word, count in counts.items():
-            heapq.heappush(freqs, (Element(count, word), word))
-            if len(freqs) > k:
-                heapq.heappop(freqs)
+            heappush(heap, Element(count, word))
+            if len(heap) > k:
+                heappop(heap)
 
-        res = [heapq.heappop(freqs)[1] for _ in range(k)]
-        return res[::-1]
+        return [heappop(heap).word for _ in range(k)][::-1]
 ```
 
 MaxHeap (n log n)
