@@ -34775,3 +34775,61 @@ class Solution(object):
 
 ### Tag: #Heap
 ---
+## 149. Max Points on a Line｜ 5/7
+Given an array of points where points[i] = [xi, yi] represents a point on the X-Y plane, return the maximum number of points that lie on the same straight line.
+
+Example 1:
+![](assets/markdown-img-paste-20210507090810691.png)
+- Input: points = [[1,1],[2,2],[3,3]]
+- Output: 3
+
+Example 2:
+![](assets/markdown-img-paste-20210507090845572.png)
+- Input: points = [[1,1],[3,2],[5,3],[4,1],[2,3],[1,4]]
+- Output: 4
+
+Constraints:
+
+- 1 <= points.length <= 300
+- points[i].length == 2
+- -10^4 <= xi, yi <= 10^4
+- All the points are unique.
+
+### 解題分析
+1. 最單純的從 points i 出發到其他點的斜率的count 用 hashmap 存起來, 並維護一個 local max, 當其他點都traverse 完再統計到 global, 當所有點 i 都走完，就相當於走訪了所有可能連線, 即為所求
+2. 例外處理
+    1. 點 i 與 點 j 重合
+        - 這邊用一個 overlap 變數去統計, 最後直接加到 local_max 裡
+    2. 垂直線
+        - 當 dx = 0 時, 這邊用 'inf' 去避免除零
+    3. 水平線
+        - 當 dy = 0 時, 這邊就是單純的斜率 = 0時
+3. Trick 剪支
+    - 點 j 不需要去訪問所有點, 只需要從 i+1 訪問起就可以了, 因為前面的點比如 i-2, 已經被從 i=i-2 出發的點給計算過了
+
+### Code
+``` py
+class Solution(object):
+    def maxPoints(self, points):
+        if len(points) <= 2:
+            return len(points)
+
+        d = defaultdict(int)
+        res = 0
+        for i in range(len(points)-1):
+            d.clear()
+            local_max_slope, overlap = 0, 0
+            for j in range(i+1, len(points)):
+                dx, dy = points[i][0] - points[j][0], points[i][1] - points[j][1]
+                if dx == 0 and dy == 0:
+                    overlap += 1
+                    continue
+                slope = dy * (1.0) / dx if dx != 0 else 'inf'
+                d[slope] += 1
+                local_max_slope = max(local_max_slope, d[slope])
+            res = max(res, local_max_slope+overlap+1)
+        return res
+```
+
+### Tag: #HashMap
+---
