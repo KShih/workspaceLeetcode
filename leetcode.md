@@ -25000,7 +25000,7 @@ class Solution:
         return True
 ```
 ---
-## 264. Ugly Number II｜ 7/13
+## 264. Ugly Number II｜ 7/13 | [ Review * 1 ]
 
 Write a program to find the n-th ugly number.
 
@@ -25032,6 +25032,8 @@ DP:
 使用三個指標去 maintain 三個被取出的位置，
 
 要求的醜陋數就是從已經生成的序列中取出來的，每次都從三個列表中取出當前最小的那個加入序列，來形成醜陋數列
+
+注意，三個都必須要用 if, 不然遇到 `2*3`, `3*2` 的情形就會讓 arr 出現重複的數導致答案錯
 
 ### Code
 min heap solution:
@@ -25072,6 +25074,7 @@ def nthUglyNumber(self, n):
            i5 += 1
    return ugly[-1]
 ```
+### Tag: #Heap #DP
 ---
 ## 266. Palindrome Permutation｜ 7/19 | [Review * 1]
 Given a string, determine if a permutation of the string could form a palindrome.
