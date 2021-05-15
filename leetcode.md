@@ -7095,7 +7095,7 @@ Merge k sorted linked lists and return it as one sorted list. Analyze and descri
     3. 若還可分割就繼續分割然後合併
 2. PriorityQueue
     1. 這邊千萬別把所有的 node 都塞進 pq 裡，我們只在意各個 List 中的第一個 node
-    2. python 的 pq 不能自定義compare rule，所以這邊把此 node 的 idx pair 起來，以作後續的 mapping
+    2. python 的 pq 不能自定義compare rule，(因此不能pair node.val 跟 node), 所以這邊把此 node 的 idx pair 起來，以作後續的 mapping
     3. 在 pop pq 並依序用指針串起來後，再繼續 push 節點進 pq，並更新 mapping 到的頭節點為下個結點
 
 ### 思路
@@ -7262,7 +7262,7 @@ public:
     }
 };
 ```
-### Tag: #DivideAndConquer #Recursive #LinkedList #PriorityQueue
+### Tag: #DivideAndConquer #Recursive #LinkedList #PriorityQueue #Heap
 ---
 ## 147. Insertion Sort List｜ 7/8
 Sort a linked list using insertion sort.
@@ -30090,7 +30090,6 @@ class Twitter:
         self.tweets_map[userId].append((self.ts, tweetId))
         self.ts += 1
 
-
     def getNewsFeed(self, userId: int) -> List[int]:
         """
         Retrieve the 10 most recent tweet ids in the user's news feed. Each item in the news feed must be posted by users who the user followed or by the user herself. Tweets must be ordered from most recent to least recent.
@@ -30103,13 +30102,11 @@ class Twitter:
                 heapq.heappush(all_feed, (-ts, tweetId))
         return [tid for _, tid in heapq.nsmallest(10, all_feed)]
 
-
     def follow(self, followerId: int, followeeId: int) -> None:
         """
         Follower follows a followee. If the operation is invalid, it should be a no-op.
         """
         self.follower_map[followerId].add(followeeId)
-
 
     def unfollow(self, followerId: int, followeeId: int) -> None:
         """
