@@ -14012,7 +14012,7 @@ class Solution(object):
 ```
 ### Tag: #Heap #QuickSelect
 ---
-## 239. Sliding Window Maximum(Deque經典題)｜ 10/12
+## 239. Sliding Window Maximum｜ 10/12 | [ Review * 1 ]
 Given an array nums, there is a sliding window of size k which is moving from the very left of the array to the very right. You can only see the k numbers in the window. Each time the sliding window moves right by one position. Return the max sliding window.
 ![](assets/markdown-img-paste-20191012153637731.png)
 
@@ -14029,6 +14029,25 @@ How about using a data structure such as deque (double-ended queue)?
 The queue size need not be the same as the window’s size.
 
 Remove redundant elements and the queue should store only elements that need to be considered.
+
+### 解題分析
+0. Brute force
+    - N*k
+    - 外面一層 for 去走訪所有元素, 每次去對 k個元素 getMax
+1. Heap
+    - 使用 heap 可以讓我們不用去 getMax
+    - 然後此時必須思考如何在每次 window shift 的時候讓 heap 知道這個元素已經被 pop 掉了?
+    - 此時可以用 dict, 去紀錄此元素是否還活著 (live), 當期 cnt 歸零的時候表示其已死
+    - 我們不需要把已死的馬上從heap移掉, 除非他在我們可能會access的位置 (heap top)
+2. Mono Queue
+    - 根據提示，我們的 window 只需要放『可能的解』就好了
+    - 考慮例子: [-1, 5, 4] => -1 不可能是解, 因為其後面 5 已經出現了, 4 有可能是解, 只要隨著 window 移動 5 被移掉的時候
+    - 因此可以想到使用遞減單調 queue 來解, 其首放的即是當前 window 的最大
+        1. 要插入前為了要維持單調性, 要先把大於此 num 的清掉
+        2. 插入此 num 的 index
+        3. 檢查目前 window 是否過大, 過大的話就要把首清掉
+        4. 最後插入 res 前做檢查, 我們不想要還在 initial 的時候就加入元素
+
 ### 思路
 ![](assets/markdown-img-paste-2019101215353966.png)
 
@@ -14047,7 +14066,7 @@ class Solution:
                 orderQueue.pop()
 
             # append the item
-            orderQueue += [i]
+            orderQueue.append(i)
 
             # keep the window size
             if i - orderQueue[0] >= k:
@@ -14060,6 +14079,29 @@ class Solution:
 
         return res
 ```
+
+Heap + Counter 的解法 (n log k)
+```py
+class Solution:
+    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
+        res = []
+        heap = []
+        live = Counter()
+
+        for i, num in enumerate(nums):
+            heappush(heap, -num)
+            live[num] += 1
+
+            while live[-heap[0]] == 0:
+                heappop(heap)
+
+            if i+1 >= k:
+                res.append(-heap[0])
+                live[nums[i-k+1]] -= 1
+        return res
+```
+
+### Tag: #MonoStack #Heap
 ---
 ## Roblox. List Max｜ 10/14
 ![](assets/markdown-img-paste-20191014103154100.png)
