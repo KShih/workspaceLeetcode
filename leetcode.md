@@ -6518,7 +6518,7 @@ public:
 ```
 ### Tag: #BinarySearch
 ---
-## 378. Kth Smallest Element in a Sorted Matrix｜ 7/2
+## 378. Kth Smallest Element in a Sorted Matrix｜ 7/2 | [ Review * 1 ]
 Given a n x n matrix where each of the rows and columns are sorted in ascending order, find the kth smallest element in the matrix.
 
 Note that it is the kth smallest element in the sorted order, not the kth distinct element.
@@ -6534,9 +6534,92 @@ priority_queue in c++ can automatically sort the queue whenever you push into it
 This properties can make sure the very top of the queue is the largest element in every loop,
 then we use size limitation to find the Top-k elements in the array.
 
-
+### 解題分析
+1. Heap 就很直覺不用解釋
+    - 但可以注意的是每一行都 sorted 過, 因此其解法與 merge K sorted arr 很像
+    - 若要妥善利用其已經 sorted 的性質, 不需要把所有的元素全部 push 進 heap
+2. Binary Search
+    1. 因為此題非完全的排列, 因此我們不能使用 index based 的搜索, instead 我們使用 range based 的搜索
+    2. initial range 就是 第一個元素 ~ 最後一個元素
+    3. 那麼我們要怎麼定位到第 k 個元素呢? 我們去找出所有小於 mid 的數 的個數, 若等於 k 此時 smaller (小於等於mid的數) 就是解
+        - 我們每次都從最後一行的第一個數開始找起, 如果太大, 就表示這整行都不可能, 因此直接退一行
+        - 要是太小我們就往前一格, 並且可以加上從頭到現在的縱向 row 數(因為前面的一定都比較小!)
+        - 同時去維護 smaller 跟 larger, smaller 為 最大的小於mid的數, larger 為 最小大於mid的數
+    4. 否則我們去調整我們的左右邊界
 
 ### Code
+Heap
+```py
+class Solution:
+    def kthSmallest(self, matrix: List[List[int]], k: int) -> int:
+        heap = []
+        for li in matrix:
+            for num in li:
+                heappush(heap, -num)
+                if len(heap) > k:
+                    heappop(heap)
+        return -heap[0]
+```
+
+Optimal heap
+Time Complexity: let X= min(K, N);   X + K log(X)
+```py
+class Solution:
+    def kthSmallest(self, matrix: List[List[int]], k: int) -> int:
+        heap = []
+        res = []
+        C = len(matrix[0])
+        for i in range(min(k, len(matrix))):
+            heappush(heap, (matrix[i][0], i, 0))
+
+        while k > 0:
+            elem, list_idx, idx = heappop(heap)
+            res.append(elem)
+
+            if idx+1 < C:
+                heappush(heap, (matrix[list_idx][idx+1], list_idx, idx+1))
+
+            k -= 1
+        return elem
+```
+
+BinarySearch
+O(N log (Max-Min))
+```py
+class Solution:
+    def kthSmallest(self, matrix: List[List[int]], k: int) -> int:
+        self.R, self.C, self.matrix = len(matrix), len(matrix[0]), matrix
+
+        l, r = matrix[0][0], matrix[-1][-1]
+        while l < r:
+            mid = l + (r-l)//2
+            cnt, smaller, larger = self.count_less_than_mid(mid)
+
+            if cnt == k:
+                return smaller
+            elif cnt < k:
+                l = larger
+            else:
+                r = smaller
+        return l
+
+    def count_less_than_mid(self, mid): # O(n)
+        cnt = 0
+        r = self.R-1
+        c = 0
+        smaller, larger = self.matrix[0][0], self.matrix[-1][-1]
+
+        while r >= 0 and c < self.C:
+            if self.matrix[r][c] > mid:
+                larger = min(larger, self.matrix[r][c])
+                r -= 1
+            else:
+                smaller = max(smaller, self.matrix[r][c])
+                cnt += r+1
+                c += 1
+        return cnt, smaller, larger
+```
+
 Sol A, Priority Queue:
 ``` c
 class Solution {
@@ -6554,8 +6637,7 @@ public:
 };
 ```
 
-Sol B, Binary Search:
-
+### Tag: #Heap #BinarySearch
 ---
 
 ## ***[Start of the Linked List]***
