@@ -13778,13 +13778,16 @@ You may assume k is always valid, 1 ≤ k ≤ array's length.
     - list = heapq.nlargest(k, list)
 
 ### Code
-Heap:
+Heap: (n log k)
 ``` py
-import heapq
 class Solution:
     def findKthLargest(self, nums: List[int], k: int) -> int:
-        heapq.heapify(nums)
-        return heapq.nlargest(k, nums)[-1]
+        heap = []
+        for num in nums:
+            heappush(heap, num)
+            if len(heap) > k:
+                heappop(heap)
+        return heappop(heap)
 ```
 
 Partition algorithm in quicksort
