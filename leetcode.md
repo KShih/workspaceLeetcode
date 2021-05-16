@@ -22561,7 +22561,19 @@ The output list must be sorted by the x position.
 There must be no consecutive horizontal lines of equal height in the output skyline. For instance, [...[2 3], [4 5], [7 5], [11 5], [12 7]...] is not acceptable; the three lines of height 5 should be merged into one in the final output as such: [...[2 3], [4 5], [12 7], ...]
 
 ### 解題分析
-1. 要求出天際線的點，首先必須先知道哪些位置有可能被畫出點來 -> building 的 start/end 位置
+0. 算法邏輯:
+    1. 需定義一個事件, 且此事件出現的先後順序必須能讓我們貪婪的去畫出天際線
+    2. 排序事件並走訪事件 -> 讓事件出現的順序按照我們希望的出現順序出現
+        1. 發生時機 -> 高度 -> 隱沒時機(不重要)
+    3. 用一個 heap 去維護:
+        1. 直到當前掃描位置, 還沒隱沒的 building 高度
+        2. 其隱沒的時機
+    4. 進行 line sweep:
+        1. 根據此事件的出現時機去移除掉已經過期的 building -> heappop
+        2. 放入新的 building
+        3. 試著畫線
+            1. 此時掃描到的 pos, 如果看到的最高 building (heap top), 跟 res 李紀錄得不一樣, 就是畫線的時機了
+1. 定義事件: 要求出天際線的點，首先必須先知道哪些位置有可能被畫出點來 -> building 的 start/end 位置
 2. 定義畫線的規則
     1. 每個點位最多只畫一點，須符合規則
         1. 需與前一個點位的高度不一樣
@@ -22570,14 +22582,14 @@ There must be no consecutive horizontal lines of equal height in the output skyl
             3. 或者 直接落到地平面 (此時就會用到 defaut放在 heap 裡的點)
 3. 定義如何操作 heap
     1. 放什麼?
-        1. building 的開始處
+        1. (高度, 隱沒位置)
     2. pop:
         1. 當此 building 已經結束
         2. 因此我們須在 event 中放入 building 的 ending place
     3. push:
         1. 當此 event 是有高度的 (非 ending event)
     4. top:
-        1. 當此 position 時的高度與前一個點不一樣
+        1. 當此 position 時所看到的最大高度與前一個點不一樣
 
 ### 思路
 
