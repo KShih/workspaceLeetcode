@@ -6570,7 +6570,7 @@ class Solution:
         res = []
         C = len(matrix[0])
         for i in range(min(k, len(matrix))):
-            heappush(heap, (matrix[i][0], i, 0))
+            heap.append((matrix[i][0], i, 0)) # no need to heappush since the order is sorted
 
         while k > 0:
             elem, list_idx, idx = heappop(heap)
@@ -11245,21 +11245,16 @@ class Solution(object):
 Heapq 解法
 ```py
 from heapq import heappush, heappop
-class Solution(object):
-    def kClosest(self, points, K):
-        """
-        :type points: List[List[int]]
-        :type K: int
-        :rtype: List[List[int]]
-        """
-        heap = []
-        for i, point in enumerate(points):
-            val = point[0]**2 + point[1]**2
-            heappush(heap, (-val, point))
-            if i >= K:
-                heappop(heap)
+class Solution:
+    def kClosest(self, points: List[List[int]], k: int) -> List[List[int]]:
+        hp = []
+        for point in points:
+            val = point[0] ** 2 + point[1] ** 2
+            heappush(hp, (-val, point))
+            if len(hp) >= k:
+                heappop(hp)
 
-        return [e[1] for e in heap]
+        return [point for _, point in hp]
 ```
 ### Tag: #Heap
 ---
