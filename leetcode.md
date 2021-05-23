@@ -11121,15 +11121,30 @@ class Solution(object):
 ```
 ### Tag: #Stack #MonoStack #TwoPointer
 ---
-## 3. Longest Substring Without Repeating Characters｜ 9/1
+## 3. Longest Substring Without Repeating Characters｜ 9/1 | [ Review * 1 ]
 Given a string, find the length of the longest substring without repeating characters.
 
 ![](assets/markdown-img-paste-2019090113545995.png)
 
-
-### 技巧
-
-判斷字典裡存不存在:  if s[i] in Dic:  Dic[s[i]] += 1
+### 解題分析
+1. 不能用 Greedy approach `set` 去解
+    - e.g.: "dvdfx" -> should return len("vdfx")=4, 但錯誤的答案會是 len("dfx") = 3
+2. HashTable + Two Pointer
+    - 先思考遇到重複的時候要怎麼更新?
+        - 要更新到 前位置的下一個 (排除掉以重複的元素)
+        - 因此我們必須 O(1) 的去 access 到那個位置的 index -> 用 hashtable
+    - 在思考我們怎麼追蹤子序列的長度?
+        - 可用 two pointer
+    - 解法:
+        - 用一個變數 left 紀錄 window 的 start, right 一直往後走
+        - 如果遇到以重複的元素時 -> 更新 left 為重複的下一個
+        - 但我們這邊須多做一個判斷是針對, 遇到已經不在此 frame 中的重複元素時呢？
+            - "tmmzuxt"
+            - 我們在遇到第二個 m 的時候其實已經把 left 更新到 2, 此時 t 已經被排除到我們拜訪過的元素中了
+            - 但此時遇到最後一個 t 的時候, 會在 pos_map 被找到
+            - 因此我們這邊需多加一個 `pos_map[c] >= left` 去表達重複元素必須要在 frame 中才去觸發 `找到重複元素的事件`
+        - 如果沒遇到重複元素, 我們就去更新 res 的長度
+        - 最後把元素更新到 pos_map 中
 
 
 ### 思路
@@ -11170,25 +11185,37 @@ class Solution(object):
 
 運用enumerate改寫版:
 ```py
-class Solution(object):
-    def lengthOfLongestSubstring(self, s):
-        """
-        :type s: str
-        :rtype: int
-        """
-        charPos = {} # maintain the newest position of each char
-        tail, ans = 0, 0
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        pos_map = {}
+        left = 0
+        res = 0
 
-        # tail is the end of current str, i is the head
-        for i, c in enumerate(s):
-            if c in charPos and tail <= charPos[c]: # avoid move the tail to front
-                tail = charPos[c] + 1
+        for right, c in enumerate(s):
+            if c in pos_map and pos_map[c] >= left: # 避免 reset 到已經不在此 window 中的 c
+                left = pos_map[c] + 1
             else:
-                ans = max(ans, i - tail + 1)
+                res = max(res, right-left+1)
+            pos_map[c] = right
+        return res
 
-            charPos[c] = i # update the char
-        return ans
 ```
+
+Greedy approach Wrong Answer
+```py
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        frame = set()
+        res = 0
+        for c in s:
+            if c not in frame:
+                frame.add(c)
+            else:
+                res = max(res, len(frame))
+                frame = set(c)
+        return max(res, len(frame))
+```
+### Tag: #HashTable #TwoPointer
 ---
 ## 973. K Closest Points to Origin｜ 9/1 | [ Review * 1 ]
 We have a list of points on the plane.  Find the K closest points to the origin (0, 0).
