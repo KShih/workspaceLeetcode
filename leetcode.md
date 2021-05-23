@@ -10493,7 +10493,7 @@ public:
 ---
 ## ***[Start to Leetcode on high frequency question on tag:Amazon interview]***
 ---
-## 1. Two Sum｜ 8/29
+## 1. Two Sum｜ 8/29  | [ Review * 1 ]
 Given an array of integers, return indices of the two numbers such that they add up to a specific target.
 
 You may assume that each input would have exactly one solution, and you may not use the same element twice.
@@ -10509,6 +10509,19 @@ return [0, 1].
 
 
 ### Code
+One path O(n)
+```py
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        dic = {}
+        for i, num in enumerate(nums):
+            if target-num in dic:
+                return [i, dic[target-num]]
+
+            dic[num] = i
+        raise 'no answer'
+```
+
 ``` c
 class Solution {
 public:
@@ -10532,6 +10545,7 @@ public:
     }
 };
 ```
+### Tag: #Hashtable
 ---
 ## ***[Start to Leetcode with Python]***
 ---
