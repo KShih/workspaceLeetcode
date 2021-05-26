@@ -9043,17 +9043,143 @@ public:
 ```
 ### Tag: #Set #TwoPointer
 ---
-## 15. 3Sum｜ 8/18
+## 15. 3Sum｜ 8/18 | [ Review * 1 ]
 Given an array nums of n integers, are there elements a, b, c in nums such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
 
 Note:
 
 The solution set must not contain duplicate triplets.
 ![](assets/markdown-img-paste-2019081812564251.png)
+
+### 解題分析
+1. HashTable Solution (based on Two Sum) < *Most Intuitive* >
+    1. 仿造 two sum 的解法, 只是這邊不需要回傳 index, 所以這邊只需要用 set 就好不用用到 dict
+    2. 處理重複:
+        1. 這邊採用直覺的 set, 但除了對 res 加set過濾外, 我們還可以多用一個 val1_dup 去過濾 val1 duplicate 的情形
+        2. 這樣可以避免大量重複數的情況 [0,0, 0, 0 ... *3000]
+        3. 其餘部分就跟 twoSum1 一樣, 每次都 new 新的 seen
+        4. 再加入 res 的時候要將組合排序, 避免順序調換的重複情形沒被偵測到, ps.: tuplize使數組 hashable
+    3. Complexity:
+        1. Time: O(N^2)
+        2. Space: O(N) for hashset
+
+2. HashTable Solution (based on Two Sum) < *2nd Most Intuitive* >
+    1. 仿造 two sum 的解法, 只是這邊不需要回傳 index, 所以這邊只需要用 set 就好不用用到 dict
+    2. 一樣需要用到 sort 的技巧去規避掉重複元素
+        1. 為了避免 index out of range, 我們先判斷後面是否可走 (先while), 再去做 最外層的 i+1
+        2. 為了避免 少判斷到重複, 我們有兩種方法:
+            1. 先確定`後面`的元素合法才去 +1 -> 使用 `while` (如 hashtable solution)
+            2. 保證跟`前面`不一樣才做 -> 可使用 `for` (如 twoPointer solution)
+            3. 注意: 不可使用 while + 判斷前面, `while i > 0 and nums[i] == nums[i-1]:`
+                1. e.g.: [-1, -1, 2, 3], 這樣第二個 -1 還是不會被過濾掉
+    3. Complexity:
+        1. Time: O(N^2)
+        2. Space: O(N) for hashset
+
+3. Two Pointer Soltion - Fix one two find another two (based on Two Sum II)
+    1. 我們先將陣列排序, 排序後就可以用 Two Sum II 的 two pointer 解法去解
+    2. 要搭配 Two Sum II, 我們必須先將第一個數固定, 因此我們 iterate over the arr, 選定一個數 nums[i] 後, 把在其右邊的數丟給 twoSum function 去做, 此時 target 即為 -nums[i], 在這邊要跳過 duplicate 的數, 因此如果相鄰兩個數是一樣的, 我們就直接跳過
+    3. 那基本上 twoSum function 寫法跟上提一樣, 只是這提要求出所有組合, 因此要改用 res 去存
+        1. 還有一點不一樣的是, 這邊同樣也要做重複就跳過的判斷, 因為如果找到同樣的解搭配上故定的 nums[i] 結果還是重複了, 因此要加上重複就跳過的判斷, 那麼要加在哪裡呢?
+        2. 不會是前面的 `if` 跟 `elif`, 因為那兩個推進, 就算一樣也不會影響我們的答案, 剩下就只能加在 `找到一組解` 的位置了, 這邊可以選擇判斷 `nums[l] == nums[l-1]`, 或者 r 跟 r+1, 因為只需要一邊不一樣, 就可以保證解會不一樣了
+    4. Complexity:
+        1. Time: O(N^2)
+        2. Space: O(N) to O(logn) for sort
+
 ### 思路
 對原數組進行排序，然後開始遍歷排序後的數組，這裡注意不是遍歷到最後一個停止，而是到倒數第三個就可以了。這裡可以先做個剪枝優化，就是當遍歷到正數的時候就 break，為啥呢，因為數組現在是有序的了，如果第一個要 fix 的數就是正數了，則後面的數字就都是正數，就永遠不會出現和為0的情況了。然後還要加上重複就跳過的處理，處理方法是從第二個數開始，如果和前面的數字相等，就跳過，因為不想把相同的數字fix兩次。對於遍歷到的數，用0減去這個 fix 的數得到一個 target，然後只需要再之後找到兩個數之和等於 target 即可。用兩個指針分別指向 fix 數字之後開始的數組首尾兩個數，如果兩個數和正好為 target，則將這兩個數和 fix 的數一起存入結果中。然後就是跳過重複數字的步驟了，兩個指針都需要檢測重複數字。如果兩數之和小於 target，則將左邊那個指針i右移一位，使得指向的數字增大一些。同理，如果兩數之和大於 target，則將右邊那個指針j左移一位，使得指向的數字減小一些
 
 ### Code
+HashTable Solution based on Two Sum I: O(N^2)
+(Use Set to avoid duplicate)
+```py
+class Solution:
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        res, val1_dup = set(), set()
+
+        for i, val1 in enumerate(nums):
+            if val1 not in val1_dup:
+                val1_dup.add(val1)
+
+                target = -val1
+                seen = set()
+                for val2 in nums[i+1:]:
+                    if target - val2 in seen:
+                        res.add(tuple(sorted((val1, val2, target-val2))))
+
+                    seen.add(val2)
+        return res
+```
+
+HashTable Solution based on Two Sum I: O(N^2)
+(Still need to sort in order to eliminate duplicate)
+```py
+class Solution:
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        nums.sort()
+        res = []
+
+        i = 0
+        while i < len(nums):
+            if nums[i] > 0:
+                break
+            res += self.twoSum(nums, i)
+
+            while i+1 < len(nums) and nums[i] == nums[i+1]:
+                i += 1
+            i += 1
+        return res
+
+    def twoSum(self, nums, idx):
+        target = -nums[idx]
+        sets = set()
+        res = []
+        i = idx+1
+        while i < len(nums):
+            if target - nums[i] in sets:
+                res.append([nums[idx], nums[i], target-nums[i]])
+                while i+1 < len(nums) and nums[i] == nums[i+1]: # 先確定後面那個數是可走的
+                    i += 1
+
+            sets.add(nums[i])
+            i += 1 # 這邊才真的走
+
+        return res
+```
+
+Two Pointer+Sort Solution based on Two Sum II: O(N^2)
+```py
+class Solution:
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        nums.sort()
+        res = []
+        for i in range(len(nums)):
+            if nums[i] > 0:
+                break
+            if i == 0 or nums[i] != nums[i-1]:
+                res += self.twoSum(nums, i)
+        return res
+
+
+    def twoSum(self, nums, idx):
+        res = []
+        target = -nums[idx]
+        l, r = idx+1, len(nums)-1
+
+        while l < r:
+            if nums[l] + nums[r] > target:
+                r -= 1
+            elif nums[l] + nums[r] < target:
+                l += 1
+            else:
+                res.append([nums[idx], nums[l], nums[r]])
+                l += 1
+                r -= 1
+                while l < r and nums[l] == nums[l-1]: # 選一邊去跳過 duplicate 就可以了，因此同樣也可以去判斷 r 跟 r+1
+                    l += 1
+        return res
+```
+
 ``` c
 class Solution {
 public:
@@ -9093,6 +9219,7 @@ public:
     }
 };
 ```
+### Tag: #HashTable #TwoPointer
 ---
 ## 253. Meeting Rooms II  ($)｜ 8/18
 Given an array of meeting time intervals consisting of start and end times [[s1,e1],[s2,e2],...] (si < ei), find the minimum number of conference rooms required.
