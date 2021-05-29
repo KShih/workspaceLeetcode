@@ -109,3 +109,9 @@
 ### 259. 3Sum smaller
 
 ### 16. 3Sum Closest
+
+- 描述: 給定一個為排序的數組, 找出最接近 target 的組合
+- 比較: 這題不是找特定值, 因此 HashTable 法無法使用
+- 解法:
+    1. Two Pointer, 使用 cusSum 大於或小於 target 去移動 l, r
+    2. BinarySearch, 固定兩個點, 去找第三個點

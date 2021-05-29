@@ -16810,6 +16810,7 @@ The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
         - 這邊大抵上可以用 new_closest 去紀錄當前總和, new_diff 去紀錄當前總和跟 target 的差值, 如果 new_diff 比較小, 我們就去更新 global closest
         - 因此我們的 twoPointer 移動的目標就是使得 new_diff 越來越小, 反過來說 new_closest 越來越接近 target
         - 因此如果當前總和是比 target 小的, 我們就讓 l 右移, 這樣可以使下一個總和變大, 下一個 diff 就有機會變小
+    3. Time: O(N^2)
 
 2. Binary Seach
     1. 跟 Two Pointer 不一樣，這個方法是固定兩個點，然後 binary search 找另一個點
@@ -16824,6 +16825,7 @@ The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
                 4. Update diff based on the smallest absolute difference.
             2. If diff is zero, break from the loop.
         4. Return the value of the closest triplet, which is target - diff.
+    3. Time: O(N^2 log(n))
 ### 思路
 
 跟3Sum一樣的解法
