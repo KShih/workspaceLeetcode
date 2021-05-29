@@ -16793,7 +16793,7 @@ class Solution:
 ```
 ### Tag: #Trie #Recursive
 ---
-## 16. 3Sum Closest｜ 11/20
+## 16. 3Sum Closest｜ 11/20 | [ Review * 1 ]
 
 Given an array nums of n integers and an integer target, find three integers in nums such that the sum is closest to target. Return the sum of the three integers. You may assume that each input would have exactly one solution.
 
@@ -16803,6 +16803,27 @@ Given array nums = [-1, 2, 1, -4], and target = 1.
 
 The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
 
+### 解題分析
+1. Two Pointer
+    1. 3Sum 有 hashset解法 跟 twoPointer解法, 但這題沒有精確值可以求, 因此無法採用 hashset 法
+    2. 一樣先 sort, 一樣固定一個數 nums[i], 然後去移動 l 跟 r, 那麼我們該如何移動呢?
+        - 這邊大抵上可以用 new_closest 去紀錄當前總和, new_diff 去紀錄當前總和跟 target 的差值, 如果 new_diff 比較小, 我們就去更新 global closest
+        - 因此我們的 twoPointer 移動的目標就是使得 new_diff 越來越小, 反過來說 new_closest 越來越接近 target
+        - 因此如果當前總和是比 target 小的, 我們就讓 l 右移, 這樣可以使下一個總和變大, 下一個 diff 就有機會變小
+
+2. Binary Seach
+    1. 跟 Two Pointer 不一樣，這個方法是固定兩個點，然後 binary search 找另一個點
+    2. 演算法:
+        1. Initialize the minimum difference diff with a large value.
+        2. Sort the input array nums.
+        3. Iterate through the array (outer loop):
+            1. For the current position i, iterate through the array starting from j = i + 1 (inner loop):
+                1. Binary-search for complement (target - nums[i] - nums[j]) in the rest of the array.
+                2. For the next higher value, check its absolute difference with complement against diff.
+                3. For the previous lower value, check its absolute difference with complement against diff.
+                4. Update diff based on the smallest absolute difference.
+            2. If diff is zero, break from the loop.
+        4. Return the value of the closest triplet, which is target - diff.
 ### 思路
 
 跟3Sum一樣的解法
@@ -16819,25 +16840,48 @@ The sum that is closest to the target is 2. (-1 + 2 + 1 = 2).
 ``` py
 class Solution:
     def threeSumClosest(self, nums: List[int], target: int) -> int:
-        nums = sorted(nums)
-        closest = nums[0] + nums[1] + nums[2]
-        diff = abs(target - closest)
+        nums.sort()
+        closest, diff = float(inf), float(inf)
 
-        for i in range(len(nums) -2):
-            l, r = i + 1, len(nums)-1
-
+        for i in range(len(nums)-2):
+            l, r = i+1, len(nums)-1
             while l < r:
-                new_sum = nums[i] + nums[l] + nums[r]
-                new_diff = abs(target - new_sum)
-                if new_diff < diff:
-                    closest, diff = new_sum, new_diff
+                new_closest = nums[i] + nums[l] + nums[r]
+                new_diff = abs(target - new_closest)
 
-                if new_sum < target:
+                if new_diff < diff:
+                    closest = new_closest
+                    diff = new_diff
+
+                if new_closest < target:
                     l += 1
                 else:
                     r -= 1
+            if diff == 0:
+                break
         return closest
 ```
+
+Binary Search
+```py
+class Solution:
+    def threeSumClosest(self, nums: List[int], target: int) -> int:
+        diff = float('inf')
+        nums.sort()
+        for i in range(len(nums)):
+            for j in range(i + 1, len(nums)):
+                complement = target - nums[i] - nums[j]
+                hi = bisect_right(nums, complement, j + 1) # search complement from nums[j+1:]
+                lo = hi - 1
+                if hi < len(nums) and abs(complement - nums[hi]) < abs(diff):
+                    diff = complement - nums[hi]
+                if lo > j and abs(complement - nums[lo]) < abs(diff):
+                    diff = complement - nums[lo]
+            if diff == 0:
+                break
+        return target - diff
+```
+### Tag: #TwoPointer #BinarySearch
 ---
 ## 18. 4Sum｜ 11/20
 
