@@ -108,10 +108,17 @@
 
 ### 259. 3Sum smaller
 
+- 描述: 給定一個未排序的數組, 找出小於 target 的組合數量
+- 比較: 這題不是找特定值, 因此 HashTable 法無法使用
+- 解法:
+    1. Two Pointer, 若是當前 l, r 組合是符合的, 那麼固定此 nums[i], nums[l] 去搭配 nums[l+1:r] 都是符合的
+    2. BinarySeach, 解法類似於 16, 但這邊要注意要使用 bisect_left, 因為:
+        - 我們的目標是尋找, 小於補數的, 因此要過濾等於, 所以要用 left
+
 ### 16. 3Sum Closest
 
-- 描述: 給定一個為排序的數組, 找出最接近 target 的組合
+- 描述: 給定一個未排序的數組, 找出最接近 target 的組合
 - 比較: 這題不是找特定值, 因此 HashTable 法無法使用
 - 解法:
     1. Two Pointer, 使用 cusSum 大於或小於 target 去移動 l, r
-    2. BinarySearch, 固定兩個點, 去找第三個點
+    2. BinarySearch, 固定兩個點, 去找第三個點, 這邊使用的是 biset_right, 因為要找出下個大於補數的位置

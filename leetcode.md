@@ -25054,7 +25054,7 @@ class Solution:
         return (num-1)%9 +1 if num != 0 else 0
 ```
 ---
-## 259. 3Sum Smaller｜ 6/18
+## 259. 3Sum Smaller｜ 6/18 | [ Review * 1 ]
 Given an array of n integers nums and a target, find the number of index triplets i, j, k with 0 <= i < j < k < n that satisfy the condition nums[i] + nums[j] + nums[k] < target.
 
 Example:
@@ -25066,35 +25066,70 @@ Explanation: Because there are two triplets which sums are less than 2:
              [-2,0,3]
 Follow up: Could you solve it in O(n2) runtime?
 
-### 思路
+### 解題分析
 
-`cnt += (end - start)`
-
-Explain: 如果此start 搭配此end 是小的，那麼搭配 end-1, end-2 ... start+1 都會是小的
-
-Then start 往上調一格
-
+1. Two Pointer
+    - `cnt += (end - start)`
+    - Explain: 如果此start 搭配此end 是小的，那麼搭配 end-1, end-2 ... start+1 都會是小的
+    - Then start 往上調一格
+2. BinarySeach, 解法類似於 16, 但這邊要注意要使用 bisect_left, 因為:
+    - 我們的目標是尋找, 小於補數的, 因此要過濾等於, 所以要用 left
 
 ### Code
+Two Pointer
 ``` py
-def solution(nums, target):
-    class Solution:
+class Solution:
     def threeSumSmaller(self, nums: List[int], target: int) -> int:
-        cnt = 0
-        nums = sorted(nums)
+        nums.sort()
+        res = 0
         for i in range(len(nums)-2):
-            num = nums[i]
-            new_target = target - num
-            start, end = i+1, len(nums)-1
-            while end > start:
-                if nums[start] + nums[end] < new_target:
-                    cnt += (end-start)
-                    start += 1
+            l, r = i+1, len(nums)-1
+            while l < r:
+                new_sum = nums[i]+nums[l]+nums[r]
+                if new_sum < target:
+                    res += (r-l) # 加入整排的結果
+                    l += 1
                 else:
-                    end -= 1
-        return cnt
-
+                    r -= 1
+        return res
 ```
+
+Two Pointer (Generate all result)
+```py
+class Solution:
+    def threeSumSmaller(self, nums: List[int], target: int) -> int:
+        nums.sort()
+        res = []
+        for i in range(len(nums)-2):
+            l, r = i+1, len(nums)-1
+            while l < r:
+                new_sum = nums[i]+nums[l]+nums[r]
+                if new_sum < target:
+                    j = r
+                    while j != l:
+                        res.append([nums[i], nums[l], nums[j]])
+                        j -= 1
+                    l += 1
+                else:
+                    r -= 1
+        return len(res)
+```
+
+Binary Search
+```py
+class Solution:
+    def threeSumSmaller(self, nums: List[int], target: int) -> int:
+        nums.sort()
+        res = 0
+        for i in range(len(nums)):
+            for j in range(i+1, len(nums)):
+                complement = target - nums[i] - nums[j]
+                idx = bisect.bisect_left(nums, complement, j+1)
+                res += (idx-1 - j)
+        return res
+```
+
+### Tag: #TwoPointer #BinarySeach
 ---
 ## 249. Group Shifted Strings｜ 7/11
 ![](assets/markdown-img-paste-20200711104414446.png)
