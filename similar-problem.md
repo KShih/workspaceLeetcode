@@ -122,3 +122,11 @@
 - 解法:
     1. Two Pointer, 使用 cusSum 大於或小於 target 去移動 l, r
     2. BinarySearch, 固定兩個點, 去找第三個點, 這邊使用的是 biset_right, 因為要找出下個大於補數的位置
+
+### 18. 4Sum (kSum)
+
+- 描述: 3Sum 的延伸, 就是加個for
+- 比較: 更高階的寫法應該要寫 kSum 的方法了
+- 解法:
+    - 用 recursive 的方法去避免不停地加上 for 迴圈上去
+    - 維護變數 k, 逐層遞減, 直到 k == 2 時呼叫 twoSum 終止遞迴

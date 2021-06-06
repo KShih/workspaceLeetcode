@@ -16885,7 +16885,7 @@ class Solution:
 ```
 ### Tag: #TwoPointer #BinarySearch
 ---
-## 18. 4Sum｜ 11/20
+## 18. 4Sum｜ 11/20 | [ Review * 1 ]
 
 Given an array nums of n integers and an integer target, are there elements a, b, c, and d in nums such that a + b + c + d = target? Find all unique quadruplets in the array which gives the sum of target.
 
@@ -16896,6 +16896,30 @@ The solution set must not contain duplicate quadruplets.
 Example:
 
 ![](assets/markdown-img-paste-20191120170849866.png)
+
+### 解題分析
+1. 多一層 for 一定能解題，但主考官如果從 2Sum 問到 3Sum 在問到這題時，他期待的不是你家一層 for 了, 而是如何讓他可以變成 k Sum
+2. 這邊就要考慮到如何輸入一個 k 可以動態做 k-2 次? (若 k == 2 我們直接呼叫 2Sum 解了)
+3. 這裡有個重要的技巧就是使用 recursive 去取代 for loop, 終止條件就是 k == 2時直接呼叫 twoSum 回傳結果
+4. 而我們的 recursive 回傳的就是 list, 最底層的 twoSum 回兩個值, 往上丟回去的時候把當前的 item 加上上一層的回傳值
+5. 主體完成了就可以來思考要用什麼解 twoSum, 這邊首推 twoPointer 的解法, 因為只需要一個 sort 我們就可以在主體與 twoSum 裡面使用比較前一個值的方式來過濾重複
+6. twoSum 裡的過濾重複再隔一個禮拜之後寫錯了, 要特別注意!
+    - 錯誤寫法:
+        ```py
+        if l-1 >= 0:
+            while nums[l] == nums[l-1]:
+                l += 1
+        l += 1
+        r -= 1
+        ```
+    - 上面這個寫法會在, 當 nums[0] == nums[1] 時漏掉過濾！！
+    - 正確寫法:
+        ```py
+        l += 1
+        r -= 1
+        while l < r and nums[l] == nums[l-1]:
+            l += 1
+        ```
 
 ### 思路
 基本上就是3Sum的延伸, 多一層for而已
@@ -16953,34 +16977,44 @@ class Solution:
         return res
 ```
 
-N-Sum Extendable Solution
+(Optimal) k-Sum solution
 ``` py
-def fourSum(self, nums, target):
-    def findNsum(nums, target, N, result, results):
-        if len(nums) < N or N < 2 or target < nums[0]*N or target > nums[-1]*N:  # early termination
-            return
-        if N == 2: # two pointers solve sorted 2-sum problem
-            l,r = 0,len(nums)-1
-            while l < r:
-                s = nums[l] + nums[r]
-                if s == target:
-                    results.append(result + [nums[l], nums[r]])
-                    l += 1
-                    while l < r and nums[l] == nums[l-1]:
-                        l += 1
-                elif s < target:
-                    l += 1
-                else:
-                    r -= 1
-        else: # recursively reduce N
-            for i in range(len(nums)-N+1):
-                if i == 0 or (i > 0 and nums[i-1] != nums[i]):
-                    findNsum(nums[i+1:], target-nums[i], N-1, result+[nums[i]], results)
+class Solution:
+    def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
+        nums.sort()
+        k = 4
+        return self.ksum(nums, target, k)
 
-    results = []
-    findNsum(sorted(nums), target, 4, [], results)
-    return results
+    def ksum(self, nums, target, k):
+        res = []
+        if k == 2:
+            return self.twoSum(nums, target)
+
+        for i in range(len(nums)):
+            if i == 0 or nums[i] != nums[i-1]:
+                for subres in self.ksum(nums[i+1:], target-nums[i], k-1):
+                    res.append([nums[i]] + subres)
+        return res
+
+
+    def twoSum(self, nums, target):
+        l, r = 0, len(nums)-1
+        res = []
+        while r > l:
+            cur = nums[l] + nums[r]
+            if cur > target:
+                r -= 1
+            elif cur < target:
+                l += 1
+            else:
+                res.append([nums[l], nums[r]])
+                l += 1
+                r -= 1
+                while l < r and nums[l] == nums[l-1]:
+                    l += 1
+        return res
 ```
+### Tag: #TwoPointer, #Recursive
 ---
 ## 31. Next Permutation｜ 11/21
 
