@@ -17208,7 +17208,7 @@ class Solution:
         return max(counter_list)*2
 ```
 ---
-## 36. Valid Sudoku(合法數獨)｜ 11/21
+## 36. Valid Sudoku(合法數獨)｜ 11/21 | [ Review * 1 ]
 Determine if a 9x9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
 
 Each row must contain the digits 1-9 without repetition.
@@ -17221,10 +17221,58 @@ Each of the 9 3x3 sub-boxes of the grid must contain the digits 1-9 without repe
 
 ![](assets/markdown-img-paste-20191121152148905.png)
 
-### 思路
+### 解題分析
+1. Naive 的解法就是使用 27 個 set去解
+2. 優化的方式就是只用一個 set, 但三個檢查都有自己獨特的樣式
+    1. row 的: (row_num, str_num)
+    2. col 的: (str_num, col_num)
+    3. zone 的: (row_num//3, col_num//3, str_num)
+3. 如此一來要是同 row 中有同樣的 str_num, 那麼他們的 pattern 就會被發現已存在 set 中了
 
 
 ### Code
+Naive Set
+```py
+class Solution:
+    def isValidSudoku(self, board: List[List[str]]) -> bool:
+        row_set = [set() for _ in range(9)]
+        col_set = [set() for _ in range(9)]
+        zone_set = [set() for _ in range(9)]
+        for r in range(9):
+            for c in range(9):
+                num = board[r][c]
+                if num == '.':
+                    continue
+                zone = 3 * (r//3) + (c//3)
+                if num in row_set[r] or num in col_set[c] or num in zone_set[zone]:
+                    return False
+                row_set[r].add(num)
+                col_set[c].add(num)
+                zone_set[zone].add(num)
+        return True
+```
+
+Optimal One Set
+```py
+class Solution:
+    def isValidSudoku(self, board: List[List[str]]) -> bool:
+        square_set = set()
+        for r in range(9):
+            for c in range(9):
+                num_str = board[r][c]
+                if num_str == '.':
+                    continue
+                row_tag = (r, num_str) # (int, str)
+                col_tag = (num_str, c)
+                zone_tag = (r//3, c//3, num_str)
+                if row_tag in square_set or col_tag in square_set or zone_tag in square_set:
+                    return False
+                square_set.add(row_tag)
+                square_set.add(col_tag)
+                square_set.add(zone_tag)
+        return True
+```
+
 ``` py
 class Solution:
     def isValidSudoku(self, board: List[List[str]]) -> bool:
@@ -17269,6 +17317,7 @@ class Solution:
                     visited.append(board[r][c])
         return True
 ```
+### Tag: #Set
 ---
 ## 37. Sudoku Solver｜ 11/21 | [Review * 1]
 
