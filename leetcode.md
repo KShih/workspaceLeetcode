@@ -11978,7 +11978,7 @@ class Solution(object):
         return 0 <= x < M and 0 <= y < N
 ```
 ---
-## 49. Group Anagrams｜ 9/7
+## 49. Group Anagrams｜ 9/7 | [ Review * 1 ]
 Given an array of strings, group anagrams together.
 
 ![](assets/markdown-img-paste-20190908000144185.png)
@@ -11998,7 +11998,7 @@ sorted("apple") => ['a','e','l','p','p']
 
 
 ### 思路
-"""
+
     We want to sort string.
 
     but python string is unsortable (list is sortable)
@@ -12012,9 +12012,19 @@ sorted("apple") => ['a','e','l','p','p']
     So, we'd use join(), to help us collect them back to string
 
     "-".join(['a','b','c']) => "a-b-c"
-"""
+
+- Update: just use tuple (or string) to make list hashable
 
 ### Code
+```py
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        dic = defaultdict(list)
+        for str1 in strs:
+            dic[tuple(sorted(str1))].append(str1)
+        return dic.values()
+```
+
 ``` py
 class Solution(object):
     def groupAnagrams(self, strs):
@@ -12053,6 +12063,7 @@ class Solution(object):
 
         return ret.values()
 ```
+### Tag: #HashTable
 ---
 ## 336. Palindrome Pairs｜ 9/9
 Given a list of unique words, find all pairs of distinct indices (i, j) in the given list, so that the concatenation of the two words, i.e. words[i] + words[j] is a palindrome.
