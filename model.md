@@ -162,6 +162,7 @@ class Solution:
     5. 992. Subarrays with K Different Integers
     6. 904. Fruit Into Baskets
     7. 862. Shortest Subarray with Sum at Least K - too hard
+    8. 76. Minimum Window Substring
 
 ---
 

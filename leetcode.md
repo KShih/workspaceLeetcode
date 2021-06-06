@@ -8850,10 +8850,39 @@ public:
 };
 ```
 ---
-## 76. Minimum Window Substring｜ 8/15
+## 76. Minimum Window Substring｜ 8/15 | [ Review * 1 ]
 Given a string S and a string T, find the minimum window in S which will contain all the characters in T in complexity O(n).
 
 ![](assets/markdown-img-paste-20190815125352744.png)
+
+### 解題分析
+1. 這裡用了 sliding window 搭配 HashTable 來解題非常漂亮
+
+2. 首先我們把題目拆成兩個部分
+    1. 找出一個子字串可以包涵 target
+    2. 這個子字串是否可以縮到更小
+
+3. 那麼對於第一個問題我們可以用 Counter + 一個變數 miss 去追蹤
+    - 先用 target 去 init 我們的 Counter, 此時 Counter 裡紀錄的正是我們缺乏的元素, miss 的數量也初始化為 target 的長度
+    - 接著對於每個新遇到的元素我們都把 count -= 1, 這裡可以討論三種情況
+        - 對的元素, 而且我們也缺 ( `-= 1` 後的 count 還是 > 0, 因為我們有事先 init 過了) :
+            - miss -= 1
+        - 對的元素, 但我們不缺 (`-= 1` 後的 count 會 < 0):
+            - do nothing
+        - 不對的元素:
+            - do nothing
+
+4. 此時如果 miss 已經歸零了, 表示我們找到了所有我們需要的元素, 但這裡面也許包含一些不必要的東西, 因此我們開始縮減 l:
+    1. 如果當前長度比 global 還小, 我們更新 res
+    2. 如同我們 r 遇到元素就把 count -= 1的操作, 我們這邊要把 l 遇到的元素都 += 1 回去
+        - 縮到 target 的元素, 但我們 window 裡還足夠 (count 還是小於零)
+            - do nothing
+        - 縮到不是 target 的元素
+            - do nothing
+        - 縮到 target, 且已經不夠了 (count > 0):
+            - miss += 1 -> 去 break while loop, 然後繼續擴展右邊
+
+
 ### 思路
 目前在腦子一片漿糊的情況下，我們還是從簡單的例子來分析吧，題目例子中的S有點長，換個短的 S = "ADBANC"，T = "ABC"，那麼肉眼遍歷一遍S唄，首先第一個是A，嗯很好，T中有，第二個是D，T中沒有，不理它，第三個是B，嗯很好，T中有，第四個又是A，多了一個，禮多人不怪嘛，收下啦，第五個是N，一邊涼快去，第六個終於是C了，那麼貌似好像需要整個S串，其實不然，注意之前有多一個A，就算去掉第一個A，也沒事，因為第四個A可以代替之，第二個D也可以去掉，因為不在T串中，第三個B就不能再去掉了，不然就沒有B了。所以最終的答案就"BANC"了。通過上面的描述，你有沒有發現一個有趣的現象，先擴展，再收縮，就好像一個窗口一樣，先擴大右邊界，然後再收縮左邊界，上面的例子中右邊界無法擴大了後才開始收縮左邊界，實際上對於複雜的例子，有可能是擴大右邊界，然後縮小一下左邊界，然後再擴大右邊界等等。這就很像一個不停滑動的窗口了，這就是大名鼎鼎的滑動窗口 Sliding Window 了，簡直是神器啊，能解很多子串，子數組，子序列等等的問題，是必須要熟練掌握的啊！
 
@@ -8866,6 +8895,32 @@ Given a string S and a string T, find the minimum window in S which will contain
 ![](assets/markdown-img-paste-20190815125153640.png)
 
 ### Code
+```py
+class Solution:
+    def minWindow(self, s: str, t: str) -> str:
+        res = ""
+        minLen = float(inf)
+        l = 0
+
+        targetCounter = Counter(t) # initial 我們還需要多少某個元素
+        miss = len(t)
+        for r, c in enumerate(s):
+            targetCounter[c] -= 1
+            if targetCounter[c] >= 0: # 會通過這個 if 表示我們找到了需要的元素, 若是過多了會小於零 不會通過 if, 因此 cnt 不會誤算
+                miss -= 1
+
+            while miss == 0: # means we collect enough
+                if r-l+1 < minLen:
+                    res = s[l:r+1]
+                    minLen = r-l+1
+
+                targetCounter[s[l]] += 1
+                if targetCounter[s[l]] > 0: # 大於零表示我們缺乏這個元素了
+                    miss += 1
+                l += 1
+        return res
+```
+
 ``` c
 /*
 The sliding window strategy to solve:
@@ -8907,6 +8962,7 @@ public:
     }
 };
 ```
+### Tag: #SlidingWindow, #HashTable
 ---
 ## 349. Intersection of Two Arrays｜ 8/15 | [Review * 1]
 Given two arrays, write a function to compute their intersection.
