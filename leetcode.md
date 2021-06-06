@@ -15758,10 +15758,20 @@ class Solution:
         return dum.next
 ```
 ---
-## 30. Substring with Concatenation of All Words｜ 10/22
+## 30. Substring with Concatenation of All Words｜ 10/22 | [ Review * 1 ]
 You are given a string, s, and a list of words, words, that are all of the same length. Find all starting indices of substring(s) in s that is a concatenation of each word in words exactly once and without any intervening characters.
 
 ![](assets/markdown-img-paste-20191023092713198.png)
+
+### 解題分析
+1. 必須逐字元當作開始搜尋, 搜尋到 match_length (所有 words 加總的長度) 即可
+2. inner for loop 就是去逐字進行比較, j 一次跳躍 word_len 個字, 如果當前遇到的就已經不存在 counter 了就直接 break, 因為題目要求要連續出現有 match
+3. 這邊必須用 counter 的原因是因為有可能會有重複字在 words 出現
+4. 當 j 已經走到離原本出發的位置 i match_length 長度時表示已經 match 完了
+5. python 的 map 型態是傳址呼叫, 所以要深拷貝
+6. Time: O(n * len(words))
+7. 優化: 不每次都 deep copy, 而是逐一新增進 cur_counter 裏
+
 
 ### 思路
 
@@ -15774,6 +15784,57 @@ You are given a string, s, and a list of words, words, that are all of the same 
 表示這個區間的所有字都符合所需的字
 
 ### Code
+```py
+class Solution:
+    def findSubstring(self, s: str, words: List[str]) -> List[int]:
+        word_len = len(words[0])
+        word_counter = Counter(words)
+        match_length = word_len * len(words)
+        res = []
+
+        for i in range(len(s) - match_length + 1):
+            cur_counter = word_counter.copy()
+            j = i
+            while j <= len(s):
+                if j == i + match_length:
+                    res.append(i)
+                    break
+
+                cur_word = s[j:j+word_len]
+                if cur_counter.get(cur_word, 0) == 0:
+                    break
+                else:
+                    cur_counter[cur_word] -= 1
+                    j += word_len
+        return res
+```
+
+優化
+```py
+class Solution:
+    def findSubstring(self, s: str, words: List[str]) -> List[int]:
+        word_len = len(words[0])
+        word_counter = Counter(words)
+        match_length = word_len * len(words)
+        res = []
+
+        for i in range(len(s) - match_length + 1):
+            cur_counter = Counter()
+            j = i
+            while j <= len(s):
+                if j == i + match_length:
+                    res.append(i)
+                    break
+
+                cur_word = s[j:j+word_len]
+                if cur_word not in word_counter or cur_counter[cur_word] >= word_counter[cur_word]:
+                    break
+                else:
+                    cur_counter[cur_word] += 1
+                    j += word_len
+        return res
+```
+
 ``` py
 from collections import Counter
 class Solution:
@@ -15804,6 +15865,7 @@ class Solution:
                 res.append(i)
         return res
 ```
+### Tag: #HashTable
 ---
 ## 25. Reverse Nodes in k-Group｜ 10/23 | [Review * 1]
 
