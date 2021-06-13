@@ -130,3 +130,24 @@
 - 解法:
     - 用 recursive 的方法去避免不停地加上 for 迴圈上去
     - 維護變數 k, 逐層遞減, 直到 k == 2 時呼叫 twoSum 終止遞迴
+
+## Line Sweep Similar
+- 253 與 759
+    1. 都需要 EventType、Balance、Prev
+    2. Balance 紀錄目前讀到多少個 Open brackets
+- 218
+    1. 同樣需要將 Start, End 拆分成不同事件
+    2. 多用一個 Heap 來去幫助我們做邏輯的處理(Get Heighest Building)
+    3. 這時的 End 事件就是來幫我們去除掉 Heap 中已過期的事件
+
+### 253. Meeting Rooms II
+- 找出 Interval 間最大同時重合數
+- 找出最大的 Open Brackets 數量
+
+### 759. Employee Free Time
+- 找出 Interval 間的空白處
+- 當 Balance 為零時，表示找到新的 Free time 了 -> (Prev, CurrentTime)
+
+### 218. The Skyline Problem
+- 只用到事件的特性
+- 後續的邏輯處理為 heap 的概念

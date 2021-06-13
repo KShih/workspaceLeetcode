@@ -9277,77 +9277,6 @@ public:
 ```
 ### Tag: #HashTable #TwoPointer
 ---
-## 253. Meeting Rooms II  ($)｜ 8/18
-Given an array of meeting time intervals consisting of start and end times [[s1,e1],[s2,e2],...] (si < ei), find the minimum number of conference rooms required.
-
-![](assets/markdown-img-paste-20190818173037502.png)
-### 思路
-Note how to use Map to make O(N^2) solution to N!
-with same solving idea.
-
-![](assets/markdown-img-paste-20190818172723103.png)
-### Code
-O(N^2) Solution:
-``` c
-/**
- * Definition of Interval:
- * classs Interval {
- *     int start, end;
- *     Interval(int start, int end) {
- *         this->start = start;
- *         this->end = end;
- *     }
- * }
- */
-class Solution {
-public:
-
-    int minMeetingRooms(vector<Interval> &intervals) {
-        if (intervals.size() <= 1)  return intervals.size();
-        int n = intervals.size();
-        int max_unit = INT_MIN;
-
-        int res = INT_MIN;
-        // find Max time unit
-        for (int i=0; i<n; i++){
-            max_unit = max(max_unit, intervals[i].end);
-        }
-        int timeunit[max_unit] = {0};
-        // find Max number in the unit while go through each interval
-        for (int i=0; i<n; i++){
-            for (int j=intervals[i].start; j < intervals[i].end; j++){
-                timeunit[j] ++;
-                res = max(res, timeunit[j]);
-            }
-        }
-        return res;
-    }
-};
-```
-
-O(n) solution:
-```c
-class Solution {
-public:
-
-    int minMeetingRooms(vector<Interval> &intervals) {
-        if (intervals.size() <= 1)  return intervals.size();
-        map<int, int> time_unit; // will auto sort
-        for (auto i: intervals ){
-            time_unit[i.start]++; // open room at this time
-            time_unit[i.end]--;   // close room at this time
-        }
-
-        int openedRoom = 0;
-        int res = 0;
-        for (auto t : time_unit){
-            res = max(res, openedRoom += t.second);
-        }
-        return res;
-    }
-};
-```
----
 ## 278. First Bad Version｜ 8/18
 You are a product manager and currently leading a team to develop a new product. Unfortunately, the latest version of your product fails the quality check. Since each version is developed based on the previous version, all the versions after a bad version are also bad.
 
@@ -23238,7 +23167,7 @@ class Solution(object):
             res += right
         return res
 ```
-### Tag: #Heap #DivideandConquer
+### Tag: #Heap #DivideandConquer #LineSweep
 ---
 ## *Heap 用途總結*
 - heap 這個資料結構適合處理
@@ -34824,7 +34753,7 @@ Constraints:
 3. 無法用 MonoStack 解
 
 ### Code
-Line Sweep
+Two Sweep
 Time: O(n), Space: O(n)
 ``` py
 class Solution:
@@ -34899,7 +34828,7 @@ class Solution:
         return rat
 ```
 
-### Tag: #Greedy #LineSweep #Heap
+### Tag: #Greedy #Sweep #Heap
 ---
 ## 767. Reorganize String｜ 4/28
 iven a string S, check if the letters can be rearranged so that two characters that are adjacent to each other are not the same.

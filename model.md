@@ -823,3 +823,22 @@ class Solution:
 - Array 類型的可用 sliding window 來解
 
 https://leetcode.com/discuss/general-discussion/563022/prefix-sum-problems
+
+
+## LineSweep
+1. 題型特徵: Interval
+2. 解題邏輯:
+    - 把 Interval 中的 Start, End 分成兩種 Event，並將 (Pos, EventType) 存入 events<arr> 中
+    - 排序 Event，並順序拜訪
+        - 需搭配 Heap 的題型
+            - Pop Heap: Pos 是用來篩選掉在 Heap 中已過時的資料
+            - Insert Heap: 將 (Data, Pos) 存入 Heap 中
+            - Do the logic (通常都是拿 Heap 中的 Top 的 Data 來做事)
+        - 無需搭配的
+            - Do the logic (拿 EventType 來做事)
+3. 例題:
+    - 需 Heap
+        - 218
+    - 無須 Heap
+        - 253
+        - 759
