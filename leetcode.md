@@ -6539,6 +6539,7 @@ then we use size limitation to find the Top-k elements in the array.
     - 但可以注意的是每一行都 sorted 過, 因此其解法與 merge K sorted arr 很像
     - 若要妥善利用其已經 sorted 的性質, 不需要把所有的元素全部 push 進 heap
 2. Binary Search
+    0. 概念上很像 QuickSelect, 都是要找出小於 target 的數有幾個，差別在這邊是使用第二層 binary search 而不是 Partion Algorithm
     1. 因為此題非完全的排列, 因此我們不能使用 index based 的搜索, instead 我們使用 range based 的搜索
     2. initial range 就是 第一個元素 ~ 最後一個元素
     3. 那麼我們要怎麼定位到第 k 個元素呢? 我們去找出所有小於 mid 的數 的個數, 若等於 k 此時 smaller (小於等於mid的數) 就是解
@@ -30594,9 +30595,8 @@ twitter.getNewsFeed(1);
     - 萬一follower 一多getNewsFeed會需要很大的記憶體空間，instead, 可動態去維護heap的大小為10。
     - 萬一很常去call getNewsFeed，為了不每次都要merge，可以維護一個 userId 所有的getNewsFeed要回傳的list，用 ETL 的概念
 ### Code
+Heapq (Nlog10)
 ``` py
-from collections import defaultdict
-import heapq
 class Twitter:
 
     def __init__(self):
@@ -30623,8 +30623,11 @@ class Twitter:
 
         for follwer in self.follower_map[userId]:
             for ts, tweetId in self.tweets_map[follwer]:
-                heapq.heappush(all_feed, (-ts, tweetId))
-        return [tid for _, tid in heapq.nsmallest(10, all_feed)]
+                heapq.heappush(all_feed, (ts, tweetId))
+                if len(all_feed) > 10:
+                    heapq.heappop(all_feed)
+
+        return [heapq.heappop(all_feed)[1] for _ in range(len(all_feed))][::-1]
 
     def follow(self, followerId: int, followeeId: int) -> None:
         """
