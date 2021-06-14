@@ -10078,7 +10078,7 @@ public:
 ```
 ### Tag: #Greedy
 ---
-## 136. Single Number｜ 8/26
+## 136. Single Number｜ 8/26 | [ Review * 1 ]
 Given a non-empty array of integers, every element appears twice except for one. Find that single one.
 
 Note:
@@ -10093,7 +10093,32 @@ XOR solution:
 
 Note: 2 ^ 1 ^ 2 = (2 ^ 2) ^ 1 = 0 ^ 1.
 
+Math Solution:
+
+- 2 * (a+b+c) + (a+a+b+b+c) = c
+
 ### Code
+Bit Solution
+```py
+class Solution:
+    def singleNumber(self, nums: List[int]) -> int:
+        res = 0
+        for num in nums:
+            res ^= num
+        return res
+```
+
+Math Solution
+```py
+class Solution(object):
+    def singleNumber(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        return 2 * sum(set(nums)) - sum(nums)
+```
+
 ``` c
 class Solution {
 public:
@@ -10124,6 +10149,7 @@ public:
     }
 };
 ```
+### Tag: #Bit #Math
 ---
 ## 282. Expression Add Operators｜ 8/26 | [ Review * 1 ]
 Given a string that contains only digits 0-9 and a target value, return all possibilities to add binary operators (not unary) +, -, or * between the digits so they evaluate to the target value.
