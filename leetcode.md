@@ -28125,7 +28125,7 @@ class Solution:
         return dum
 ```
 ---
-## 170. Two Sum III - Data structure design｜ 10/9
+## 170. Two Sum III - Data structure design｜ 10/9 | [ Review * 1 ]
 Design a data structure that accepts a stream of integers and checks if it has a pair of integers that sum up to a particular value.
 
 Implement the TwoSum class:
@@ -28158,6 +28158,9 @@ Constraints:
 -231 <= value <= 231 - 1
 At most 5 * 104 calls will be made to add and find.
 
+### 解題分析
+1. 這種題要討論哪個 function 作為 trade off
+2. 一定要用 dict 去紀錄 count, 不能只用 set + count_zero 去處理 0 的例外情況
 
 ### 思路
 
@@ -28167,16 +28170,14 @@ At most 5 * 104 calls will be made to add and find.
     2. ["TwoSum","add","add","find"], [[],[0],[0],[0]]
 
 ### Code
+Trade off find()
 ``` py
 class TwoSum:
     def __init__(self):
         self.m = {}
 
     def add(self, number: int) -> None:
-        if number not in self.m:
-            self.m[number] = 1
-        else:
-            self.m[number] += 1
+        self.m[number] = self.m.get(number, 0) + 1
 
     def find(self, value: int) -> bool:
         for v in self.m:
@@ -28187,7 +28188,7 @@ class TwoSum:
         return False
 ```
 
-set() TLE:
+Trade off add()
 ```py
 class TwoSum:
     def __init__(self):
@@ -28205,6 +28206,7 @@ class TwoSum:
 
         return value in self._sum
 ```
+### Tag: #HashTable
 ---
 ## 452. Minimum Number of Arrows to Burst Balloons(Proof of work 如何證明?)｜ 10/10 | [ Review * 1 ]
 
