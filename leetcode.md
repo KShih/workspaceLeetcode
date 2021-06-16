@@ -24574,7 +24574,7 @@ class Solution:
 ```
 ### Tag: #BinarySearch
 ---
-## 242. Valid Anagram｜ 6/10
+## 242. Valid Anagram｜ 6/10 | [ Review * 1 ]
 Given two strings s and t , write a function to determine if t is an anagram of s.
 
 Example 1:
@@ -24591,6 +24591,11 @@ You may assume the string contains only lowercase alphabets.
 Follow up:
 What if the inputs contain unicode characters? How would you adapt your solution to such case?
 
+### 解題分析
+1. 這題不能用 sum(ord(c)) 去是否為解, 因為 ac != bb
+2. for follow Up:
+    - 直接用 hashtable 存吧
+
 ### 思路
 
 記得判斷 s 跟 t 誰大，
@@ -24603,24 +24608,21 @@ s = "ab", t = "a"
 ``` py
 class Solution:
     def isAnagram(self, s: str, t: str) -> bool:
-        dic = {}
-        if len(s) > len(t):
-            s, t = t, s
-        for i in s:
-            if i not in dic:
-                dic[i] = 1
-            else:
-                dic[i] += 1
+        if len(s) != len(t):
+            return False
 
-        for j in t:
-            if j not in dic:
+        arr = [0 for _ in range(26)]
+        for c in s:
+            arr[ord(c)-97] += 1
+
+        for c in t:
+            arr[ord(c)-97] -= 1
+            if arr[ord(c)-97] < 0:
                 return False
-            else:
-                dic[j] -= 1
-                if dic[j] < 0:
-                    return False
+
         return True
 ```
+### Tag: #HashTable
 ---
 ## 243. Shortest Word Distance｜ 6/10
 Given a list of words and two words word1 and word2, return the shortest distance between these two words in the list.
