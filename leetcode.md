@@ -24759,7 +24759,7 @@ class Solution:
 ```
 ### Tag: #Array, #TwoPointer
 ---
-## 246. Strobogrammatic Number｜ 6/11
+## 246. Strobogrammatic Number｜ 6/11 | [ Review * 1 ]
 A strobogrammatic number is a number that looks the same when rotated 180 degrees (looked at upside down).
 
 Write a function to determine if a number is strobogrammatic. The number is represented as a string.
