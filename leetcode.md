@@ -22909,7 +22909,7 @@ class Solution:
 ```
 ### Tag: #HashTable
 ---
-## 220. Contains Duplicate III｜ 3/30
+## 220. Contains Duplicate III｜ 3/30 | [ Review * 1 ]
 Given an array of integers, find out whether there are two distinct indices i and j in the array such that the absolute difference between nums[i] and nums[j] is at most t and the absolute difference between i and j is at most k.
 
 Example 1:
@@ -22948,8 +22948,12 @@ Bucket Sort: 用來快速的將一個陣列分類，並找出特定range的
 - Bucket Sort + Sliding Window
     - 我們可以先使用滑動窗口來處理index range的問題
     - 剩下的問題就是如何在 constant 時間中在這個window中找出，是否有符合range的數
-    - 這時就可以使用 Bucket 法
+    - 這時就可以使用 Bucket 法 (Range query 特別適用)
         - ![](assets/markdown-img-paste-20200330150804242.png)
+        - 我們一個 bucket 裡面只放一個 num
+        - 針對每一個新遇到的 num, 我們先去取得他的 bucket_idx, 再去檢查這個 index 周邊(含自己) 的 bucket 裡是否有東西
+        - 檢查周邊的這個動作就是 query range 的操作, 我們把題目要我們求的 range 變成 bucket_idx 的一個單位
+        - 對於處理過期的元素, 我們首先是把這個 num 找出來, 也就是 curr_i - idx_diff, 再透過這個 num 去找出對應的 bucket 把它刪了
 
 ### Code
 Bucket Sort
@@ -22986,23 +22990,27 @@ class Solution:
 Simplify Version
 ```py
 class Solution:
-    def containsNearbyAlmostDuplicate(self, nums: List[int], k: int, t: int) -> bool:
-        if k<0 or t<0:
-            return False
-        bucket = dict()
-        bucket_size = t
-        for i, num in enumerate(nums):
-            idx = num // bucket_size if bucket_size != 0 else num
+    def containsNearbyAlmostDuplicate(self, nums: List[int], idx_diff: int, val_diff: int) -> bool:
+        bucket_size = val_diff
+        bucket = {} # b_idx -> num
 
-            for nearby_bucket in (idx-1, idx, idx+1): # rule out the bucket that needed to be looked for
-                if nearby_bucket in bucket and abs(bucket[nearby_bucket] - num) <= t:
+        def get_bucket_idx(num):
+            return num // bucket_size if bucket_size != 0 else num
+
+        for i, num in enumerate(nums):
+            b_idx = get_bucket_idx(num)
+
+            for nearby_idx in [b_idx-1, b_idx, b_idx+1]:
+                if nearby_idx in bucket and abs(bucket[nearby_idx] - num) <= val_diff:
                     return True
 
-            # move the window
-            bucket[idx] = num
-            if i >= k:
-                expired_idx = nums[i-k] // bucket_size if bucket_size != 0 else nums[i-k]
-                del bucket[expired_idx] # can delete a bucket bc only alow one elem in a bucket(if there is a num going to same bucket, we return True in advance)
+            bucket[b_idx] = num
+
+            if i >= idx_diff:
+                expired_num = nums[i-idx_diff]
+                expired_idx = get_bucket_idx(expired_num)
+                del bucket[expired_idx]
+
         return False
 ```
 
@@ -23042,6 +23050,7 @@ class Solution:
                 return True
         return False
 ```
+### Tag: #HashTable #Bucket
 ---
 ## 221. Maximal Square｜ 3/30
 Given a 2D binary matrix filled with 0's and 1's, find the largest square containing only 1's and return its area.
