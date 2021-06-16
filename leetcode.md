@@ -22435,7 +22435,7 @@ class Solution:
         return cnt
 ```
 ---
-## 205. Isomorphic Strings｜ 3/26
+## 205. Isomorphic Strings｜ 3/26 | [ Review * 1 ]
 Given two strings s and t, determine if they are isomorphic.
 
 Two strings are isomorphic if the characters in s can be replaced to get t.
@@ -22443,11 +22443,35 @@ Two strings are isomorphic if the characters in s can be replaced to get t.
 All occurrences of a character must be replaced with another character while preserving the order of characters. No two characters may map to the same character but a character may map to itself.
 
 ![](assets/markdown-img-paste-2020032619533122.png)
+
+### 解題分析
+1. 此題求 pattern 要相同, 因此在做 mapping 的時候是要做雙向的 mapping
+    - 參考例子: s = badc, t = baba
+
 ### 思路
 
 將其轉換成共同的形式
 
+### 相似題
+
+LC 1153. String Transforms Into Another String
+
 ### Code
+General Approach for this and 1153
+```py
+class Solution:
+    def isIsomorphic(self, s: str, t: str) -> bool:
+        map_s2t = {}
+        map_t2s = {}
+        for s1, t1 in zip(s, t):
+            if s1 not in map_s2t and t1 not in map_t2s:
+                map_s2t[s1] = t1
+                map_t2s[t1] = s1
+            elif map_s2t.get(s1) != t1 or map_t2s.get(t1) != s1:
+                return False
+        return True
+```
+
 ``` py
 class Solution:
     def isIsomorphic(self, s: str, t: str) -> bool:
@@ -22462,6 +22486,7 @@ class Solution:
             str1 += dic[c]
         return str1
 ```
+### Tag: #HashTable
 ---
 ## 211. Add and Search Word - Data structure design｜ 3/27 | [Review * 1]
 Design a data structure that supports the following two operations:

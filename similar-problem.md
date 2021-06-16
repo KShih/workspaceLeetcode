@@ -151,3 +151,18 @@
 ### 218. The Skyline Problem
 - 只用到事件的特性
 - 後續的邏輯處理為 heap 的概念
+
+## String Convert/Pattern
+### LC205. Isomorphic Strings
+- 此題求的是 pattern, 也就是去看相同字母其出現在兩個字串的位置是否相同
+- 例子
+    - s = "badc", t = "baba"
+    - return False
+- 解法: 要用雙向的 map
+
+### LC1153. String Transforms Into Another String
+- 而此題求的事 convert 成功與否, 彈性較大
+- 例子
+    - s = "badc", t = "baba"
+    - return True
+- 解法: 單向的 map, 但最後要加上檢查是否有橋可以去做 tmp char 的放置
