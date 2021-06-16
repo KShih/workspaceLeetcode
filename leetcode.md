@@ -24624,7 +24624,7 @@ class Solution:
 ```
 ### Tag: #HashTable
 ---
-## 243. Shortest Word Distance｜ 6/10
+## 243. Shortest Word Distance｜ 6/10 | [ Review * 1 ]
 Given a list of words and two words word1 and word2, return the shortest distance between these two words in the list.
 
 Example:
@@ -24670,6 +24670,7 @@ class Solution:
                 idx = i
         return res
 ```
+### Tag: #Array
 ---
 ## 244. Shortest Word Distance II｜ 6/10
 Design a class which receives a list of words in the constructor, and implements a method that takes two words word1 and word2 and return the shortest distance between these two words in the list. Your method will be called repeatedly many times with different parameters.
