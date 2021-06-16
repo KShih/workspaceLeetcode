@@ -25718,13 +25718,13 @@ Output: true
 ``` py
 class Solution:
     def canPermutePalindrome(self, s: str) -> bool:
-        myDict = {}
+        mySet = set()
         for c in s:
-            if c in myDict:
-                del myDict[c]
+            if c in mySet:
+                mySet.remove(c)
             else:
-                myDict[c] = ""
-        return len(myDict) <= 1 # equal to zero or one
+                mySet.add(c)
+        return len(mySet) <= 1 # equal to zero or one
 ```
 
 Counter 解法
@@ -25740,6 +25740,7 @@ class Solution:
                 is_odd = True
         return True
 ```
+### Tag: #Set
 ---
 ## 267. Palindrome Permutation II｜ 7/19 | [Review * 1]
 
