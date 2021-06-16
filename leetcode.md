@@ -7983,11 +7983,26 @@ public:
 ```
 ### Tag: #Greedy #Array
 ---
-## 274. H-Index｜ 7/16
+## 274. H-Index｜ 7/16 | [ Review * 1 ]
 Given an array of citations (each citation is a non-negative integer) of a researcher, write a function to compute the researcher's h-index.
 
 According to the definition of h-index on Wikipedia: "A scientist has index h if h of his/her N papers have at least h citations each, and the other N − h papers have no more than h citations each."
 ![](assets/markdown-img-paste-20190716160220606.png)
+
+### 解題分析
+
+1. Typical Sort
+    1. 我們想要知道他到底有幾分 paper citation 是夠多的, 因此我們可以先將他的論文依照 citation 從大到小排序
+    2. 並開始 for 迴圈, 此時的 index 即可以視為 "目前數過的 paper 數", n 跟 citation 的關係就可以解讀為, 有 n 份 paper 其引用數大於等於 citation
+        - ![](assets/markdown-img-paste-20210616203328472.png)
+    3. 因此便可以直接寫出第一種解法
+
+2. Counting Sort
+    1. 那麼如果要優化此種做法只有採取更有效率的排序，也就是 counting sort
+    2. 但 counting sort 的前提是我們陣列中元素的大小不能超過陣列大小
+    3. 然而我們發現即便把那些大於 陣列大小的元素通通變小到陣列大小, 其答案還是不變, 因此可以採用 counting sort
+        - ![](assets/markdown-img-paste-20210616203757751.png)
+
 ### 思路
 按照如下方法確定某人的H指數：
 1、將其發表的所有SCI論文按被引次數從高到低排序；
@@ -7995,6 +8010,36 @@ According to the definition of h-index on Wikipedia: "A scientist has index h if
 我也就沒多想，直接按照上面的方法寫出了代碼：
 
 ### Code
+Typical sort
+```py
+class Solution:
+    def hIndex(self, citations: List[int]) -> int:
+        citations = sorted(citations, reverse=True)
+
+        for n, citation in enumerate(citations):
+            if n >= citation:
+                return n
+        return len(citations)
+```
+
+Counting Sort
+```py
+class Solution:
+    def hIndex(self, citations: List[int]) -> int:
+        n = len(citations)
+        counts = [0 for _ in range(n+1)] # index is the citation_count, i.e: counts[1] = 5 -> citation 為 1 的有 5 篇
+
+        for c in citations:
+            counts[min(n, c)] += 1
+
+        paper_sum = 0
+        for citation in range(n, -1, -1):
+            paper_sum += counts[citation]
+            if paper_sum >= citation:
+                return citation
+        return len(citations)
+```
+
 ``` c
 class Solution {
 public:
@@ -8007,6 +8052,7 @@ public:
     }
 };
 ```
+### Tag: #CountingSort #Sort 
 ---
 ## 275. H-Index II｜ 7/16
 Given an array of citations sorted in ascending order (each citation is a non-negative integer) of a researcher, write a function to compute the researcher's h-index.
