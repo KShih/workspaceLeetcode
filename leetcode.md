@@ -16306,7 +16306,7 @@ class Solution:
         return dp[-1]
 ```
 ---
-## 202. Happy Number｜ 11/3
+## 202. Happy Number｜ 11/3 | [ Review * 1 ]
 (Easy)
 Write an algorithm to determine if a number is "happy".
 
@@ -16317,34 +16317,45 @@ A happy number is a number defined by the following process: Starting with any p
 
 
 ### Code
+HashTable 解法
 ``` py
+def isHappy(self, n: int) -> bool:
+
+    def get_next(n):
+        total_sum = 0
+        while n > 0:
+            n, digit = divmod(n, 10)
+            total_sum += digit ** 2
+        return total_sum
+
+    seen = set()
+    while n != 1 and n not in seen:
+        seen.add(n)
+        n = get_next(n)
+
+    return n == 1
+```
+
+快慢指針找環解法
+```py
 class Solution:
     def isHappy(self, n: int) -> bool:
-        def add(num):
-            str_num = str(num)
-            total = 0
-            if str_num not in dic:
-                dic[str_num] = 1
+        def get_next(number):
+            total_sum = 0
+            while number > 0:
+                number, digit = divmod(number, 10)
+                total_sum += digit ** 2
+            return total_sum
 
-                for c in str_num:
-                    total += int(c)*int(c)
-
-                if total == 1:
-                    return 0
-                return total
-            else:
-                return -1
-
-        dic = dict()
-        status = n
-        while status > 0:
-            status = add(status)
-
-        if status == 0:
-            return True
-        else:
-            return False
+        slow_runner = n
+        fast_runner = get_next(n)
+        while fast_runner != 1 and slow_runner != fast_runner:
+            slow_runner = get_next(slow_runner)
+            fast_runner = get_next(get_next(fast_runner))
+        return fast_runner == 1
 ```
+
+### Tag: #HashTable
 ---
 ## 80. Remove Duplicates from Sorted Array II｜ 11/3
 

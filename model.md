@@ -23,6 +23,7 @@ Solution Model
     3. max 也可用: `max(counters.items(), key = lambda x: x[1])`
 3. 利用 tuple 的性質讓 unhashable type 變成 hashable
     1. `set.add(tuple(list))`
+4. 要取出一個整數中的各個位數，使用 `while n > 0: n, digit = divmod(n, 10)`
 
 ## Greedy
 1. Greedy problems usually look like "Find minimum number of something to do something" or "Find maximum number of something to fit in some conditions", and typically propose an unsorted input.
