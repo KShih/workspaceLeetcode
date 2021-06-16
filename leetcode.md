@@ -8104,7 +8104,7 @@ public:
 
 ```
 ---
-## 217. Contains Duplicate｜ 7/18
+## 217. Contains Duplicate｜ 7/18 | [ Review * 1 ]
 Given an array of integers, find if the array contains any duplicates.
 
 Your function should return true if any value appears at least twice in the array, and it should return false if every element is distinct.
@@ -8113,7 +8113,17 @@ Your function should return true if any value appears at least twice in the arra
 ### 思路
 Sort Solution 99% for time, 99% for space
 
+### 類似題
+
+LC136
+
 ### Code
+```py
+class Solution:
+    def containsDuplicate(self, nums: List[int]) -> bool:
+        return len(set(nums)) < len(nums)
+```
+
 Hash map solution:
 ``` c
 class Solution {
@@ -8141,6 +8151,7 @@ public:
         return false;
     }
 };
+### Tag: #Set
 ---
 ## 55. Jump Game｜ 8/8 | [ Review * 1 ]
 Given an array of non-negative integers, you are initially positioned at the first index of the array.
@@ -10096,6 +10107,9 @@ Note: 2 ^ 1 ^ 2 = (2 ^ 2) ^ 1 = 0 ^ 1.
 Math Solution:
 
 - 2 * (a+b+c) + (a+a+b+b+c) = c
+
+### 類似題
+LC217
 
 ### Code
 Bit Solution

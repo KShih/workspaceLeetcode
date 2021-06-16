@@ -154,15 +154,24 @@
 
 ## String Convert/Pattern
 ### LC205. Isomorphic Strings
-- 此題求的是 pattern, 也就是去看相同字母其出現在兩個字串的位置是否相同
+- 此題求的是字串 pattern是否相同, 也就是去看相同字母其出現在兩個字串的位置是否相同
 - 例子
     - s = "badc", t = "baba"
     - return False
 - 解法: 要用雙向的 map
 
 ### LC1153. String Transforms Into Another String
-- 而此題求的事 convert 成功與否, 彈性較大
+- 而此題求的是字串A是否能 convert 成字串B, 彈性較大, 而且方向固定
 - 例子
     - s = "badc", t = "baba"
     - return True
 - 解法: 單向的 map, 但最後要加上檢查是否有橋可以去做 tmp char 的放置
+
+## Duplicate Element in List
+### LC136. Single Number
+- 此題為 List 中只有一個重複的元素, 求出來
+- 因此可以用 XOR 的方式去解
+
+### LC217. Contains Duplicate
+- 而此題是要求 List 中是否有包含重複的元素
+- XOR 派不上用場
