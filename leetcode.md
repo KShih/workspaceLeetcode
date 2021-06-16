@@ -24634,10 +24634,14 @@ Input: word1 = “coding”, word2 = “practice”
 Output: 3
 Input: word1 = "makes", word2 = "coding"
 Output: 1
+
 Note:
+
 You may assume that word1 does not equal to word2, and word1 and word2 are both in the list.
+
 ### 思路
 
+固定一個, 另一個往後
 
 ### Code
 ``` py
@@ -24670,7 +24674,7 @@ class Solution:
                 idx = i
         return res
 ```
-### Tag: #Array
+### Tag: #Array, #TwoPointer
 ---
 ## 244. Shortest Word Distance II｜ 6/10 | [ Review * 1 ]
 Design a class which receives a list of words in the constructor, and implements a method that takes two words word1 and word2 and return the shortest distance between these two words in the list. Your method will be called repeatedly many times with different parameters.
@@ -24721,7 +24725,7 @@ class WordDistance:
 ```
 ### Tag: #HashTable
 ---
-## 245. Shortest Word Distance III｜ 6/11
+## 245. Shortest Word Distance III｜ 6/11 | [ Review * 1 ]
 iven a list of words and two words word1 and word2, return the shortest distance between these two words in the list.
 
 word1 and word2 may be the same and they represent two individual words in the list.
@@ -24753,6 +24757,7 @@ class Solution:
                 idx = i
         return res
 ```
+### Tag: #Array, #TwoPointer
 ---
 ## 246. Strobogrammatic Number｜ 6/11
 A strobogrammatic number is a number that looks the same when rotated 180 degrees (looked at upside down).
