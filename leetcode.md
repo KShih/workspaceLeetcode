@@ -25365,7 +25365,7 @@ class Solution:
 
 ### Tag: #TwoPointer #BinarySeach
 ---
-## 249. Group Shifted Strings｜ 7/11
+## 249. Group Shifted Strings｜ 7/11 | [ Review * 1 ]
 ![](assets/markdown-img-paste-20200711104414446.png)
 
 計算每個字串的偏移量
@@ -25400,6 +25400,7 @@ class Solution:
             delta += ','
         return delta
 ```
+### Tag: #HashTable
 ---
 ## 261. Graph Valid Tree｜ 7/11 | [ Review * 1 ]
 Given n nodes labeled from 0 to n-1 and a list of undirected edges (each edge is a pair of nodes), write a function to check whether these edges make up a valid tree.
