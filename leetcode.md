@@ -30170,7 +30170,7 @@ class TicTacToe:
 
 ### Tag: #Array
 ---
-## 340. Longest Substring with At Most K Distinct Characters｜ 11/13
+## 340. Longest Substring with At Most K Distinct Characters｜ 11/13 | [ Review * 1 ]
 Given a string, find the length of the longest substring T that contains at most k distinct characters.
 
 Example 1:
@@ -30188,6 +30188,15 @@ Input: s = "aa", k = 1
 Output: 2
 
 Explanation: T is "aa" which its length is 2.
+
+### 解題分析
+1. 這種連續子序列會讓我想到要用 sliding window 解, 這是個對的方向
+2. 再來考慮如何擴張, 只要新進的元素並不會使 set 超過 k, 那就可以擴張
+3. 再來考慮何時縮編, 如果超過 k
+4. 再來考慮如何縮編, 一開始是想說是縮 l 那個元素的最新的位置, 但這個縮法會有錯誤
+    - "eceeeeeebbbbb", k=2 -> 如果按照我們的縮法, 會直接把 left 移到 b 的位址
+5. 正確的做法, 因為 e 在後面還會出現, 我們也要給他機會跟後面的字組合, 這邊讓我們終止的其實是 c, 也就是*最近遇到的字元中最小的那個 index* (e 在後面被更新所以大於 c)
+
 ### 思路
 
 第159題的延伸
@@ -30196,22 +30205,20 @@ Explanation: T is "aa" which its length is 2.
 ``` py
 class Solution:
     def lengthOfLongestSubstringKDistinct(self, s: str, k: int) -> int:
-        if len(s) < k+1:
+        if len(s) <= k:
             return len(s)
-        left_most_map = {}
-        l, r, max_len = 0, 0, k
+        l, res = 0, 0
+        latest_char_map = {}
 
-        for i, ch in enumerate(s):
-            left_most_map[ch] = i
-            r += 1
+        for r, c in enumerate(s):
+            latest_char_map[c] = r
 
-            if len(left_most_map) > k:
-                del_idx = min(left_most_map.values())
-                del left_most_map[s[del_idx]]
-                l = del_idx+1
-
-            max_len = max(max_len, r-l)
-        return max_len
+            if len(latest_char_map) > k:
+                min_idx = min(latest_char_map.values())
+                del latest_char_map[s[min_idx]]
+                l = min_idx+1
+            res = max(res, r-l+1)
+        return res
 ```
 
 ### Tag: #SlidingWindow #DictSize
