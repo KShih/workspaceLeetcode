@@ -8052,36 +8052,7 @@ public:
     }
 };
 ```
-### Tag: #CountingSort #Sort 
----
-## 275. H-Index II｜ 7/16
-Given an array of citations sorted in ascending order (each citation is a non-negative integer) of a researcher, write a function to compute the researcher's h-index.
-
-According to the definition of h-index on Wikipedia: "A scientist has index h if h of his/her N papers have at least h citations each, and the other N − h papers have no more than h citations each."
-![](assets/markdown-img-paste-2019071617301273.png)
-### 思路
-This is the question of the #274,
-O(log(n)) implies we should use binary search to solve this.
-
-According to 274, this question should solve by sort from greater to smaller,
-however we are given the opposite of it, therefore we can prefix the return with 'len - x'
-
-### Code
-``` c
-class Solution {
-public:
-    int hIndex(vector<int>& citations) {
-        int len = citations.size(), left = 0, right = len-1;
-        while (left <= right) {
-            int mid = 0.5 * (left+right);
-            if (len - mid == citations[mid])  return len - mid;
-            else if (len - mid > citations[mid])  left = mid + 1;
-            else right = mid - 1;
-        }
-        return len - left;
-    }
-};
-```
+### Tag: #CountingSort #Sort
 ---
 ## 243. Shortest Word Distance ($)｜ 7/17
 Given a list of words and two words word1 and word2, return the shortest distance between these two words in the list.
@@ -26518,8 +26489,9 @@ def hIndex(self, ci: List[int]) -> int:
             r = mid
         else:
             l = mid+1
-    return n-l
+    return n-r
 ```
+### Tag: #BinarySearch
 ---
 ## 281. Zigzag Iterator｜ 8/14
 
