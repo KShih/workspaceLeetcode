@@ -7819,18 +7819,18 @@ after the positioning, we can find out the least postive int by walking through.
 Note: might consider the range of the array otherwise overflowing.
 ![](assets/markdown-img-paste-20190712221842526.png)
 ### Code
-``` c
+``` c++
 class Solution {
 public:
     int firstMissingPositive(vector<int>& nums) {
         int n = nums.size();
-        for (int i=0; i<n; i++){
+        for (int i=0; i< n; i++){
             while (nums[i] > 0 && nums[i] <= n && nums[i] != nums[nums[i]-1]){
                 swap (nums[i], nums[nums[i] -1]);
             } // positioning elem which >0 and <n at the 'right' position
 
         }
-        for (int i=0; i<n; i++){
+        for (int i=0; i< n; i++){
             if (nums[i] != i+1) return i+1;
         }
         return n+1;
@@ -7838,13 +7838,32 @@ public:
 };
 ```
 ---
-## 299. Bulls and Cows｜ 7/15
+## 299. Bulls and Cows｜ 7/15 | [ Review * 1 ]
 You are playing the following Bulls and Cows game with your friend: You write down a number and ask your friend to guess what the number is. Each time your friend makes a guess, you provide a hint that indicates how many digits in said guess match your secret number exactly in both digit and position (called "bulls") and how many digits match the secret number but locate in the wrong position (called "cows"). Your friend will use successive guesses and hints to eventually derive the secret number.
 
 Write a function to return a hint according to the secret number and friend's guess, use A to indicate the bulls and B to indicate the cows.
 
 Please note that both secret number and friend's guess may contain duplicate digits.
 ![](assets/markdown-img-paste-20190715145102960.png)
+
+### 解題分析
+1. Intuitive
+    1. 必須儲存可使用的數量, e.g.: secret = "1123", guess = "0111", Output: "1A1B", 而不是 1A2B!
+        - 所以在加 B 的數量的時候也要去判斷是否 useup 了
+    2. 也有可能 secret = "2331", guess = "1231", 第一個 1 會先被判定成 B, 而最後一個 1 卻是 A, 此時要把 greedy 加上去的 B 給去掉
+            - 所以在加完 A 的時候也要去判斷一下是否要把先加上去的扣回來
+2. One pass
+    1. 在上面那個解法中我們必須先 initial counter, 目的就是為了先把 secret 統計完, 目的是
+        1. 讓新進來的 guess 知道, secret 有包含這個數字哦
+            1. 有可以分成兩種情況, secret 先出了此數字 or guess 先出了此數字
+        2. 因此我們如果要邊 count 邊做, 我們必須要能夠處理這兩種狀態
+    2. 方法:
+        1. 我們對於每個 secret 我們都讓他在字典裡 +1, (與上面的 counter 作法一樣)
+        2. 不一樣的事, 我們對於每個 guess 都讓他在字典裡 -1
+        3. 然後再判定 cow 是否要 +1 時,
+            1. if h[s] < 0 -> 會通過這個 if 表示 guess 之前有出現過這個字, 只是 secret 的此數字還在後面而已, 因此要 cow要+1
+            2. if h[g] > 0 -> 會通過這個 if 表示 secret 之前有出現過這個字, 只是 guess 的此數字還在後面而已, 因此 cow 也要 +1
+
 ### 思路
 We firstly defined the conduct of the secret and guess in the map:
   - for secret: We Count it, so used the 'add' operation to define.
@@ -7866,6 +7885,50 @@ remind, if (k++ > 0) , equal to determine if k is larger than 0 and no matter wh
 remind, if (++k > 0) , equal to do k+=1 first, and determine if the k+=1 is larger than 0
 
 ### Code
+Two Pass Intuitive
+```py
+class Solution:
+    def getHint(self, secret: str, guess: str) -> str:
+        counts = Counter(secret)
+
+        bull, cow = 0, 0
+        for i, c in enumerate(guess):
+            if c in counts:
+                if secret[i] == c:
+                    bull += 1
+                    if counts[c] <= 0: # use up the same char
+                        cow -= 1
+                else:
+                    if counts[c] > 0:
+                        cow += 1
+                counts[c] -= 1
+        return f"{bull}A{cow}B"
+```
+
+One Pass, Count During Processing (Optimal)
+```py
+class Solution:
+    def getHint(self, secret: str, guess: str) -> str:
+        cow, bull = 0, 0
+        counts = [0 for _ in range(10)]
+
+        for i in range(len(secret)):
+            s = int(secret[i])
+            g = int(guess[i])
+
+            if s == g:
+                bull += 1
+            else:
+                if counts[s] < 0:
+                    cow += 1
+                if counts[g] > 0:
+                    cow += 1
+
+                counts[s] += 1
+                counts[g] -= 1
+        return f"{bull}A{cow}B"
+```
+
 Advanced way:
 ``` c
 class Solution {
@@ -7905,6 +7968,7 @@ public:
     }
 };
 ```
+### Tag: #HashTable #Counter
 ---
 ## 134. Gas Station｜ 7/16 | [ Review * 1 ]
 There are N gas stations along a circular route, where the amount of gas at station i is gas[i].
