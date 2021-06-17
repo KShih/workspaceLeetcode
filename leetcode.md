@@ -28708,7 +28708,7 @@ class Solution:
         return max(sold, reset)
 ```
 ---
-## 311. Sparse Matrix Multiplication｜ 10/19
+## 311. Sparse Matrix Multiplication｜ 10/19 | [ Review * 1 ]
 Given two sparse matrices A and B, return the result of AB.
 
 You may assume that A's column number is equal to B's row number.
@@ -28740,6 +28740,13 @@ Constraints:
 1 <= A.length, B.length <= 100
 1 <= A[i].length, B[i].length <= 100
 -100 <= A[i][j], B[i][j] <= 100
+
+### 解題分析
+1. 先了解到 result 每個位置的值是怎麼球出來的
+    - A X B = C
+    - sum (A[1][n] x B[n][2]) = C[1][2]
+2. 所以我們先把 A B 中有值得地方全部存起來
+3. 第三個 for 迴圈再去把 A[i] 中所有的元素 a[i][j] 取出來, 然後去跟 B[j] 中所有元素 B[j][k] 相乘 加到 result 裡
 
 ### 思路
 
@@ -28804,6 +28811,7 @@ class Solution(object):
                     C[i][j] += table_A[i][k] * table_B[k][j]
         return C
 ```
+### Tag: #HashTable #Array
 ---
 ## 312. Burst Balloons｜ 10/20 | [ Review * 1 ]
 
