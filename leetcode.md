@@ -30377,7 +30377,7 @@ class Solution:
 ```
 ### Tag:
 ---
-## 350. Intersection of Two Arrays II｜ 11/16
+## 350. Intersection of Two Arrays II｜ 11/16 | [ Review * 1 ]
 Given two arrays, write a function to compute their intersection.
 
 Example 1:
