@@ -29382,7 +29382,7 @@ class Solution:
 
 ### Tag: #Graph, #DFS, #UnionFind, #BFS
 ---
-## 325. Maximum Size Subarray Sum Equals k｜ 8/29
+## 325. Maximum Size Subarray Sum Equals k｜ 8/29 | [ Review * 1 ]
 
 Given an array nums and a target value k, find the maximum length of a subarray that sums to k. If there isn't one, return 0 instead.
 
@@ -29406,6 +29406,16 @@ Explanation: The subarray [-1, 2] sums to 1 and is the longest.
 Follow Up:
 Can you do it in O(n) time?
 
+### 解題分析
+1. subarray sum -> 聯想到要用 accumlated sum 的概念
+2. 那就可以來考慮什麼情況下可以達成 k
+    1. 從頭一直累積就剛好成 k
+    2. 從中間某個數開始累積, 剛好成k
+3. 第一點我們可以用一行 if 就判斷出來
+4. 第二點就必須藉助 HashTable 來達到 O(1) 的 access
+    - 因此我們把當前的 acc_sum : index 存成 dictionary
+5. 記得如果有同樣的 accSum 出現要存最一開始出現的，這樣才能保證最長
+
 ### 思路
 
 1. 基本的思路就是accumulated sum
@@ -29417,21 +29427,22 @@ Can you do it in O(n) time?
 ``` py
 class Solution:
     def maxSubArrayLen(self, nums: List[int], k: int) -> int:
-        sums, sumMap, maxLeng = 0, {}, 0
+        cur_sum, acc_map, res = 0, {}, 0
 
         for i, num in enumerate(nums):
-            sums += num
-            if sums == k:
-                maxLeng = i+1 # accumulate from the start is the max leng
-            elif (sums-k) in sumMap:
-                maxLeng = max(maxLeng, i-sumMap[sums-k])
+            cur_sum += num
+            compliment = cur_sum - k
+            if cur_sum == k:
+                res = i+1
+            elif compliment in acc_map:
+                res = max(res, i - acc_map[compliment])
 
-            if sums not in sumMap: # record the first i which accSum is sums
-                sumMap[sums] = i
-        return maxLeng
+            if cur_sum not in acc_map:
+                acc_map[cur_sum] = i
+        return res
 ```
 
-### Tag: Accumulated Sum, HashMap
+### Tag: #AccumulatedSum, #HashTable
 ---
 ## 328. Odd Even Linked List｜ 10/30 | [Review * 1]
 Given a singly linked list, group all odd nodes together followed by the even nodes. Please note here we are talking about the node number and not the value in the nodes.
