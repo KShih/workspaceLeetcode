@@ -35920,3 +35920,80 @@ class Logger(object):
 
 ### Tag: #
 ---
+## 381. Insert Delete GetRandom O(1) - Duplicates allowed｜ 6/18
+Implement the RandomizedCollection class:
+
+- RandomizedCollection() Initializes the RandomizedCollection object.
+- bool insert(int val) Inserts an item val into the multiset if not present. Returns true if the item was not present, false otherwise.
+- bool remove(int val) Removes an item val from the multiset if present. Returns true if the item was present, false otherwise. Note that if val has multiple occurrences in the multiset, we only remove one of them.
+- int getRandom() Returns a random element from the current multiset of elements (it's guaranteed that at least one element exists when this method is called). The probability of each element being returned is linearly related to the number of same values the multiset contains.
+You must implement the functions of the class such that each function works in average O(1) time complexity.
+
+
+- Example 1:
+
+- Input
+- ["RandomizedCollection", "insert", "insert", "insert", "getRandom", "remove", "getRandom"]
+- [[], [1], [1], [2], [], [1], []]
+- Output
+- [null, true, false, true, 2, true, 1]
+
+- Explanation
+- RandomizedCollection randomizedCollection = new RandomizedCollection();
+- randomizedCollection.insert(1);   // return True. Inserts 1 to the collection. Returns true as the collection did not contain 1.
+- randomizedCollection.insert(1);   // return False. Inserts another 1 to the collection. Returns false as the collection contained 1. Collection now contains [1,1].
+- randomizedCollection.insert(2);   // return True. Inserts 2 to the collection, returns true. Collection now contains [1,1,2].
+- randomizedCollection.getRandom(); // getRandom should return 1 with the probability 2/3, and returns 2 with the probability 1/3.
+- randomizedCollection.remove(1);   // return True. Removes 1 from the collection, returns true. Collection now contains [1,2].
+- randomizedCollection.getRandom(); // getRandom should return 1 and 2 both equally likely.
+
+
+- Constraints:
+
+- -231 <= val <= 231 - 1
+- At most 2 * 105  calls will be made to insert, remove, and getRandom.
+- There will be at least one element in the data structure when getRandom is called.
+
+### 解題分析
+1. 比起上題, 我們需要額外更多的資訊來處理 duplicate element, 那這個資訊便可以是此 element 在 list 中的 index
+2. 那在刪除時, 我們一樣是把最後面的元素拿來補前面, 然後再去把最後面的元素在 map 中的位址值改成被刪除的 index 就可以了
+    - 那這邊可能會有個問題, 那如果被刪除的是最後一個元素呢?
+        - 我們可以透過先 add 再 remove 去處理這塊, 也就是把 pop() 出來的 index 加回去, 然後再 remove 掉
+
+
+### Code
+``` py
+class RandomizedCollection:
+
+    def __init__(self):
+        self.val_pos = defaultdict(set)
+        self.values = []
+
+
+    def insert(self, val: int) -> bool:
+        self.val_pos[val].add(len(self.values))
+        self.values.append(val)
+        return len(self.val_pos[val]) == 1
+
+
+    def remove(self, val: int) -> bool:
+        if val not in self.val_pos or len(self.val_pos[val]) == 0:
+            return False
+
+        rm_idx = self.val_pos[val].pop()
+        last_val = self.values[-1]
+
+        self.values[rm_idx] = last_val
+        self.val_pos[last_val].add(rm_idx)
+        self.val_pos[last_val].remove(len(self.values)-1)
+
+        self.values.pop()
+        return True
+
+
+    def getRandom(self) -> int:
+        return choice(self.values)
+```
+
+### Tag: #HashTable
+---
