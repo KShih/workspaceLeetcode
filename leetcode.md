@@ -12172,34 +12172,107 @@ class Solution(object):
 ```
 ### Tag: #HashTable
 ---
-## 336. Palindrome Pairs｜ 9/9
+## 336. Palindrome Pairs｜ 9/9 | [ Review * 1 ]
 Given a list of unique words, find all pairs of distinct indices (i, j) in the given list, so that the concatenation of the two words, i.e. words[i] + words[j] is a palindrome.
 
 ![](assets/markdown-img-paste-20190909134847447.png)
 
-### 技巧
+### 解題分析
 
-1. 反轉字串: rev_str = str[::-1]
-2. 切割字串:
-  - n = len("apple")
-  - str[:2] = "ap", str[2:] = "ple"
-  - str[:n] = "apple", str[n:] = ""   -> 看起來會overflow但不會. cuz there is a empty char 在字串最後面
-3. 少用指定搜尋dic.keys()，會TLE
-  - 直接用: if reverse != word and __reverse in dic__:
+1. 我們首先要先想, 如何可以使兩個字成為一個合法的 palin
+    1. Case1: 兩個字互為反字
+        - "abc" vs "cba"
+    2. Case2: 左邊那個字的 prefix 的 reverse 是右邊那個字, 且左邊那個字 prefix 以外的部分是回文
+        - "abcdd" vs "cba"
+        - ![](assets/markdown-img-paste-20210618152234417.png)
+    3. Case3: 右邊那個字的 suffix 的 reverse 是左邊那個字, 且右邊那個字 suffix 以外的部分是回文
+        - "abc" vs "ddcba"
+        - ![](assets/markdown-img-paste-20210618152402827.png)
+    4. EdgeCase: 左或右字為空, 另一字自己本身就是回文 -> 這可以被 case2 and case3 給包含
 
-### 思路
-![](assets/markdown-img-paste-20190909134045216.png)
+2. 如何證明我們已經涵蓋所有 testcase 了 ?
+    - 兩個字的關係只有: 相等(case1), 左大(case2), 右大(case3)
 
-The basic idea is to check each word for prefixes (and suffixes) that are themselves palindromes. If you find a prefix that is a valid palindrome, then the suffix reversed can be paired with the word in order to make a palindrome. It's better explained with an example.
+3. 代碼:
+    1. 我們首先先建立所有字跟他的 index 關係
+    2. 對於 case1 我們直接檢查 rev_word 是否存在 map 裏
+    3. 對於 case2 我們 call get_valid_prefix(), 去拿到這個字可能會合法的 prefixes 數組, 再去檢查 rev_prefix 是否存在
+    4. 對於 case3 跟上面一樣, 但要注意, python 的 slice[:len(s)+1] 這樣才能取到整個字串
 
-words = ["bot", "t", "to"]
-Starting with the string "bot". We start checking all prefixes. If "", "b", "bo", "bot" are themselves palindromes. The empty string and "b" are palindromes. We work with the corresponding suffixes ("bot", "ot") and check to see if their reverses ("tob", "to") are present in our initial word list. If so (like the word to"to"), we have found a valid pairing where the reversed suffix can be prepended to the current word in order to form "to" + "bot" = "tobot".
+4. Time:
+    - O(k^2 * n)
+        - k 為 最大字長, n為數組長
+        - 要嘗試 k 次來找 prefix, 然後再花 O(k) 來 reverse
 
-You can do the same thing by checking all suffixes to see if they are palindromes. If so, then finding all reversed prefixes will give you the words that can be appended to the current word to form a palindrome.
-
-The process is then repeated for every word in the list. Note that when considering suffixes, we explicitly leave out the empty string to avoid counting duplicates. That is, if a palindrome can be created by appending an entire other word to the current word, then we will already consider such a palindrome when considering the empty string as prefix for the other word.
+5. 優化:
+    1. 我們可以透過直接把 word 的 reverse 先求出來，並且拿來用在判斷 *剩餘的部分是否為 palin 的階段*, 就可以避免一直需要重複去算 palin 了
+    2. 透過 `-j` 就可以用同一個 index 對付 prefix 和 suffix 了
+    3. 整體邏輯變成, **如果某部分的字有在 reverse_map 裏, 且其他部分為 palin, 那就是合法的組合** <- *超好記得解題邏輯*
 
 ### Code
+```py
+class Solution:
+    def palindromePairs(self, words: List[str]) -> List[List[int]]:
+        res = []
+        word_dic = {word: i for i, word in enumerate(words)}
+
+        for i, word in enumerate(words):
+            rev_word = word[::-1]
+            if rev_word in word_dic and word_dic[rev_word] != i: # case1
+                res.append([i, word_dic[rev_word]])
+
+            for valid_prefix in self.get_valid_prefix(word):
+                rev_prefix = valid_prefix[::-1]
+                if rev_prefix in word_dic:
+                    res.append([i, word_dic[rev_prefix]])
+
+            for valid_suffix in self.get_valid_suffix(word):
+                rev_suffix = valid_suffix[::-1]
+                if rev_suffix in word_dic:
+                    res.append([word_dic[rev_suffix], i])
+        return res
+
+    def get_valid_prefix(self, word): # lls -> [ll] + s
+        valids = []
+        for i in range(len(word)):
+            # check if its suffix is palin
+            suf = word[i:]
+            if suf == suf[::-1]:
+                valids.append(word[:i]) # append rest part as valid prefix
+        return valids
+
+    def get_valid_suffix(self, word): # sssll -> ss + [sll]
+        valids = []
+        for i in range(len(word)):
+            pre = word[:i+1]
+            if pre == pre[::-1]:
+                valids.append(word[i+1:])
+        return valids
+```
+
+極致精簡版 (Optimal) -> O(nk)
+```py
+class Solution(object):
+    def palindromePairs(self, words):
+        rev = {
+            word[::-1]:i for i, word in enumerate(words)
+        }
+        result = []
+        for i, word in enumerate(words):
+            revs = word[::-1]
+            if word in rev and i != rev[word]:
+                result.append([i, rev[word]])
+
+            for j in range(1, len(word)+1):
+                if word[:-j] in rev and word[-j:] == revs[:j]:
+                    result.append([i, rev[word[:-j]]])
+
+                if word[j:] in rev and word[:j] == revs[-j:]:
+                    result.append([rev[word[j:]], i])
+        return result
+```
+
+
 ``` py
 class Solution(object):
     def palindromePairs(self, words):
@@ -12236,6 +12309,7 @@ class Solution(object):
     def is_palind(self,string):
         return string == string[::-1] # reverse the string
 ```
+### Tag: #HashTable
 ---
 ## 11. Container With Most Water｜ 9/10
 Given n non-negative integers a1, a2, ..., an , where each represents a point at coordinate (i, ai). n vertical lines are drawn such that the two endpoints of line i is at (i, ai) and (i, 0). Find two lines, which together with x-axis forms a container, such that the container contains the most water.
