@@ -35997,3 +35997,49 @@ class RandomizedCollection:
 
 ### Tag: #HashTable
 ---
+## 387. First Unique Character in a String｜ 6/18
+Given a string s, return the first non-repeating character in it and return its index. If it does not exist, return -1.
+
+Example 1:
+
+Input: s = "leetcode"
+
+Output: 0
+
+Example 2:
+
+Input: s = "loveleetcode"
+
+Output: 2
+
+Example 3:
+
+Input: s = "aabb"
+
+Output: -1
+
+
+Constraints:
+
+1 <= s.length <= 105
+
+s consists of only lowercase English letters.
+
+### 思路
+
+好像只有 Java 的 LinkedHashMap 才能做到 One Pass
+
+### Code
+``` py
+class Solution:
+    def firstUniqChar(self, s: str) -> int:
+        count = collections.Counter(s)
+
+        for idx, ch in enumerate(s):
+            if count[ch] == 1:
+                return idx
+        return -1
+```
+
+### Tag: #
+---
