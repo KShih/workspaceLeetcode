@@ -35763,3 +35763,78 @@ class Solution(object):
 
 ### Tag: #HashMap
 ---
+## 356. Line Reflection｜ 6/18
+Given n points on a 2D plane, find if there is such a line parallel to y-axis that reflect the given points symmetrically, in other words, answer whether or not if there exists a line that after reflecting all points over the given line the set of the original points is the same that the reflected ones.
+
+Note that there can be repeated points.
+
+Follow up:
+Could you do better than O(n2) ?
+
+![](assets/markdown-img-paste-20210618163549905.png)
+
+Input: points = [[1,1],[-1,1]]
+
+Output: true
+
+Explanation: We can choose the line x = 0.
+
+
+![](assets/markdown-img-paste-20210618163609356.png)
+
+Input: points = [[1,1],[-1,-1]]
+
+Output: false
+
+Explanation: We can't choose a line.
+
+Constraints:
+
+- n == points.length
+- 1 <= n <= 10^4
+- -10^8 <= points[i][j] <= 10^8
+
+### 解題分析
+1. 此題不能用 counter of same y value 去解:
+    - [[1,1],[0,0],[-1,1]] -> True
+    - 因為 [0,0] 位於對稱軸上
+
+2. 因此我們需要先去找出那條對稱軸, 也就是 (min(x) + max(x)) // 2
+
+3. 再去計算出每個點的對稱點是誰, 並且其是否存在在圖中
+
+
+### Code
+``` py
+class Solution:
+    def isReflected(self, points):
+        if not points: return True # very weird, but this is the expected answer of the OJ...
+        points = set([ tuple(p) for p in points])
+        mid = (min(x for x,y in points) + max(x for x,y in points))/2
+
+        for x, y in points:
+            mirror_x = mid + (mid-x)
+            if (mirror_x, y) not in points: return False
+
+        return True
+```
+
+Wrong Solution
+```py
+class Solution:
+    def isReflected(self, points: List[List[int]]) -> bool:
+        if len(points) == 1:
+            return True
+
+        counters = defaultdict(set)
+        for x, y in points:
+            counters[y].add(x)
+
+        for entry in counters:
+            if len(counters[entry]) %2 != 0:
+                return False
+        return True
+```
+
+### Tag: #HashTable
+---
