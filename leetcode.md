@@ -14521,6 +14521,25 @@ class Solution:
         return res
 ```
 
+單純只用 Heap 的解法
+- 複習時想出的
+- 我們只在需要用到時才去檢查
+```py
+class Solution:
+    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
+        res = []
+        heap = []
+
+        for i, num in enumerate(nums):
+            heappush(heap, (-num, i))
+
+            if i+1 >= k:
+                while heap[0][-1] < i-k+1:
+                    heappop(heap)
+                res.append(-heap[0][0])
+        return res
+```
+
 Heap + Counter 的解法 (n log k)
 ```py
 class Solution:
