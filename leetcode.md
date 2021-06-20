@@ -35304,7 +35304,7 @@ class Solution:
 
 ### Tag: #Greedy #Heap #LineSweep
 ---
-## 1326. Minimum Number of Taps to Open to Water a Garden｜ 5/3
+## 1326. Minimum Number of Taps to Open to Water a Garden｜ 5/3 | [ Review * 1 ]
 
 There is a one-dimensional garden on the x-axis. The garden starts at the point 0 and ends at the point n. (i.e The length of the garden is n).
 
@@ -35387,6 +35387,28 @@ class Solution:
             l, r = r, max(i + max_reach[i] for i in range(l, r+1))
             if l >= r:
                 return -1 # cant reach more
+        return step
+```
+
+複習時寫法, AC
+- arr 直接存最遠的到達位置, 而不是最遠能多走幾步, 因此在 while 的 for 裡也不用再 + i
+- 忘記要加上 if break 的邏輯!
+- **註, 這個寫法才與 LC1024 相同**
+```py
+class Solution:
+    def minTaps(self, n, ranges):
+        max_reach = [0] * (n+1)
+        for i, r in enumerate(ranges):
+            leftmost, rightmost = max(0, i-r), min(n, i+r)
+            max_reach[leftmost] = max(max_reach[leftmost], rightmost) # max more steps from leftmost idx
+
+        # jump game II start
+        l, r, step = 0, 0, 0
+        while r < n:
+            step += 1
+            l, r = r, max(max_reach[i] for i in range(l, r+1))
+            if l >= r:
+                return -1
         return step
 ```
 
