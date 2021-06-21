@@ -23702,7 +23702,7 @@ class Solution:
         return stack
 ```
 ---
-## 525. Contiguous Array｜ 4/14 (W2 D6)
+## 525. Contiguous Array｜ 4/14  | [ Review * 1 ]
 Given a binary array, find the maximum length of a contiguous subarray with equal number of 0 and 1.
 
 Example 1:
@@ -23723,7 +23723,7 @@ Note: The length of the given binary array will not exceed 50,000.
 
 ### 技巧
 
-- Acumulated Sum 的變形
+- Contiguous Subarray -> Acumulated Sum
 - Hashmap 快速定位
 
 ### 思路
@@ -23740,21 +23740,17 @@ Note: The length of the given binary array will not exceed 50,000.
 ``` py
 class Solution:
     def findMaxLength(self, nums: List[int]) -> int:
-        sums = 0
-        dic = {0: -1} # initialize with sum=0: index=(-1)
-        res = 0
-
+        sum_idx_map = {0: -1}
+        _sum, res = 0, 0
         for i, num in enumerate(nums):
-            if num == 0:
-                sums -= 1
+            _sum += num if num == 1 else -1
+            if _sum not in sum_idx_map:
+                sum_idx_map[_sum] = i
             else:
-                sums += 1
-            if sums in dic:
-                res = max(res, i-dic[sums])
-            else:
-                dic[sums] = i
+                res = max(res, i - sum_idx_map[_sum])
         return res
 ```
+### Tag: #HashTable #AccumulatedSum
 ---
 ## Perform String Shifts｜ 4/15 (W2 D7)
 You are given a string s containing lowercase English letters, and a matrix shift, where shift[i] = [direction, amount]:
