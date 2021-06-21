@@ -36373,3 +36373,94 @@ class Solution(object):
 
 ### Tag: #HashTable #Design
 ---
+## 718. Maximum Length of Repeated Subarray｜ 6/21
+Given two integer arrays nums1 and nums2, return the maximum length of a subarray that appears in both arrays.
+
+Example 1:
+
+- Input: nums1 = [1,2,3,2,1], nums2 = [3,2,1,4,7]
+- Output: 3
+- Explanation: The repeated subarray with maximum length is [3,2,1].
+
+Example 2:
+
+- Input: nums1 = [0,0,0,0,0], nums2 = [0,0,0,0,0]
+- Output: 5
+
+Constraints:
+
+- 1 <= nums1.length, nums2.length <= 1000
+- 0 <= nums1[i], nums2[i] <= 100
+### 解題分析
+1. Naive indexing
+    1. 有自己寫出 Naive 的寫法, 不錯
+    2. 我們的解題大綱就是 先找到某個位置是互相相等的，在不停地往後移動指針，看能走多遠
+    3. 利用這個概念我們可以用 DP 優化解法
+2. DP
+    1. 由上述的概念我們可以發現, 兩個新指針指到的值若是一樣, 我們就可以將 k+1, 而這個 k 我們其實可以重複利用不必每次都從零計算起, 只要我們能夠取得這兩個新指針各自的前一位所算出的 k
+    2. 由上述的想法可以得到 `dp[i+1][j+1] = dp[i][j] + 1 if nums1[i] == nums2[j]`
+3. Sliding Window
+    0. ![](assets/markdown-img-paste-20210622002031966.png)
+    1. 本題最漂亮的解法
+    2. 我們一開始先把 A 的尾, 與 Ｂ的頭接在一起 (此時重合的部分k 只有1)
+    3. 經過平移後 k 變成 2, 依此類推直到 k = m 時, A的頭對上了 B的頭(ptrA=0, ptrB=0)
+    4. 接著變這樣 (自己操作一次就懂了＠＠)
+        ```py
+        #                [1,2,3,2,1]      -->
+        #     <--      [3,2,1,4,7]
+        ```
+    5. 因此我們可以接著 ptrA, ptrB 的移動, 去求出所有的重合可能 (frames), 並且在每個 frame 裡面試著找出最大的 cnt
+    6. 需要小心的地方是, 這種做法 cnt 是不能累積的, 一遇到不合的就要 reset 成 0 (也合理)
+
+### Code
+Naive TLE
+``` py
+class Solution(object):
+    def findLength(self, A, B):
+        ans = 0
+        Bstarts = collections.defaultdict(list)
+        for j, y in enumerate(B):
+            Bstarts[y].append(j)
+
+        for i, x in enumerate(A):
+            for j in Bstarts[x]:
+                k = 0
+                while i + k < len(A) and j + k < len(B) and A[i + k] == B[j + k]:
+                    k += 1
+                ans = max(ans, k)
+        return ans
+```
+
+DP (Optimal)
+```py
+class Solution:
+    def findLength(self, nums1: List[int], nums2: List[int]) -> int:
+        n1, n2 = len(nums1), len(nums2)
+        dp = [[0 for _ in range(n2+1)] for _ in range(n1+1)]
+        for i in range(n1):
+            for j in range(n2):
+                if nums1[i] == nums2[j]:
+                    dp[i+1][j+1] = dp[i][j]+1
+        return max(max(r) for r in dp)
+```
+
+Sliding Window (Optimal)
+```py
+class Solution(object):
+    def findLength(self, A, B):
+        m = len(A)
+        n = len(B)
+        maxLen = 0
+        for i in range(m+n-1):
+            ptrA = max(0, m-1-i) # start from last idx of A
+            ptrB = max(0, i-(m-1)) # always start from zero until m iterations
+            cnt = 0
+            while ptrA < m and ptrB < n:
+                cnt = cnt + 1 if A[ptrA] == B[ptrB] else 0 # reset to zero if found not equal
+                maxLen = max(maxLen, cnt)
+                ptrA, ptrB = ptrA+1, ptrB+1
+        return maxLen
+```
+
+### Tag: #DP #HashTable #SlidingWindow
+---
