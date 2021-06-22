@@ -36464,3 +36464,106 @@ class Solution(object):
 
 ### Tag: #DP #HashTable #SlidingWindow
 ---
+## 720. Longest Word in Dictionary｜ 6/22
+Given an array of strings words representing an English Dictionary, return the longest word in words that can be built one character at a time by other words in words.
+
+If there is more than one possible answer, return the longest word with the smallest lexicographical order. If there is no answer, return the empty string.
+
+Example 1:
+
+- Input: words = ["w","wo","wor","worl","world"]
+- Output: "world"
+- Explanation: The word "world" can be built one character at a time by "w", "wo", "wor", and "worl".
+
+Example 2:
+
+- Input: words = ["a","banana","app","appl","ap","apply","apple"]
+- Output: "apple"
+- Explanation: Both "apply" and "apple" can be built from other words in the dictionary. However, "apple" is lexicographically smaller than "apply".
+
+Constraints:
+
+- 1 <= words.length <= 1000
+- 1 <= words[i].length <= 30
+- words[i] consists of lowercase English letters.
+
+### 解題分析
+1. Sort 法
+    1. 我們必須從 1個字元慢慢判斷到 n個, 因為這樣才能保證整條路都是完整的
+    2. 因此我們必須先對 words 進行排序
+    3. 並初始化一個 set 裡面是只含有一個空字元 (意義: 所有字元都可由空字元演化來)
+    4. 然後逐一比對 word, 如果 word[:-1] 已經存在在 set, 表示此 word 是合法的, 加進去 set 中, 並判斷其是否為最長字串
+2. Trie 法
+    1. 對整個陣列建 Trie
+    2. 用 BFS 走訪, 只把 isEnd=True 的孩子加進去 queue 裏
+    3. 在 `len(n.word)>len(res) or n.word<res`, 可以直接判斷 `n.word < res` 是因為我們前面的 isEnd 保證了越長的字越晚出現
+
+
+### Code
+
+AC, sort
+```py
+class Solution:
+    def longestWord(self, words: List[str]) -> str:
+        word_set, longest = {""}, ""
+        for word in sorted(words):
+            if word[:-1] in word_set:
+                word_set.add(word)
+                if len(word) > len(longest):
+                    longest = word
+        return longest
+```
+
+Trie (Optimal)
+```py
+class TrieNode(object):
+    def __init__(self):
+        self.children=collections.defaultdict(TrieNode)
+        self.isEnd=False
+        self.word =''
+
+class Trie(object):
+    def __init__(self):
+        self.root=TrieNode()
+
+    def insert(self, word):
+        node=self.root
+        for c in word:
+            node =node.children[c]
+        node.isEnd=True
+        node.word=word
+
+    def bfs(self):
+        q=collections.deque([self.root])
+        res=''
+        while q:
+            cur=q.popleft()
+            for n in cur.children.values():
+                if n.isEnd:
+                    q.append(n)
+                    if len(n.word)>len(res) or n.word<res:
+                        res=n.word
+        return res
+
+class Solution(object):
+    def longestWord(self, words):
+        trie = Trie()
+        for w in words: trie.insert(w)
+        return trie.bfs()
+```
+
+WA,
+不能從後面判斷起, 因為就算 word[:-1] 存在也不保證 word[:-2~n]存在
+``` py
+class Solution:
+    def longestWord(self, words: List[str]) -> str:
+        word_set = set(words)
+        words = sorted(words, key=lambda k: (-len(k), k))
+        for word in words:
+            if word[:-1] in word_set:
+                return word
+        return words[-1]
+```
+
+### Tag: #Set #Sort #HashTable
+---

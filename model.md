@@ -456,6 +456,28 @@ class Solution:
 
 ---
 
+## Trie
+```py
+class TrieNode(object):
+    def __init__(self):
+        self.children=collections.defaultdict(TrieNode)
+        self.isEnd=False
+        self.word =''
+
+class Trie(object):
+    def __init__(self):
+        self.root=TrieNode()
+
+    def insert(self, word):
+        node=self.root
+        for c in word:
+            node =node.children[c]
+        node.isEnd=True
+        node.word=word
+```
+
+---
+
 ## BFS
 
 ```py
