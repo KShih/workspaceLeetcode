@@ -38,6 +38,7 @@ Solution Model
 - for `224`, `227`, `772`
 - 對於負整數也能解
 - ![](assets/markdown-img-paste-20200414144532950.png)
+- 變化題: `726 化學式`
 
 ### model
 ```py

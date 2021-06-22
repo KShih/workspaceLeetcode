@@ -36567,3 +36567,101 @@ class Solution:
 
 ### Tag: #Set #Sort #HashTable
 ---
+## 726. Number of Atoms｜ 6/22
+Given a chemical formula (given as a string), return the count of each atom.
+
+The atomic element always starts with an uppercase character, then zero or more lowercase letters, representing the name.
+
+One or more digits representing that element's count may follow if the count is greater than 1. If the count is 1, no digits will follow. For example, H2O and H2O2 are possible, but H1O2 is impossible.
+
+Two formulas concatenated together to produce another formula. For example, H2O2He3Mg4 is also a formula.
+
+A formula placed in parentheses, and a count (optionally added) is also a formula. For example, (H2O2) and (H2O2)3 are formulas.
+
+Given a formula, return the count of all elements as a string in the following form: the first name (in sorted order), followed by its count (if that count is more than 1), followed by the second name (in sorted order), followed by its count (if that count is more than 1), and so on.
+
+Example 1:
+
+- Input: formula = "H2O"
+- Output: "H2O"
+- Explanation: The count of elements are {'H': 2, 'O': 1}.
+
+Example 2:
+
+- Input: formula = "Mg(OH)2"
+- Output: "H2MgO2"
+- Explanation: The count of elements are {'H': 2, 'Mg': 1, 'O': 2}.
+
+Example 3:
+
+- Input: formula = "K4(ON(SO3)2)2"
+- Output: "K4N2O14S4"
+- Explanation: The count of elements are {'K': 4, 'N': 2, 'O': 14, 'S': 4}.
+
+Example 4:
+
+- Input: formula = "Be32"
+- Output: "Be32"
+
+Constraints:
+
+- 1 <= formula.length <= 1000
+- formula consists of English letters, digits, '(', and ')'.
+- formula is always valid.
+
+### 解題分析
+1. 曾經有想過用 recursion 去做, 遇到括號時呼叫子程序 (如同我們計算機模板一樣), 但在處理係數時好像會導致時間複雜度變成 O(N^2)
+2. 大神的 O(N) 解法
+    1. 想法:
+        1. 最初始的觀察我們可以發現我們在看一個 formula 的時候是先看他的係數, 然後再去看裡面有什麼元素, 把個數乘上係數就是我們的總數
+        2. 但如果從頭開始往後走變成我們要先計算出括號內的元素總類後, 才能去拿外面的係數, 此時又要 loop 一次已經拿到的 dict 把裡面的 count 乘上係數
+        3. 因此如果可以從後面開始反著讀, 就可以在這點上面做到優化
+    2. 實作:
+        1. 數字:
+            - 我們一樣用 cnt 去存數字, 那反著讀在處理 cnt 時就需要去多存一個 '位數', e.g. 49 -> 先讀到9, 在讀到4 -> 9 + 4 * `1` * 10
+        2. 係數轉換:
+            - 當遇到 `)` 的時候, 我們需要把當前的係數值乘上 cnt (因為有可能當前不是在第一層)
+            - reset cnt, digit
+        3. 係數還原:
+            - 當遇到 `(` 的時候, 表示我們已經結束當前的括號了, 係數必須還原成轉換前的樣子, 因此我們在這邊必須用 stack 在轉換時存入乘上的數的次序, 在還原時才能取出來還原
+        4. 遇到大寫字:
+            - 遇到大寫表示我們可以將當前的字與次數統計回字典了
+            - reset cnt, digit, element
+        5. 遇到小寫字:
+            - 直接加上, 表示還沒結束
+    3. 變數
+        1. cnt: 紀錄數字
+        2. digit: 協助紀錄數字目前 parse 的第幾位
+        3. coeff: 係數
+        4. stack: 在巢狀的狀況下, 用來還原原係數
+        5. atom: 紀錄字串
+
+
+### Code
+``` py
+class Solution:
+    def countOfAtoms(self, formula: str) -> str:
+        dic, cnt, digit, coeff, stack, atom = defaultdict(int), 0, 0, 1, [], ""
+
+        for c in formula[::-1]:
+            if c.isdigit():
+                cnt += int(c) * (10 ** digit)
+                digit += 1
+            elif c == ')':
+                stack.append(cnt or 1) # for testcase: '(H)'
+                coeff *= (cnt or 1)
+                digit, cnt = 0, 0
+            elif c == '(':
+                coeff //= stack.pop()
+            elif c.isupper():
+                atom += c
+                dic[atom[::-1]] += coeff * cnt if cnt > 1 else coeff
+                cnt, digit, atom = 0, 0, ""
+            elif c.islower():
+                atom += c
+
+        return "".join(k + str(v) if v > 1 else k for k, v in sorted(dic.items()))
+```
+
+### Tag: #HashTable #Calculator #Stack
+---
