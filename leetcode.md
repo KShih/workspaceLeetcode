@@ -36665,3 +36665,124 @@ class Solution:
 
 ### Tag: #HashTable #Calculator #Stack
 ---
+## 706. Design HashMap｜ 6/23
+Design a HashMap without using any built-in hash table libraries.
+
+Implement the MyHashMap class:
+
+- MyHashMap() initializes the object with an empty map.
+- void put(int key, int value) inserts a (key, value) pair into the HashMap. If the key already exists in the map, update the corresponding value.
+- int get(int key) returns the value to which the specified key is mapped, or -1 if this map contains no mapping for the key.
+- void remove(key) removes the key and its corresponding value if the map contains the mapping for the key.
+
+Example 1:
+
+- Input
+- ["MyHashMap", "put", "put", "get", "get", "put", "get", "remove", "get"]
+- [[], [1, 1], [2, 2], [1], [3], [2, 1], [2], [2], [2]]
+- Output
+- [null, null, null, 1, -1, null, 1, null, -1]
+
+Explanation
+- MyHashMap myHashMap = new MyHashMap();
+- myHashMap.put(1, 1); // The map is now [[1,1]]
+- myHashMap.put(2, 2); // The map is now [[1,1], [2,2]]
+- myHashMap.get(1);    // return 1, The map is now [[1,1], [2,2]]
+- myHashMap.get(3);    // return -1 (i.e., not found), The map is now [[1,1], [2,2]]
+- myHashMap.put(2, 1); // The map is now [[1,1], [2,1]] (i.e., update the existing value)
+- myHashMap.get(2);    // return 1, The map is now [[1,1], [2,1]]
+- myHashMap.remove(2); // remove the mapping for 2, The map is now [[1,1]]
+- myHashMap.get(2);    // return -1 (i.e., not found), The map is now [[1,1]]
+
+Constraints:
+
+- 0 <= key, value <= 106
+- At most 104 calls will be made to put, get, and remove.
+
+### 解題分析
+
+1. 首先我們要先思考 HashTable 的一些特點
+    1. O(1) Access
+        - 思考有哪種 data structure 可以提供我們 O(1) 的儲存體 -> Array
+        - 我們可以使用 array 的 idx 當 key
+        - Array Size? depends on our Hash Function
+    2. Hash Function
+        - 必須 mapping 出來的值要小於 array size
+        - mapping 出來的值必須大於零
+        - 這邊我們選用簡單的 module: `key % size`
+        - 教科書是教最好使用 prime number 當 module 的數, 那同時也必須去改 array size
+    3. Collidsion Handling
+        - Chaining
+            - Bucket method
+            - 比較好實作, 這邊選用這個
+            - 有可能會導致所有 key 都 map 到同一個 slot 上, 此時可以選擇修正 hash function
+        - Open Address
+            - 不停持續的 probe 直到找到空的 slot 來 insert
+2. Time:
+    - O(N/M) for all function
+    - 假設我們的 hash function 足夠好 -> 那麼 complexity 就會降到 O(1), 即所有slot上都只有一個節點
+
+
+### Code
+``` py
+class TreeNode:
+    def __init__(self, key, value):
+        self.pair = (key, value)
+        self.next = None
+
+class MyHashMap:
+
+    def __init__(self):
+        self.size = 1000
+        self.table = [None for _ in range(self.size)]
+
+    def put(self, key: int, value: int) -> None:
+        hash_key = self.get_hash_key(key)
+
+        if self.table[hash_key] == None:
+            self.table[hash_key] = TreeNode(key, value)
+        else:
+            node = self.table[hash_key]
+            while True:
+                if node.pair[0] == key:
+                    node.pair = (key, value)
+                    break
+                elif node.next == None:
+                    node.next = TreeNode(key, value)
+                    break
+                node = node.next
+
+
+    def get(self, key: int) -> int:
+        hash_key = self.get_hash_key(key)
+
+        node = self.table[hash_key]
+        while node:
+            if node.pair[0] == key:
+                return node.pair[1]
+            node = node.next
+        return -1
+
+    def remove(self, key: int) -> None:
+        hash_key = self.get_hash_key(key)
+
+        prev = node = self.table[hash_key]
+        if not node:
+            return
+        if node.pair[0] == key:
+            self.table[hash_key] = node.next # remove from head
+        else:
+            node = node.next
+            while node:
+                if node.pair[0] == key:
+                    prev.next = node.next
+                    break
+                prev, node = prev.next, node.next
+
+
+    def get_hash_key(self, key):
+        return key % self.size
+```
+
+### Tag: #LinkedList #HashTable
+---
