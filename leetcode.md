@@ -37039,3 +37039,85 @@ class Solution:
 
 ### Tag: #HashTable
 ---
+## 981. Time Based Key-Value Store｜ 6/23
+Create a timebased key-value store class TimeMap, that supports two operations.
+
+1. set(string key, string value, int timestamp)
+    - Stores the key and value, along with the given timestamp.
+
+2. get(string key, int timestamp)
+    - Returns a value such that set(key, value, timestamp_prev) was called previously, with timestamp_prev <= timestamp.
+    - If there are multiple such values, it returns the one with the largest timestamp_prev.
+    - If there are no values, it returns the empty string ("").
+
+Example 1:
+
+- Input: inputs = ["TimeMap","set","get","get","set","get","get"], inputs = [[],["foo","bar",1],["foo",1],["foo",3],["foo","bar2",4],["foo",4],["foo",5]]
+- Output: [null,null,"bar","bar",null,"bar2","bar2"]
+- Explanation:
+- TimeMap kv;
+- kv.set("foo", "bar", 1); // store the key "foo" and value "bar" along with timestamp = 1
+- kv.get("foo", 1);  // output "bar"
+- kv.get("foo", 3); // output "bar" since there is no value corresponding to foo at timestamp 3 and timestamp 2, then the only value is at timestamp 1 ie "bar"
+- kv.set("foo", "bar2", 4);
+- kv.get("foo", 4); // output "bar2"
+- kv.get("foo", 5); //output "bar2"
+
+Example 2:
+
+- Input: inputs = ["TimeMap","set","set","get","get","get","get","get"], inputs = [[],["love","high",10],["love","low",20],["love",5],["love",10],["love",15],["love",20],["love",25]]
+- Output: [null,null,null,"","high","high","low","low"]
+
+
+Note:
+
+- All key/value strings are lowercase.
+- All key/value strings have length in the range [1, 100]
+- The timestamps for all TimeMap.set operations are strictly increasing.
+- 1 <= timestamp <= 10^7
+- TimeMap.set and TimeMap.get functions will be called a total of 120000 times (combined) per test case.
+
+### 解題分析
+1. 看似與 LC895 Maximum Frequency Stack 有點像, 但這題更要求在 get 的時候要取出 <= ts 的, 因此需要額外存 ts 資訊也不能直接用 pop 的那麼簡單了
+2. 因為保證 set 的 ts 會越來越大, 因此我們在 set 的時候不用去找插入點, 直接 append 就行了, append 的內容即是 (timestamp, value)
+3. 在 get 的時候我們則先去把該 key 底下的 array 取出來, 然後對其進行 binary search
+    - 這邊要討論的即是找左右邊界的模板了, 複習一下模板中的 if 條件判斷式一定要是帶有等號的
+    - 因此根據題意我們可以有兩種表達法
+        1. 尋找不大於 ts 的右邊界
+        2. 尋找大於 ts 的左邊界
+    - 在這邊我們要選 1
+    - 那麼根據模板, 我們就可以把 while loop 寫出來
+4. 最後在輸出前要再去判斷一下取出來的 ts 是否真的小於 input
+    - case: `set("a", "aa", 10), get("a", 5)` should return ""
+
+
+### Code
+Binary Serach
+``` py
+class TimeMap:
+
+    def __init__(self):
+        self.table = defaultdict(list)
+
+    def set(self, key: str, value: str, timestamp: int) -> None:
+        self.table[key].append((timestamp, value))
+
+    def get(self, key: str, timestamp: int) -> str:
+        if not self.table[key]:
+            return ""
+        cur_list = self.table[key]
+        l, r = 0, len(cur_list)-1
+
+        while l < r:
+            mid = l + (r-l)//2+1
+            mid_ts = cur_list[mid][0]
+            if mid_ts <= timestamp:
+                l = mid
+            else:
+                r = mid-1
+
+        return cur_list[l][1] if cur_list[l][0] <= timestamp else ""
+```
+
+### Tag: #HashTable #BinarySeach
+---

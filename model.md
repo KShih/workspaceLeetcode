@@ -189,16 +189,23 @@ class Solution:
 4. 查找右邊界:
     - l < r
     - **mid = l + (r-l)//2 + 1**
+        - 倘若被問到為何這邊要+1, 因為 `l < r` 的條件下, 若 `l == r` 會導致 `mid = l`, 然後若是進到了 `l = mid`, 將會形成無窮迴圈
     - **l = mid**
         - 同上，其所屬的條件及為言語上的所求，例如 LC34 的第二個 bs
     - r = mid - 1
     - **return l**
 5. 注意查找左右邊界的if判斷式寫法:
-    - **if 判斷式均要放 >= or <= 的情形 (因配合我們宣告 r = len(nums)-1)**
-    - 不見得！用一些 testcase 去帶去思考
+    - **if 判斷式均要寫成 >= or <=**
+        - **因此當在選擇要使用左邊界右邊界時，應該要以能滿足寫出此種 if 的條件去選擇**
+        - 例 LC981 的 get(key, ts)
+            - 我們既可以解讀成
+                1. 尋找不大於 ts 的右邊界
+                2. 尋找大於 ts 的左邊界
+            - 但此時我們只能選擇 *1.尋找不大於 ts 的右邊界*
     - 詳見LC34三刷code
 
 6. 實作 bisect_left (使用查找特定值模板)
+    - 官方 implement https://github.com/python/cpython/blob/3.9/Lib/bisect.py#L15-L35
     ```py
     def bisect_left(self, arr, target):
         i = 0
