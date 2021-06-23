@@ -36861,3 +36861,108 @@ class Solution:
 
 ### Tag: #
 ---
+## 895. Maximum Frequency Stack｜ 6/23
+Design a stack-like data structure to push elements to the stack and pop the most frequent element from the stack.
+
+Implement the FreqStack class:
+
+- FreqStack() constructs an empty frequency stack.
+- void push(int val) pushes an integer val onto the top of the stack.
+- int pop() removes and returns the most frequent element in the stack.
+- If there is a tie for the most frequent element, the element closest to the stack's top is removed and returned.
+
+Example 1:
+
+- Input
+- ["FreqStack", "push", "push", "push", "push", "push", "push", "pop", "pop", "pop", "pop"]
+- [[], [5], [7], [5], [7], [4], [5], [], [], [], []]
+- Output
+- [null, null, null, null, null, null, null, 5, 7, 5, 4]
+
+Explanation
+- FreqStack freqStack = new FreqStack();
+- freqStack.push(5); // The stack is [5]
+- freqStack.push(7); // The stack is [5,7]
+- freqStack.push(5); // The stack is [5,7,5]
+- freqStack.push(7); // The stack is [5,7,5,7]
+- freqStack.push(4); // The stack is [5,7,5,7,4]
+- freqStack.push(5); // The stack is [5,7,5,7,4,5]
+- freqStack.pop();   // return 5, as 5 is the most frequent. The stack becomes [5,7,5,7,4].
+- freqStack.pop();   // return 7, as 5 and 7 is the most frequent, but 7 is closest to the top. The stack becomes [5,7,5,4].
+- freqStack.pop();   // return 5, as 5 is the most frequent. The stack becomes [5,7,4].
+- freqStack.pop();   // return 4, as 4, 5 and 7 is the most frequent, but 4 is closest to the top. The stack becomes [5,7].
+
+Constraints:
+
+- 0 <= val <= 109
+- At most 2 * 104 calls will be made to push and pop.
+- It is guaranteed that there will be at least one element in the stack before calling pop.
+
+### 解題分析
+
+1. Map of Stack
+    1. 用一個變數 max_freq, counter 去紀錄當前的狀態這個我有想到
+    2. 那麼剩下的問題是如何 access 到 max_freq 的元素 (同時有可能有多個, 且必須保持插入的次序)
+        - 首先先想到字典, key 就是 frequency, value 是 list
+        - 這樣做既可以 O(1) access max_freq, 又可以透過不停的 append 新 item 維持次序
+    3. 實作
+        1. push
+            1. 我們更新 counter, 且注意新的freq是否有超過 max_freq, 有的話就更新
+            2. 並且都將當前的 freq 插入到該 list 中, 沒錯, 隨著 freq 增加需要插入到不同 key, 你可能會想說比如 a元素 freq 已經更新到 5了, 那為什麼要留 4, 因為當持續的 pop 導致 max_freq 降到4的時候, 我們才還可以 access 到
+        2. pop
+            1. 透過 max_freq 去 access 到該freq下最近的元素
+            2. 將 counter -1
+            3. 如果該 freq 已經沒有元素了, 表示 max_freq 該降了
+2. Heap
+    1. 這個方法本來有想到, 但想不到要如何進去 heap 裡面去修改數字的值, 後來看解答其實不用進去修改, 一直往 heap 裡面堆東西就對了, 即使是相同 element 但不同 freq
+
+### Code
+Optimal, Map of Stack
+``` py
+class FreqStack:
+
+    def __init__(self):
+        self.max_freq = 0
+        self.counter = Counter()
+        self.freq_history = defaultdict(list)
+
+    def push(self, val: int) -> None:
+        new_fq = self.counter[val] + 1
+        self.counter[val] = new_fq
+
+        if new_fq > self.max_freq:
+            self.max_freq = new_fq
+
+        self.freq_history[new_fq].append(val)
+
+    def pop(self) -> int:
+        max_item = self.freq_history[self.max_freq].pop()
+        self.counter[max_item] -= 1
+        if len(self.freq_history[self.max_freq]) == 0:
+            self.max_freq -= 1
+
+        return max_item
+```
+
+Heap
+```py
+class FreqStack:
+
+    def __init__(self):
+        self.ts = 0
+        self.counter = Counter()
+        self.heap = []
+
+    def push(self, val: int) -> None:
+        self.counter[val] += 1
+        heappush(self.heap, (-self.counter[val], -self.ts, val))
+        self.ts += 1
+
+    def pop(self) -> int:
+        _, _, item = heappop(self.heap)
+        self.counter[item] -= 1
+        return item
+```
+
+### Tag: #HashTable #Stack #Heap
+---
