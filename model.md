@@ -495,22 +495,32 @@ class Solution:
 ```py
 class TrieNode(object):
     def __init__(self):
-        self.children=collections.defaultdict(TrieNode)
-        self.isEnd=False
-        self.word =''
+        self.children = collections.defaultdict(TrieNode)
+        self.isEnd = False
+        self.word = ''
 
 class Trie(object):
     def __init__(self):
-        self.root=TrieNode()
+        self.root = TrieNode()
 
     def insert(self, word):
-        node=self.root
+        node = self.root
         for c in word:
-            node =node.children[c]
-        node.isEnd=True
-        node.word=word
-```
+            ## Nomral Dictionary implement
+            # if c not in node.children:
+            #     node.children[c] = TrieNode()
+            node = node.children[c]
+        node.isEnd = True
+        node.word = word
 
+    def search(self, word):
+        node = self.root
+        for c in word:
+            if c not in node.children:
+                return False
+            node = node.children[c]
+        return node.isEnd
+```
 ---
 
 ## BFS

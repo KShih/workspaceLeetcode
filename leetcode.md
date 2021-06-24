@@ -37367,3 +37367,120 @@ class Solution:
 
 ### Tag: #DP #HashTable
 ---
+## 588. Design In-Memory File System｜ 6/24
+Design a data structure that simulates an in-memory file system.
+
+Implement the FileSystem class:
+
+- FileSystem()
+    - Initializes the object of the system.
+- List<String> ls(String path)
+    - If path is a file path, returns a list that only contains this file's name.
+    - If path is a directory path, returns the list of file and directory names in this directory.
+    - The answer should in lexicographic order.
+- void mkdir(String path)
+    - Makes a new directory according to the given path.
+    - The given directory path does not exist. If the middle directories in the path do not exist, you should create them as well.
+- void addContentToFile(String filePath, String content)
+    - If filePath does not exist, creates that file containing given content.
+    - If filePath already exists, appends the given content to original content.
+- String readContentFromFile(String filePath)
+    - Returns the content in the file at filePath.
+
+Example 1:
+
+- Input
+- ["FileSystem", "ls", "mkdir", "addContentToFile", "ls", "readContentFromFile"]
+- [[], ["/"], ["/a/b/c"], ["/a/b/c/d", "hello"], ["/"], ["/a/b/c/d"]]
+- Output
+- [null, [], null, null, ["a"], "hello"]
+
+Explanation
+- FileSystem fileSystem = new FileSystem();
+- fileSystem.ls("/");                         // return []
+- fileSystem.mkdir("/a/b/c");
+- fileSystem.addContentToFile("/a/b/c/d", "hello");
+- fileSystem.ls("/");                         // return ["a"]
+- fileSystem.readContentFromFile("/a/b/c/d"); // return "hello"
+
+Constraints:
+
+- 1 <= path.length, filePath.length <= 100
+- path and filePath are absolute paths which begin with '/' and do not end with '/' except that the path is just "/".
+- You can assume that all directory names and file names only contain lowercase letters, and the same names will not exist in the same directory.
+- You can assume that all operations will be passed valid parameters, and users will not attempt to retrieve file content or list a directory or file that does not exist.
+- 1 <= content.length <= 50
+- At most 300 calls will be made to ls, mkdir, addContentToFile, and readContentFromFile
+
+### 解題分析
+
+1. 應用 Trie 的模板
+    1. 修改 insert:
+        1. 多增加 word != None 去區分為單純 mkdir 還是去 addContent
+        2. 去判斷 node.isEnd 是否已經被設過了, 來判斷是要 append file 還是 new File
+    2. 修改 search:
+        1. 多增加根目錄的判斷, 並將 return 值改為找到的節點
+            2. path.split 要跳過第一個 elem, 因為會是空字元
+            3. 因此我們的 `ls "/"` 要特別判斷掉
+
+### Code
+``` py
+class TrieNode(object):
+    def __init__(self):
+        self.children = collections.defaultdict(TrieNode)
+        self.isEnd = False
+        self.word = ''
+
+class Trie(object):
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, path, word):
+        node = self.root
+        for c in path.split("/")[1:]:
+            node = node.children[c]
+
+        if word != None: # is not dir
+            if node.isEnd:
+                node.word += word
+            else:
+                node.isEnd = True
+                node.word = word
+
+    def search(self, path):
+        node = self.root
+        if path == "/":
+            return node
+
+        for c in path.split("/")[1:]:
+            if c not in node.children:
+                raise "path not found"
+                return
+            node = node.children[c]
+        return node
+
+class FileSystem:
+
+    def __init__(self):
+        self.trie = Trie()
+
+    def ls(self, path: str) -> List[str]:
+        node = self.trie.search(path)
+        if node.isEnd:
+            return [path.split("/")[-1]]
+        else:
+            return sorted(node.children.keys())
+
+
+    def mkdir(self, path: str) -> None:
+        self.trie.insert(path, None)
+
+    def addContentToFile(self, filePath: str, content: str) -> None:
+        self.trie.insert(filePath, content)
+
+    def readContentFromFile(self, filePath: str) -> str:
+        return self.trie.search(filePath).word
+```
+
+### Tag: #Trie
+---
