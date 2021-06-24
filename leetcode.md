@@ -37171,3 +37171,89 @@ class Solution:
 
 ### Tag: #
 ---
+## 1152. Analyze User Website Visit Pattern｜ 6/24
+We are given some website visits: the user with name username[i] visited the website website[i] at time timestamp[i].
+
+A 3-sequence is a list of websites of length 3 sorted in ascending order by the time of their visits.  (The websites in a 3-sequence are not necessarily distinct.)
+
+Find the 3-sequence visited by the largest number of users. If there is more than one solution, return the lexicographically smallest such 3-sequence.
+
+Example 1:
+
+- Input:
+    - username = ["joe","joe","joe","james","james","james","james","mary","mary","mary"]
+    - timestamp = [1,2,3,4,5,6,7,8,9,10]
+    - website = ["home","about","career","home","cart","maps","home","home","about","career"]
+- Output: ["home","about","career"]
+- Explanation:
+- The tuples in this example are:
+    - ["joe", 1, "home"]
+    - ["joe", 2, "about"]
+    - ["joe", 3, "career"]
+    - ["james", 4, "home"]
+    - ["james", 5, "cart"]
+    - ["james", 6, "maps"]
+    - ["james", 7, "home"]
+    - ["mary", 8, "home"]
+    - ["mary", 9, "about"]
+    - ["mary", 10, "career"]
+    - The 3-sequence ("home", "about", "career") was visited at least once by 2 users.
+    - The 3-sequence ("home", "cart", "maps") was visited at least once by 1 user.
+    - The 3-sequence ("home", "cart", "home") was visited at least once by 1 user.
+    - The 3-sequence ("home", "maps", "home") was visited at least once by 1 user.
+    - The 3-sequence ("cart", "maps", "home") was visited at least once by 1 user.
+
+Note:
+
+- 3 <= N = username.length = timestamp.length = website.length <= 50
+- 1 <= username[i].length <= 10
+- 0 <= timestamp[i] <= 10^9
+- 1 <= website[i].length <= 10
+- Both username[i] and website[i] contain only lowercase characters.
+- It is guaranteed that there is at least one user who visited at least 3 websites.
+No user visits two websites at the same time.
+
+### 解題分析
+
+1. 首先我們必須先分類每個 User 瀏覽網站的紀錄(須按照時間), 這邊就用 dic of list 就可以了
+2. 再來題目只要求求次序最高, 因此哪個 user 瀏覽已經不重要了, 瀏覽紀錄才是我們要關注的點
+3. 由題目的例子可以知道 [a, b, c, d] 可以被視為 [abc, abd, acd, bcd], 也就是題目要考我們產生 combination 的能力
+4. 這邊參照 python build-in lib 的 api `combination(arr=[], leng=0)`自己寫了 recursive 版的 combination (could be general use!)
+    - 註: 這邊因為不行重複所以一定只能用 set 來處理
+5. 然後 call dic.update 將生成的 set 更新回 global
+6. 最後在 return 前要先 sorted by keyname, 因為當兩個 pattern 的次序相等時, 要回傳 lexicographical 較小的那個
+
+### Code
+``` py
+class Solution:
+    def mostVisitedPattern(self, username: List[str], timestamp: List[int], website: List[str]) -> List[str]:
+
+        users = defaultdict(list)
+
+        for user, time, site in sorted(zip(username, timestamp, website), key = lambda x: (x[0],x[1])):
+            users[user].append(site)
+
+        patterns = Counter()
+
+        for user, sites in users.items():
+            combs = self.combinations(sites, 3)
+            patterns.update(Counter(combs))
+
+        return max(sorted(patterns), key=patterns.get)
+
+    def combinations(self, arr, leng):
+        res = set()
+        def helper(idx, comb, leng):
+            if leng == 0:
+                res.add(tuple(comb))
+                return
+
+            for i in range(idx, len(arr)):
+                helper(i+1, comb+[arr[i]], leng-1)
+
+        helper(0, [], leng)
+        return res
+```
+
+### Tag: #Recursive #HashTable #Combination
+---

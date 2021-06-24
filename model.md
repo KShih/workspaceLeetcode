@@ -24,6 +24,33 @@ Solution Model
 3. 利用 tuple 的性質讓 unhashable type 變成 hashable
     1. `set.add(tuple(list))`
 4. 要取出一個整數中的各個位數，使用 `while n > 0: n, digit = divmod(n, 10)`
+5. 取出 dic 中 value 最大的 key
+    - `max(dic, key=dic.get)`
+
+## Combination
+- 參考 python build-in function `combinations(arr, length)`, 自己寫的 general usage recursive 版本
+    ```py
+    def combinations(self, arr, leng):
+        res = set()
+        def helper(idx, comb, leng):
+            if leng == 0:
+                res.add(tuple(comb))
+                return
+
+            for i in range(idx, len(arr)):
+                helper(i+1, comb+[arr[i]], leng-1)
+
+        helper(0, [], leng)
+        return res
+    ```
+- 使用方式:
+    - 如果允許重複, 請把 res 型態宣告成 list
+- 技術學習:
+    - 這邊用 helper 的 design pattern, 暴露了簡單的使用方式給外面
+        - 主要因為面對求 combination 的題, 這個 result 要使用 pass by reference 的方式會比較方便
+        - 但如果我不想讓 user 在使用這個 function 的時候還要帶一個 result 進來, 我們直接幫 user 創, 然後用 inline function 直接往幫他創的 result 塞東西, 最後回傳給他
+        - inline function 還有好處是不用一直傳遞 arr
+    - 這邊用 idx, 取代了一直切割字串
 
 ## Greedy
 1. Greedy problems usually look like "Find minimum number of something to do something" or "Find maximum number of something to fit in some conditions", and typically propose an unsorted input.
