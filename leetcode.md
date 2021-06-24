@@ -37257,3 +37257,113 @@ class Solution:
 
 ### Tag: #Recursive #HashTable #Combination
 ---
+## 1048. Longest String Chain｜ 6/24
+You are given an array of words where each word consists of lowercase English letters.
+
+wordA is a predecessor of wordB if and only if we can insert exactly one letter anywhere in wordA without changing the order of the other characters to make it equal to wordB.
+
+For example, "abc" is a predecessor of "abac", while "cba" is not a predecessor of "bcad".
+
+A word chain is a sequence of words [word1, word2, ..., wordk] with k >= 1, where word1 is a predecessor of word2, word2 is a predecessor of word3, and so on. A single word is trivially a word chain with k == 1.
+
+Return the length of the longest possible word chain with words chosen from the given list of words.
+
+Example 1:
+
+- Input: words = ["a","b","ba","bca","bda","bdca"]
+- Output: 4
+- Explanation: One of the longest word chains is ["a","ba","bda","bdca"].
+
+Example 2:
+
+- Input: words = ["xbc","pcxbcf","xb","cxbc","pcxbc"]
+- Output: 5
+- Explanation: All the words can be put in a word chain ["xb", "xbc", "cxbc", "pcxbc", "pcxbcf"].
+
+Example 3:
+
+- Input: words = ["abcd","dbqca"]
+- Output: 1
+- Explanation: The trivial word chain ["abcd"] is one of the longest word chains.
+- ["abcd","dbqca"] is not a valid word chain because the ordering of the letters is changed.
+
+Constraints:
+
+- 1 <= words.length <= 1000
+- 1 <= words[i].length <= 16
+- words[i] only consists of lowercase English letters.
+
+### 解題分析
+
+1. 一開始的想法是從最長的字母往前做 DFS, 然後用 recursive 的方式做
+    - cnt_cache: 用來存該字最大可有多深的 depth
+    - gen_cache: 用來存由 word 可生成的子字
+    - helper function:
+        - 先判斷是否在cache裡有
+        - 再試著從 gen_cache 拿出他的子字
+        - 如果此子字存在在我們的 word_set 中, 且cache中沒有, 就對此子字做 recursive call, 並且攜帶的 depth + 1
+        - 拿回來更新一下 ans
+        - 最後寫回 cache
+
+2. 而其實可以使用 Bottom Up 的方式, 就不用 Recursive 了
+    - 我們用 path 存此字的最長 depth, 首先先 initial 每個字的深度為 1
+    - 然後由短到長排序, 短的先做
+    - 若他的子字存在, 他就是子字長度+1
+
+
+### Code
+Self Written DFS + Cache (Top-Down)
+``` py
+class Solution:
+    def longestStrChain(self, words: List[str]) -> int:
+        cnt_cache = {} # str -> int
+        gen_cache = {} # str -> str
+        word_set = set(words)
+
+        def helper(word, depth):
+            if word in cnt_cache:
+                return cnt_cache[word]
+
+            cut_words = gen_cache.get(word, None)
+            if cut_words == None:
+                cut_words = self.gen_cut_words(word)
+                gen_cache[word] = cut_words
+
+            ans = depth
+            for cut_word in cut_words:
+                if cut_word in word_set and cut_word not in cnt_cache:
+                    cnt_cache[cut_word] = helper(cut_word, depth+1)
+                    ans = max(ans, cnt_cache[cut_word])
+
+            cnt_cache[word] = ans
+            return ans
+
+        for word in sorted(words, key=lambda k: len(k), reverse=True):
+            helper(word, 1)
+        return max(cnt_cache.values())
+
+    def gen_cut_words(self, word):
+        res = []
+        for i in range(len(word)):
+            res.append(word[:i] + word[i+1:])
+        return res
+```
+
+Optimal DP(Bottom-UP)
+```py
+class Solution:
+    def longestStrChain(self, words: List[str]) -> int:
+        path = {word: 1 for word in words}
+
+        longest = 1
+        for word in sorted(words, key=len):
+            for i in range(len(word)):
+                prev = word[:i] + word[i+1:]
+                if prev in path:
+                    path[word] = max(path[word], path[prev]+1)
+                    longest = max(longest, path[word])
+        return longest
+```
+
+### Tag: #DP #HashTable
+---
