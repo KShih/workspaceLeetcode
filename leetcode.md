@@ -14333,7 +14333,7 @@ if __name__ == "__main__":
 
 ```
 ---
-## 1189. Maximum Number of Balloons｜ 10/11
+## 1189. Maximum Number of Balloons｜ 10/11 | [ Review * 1 ]
 Given a string text, you want to use the characters of text to form as many instances of the word "balloon" as possible.
 
 You can use each character in text at most once. Return the maximum number of instances that can be formed.
@@ -14344,14 +14344,14 @@ You can use each character in text at most once. Return the maximum number of in
 
 ### Code
 ``` py
-from collections import Counter
 class Solution:
     def maxNumberOfBalloons(self, text: str) -> int:
         dic = Counter(list(text))
-        single = min(min(dic['b'], dic['a']), dic['n'])
+        single = min(dic['b'], dic['a'], dic['n'])
         double = min(dic['l'], dic['o'])
         return min(single, double//2)
 ```
+### Tag: #HashTable
 ---
 ## 347. Top K Frequent Elements(Heap用法經典題)｜ 10/12 | [ Review * 1 ]
 Given a non-empty array of integers, return the k most frequent elements.
