@@ -37484,3 +37484,259 @@ class FileSystem:
 
 ### Tag: #Trie
 ---
+## 460. LFU Cache｜ 6/25
+Design and implement a data structure for a Least Frequently Used (LFU) cache.
+
+Implement the LFUCache class:
+
+- LFUCache(int capacity)
+    - Initializes the object with the capacity of the data structure.
+- int get(int key)
+    - Gets the value of the key if the key exists in the cache. Otherwise, returns -1.
+- void put(int key, int value)
+    - Update the value of the key if present, or inserts the key if not already present. When the cache reaches its capacity, it should invalidate and remove the least frequently used key before inserting a new item. For this problem, when there is a tie (i.e., two or more keys with the same frequency), the least recently used key would be invalidated.
+
+Hint:
+
+To determine the least frequently used key, a use counter is maintained for each key in the cache. The key with the smallest use counter is the least frequently used key.
+
+When a key is first inserted into the cache, its use counter is set to 1 (due to the put operation). The use counter for a key in the cache is incremented either a get or put operation is called on it.
+
+The functions get and put must each run in O(1) average time complexity.
+
+Example 1:
+
+- Input
+- ["LFUCache", "put", "put", "get", "put", "get", "get", "put", "get", "get", "get"]
+- [[2], [1, 1], [2, 2], [1], [3, 3], [2], [3], [4, 4], [1], [3], [4]]
+- Output
+- [null, null, null, 1, null, -1, 3, null, -1, 3, 4]
+
+Explanation
+
+- // cnt(x) = the use counter for key x
+- // cache=[] will show the last used order for tiebreakers (leftmost element is  most recent)
+- LFUCache lfu = new LFUCache(2);
+- lfu.put(1, 1);   // cache=[1,_], cnt(1)=1
+- lfu.put(2, 2);   // cache=[2,1], cnt(2)=1, cnt(1)=1
+- lfu.get(1);      // return 1
+-                  // cache=[1,2], cnt(2)=1, cnt(1)=2
+- lfu.put(3, 3);   // 2 is the LFU key because cnt(2)=1 is the smallest, invalidate 2.
+-                  // cache=[3,1], cnt(3)=1, cnt(1)=2
+- lfu.get(2);      // return -1 (not found)
+- lfu.get(3);      // return 3
+-                  // cache=[3,1], cnt(3)=2, cnt(1)=2
+- lfu.put(4, 4);   // Both 1 and 3 have the same cnt, but 1 is LRU, invalidate 1.
+-                  // cache=[4,3], cnt(4)=1, cnt(3)=2
+- lfu.get(1);      // return -1 (not found)
+- lfu.get(3);      // return 3
+-                  // cache=[3,4], cnt(4)=1, cnt(3)=3
+- lfu.get(4);      // return 4
+-                  // cache=[3,4], cnt(4)=2, cnt(3)=3
+
+Constraints:
+
+- 0 <= capacity <= 104
+- 0 <= key <= 105
+- 0 <= value <= 109
+- At most 2 * 105 calls will be made to get and put.
+
+### 解題分析
+1. 此題靈感取自於 LC895, 用變數去紀錄題目所要求的 pop item 的規則
+2. 之前那題並沒有要求需要去刪除元素, e.g.:  frequency use 的更新 及 capacity 的限制
+    - 所以我們可以用 stack 的後進先出的概念去達成
+3. 這題需要用到的是先進先出的概念, 可能會想那就用 deque 就可以了, 但 deque 就沒辦法做到 frequency use 的更新, 因為不知道要更新的 node 在 queue 的哪個位置
+4. 所以結論上來說我們需要 delete 可以做到 O(1) 的先進先出的資料格式, 那就只能透過 `dict + doubly linked list` 了
+    - dict 紀錄 node 的記憶體位置
+    - delete 時直接把要刪除的 node 傳進去
+5. DoubleLinkedList Class:
+    1. 需要一個 master node 去指向 list 的 頭尾
+    2. 需要一個 size 變數去紀錄目前 list 中的元素多寡
+    3. 去繼承 `__len__` 回傳 size
+    4. append 函式去從`頭`插入一個節點
+    5. pop 函式去 pop 特定的 node, 或從尾巴 pop 出來
+6. 程式碼大綱:
+    0. 變數:
+        1. least_freq: 紀錄當前最小的 freq
+        2. capacity: 紀錄題目規定的最大空間大小
+        3. table: 紀錄 key -> Node
+        4. freq_table: 紀錄 freq -> DoubleLinkedList
+    1. get(key)
+        1. 將 node 的位置從 table 取出
+        2. 呼叫 `adjust_freq(node)` 去更新該 node 與 freq_table
+    2. put(key, val)
+        1. 若 key 不存在
+            1. 先檢查是否達到上限了, 因為我們待會會+1
+            2. 若達到了就要先清一個位置出來, 這裡呼叫 `retention()`
+            3. 然後就插入一個節點, 並同步更新所有 table
+        2. 若 key 已存在
+            1. 這裡就不用檢查上線了
+            2. 直接把 node 取出來更新
+            3. 並且再去 `adjust_freq(node)`
+    3. retention():
+        1. 把最小 freq 的 List pop 掉一個元素
+        2. 並把該元素的 key 從 table 中刪除
+        3. 如果最小的已經空了, least_freq 就要+1
+    4. adjust_freq(node):
+        1. 存下原本的 freq 作為後續使用
+        2. 把該 node 的 freq +1
+        3. 把該 node 從原本的 freq list 刪除, 並插入新的 freq+1 的 list
+        4. 如果舊的 list 已經空了就把 least_freq +1
+
+7. 另外可以用 Build-in 的 OrderedDict
+    1. 一樣一個 table `key2node` 用來直接回傳 value
+    2. 另一個 table `cnt2node` 是存 freq, 只是這邊的 value 不是 doublelinkedList, 而是 OrderedDict
+        - OrderedDict 是 dict + DoublyLinkedList
+            - key 這邊用的就是此節點的 key, value 就是 node
+    3. 其餘的邏輯則跟上面雷同
+        1. get:
+            1. 把節點拿出來調整他的 freq, 並移到正確的 cnt_table 的 key 上
+            2. 檢查 minCnt 是否要更新了
+        2. put:
+            1. 如果 key 已存在, 則更新
+                1. 這邊 call 一次 get 是因為 get 可幫我們對節點做更新
+            2. 如果不存在
+                1. 檢查 cap, 如果超過則要從 minCount 對應到的 OrderedDict 裡面 pop 掉一個東西, 並把對應的 key 刪除
+                2. 然後插入新的節點到 cnt=1, 並更新 minCount = 1 
+
+### 類似題
+1. LC895. Maximum Frequency Stack
+
+### Code
+DoublyLinkedList
+``` py
+class Node:
+    def __init__(self, key, val):
+        self.key = key
+        self.val = val
+        self.freq = 1
+        self.prev = None
+        self.next = None
+
+class DoubleLinkedList:
+    def __init__(self):
+        self.master = Node(None, None)
+        self.master.next = self.master
+        self.master.prev = self.master
+        self._size = 0
+
+    def __len__(self):
+        return self._size
+
+    def append(self, node):
+        node.next = self.master.next
+        node.prev = self.master
+        self.master.next = node
+        node.next.prev = node
+        self._size += 1
+
+    def pop(self, node=None):
+        if self._size == 0:
+            return
+
+        if node == None: # pop from back
+            node = self.master.prev
+
+        node.prev.next = node.next
+        node.next.prev = node.prev
+        self._size -= 1
+        return node
+
+class LFUCache:
+
+    def __init__(self, capacity: int):
+        self.least_freq = 1
+        self.capacity = capacity
+        self.table = {} # key -> Node
+        self.freq_table = defaultdict(DoubleLinkedList)
+
+    def get(self, key: int) -> int:
+        if key not in self.table:
+            return -1
+        node = self.table[key]
+        self.adjust_freq(node)
+        return node.val
+
+    def put(self, key: int, value: int) -> None:
+        if self.capacity == 0:
+            return
+
+        if key not in self.table:   # create
+            if len(self.table) == self.capacity:
+                self.retention()
+            node = Node(key, value)
+            self.table[key] = node
+            self.freq_table[1].append(node)
+            self.least_freq = 1
+        else:                       # update
+            node = self.table[key]
+            node.val = value
+            self.adjust_freq(node)
+
+    def retention(self):
+        least_freq = self.least_freq
+        node = self.freq_table[least_freq].pop()
+        del self.table[node.key]
+        if len(self.freq_table[least_freq]) == 0:
+            self.least_freq += 1
+
+    def adjust_freq(self, node):
+        freq = node.freq
+        node.freq += 1
+        self.freq_table[freq].pop(node)
+        self.freq_table[freq+1].append(node)
+        if freq == self.least_freq and len(self.freq_table[freq]) == 0:
+            self.least_freq += 1
+```
+
+Use library
+```py
+class Node:
+    def __init__(self, val, count):
+        self.val = val
+        self.count = count
+
+class LFUCache(object):
+    def __init__(self, capacity):
+        self.cap = capacity
+        self.key2node = {}
+        self.count2node = defaultdict(OrderedDict)
+        self.minCount = None
+
+    def get(self, key):
+        if key not in self.key2node:
+            return -1
+
+        node = self.key2node[key]
+        del self.count2node[node.count][key]
+
+        node.count += 1
+        self.count2node[node.count][key] = node
+
+        # NOTICE check minCount!!!
+        if not self.count2node[self.minCount]:
+            self.minCount += 1
+
+        return node.val
+
+    def put(self, key, value):
+        if not self.cap:
+            return
+
+        if key in self.key2node:
+            self.key2node[key].val = value
+            self.get(key) # NOTICE, put makes count+1 too
+            return
+
+        if len(self.key2node) == self.cap:
+            # popitem(last=False) is FIFO, like queue
+            # it return key and value!!!
+            k, n = self.count2node[self.minCount].popitem(last=False)
+            del self.key2node[k]
+
+        self.count2node[1][key] = self.key2node[key] = Node(value, 1)
+        self.minCount = 1
+        return
+```
+### Tag: #LinkedList #HashTable #DoubleLinkedList
+---
