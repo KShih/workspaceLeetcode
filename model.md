@@ -7,6 +7,7 @@ Solution Model
         - Note: should listify!
     2. secure way to visit dict:
         - `dict.get(k)`
+        - `dict.get(k, defaultvalue)` with default value
         - Benifit:
             - no need to initialize dict
             - no need to write `if k in dict: ...`
@@ -17,6 +18,10 @@ Solution Model
         - `dict = {c: True for c in boolTable}`
     5. get key:value pair
         - `pairs = dic.itmes()`
+    6. defaultdict default value with customize type
+        - `dict = defaultdict(lambda: expression)`
+            - `dict = defaultdict(lambda : [0, 0])`
+            - default value will be array of two element 
 2. Sort by key
     1. `intervals = sorted(intervals, key=lambda x: x[0])`
     2. `intervals = sorted(intervals, key=lambda x: (x[0], x[1], x[2], ...))`
