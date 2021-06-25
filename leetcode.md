@@ -37817,3 +37817,128 @@ class UndergroundSystem:
 
 ### Tag: #HashTable
 ---
+## 1348. Tweet Counts Per Frequency｜ 6/25
+A social media company is trying to monitor activity on their site by analyzing the number of tweets that occur in select periods of time. These periods can be partitioned into smaller time chunks based on a certain frequency (every minute, hour, or day).
+
+For example, the period [10, 10000] (in seconds) would be partitioned into the following time chunks with these frequencies:
+
+- Every minute (60-second chunks): [10,69], [70,129], [130,189], ..., [9970,10000]
+- Every hour (3600-second chunks): [10,3609], [3610,7209], [7210,10000]
+- Every day (86400-second chunks): [10,10000]
+- Notice that the last chunk may be shorter than the specified frequency's chunk size and will always end with the end time of the period (10000 in the above example).
+
+Design and implement an API to help the company with their analysis.
+
+Implement the TweetCounts class:
+
+- TweetCounts() Initializes the TweetCounts object.
+- void recordTweet(String tweetName, int time) Stores the tweetName at the recorded time (in seconds).
+- List<Integer> getTweetCountsPerFrequency(String freq, String tweetName, int startTime, int endTime)
+    - Returns a list of integers representing the number of tweets with tweetName in each time chunk for the given period of time [startTime, endTime] (in seconds) and frequency freq.
+- freq is one of "minute", "hour", or "day" representing a frequency of every minute, hour, or day respectively.
+
+
+Example:
+
+- Input
+- ["TweetCounts","recordTweet","recordTweet","recordTweet","getTweetCountsPerFrequency","getTweetCountsPerFrequency","recordTweet","getTweetCountsPerFrequency"]
+- [[],["tweet3",0],["tweet3",60],["tweet3",10],["minute","tweet3",0,59],["minute","tweet3",0,60],["tweet3",120],["hour","tweet3",0,210]]
+
+- Output
+- [null,null,null,null,[2],[2,1],null,[4]]
+
+- Explanation
+- TweetCounts tweetCounts = new TweetCounts();
+- tweetCounts.recordTweet("tweet3", 0);                              // New tweet "tweet3" at time 0
+- tweetCounts.recordTweet("tweet3", 60);                             // New tweet "tweet3" at time 60
+- tweetCounts.recordTweet("tweet3", 10);                             // New tweet "tweet3" at time 10
+- tweetCounts.getTweetCountsPerFrequency("minute", "tweet3", 0, 59); // return [2]; chunk [0,59] had 2 tweets
+- tweetCounts.getTweetCountsPerFrequency("minute", "tweet3", 0, 60); // return [2,1]; chunk [0,59] had 2 tweets, chunk [60,60] had 1 tweet
+- tweetCounts.recordTweet("tweet3", 120);                            // New tweet "tweet3" at time 120
+- tweetCounts.getTweetCountsPerFrequency("hour", "tweet3", 0, 210);  // return [4]; chunk [0,210] had 4 tweets
+
+Constraints:
+
+- 0 <= time, startTime, endTime <= 109
+- 0 <= endTime - startTime <= 104
+- There will be at most 104 calls in total to recordTweet and getTweetCountsPerFrequency.
+
+### 解題分析
+1. Bucket 法
+    1. Write: O(1)
+    2. Read: O(n)
+2. BinarySeach 法
+    1. Write: O(n) for insort
+        - O(logn) for find the poition, O(n) for insert
+    2. Read: O(log(n))
+
+
+### Code
+``` py
+class TweetCounts:
+
+    def __init__(self):
+        self.tweets = defaultdict(list)
+
+    def recordTweet(self, tweetName: str, time: int) -> None:
+        self.tweets[tweetName].append(time)
+
+    def getTweetCountsPerFrequency(self, freq: str, tweetName: str, startTime: int, endTime: int) -> List[int]:
+        if freq == "minute":
+            freq_int = 60
+        elif freq == "hour":
+            freq_int = 3600
+        elif freq == "day":
+            freq_int = 21600
+        else:
+            raise "freq not found"
+            return
+
+        bucket_size = freq_int
+        bucket_len = (endTime-startTime) // bucket_size +1
+        buckets = [0 for _ in range(bucket_len)]
+
+        if tweetName not in self.tweets:
+            return buckets
+
+        for time in self.tweets[tweetName]:
+            if time >= startTime and time <= endTime:
+                buckets[(time-startTime)//bucket_size] += 1
+        return buckets
+```
+
+BinarySeach
+```py
+import bisect
+
+class TweetCounts:
+    SECONDS = {
+        'minute': 60,
+        'hour': 60*60,
+        'day': 60*60*24
+    }
+
+    def __init__(self):
+        self.store = defaultdict(list)
+
+    def recordTweet(self, tweetName: str, time: int) -> None:
+        bisect.insort(self.store[tweetName], time)
+
+    def getTweetCountsPerFrequency(self, freq: str, tweetName: str, startTime: int, endTime: int) -> List[int]:
+
+        cur_store = self.store[tweetName]
+        partition = self.SECONDS[freq]
+        lo = bisect.bisect_left(self.store[tweetName], startTime)
+        hi = bisect.bisect_right(self.store[tweetName], endTime)
+
+        buckets = [0] * (((endTime-startTime) // partition) + 1)
+
+        for i in range(lo, hi):
+            idx = (cur_store[i] - startTime) // partition
+            buckets[idx] += 1
+
+        return buckets
+```
+
+### Tag: #HashTable #BinarySearch
+---

@@ -21,7 +21,7 @@ Solution Model
     6. defaultdict default value with customize type
         - `dict = defaultdict(lambda: expression)`
             - `dict = defaultdict(lambda : [0, 0])`
-            - default value will be array of two element 
+            - default value will be array of two element
 2. Sort by key
     1. `intervals = sorted(intervals, key=lambda x: x[0])`
     2. `intervals = sorted(intervals, key=lambda x: (x[0], x[1], x[2], ...))`
@@ -236,23 +236,42 @@ class Solution:
             - 但此時我們只能選擇 *1.尋找不大於 ts 的右邊界*
     - 詳見LC34三刷code
 
-6. 實作 bisect_left (使用查找特定值模板)
+6. 實作 bisect (使用查找特定值模板)
     - 官方 implement https://github.com/python/cpython/blob/3.9/Lib/bisect.py#L15-L35
-    ```py
-    def bisect_left(self, arr, target):
-        i = 0
-        j = len(arr)-1
-        while i <= j:
-            mid = i + (j-i)//2
-            if arr[mid] == target:
-                return mid
-            elif arr[mid] < target:
-                i = mid+1
-            else:
-                j = mid-1
-        return i
-    ```
+    - 比較
+        ```py
+        from bisect import bisect_left, bisect_right
+        a = [0,2,2,2,5]
+        bisect_left(a,2)  # return 1
+        bisect_right(a,2) # return 4
+        ```
+    - biset_left
+        ```py
+        def bisect_left(a, x):
+            lo, hi = 0, len(a)
 
+            while lo < hi:
+                mid = (lo+hi)//2
+                if a[mid] < x:
+                    lo = mid+1
+                else:
+                    hi = mid
+            return lo
+        ```
+
+    - biset_right
+        ```py
+        def bisect_left(a, x):
+            lo, hi = 0, len(a)
+
+            while lo < hi:
+                mid = (lo+hi)//2
+                if x < a[mid]:
+                    hi = mid
+                else:
+                    lo = mid+1
+            return lo
+        ```
 
 ---
 
