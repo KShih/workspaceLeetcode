@@ -21518,7 +21518,7 @@ class Solution:
         return num1, num2
 ```
 ---
-## 166. Fraction to Recurring Decimal｜ 3/11
+## 166. Fraction to Recurring Decimal｜ 3/11 | [ Review * 1 ]
 Given two integers representing the numerator and denominator of a fraction, return the fraction in string format.
 
 If the fractional part is repeating, enclose the repeating part in parentheses.
@@ -21547,35 +21547,31 @@ Output: "0.(6)"
 
 ### 思路
 
-小數點後的算法：我們要算出小數每一位，採取的方法是每次把餘數乘10，再除以除數，得到的商即為小數的下一位數字。
-
-因此並不會出現小數點後有"235728" 當到第二個2的時候就會開始循環了。
-
-3.14159xxx -> 這個例子不會出現在整數除法當中
+1. 小數點後的算法：我們要算出小數每一位，採取的方法是每次把餘數乘10，再除以除數，得到的商即為小數的下一位數字。
 
 ### Code
 ``` py
 class Solution:
     def fractionToDecimal(self, numerator: int, denominator: int) -> str:
         n, r = divmod(abs(numerator), abs(denominator))
+        sign = "-" if numerator*denominator < 0 else "" # 一定要用乘法, 因為 0 / -5 = 0, 但 1 / -5 = -0.2
+        res = [sign + str(n), "."]
+        r_table = {}
 
-        sign = "-" if numerator * denominator < 0 else ""
-        result = [sign + str(n), '.']
-        stack = []
+        if r == 0:
+            return "".join(res[:-1]) # return if there's no remainder
 
-        while r not in stack:
-            stack.append(r)
+        while r > 0 and r not in r_table:
+            r_table[r] = len(res)
             n, r = divmod(r*10, abs(denominator))
-            result.append(str(n))
+            res.append(str(n))
 
-        idx = stack.index(r) # get what is the position started to repeat in stack
-        result.insert(idx+2, '(' ) # insert after quotient and '.', so it's +2
-        result.append(')')
-
-        # there is case that will break the while loop with zero repeat, which shouldn be return in answer
-        # after replace (0), there is case that is no remainder like 4/2, need to rstrip the '.'
-        return ''.join(result).replace('(0)', '').rstrip('.')
+        if r > 0:
+            res.insert(r_table[r], "(")
+            res.append(")")
+        return "".join(res)
 ```
+### Tag: #HashTable
 ---
 ## 179. Largest Number｜ 3/11
 Given a list of non negative integers, arrange them such that they form the largest number.
