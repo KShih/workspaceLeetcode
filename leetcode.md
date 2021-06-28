@@ -38311,3 +38311,116 @@ class SparseVector:
 
 ### Tag: #HashTable
 ---
+## 1650. Lowest Common Ancestor of a Binary Tree III｜ 6/28
+Given two nodes of a binary tree p and q, return their lowest common ancestor (LCA).
+
+Each node will have a reference to its parent node. The definition for Node is below:
+
+class Node {
+    public int val;
+    public Node left;
+    public Node right;
+    public Node parent;
+}
+
+According to the definition of LCA on Wikipedia: "The lowest common ancestor of two nodes p and q in a tree T is the lowest node that has both p and q as descendants (where we allow a node to be a descendant of itself)."
+
+Example 1:
+
+![](assets/markdown-img-paste-20210628211840245.png)
+
+- Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
+- Output: 3
+- Explanation: The LCA of nodes 5 and 1 is 3.
+
+Example 2:
+
+- Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
+- Output: 5
+- Explanation: The LCA of nodes 5 and 4 is 5 since a node can be a descendant of itself according to the LCA definition.
+
+Example 3:
+
+- Input: root = [1,2], p = 1, q = 2
+- Output: 1
+
+Constraints:
+
+- The number of nodes in the tree is in the range [2, 105].
+- -109 <= Node.val <= 109
+- All Node.val are unique.
+- p != q
+- p and q exist in the tree.
+
+### 解題分析
+
+1. Optimal Space(1)
+    - If the distance from p1 to c1 is the same as the distance from q1 to c1, it's pretty obvious this algorithm will find when c1 == c1.
+        - p1 -> p2 -> p3 -> c1 -> c2 -> c3
+        - q1 -> q2 -> q3 -> c1 -> c2 -> c3
+    - But now imagine those distances are different.
+        - p1 -> p2 -> p3 -> c1 -> c2 -> c3
+        - ........... q1 -> c1 -> c2 -> c3
+            - If you force them to switch paths after they reach c3:
+            - P Travels: (3 steps to c1), (3 common steps to q1), (1 step to c1)
+            - Q Travels: (1 step to c1), (3 common steps to p1), (3 steps to c1)
+    - OR put another way
+        - P Travels: PC, C, QC
+        - Q Travels: QC, C, PC
+        - where C is the common paths. PC is p's unique path to the common ancestor. QC is q's unique path.
+
+### Code
+``` py
+class Solution:
+    def lowestCommonAncestor(self, p: 'Node', q: 'Node') -> 'Node':
+        path_p, path_q = deque(), deque()
+        while p != None:
+            path_p.append(p)
+            p = p.parent
+
+        while q != None:
+            path_q.append(q)
+            q = q.parent
+
+        while path_p[0] != path_q[0]:
+            if len(path_p) > len(path_q):
+                path_p.popleft()
+            else:
+                path_q.popleft()
+        return path_p[0]
+```
+
+Better
+```py
+class Solution:
+    def lowestCommonAncestor(self, p: 'Node', q: 'Node') -> 'Node':
+        set_p = set()
+        while p != None:
+            if p == q:
+                return p
+            else:
+                set_p.add(p)
+                p = p.parent
+
+        while q != None:
+            if q in set_p:
+                return q
+            q = q.parent
+
+        return None
+```
+
+Optimal
+```py
+class Solution:
+    def lowestCommonAncestor(self, p: 'Node', q: 'Node') -> 'Node':
+        p1, p2 = p, q
+        while p1 != p2:
+            p1 = p1.parent if p1.parent else q
+            p2 = p2.parent if p2.parent else p
+
+        return p1
+```
+
+### Tag: #Set #LinkedList
+---
