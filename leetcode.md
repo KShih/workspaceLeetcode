@@ -37942,3 +37942,111 @@ class TweetCounts:
 
 ### Tag: #HashTable #BinarySearch
 ---
+## 740. Delete and Earn｜ 6/28
+Given an array nums of integers, you can perform operations on the array.
+
+In each operation, you pick any nums[i] and delete it to earn nums[i] points. After, you must delete every element equal to nums[i] - 1 or nums[i] + 1.
+
+You start with 0 points. Return the maximum number of points you can earn by applying such operations.
+
+Example 1:
+
+- Input: nums = [3,4,2]
+- Output: 6
+- Explanation: Delete 4 to earn 4 points, consequently 3 is also deleted.
+- Then, delete 2 to earn 2 points.
+- 6 total points are earned.
+
+Example 2:
+
+- Input: nums = [2,2,3,3,3,4]
+- Output: 9
+- Explanation: Delete 3 to earn 3 points, deleting both 2's and the 4.
+- Then, delete 3 again to earn 3 points, and 3 again to earn 3 points.
+- 9 total points are earned.
+
+Constraints:
+
+- 1 <= nums.length <= 2 * 104
+- 1 <= nums[i] <= 104
+
+### 思路
+1. 想法:
+    1. 一開始的想法就是要先統計Count 並排序, 然後去算出選了這個可以得到多少, 必須失去多少
+    2. 這時候就剩下 `如何求出剩餘的部分`, 而這部分就是跟 DP 的概念類似了, 後面的結果是由前面的東西`操作`而來, 這裡的操作指的就是`累加`
+2. 解題:
+    1. Solution1
+        0. rob house 規定只能隔間偷, 並且已經給我們每一間房子的價值, 而此題也同樣是必須跳著選數字, 此題的價值就是 nums[i] * `counts of nums[i]`
+        1. 假使在 nums 裡面的數字都不會太大, 我們可以運用 counting sort 的概念, 用空間換取時間, 就不用 sort了
+        2. 演算法
+            1. 這邊運用 House Robber 的概念, 隔間偷
+            2. 這邊把 dp[i] 定義為, 直到 bucket[i] 我所可以得到的最大價值
+            3. 要求出 dp[i] 有兩種可能, 從這兩種取出最大的價值
+                1. 拿 dp[i-2] + bucket[i] -> 跳過前一格, 去取前前一格最大的累積價值
+                2. 拿 dp[i-1] -> 不拿此 bucket[i] 了
+            4. bucket 放的就是所謂的價值, bucket[k] 就是 `k * counts of k`
+        3. 複雜度:
+            - Time: O(N)
+            - Space: O(max(nums))
+    2. Solution2
+        1. 如果 nums 中的最大值超級大, bucket 就必須跟著宣告很大, 此時 sort 的方法可能會好一點
+        2. 而這邊也不用 dp array 了, 我們只需要維護三個變數R
+            1. cur_max_earn: 當前的最大收入 (dp[i-1])
+            2. prev_max_earn: 先前的最大收入 (dp[i-2])
+            3. prev_idx: 先前最大收入的 index (i-1)
+        3. 透過判斷當前的 index 是否為 prev_idx + 1 即可決定我們要怎麼計算新的當前值
+            1. 若不是
+                - 把當前值先丟給 prev
+                - 更新當前值為: 原本的當前值+ 此時新增的
+            2. 若是的話, `表示我們不能使用原本的當前值`
+                - 把當前值先丟給 prev
+                - 此時的當前值只能是:
+                    1. prev + 此時新增的
+                    2. 原本的當前值
+            3. 複雜度:
+                - Time: O(N log N)
+                - Space: O(1)
+
+### 類似題
+LC198. House Robber
+
+### Code
+Solution1
+Similar to LC198. House Robber
+``` py
+class Solution:
+    def deleteAndEarn(self, nums: List[int]) -> int:
+        _size = max(nums)+1
+        dp = buckets = [0 for _ in range(_size)]
+
+        for num in nums:
+            buckets[num] += num
+
+        dp[0] = buckets[0]
+        dp[1] = max(dp[0], buckets[1])
+
+        for i in range(2, _size):
+            dp[i] = max(dp[i-1], dp[i-2] + buckets[i])
+
+        return dp[-1]
+```
+
+Solution2
+```py
+class Solution:
+    def deleteAndEarn(self, nums: List[int]) -> int:
+        counters = Counter(nums)
+
+        prev_idx, prev_max_earn, cur_max_earn = -1, 0, 0
+        for k, count in sorted(counters.items()):
+            if k - 1 != prev_idx:
+                prev_max_earn, cur_max_earn = cur_max_earn, cur_max_earn + k*count
+            else:
+                prev_max_earn, cur_max_earn = cur_max_earn, max(prev_max_earn + k*count, cur_max_earn)
+
+            prev_idx = k
+        return cur_max_earn
+```
+
+### Tag: #HashTable #DP
+---
