@@ -38170,3 +38170,68 @@ class Solution:
 
 ### Tag: #
 ---
+## 1010. Pairs of Songs With Total Durations Divisible by 60｜ 6/28
+You are given a list of songs where the ith song has a duration of time[i] seconds.
+
+Return the number of pairs of songs for which their total duration in seconds is divisible by 60. Formally, we want the number of indices i, j such that i < j with (time[i] + time[j]) % 60 == 0.
+
+Example 1:
+
+- Input: time = [30,20,150,100,40]
+- Output: 3
+- Explanation: Three pairs have a total duration divisible by 60:
+- (time[0] = 30, time[2] = 150): total duration 180
+- (time[1] = 20, time[3] = 100): total duration 120
+- (time[1] = 20, time[4] = 40): total duration 60
+
+Example 2:
+
+- Input: time = [60,60,60]
+- Output: 3
+- Explanation: All three pairs have a total duration of 120, which is divisible by 60.
+
+Constraints:
+
+- 1 <= time.length <= 6 * 104
+- 1 <= time[i] <= 500
+
+### 思路
+
+
+### Code
+Naive
+```py
+class Solution:
+    def numPairsDivisibleBy60(self, time: List[int]) -> int:
+        counter = defaultdict(int)
+        res = 0
+
+        for i in range(len(time)-1, -1, -1):
+            t = time[i]
+            comp = 60 - t
+            for k in range(20):
+                target = comp + 60*k
+                if target in counter:
+                    res += counter[target]
+            counter[t] += 1
+        return res
+```
+
+Optimal
+``` py
+class Solution:
+    def numPairsDivisibleBy60(self, time: List[int]) -> int:
+        candidate = collections.defaultdict(int)
+        ans = 0
+        for i in range(len(time) - 1, -1, -1):
+            modulo = time[i] % 60
+            if modulo == 0:
+                ans += candidate[0]
+            else:
+                ans += candidate[60 - modulo]
+            candidate[modulo] += 1
+        return ans
+```
+
+### Tag: #HashTable
+---
