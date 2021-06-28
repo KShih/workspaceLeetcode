@@ -22032,7 +22032,7 @@ class Solution:
 
 ### Tag: #DP
 ---
-## 198. House Robber｜ 3/16 (DP 經典題！打通DP任督二脈)
+## 198. House Robber｜ 3/16  | [ Review * 1 ] (DP 經典題！打通DP任督二脈)
 You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security system connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
 
 Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight without alerting the police.
@@ -22087,6 +22087,10 @@ a[2][0] = 7, a[2][1] = 2 + 9
 
 維護一個一位數組 dp，其中 dp[i] 表示 [0, i] 區間可以搶奪的最大值，對當前i來說，有搶和不搶兩種互斥的選擇，不搶即為 dp[i-1]（等價於去掉 nums[i] 只搶 [0, i-1] 區間最大值），搶即為 dp[i-2] + nums[i]（等價於去掉 nums[i-1]）
 
+### 類似題
+
+LC740, Delete and Earn
+
 ### Code
 ``` py
 class Solution:
@@ -22115,6 +22119,7 @@ class Solution:
             dp[i] = max(dp[i-1], dp[i-2] + nums[i-1])
         return dp[-1]
 ```
+### Tag: #DP
 ---
 ## 199. Binary Tree Right Side View｜ 3/19 | [ Review * 1 ]
 Given a binary tree, imagine yourself standing on the right side of it, return the values of the nodes you can see ordered from top to bottom.
