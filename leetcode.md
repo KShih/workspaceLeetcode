@@ -38533,3 +38533,84 @@ class Solution:
 
 ### Tag: #HashTable #Combination #BitManipulation
 ---
+## 523. Continuous Subarray Sum｜ 6/29
+Given an integer array nums and an integer k, return true if nums has a continuous subarray of size at least two whose elements sum up to a multiple of k, or false otherwise.
+
+An integer x is a multiple of k if there exists an integer n such that x = n * k. 0 is always a multiple of k.
+
+Example 1:
+
+- Input: nums = [23,2,4,6,7], k = 6
+- Output: true
+- Explanation: [2, 4] is a continuous subarray of size 2 whose elements sum up to 6.
+
+Example 2:
+
+- Input: nums = [23,2,6,4,7], k = 6
+- Output: true
+- Explanation: [23, 2, 6, 4, 7] is an continuous subarray of size 5 whose elements sum up to 42.
+- 42 is a multiple of 6 because 42 = 7 * 6 and 7 is an integer.
+
+Example 3:
+
+- Input: nums = [23,2,6,4,7], k = 13
+- Output: false
+
+Constraints:
+
+- 1 <= nums.length <= 105
+- 0 <= nums[i] <= 109
+- 0 <= sum(nums[i]) <= 231 - 1
+- 1 <= k <= 231 - 1
+
+### 解題分析
+1. Naive Subarray Sum
+    1. 先算出 accSum
+    2. 再從 i+2 以上的位置去求 accSum[i:j] 的餘, 非常直觀
+    3. 然而這樣 O(N^2)
+2. Optimal Subarray Sum
+    1. sum[i:j] = sum[:j] - sum[:i]
+    2. sum[i:j] % k = 0 => return True, which equal to
+        1. => (sum[:j] - sum[:i]) % k = 0
+        2. => sum[:j] % k == sum[:i] % k
+        3. 所以只要 sum[:j] % k 曾經出現過, 就表示 sum[i:j] % k = 0 -> return True
+
+### Code
+Naive Acc Sum
+```py
+class Solution:
+    def checkSubarraySum(self, nums: List[int], k: int) -> bool:
+        acc_sum = [0]
+        for i in range(1, len(nums)+1):
+            acc_sum.append(nums[i-1] + acc_sum[i-1])
+
+        for i in range(len(acc_sum)):
+            for j in range(i+2, len(acc_sum)):
+                if k == 0:
+                    if acc_sum[j] - acc_sum[i] == 0:
+                        return True
+                elif (acc_sum[j] - acc_sum[i]) % k == 0:
+                    return True
+        return False
+```
+
+Optimal
+``` py
+class Solution:
+    def checkSubarraySum(self, nums: List[int], k: int) -> bool:
+        dic = {}
+        dic[0] = -1 # init remainder=0 with index = -1, states nums[:i] is multiple of k
+
+        summ = 0
+        for j, num in enumerate(nums):
+            summ += num
+            r = summ % k if k != 0 else summ
+            if r not in dic:
+                dic[r] = j
+            elif j - dic[r] >= 2:
+                return True
+        return False
+```
+
+### Tag: #HashTable #Accumulated
+---
