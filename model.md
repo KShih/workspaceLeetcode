@@ -33,29 +33,86 @@ Solution Model
     - `max(dic, key=dic.get)`
 
 ## Combination
-- 參考 python build-in function `combinations(arr, length)`, 自己寫的 general usage recursive 版本
-    ```py
-    def combinations(self, arr, leng):
-        res = set()
-        def helper(idx, comb, leng):
-            if leng == 0:
-                res.add(tuple(comb))
-                return
+1. 固定長度
+    1. DFS
+        - 參考 python build-in function `combinations(arr, length)`, 自己寫的 general usage recursive 版本
+        ```py
+        def combinations(self, arr, leng):
+            res = set()
+            def helper(idx, comb, leng):
+                if leng == 0:
+                    res.add(tuple(comb))
+                    return
 
-            for i in range(idx, len(arr)):
-                helper(i+1, comb+[arr[i]], leng-1)
+                for i in range(idx, len(arr)):
+                    helper(i+1, comb+[arr[i]], leng-1)
 
-        helper(0, [], leng)
-        return res
-    ```
-- 使用方式:
-    - 如果允許重複, 請把 res 型態宣告成 list
-- 技術學習:
-    - 這邊用 helper 的 design pattern, 暴露了簡單的使用方式給外面
-        - 主要因為面對求 combination 的題, 這個 result 要使用 pass by reference 的方式會比較方便
-        - 但如果我不想讓 user 在使用這個 function 的時候還要帶一個 result 進來, 我們直接幫 user 創, 然後用 inline function 直接往幫他創的 result 塞東西, 最後回傳給他
-        - inline function 還有好處是不用一直傳遞 arr
-    - 這邊用 idx, 取代了一直切割字串
+            helper(0, [], leng)
+            return res
+        ```
+    2. BFS
+        - ![](assets/markdown-img-paste-20210629162149353.png)
+        ```py
+        def combinations(self, source, length):
+            bfs = [""]
+            for c in source:
+                bfs += [s+c for s in bfs]
+
+            return set(b for b in bfs if len(b) == length)
+        ```
+    - 使用方式:
+        - 如果允許重複, 請把 res 型態宣告成 list
+    - 技術學習:
+        - 這邊用 helper 的 design pattern, 暴露了簡單的使用方式給外面
+            - 主要因為面對求 combination 的題, 這個 result 要使用 pass by reference 的方式會比較方便
+            - 但如果我不想讓 user 在使用這個 function 的時候還要帶一個 result 進來, 我們直接幫 user 創, 然後用 inline function 直接往幫他創的 result 塞東西, 最後回傳給他
+            - inline function 還有好處是不用一直傳遞 arr
+        - 這邊用 idx, 取代了一直切割字串
+2. 不固定長度
+    1. BFS
+        ```py
+        def combinations(self, source):
+            bfs = [""]
+            for c in source:
+                bfs += [s+c for s in bfs]
+            return bfs[1:]
+        ```
+    2. DFS
+        ```py
+        def combinations2(self, arr):
+            res = set()
+            def helper(idx, comb):
+                for i in range(idx, len(arr)):
+                    res.add(tuple(comb+[arr[i]]))
+                    helper(i+1, comb+[arr[i]])
+
+            helper(0, [])
+            return res
+        ```
+
+## Permutation
+    - perfer 使用 dfs + set(indexes)
+    1. DFS
+        ```py
+        def permute(self, nums: List[int]) -> List[List[int]]:
+            res = []
+            n = len(nums)
+
+            def helper(comb, visited):
+                if len(comb) == n:
+                    res.append(comb)
+                    return
+
+                for num in nums:
+                    if num not in visited:
+                        visited.add(num)
+                        helper(comb + [num], visited)
+                        visited.remove(num)
+
+            if nums:
+                helper([], set())
+            return res
+        ```
 
 ## Greedy
 1. Greedy problems usually look like "Find minimum number of something to do something" or "Find maximum number of something to fit in some conditions", and typically propose an unsorted input.
@@ -353,6 +410,23 @@ class Solution:
 
 ## Bit manipulate
 
+1. 可用於 O(1) 判斷一個集合曾經出現與否, e.g.: set("apple") == set("apppple")
+    ```py
+    def get_str_mask(self, iterable):
+        m = 0
+        for c in iterable:
+            m |= self.get_char_mask(c)
+        return m
+
+    def get_char_mask(self, char):
+        return 1 << (ord(char)-97)
+
+    # Input: get_str_mask("apple")
+    # Output:
+    # 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 0 1 0 0 0 1
+    # z y x w v u t s r q p o n m l k j i h g f e d c b a
+    # ps: get_str_mask("apple") == get_str_mask("apppppple") -> True
+    ```
 1. https://medium.com/techie-delight/bit-manipulation-interview-questions-and-practice-problems-27c0e71412e7
 
 ---

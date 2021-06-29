@@ -38420,3 +38420,116 @@ class Solution:
 
 ### Tag: #Set #LinkedList
 ---
+## 1178. Number of Valid Words for Each Puzzle｜ 6/29
+- With respect to a given puzzle string, a word is valid if both the following conditions are satisfied:
+1. word contains the first letter of puzzle.
+2. For each letter in word, that letter is in puzzle.
+
+- For example, if the puzzle is "abcdefg", then valid words are "faced", "cabbage", and "baggage"; while invalid words are "beefed" (doesn't include "a") and "based" (includes "s" which isn't in the puzzle).
+- Return an array answer, where answer[i] is the number of words in the given word list words that are valid with respect to the puzzle puzzles[i].
+
+
+Example :
+
+- Input:
+- words = ["aaaa","asas","able","ability","actt","actor","access"],
+- puzzles = ["aboveyz","abrodyz","abslute","absoryz","actresz","gaswxyz"]
+- Output: [1,1,3,2,4,0]
+- Explanation:
+- 1 valid word for "aboveyz" : "aaaa"
+- 1 valid word for "abrodyz" : "aaaa"
+- 3 valid words for "abslute" : "aaaa", "asas", "able"
+- 2 valid words for "absoryz" : "aaaa", "asas"
+- 4 valid words for "actresz" : "aaaa", "asas", "actt", "access"
+- There're no valid words for "gaswxyz" cause none of the words in the list contains letter 'g'.
+
+Constraints:
+
+- 1 <= words.length <= 10^5
+- 4 <= words[i].length <= 50
+- 1 <= puzzles.length <= 10^4
+- puzzles[i].length == 7
+- words[i][j], puzzles[i][j] are English lowercase letters.
+- Each puzzles[i] doesn't contain repeated characters.
+
+### 解題分析
+1. 分析題目
+    1. 題目要求
+        1. word 的所有字都要在 puzzle 出現
+        2. puzzle 的第一個字要在 word 中出現
+        3. 每個 puzlle 的長度固定是 7
+    2. 那麼根據第一點我們可以想到把 word 中所出現的字做成 key (必須sort過)
+    3. 根據第二、三點, 我們可以想到用 puzzle 所可能產出的 combination (並且要固定第一個字是 puzzle[0])
+        - 這邊的 combination 用 conbination.BFS 的模板去改
+    4. 最後再去看看 word 中有幾個 key 符合這些 combination
+
+2. Bit manipulation 優化
+    1. 可以優化的地方是在我們可以不必使用 `sorted(set(str))` 當作 key, instead, 使用 Mask (詳見 model)
+        - Input: get_str_mask("apple")
+        - Output:
+        - 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 0 1 0 0 0 1
+        - z y x w v u t s r q p o n m l k j i h g f e d c b a
+    2. 所以需要修改的地方即時生成 word key 的地方, 以及生成 combination 的地方 (因為 bit mask 的操作, 生成combination 即是key了)
+
+
+### Code
+``` py
+class Solution:
+    def findNumOfValidWords(self, words: List[str], puzzles: List[str]) -> List[int]:
+        count_wordset = Counter()
+        for word in words:
+            key = self.get_count_key(set(word))
+            count_wordset[key] += 1
+
+        res = [0 for _ in range(len(puzzles))]
+        for i, puzzle in enumerate(puzzles):
+            combs = self.find_comb(puzzle)
+            for comb in combs:
+                key = self.get_count_key(comb)
+                res[i] += count_wordset[key]
+        return res
+
+    def get_count_key(self, iterable):
+        return "".join(sorted(iterable))
+
+    def find_comb(self, source):
+        bfs = [source[0]]
+        for c in source[1:]:
+            bfs += [s+c for s in bfs]
+        return bfs
+```
+
+Bit manipulation (Optimal)
+```py
+class Solution:
+    def findNumOfValidWords(self, words: List[str], puzzles: List[str]) -> List[int]:
+        count_wordset = Counter()
+        for word in words:
+            key = self.get_count_key(word)
+            count_wordset[key] += 1
+
+        res = [0 for _ in range(len(puzzles))]
+        for i, puzzle in enumerate(puzzles):
+            combs = self.find_comb(puzzle)
+            for key in combs:
+                res[i] += count_wordset[key]
+        return res
+
+    def get_count_key(self, iterable):
+        m = 0
+        for c in iterable:
+            m |= self.get_mask(c)
+        return m
+
+    def get_mask(self, char):
+        return 1 << (ord(char)-97)
+
+    def find_comb(self, source):
+        bfs = [self.get_mask(source[0])]
+        for c in source[1:]:
+            bfs += [m | self.get_mask(c) for m in bfs]
+        return bfs
+```
+
+### Tag: #HashTable #Combination #BitManipulation
+---
