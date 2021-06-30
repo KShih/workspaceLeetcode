@@ -11537,7 +11537,7 @@ class Solution:
 ```
 ### Tag: #Heap
 ---
-## 53. Maximum Subarray｜ 9/2 | [Review *1]
+## 53. Maximum Subarray｜ 9/2 | [Review *2]
 Given an integer array nums, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.
 
 Example:
@@ -11559,9 +11559,13 @@ Follow up:
 
 ### 思路
 
-1, Kadne Algorithm:
+1, Kadne Algorithm(Dynamic Programming):
 
 Compare this element vs this element + pastMax combination (curSum)
+
+如果當前值比以前的總總加起來還大, 表示以前的都是累贅, 直接 cut off,
+
+再搭配 global_max 去紀錄曾經的輝煌時期, 因此可以安心的 cut off.
 
 
 2, Divide and Conquer:
@@ -11594,7 +11598,7 @@ class Solution:
         max_global, max_current = nums[0], nums[0]
         for num in nums[1:]:
             max_current = max(num, num + max_current)
-            max_global = max(max_current, max_global)
+            max_global = max(max_global, max_current)
         return max_global
 ```
 
@@ -11603,13 +11607,13 @@ Kadane Follow-up
 class Solution:
     def maxSubArray(self, nums: List[int]) -> int:
         max_global, max_current = 0, 0
-        for num in nums[1:]:
+        for num in nums:
             max_current = max(0, num + max_current)
-            max_global = max(max_current, max_global)
+            max_global = max(max_global, max_current)
         return max_global
 ```
 
-印出區間
+印出區間(Updating w/ Sliding Window)
 ```py
 class Solution:
     def maxSubArray(self, nums: List[int]) -> int:
@@ -11661,7 +11665,7 @@ class Solution(object):
 
         return max(lmax, rmax, mmax)
 ```
-### Tag: #SlidingWindow #DivideAndConquer
+### Tag: #SlidingWindow #DivideAndConquer #DP
 ---
 ## 20. Valid Parentheses｜ 9/2 | [ Review * 1 ]
 Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
@@ -38633,7 +38637,7 @@ Example 3:
 
 - Input: nums = [1]
 - Output: []
- 
+
 Constraints:
 
 - n == nums.length
