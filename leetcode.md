@@ -16352,7 +16352,7 @@ class Solution:
 ```
 ### Tag: #Recursive, #DFS
 ---
-## 70. Climbing Stairs｜ 10/28
+## 70. Climbing Stairs｜ 10/28 | [ Review * 1 ]
 You are climbing a stair case. It takes n steps to reach to the top.
 
 Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
@@ -16394,6 +16394,9 @@ Explanation: There are three ways to climb to the top.
     - @lru_cache(None)
         - ![](assets/markdown-img-paste-20191028162218315.png)
 
+### 解題分析
+1. 首先先使用 Recursive 去解題, 再試著使用 memo 去優化, 最後再根據 memo 紀錄的東西當作線索來轉換成 bottom up 的狀態轉移方程式
+
 
 ### 思路
 
@@ -16413,39 +16416,50 @@ dp[i] = dp[i-1] + dp[i-2]
 
 
 ### Code
-Brute-force Recursive:
+Recursive:
 ``` py
 class Solution:
     def climbStairs(self, n: int) -> int:
-        def recur(n):
-            if str(n) in dic.keys():
-                return dic[str(n)]
-            one_step = recur(n-1)
-            dic[str(n-1)] = one_step
-
-            two_step = recur(n-2)
-            dic[str(n-2)] = two_step
-
-            return one_step+two_step
-
-        dic = dict()
-        dic["1"] = 1
-        dic["2"] = 2
-        print(dic)
-        return recur(n)
+        def climb_from(cur_pos):
+            if cur_pos > n:
+                return 0
+            if cur_pos == n:
+                return 1
+            return climb(cur_pos+1) + climb(cur_pos+2)
+        return climb_from(0)
 ```
+
+Recursive w/ Memorization (TopDown):
 ```py
-def dp_way(self,n):
-    if n == 1:
-        return 1
-    dp = [0] * n
-    dp[0], dp[1] = 1, 2
-
-    for i in range(2, n):
-        dp[i] = dp[i-1] + dp[i-2]
-
-    return dp[n-1]
+class Solution:
+    def climbStairs(self, n: int) -> int:
+        memo = {}
+        def climb_from(cur_pos):
+            if cur_pos > n:
+                return 0
+            if cur_pos == n:
+                return 1
+            if cur_pos not in memo:
+                memo[cur_pos] = climb(cur_pos+1) + climb(cur_pos+2)
+            return memo[cur_pos]
+        return climb_from(0)
 ```
+
+DP BottomUp
+```py
+class Solution:
+    def climbStairs(self, n: int) -> int:
+        if n == 1:
+            return 1
+        dp = [0 for _ in range(n+1)]
+        dp[1] = 1
+        dp[2] = 2
+
+        for i in range(3, len(dp)):
+            dp[i] = dp[i-1] + dp[i-2]
+        return dp[-1]
+```
+### Tag: #DP
 ---
 ## 91. Decode Ways｜ 10/28
 A message containing letters from A-Z is being encoded to numbers using the following mapping:
