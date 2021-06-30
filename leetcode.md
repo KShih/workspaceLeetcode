@@ -19666,7 +19666,7 @@ class Solution:
         return False
 ```
 ---
-## 118. Pascal's Triangle｜ 1/26
+## 118. Pascal's Triangle｜ 1/26 | [ Review * 1 ]
 ![](assets/markdown-img-paste-20200126105025658.png)
 
 In Pascal's triangle, each number is the sum of the two numbers directly above it.
@@ -19691,18 +19691,15 @@ Naive版:
 ``` py
 class Solution:
     def generate(self, numRows: int) -> List[List[int]]:
-        if numRows <= 0:
-            return []
-        ret = [[1]]
-        for i in range(1,numRows):
-            comb = []
-            for j in range(-1, len(ret[i-1])):
-                if j == -1 or j == len(ret[i-1])-1:
-                    comb.append(1)
-                else:
-                    comb.append(ret[i-1][j] + ret[i-1][j+1])
-            ret.append(comb)
-        return ret
+        triangle = [[1]]
+        for i in range(1, numRows):
+            new_row = [1]
+            cur_row = triangle[i-1]
+            for i in range(1, len(cur_row)):
+                new_row.append(cur_row[i] + cur_row[i-1])
+            new_row.append(1)
+            triangle.append(new_row)
+        return triangle
 ```
 
 精簡版
@@ -19715,6 +19712,7 @@ class Solution:
                 res[i][j] = res[i-1][j-1] + res[i-1][j]
         return res
 ```
+### Tag: #DP
 ---
 ## 119. Pascal's Triangle II｜ 1/26
 ![](assets/markdown-img-paste-20200126160430325.png)
