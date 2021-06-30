@@ -38614,3 +38614,73 @@ class Solution:
 
 ### Tag: #HashTable #Accumulated
 ---
+## 442. Find All Duplicates in an Array｜ 6/30
+Given an integer array nums of length n where all the integers of nums are in the range [1, n] and each integer appears once or twice, return an array of all the integers that appears twice.
+
+You must write an algorithm that runs in O(n) time and uses only constant extra space.
+
+Example 1:
+
+- Input: nums = [4,3,2,7,8,2,3,1]
+- Output: [2,3]
+
+Example 2:
+
+- Input: nums = [1,1,2]
+- Output: [1]
+
+Example 3:
+
+- Input: nums = [1]
+- Output: []
+ 
+Constraints:
+
+- n == nums.length
+- 1 <= n <= 105
+- 1 <= nums[i] <= n
+- Each element in nums appears once or twice.
+
+### 解題分析
+0. 當然可以用 sort, hashtable 之類的來解, 但要求要 O(1) Space
+1. 利用題目中的關鍵資訊: 只出現一次或兩次, 且每個數的大小不超過陣列大小 1 <= num <= len(arr)
+    1. 第一句讓我們想到了正反號
+    2. 第二句讓我們想到了 index (num-1 一定是合法的 index 範圍)
+2. 那本題的目的就是要標記出重複的元素，再不用 extra space 的情況下，等於我們只能在 array 裡面去做這個標記的動作
+3. 綜合以上兩點提示就是在 index 的位置變換正反號來達到標示的動作
+4. Naive 的做法就是 iterate through array 並且把 nums[num-1] 給flip `*= -1`，那麼如果有重複的元素時他就會被翻了兩次變成正
+5. 那第二次回圈就可以把正的數找出來，其 index 即為重複的點，但我們不想要答案裡有兩個重複的，所以我們要再一次的把它變號
+6. 優化: 這兩個 pass 可以合併成一個
+7. 注意: 過程中的 num - 1, num 都要加上 abs, 因為有可能先前的 num 已經把此 num 給變號了
+
+
+### Code
+Two Pass
+``` py
+class Solution:
+    def findDuplicates(self, nums: List[int]) -> List[int]:
+        res = []
+        for num in nums:
+            nums[abs(num)-1] *= -1
+
+        for num in nums:
+            if nums[abs(num)-1] > 0:
+                res.append(abs(num))
+                nums[abs(num)-1] *= -1
+        return res
+```
+
+One Pass
+``` py
+class Solution:
+    def findDuplicates(self, nums: List[int]) -> List[int]:
+        res = []
+        for num in nums:
+            if nums[abs(num)-1] < 0:
+                res.append(abs(num))
+            nums[abs(num)-1] *= -1
+        return res
+```
+
+### Tag: #Array
+---
