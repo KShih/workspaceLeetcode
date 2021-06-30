@@ -19714,7 +19714,7 @@ class Solution:
 ```
 ### Tag: #DP
 ---
-## 119. Pascal's Triangle II｜ 1/26
+## 119. Pascal's Triangle II｜ 1/26 | [ Review * 1 ]
 ![](assets/markdown-img-paste-20200126160430325.png)
 
 ### 思路
@@ -19723,18 +19723,37 @@ class Solution:
 Naive:
 ``` py
 class Solution:
-    def getRow(self, rowIndex: int) -> List[int]:
-        ret = [1]
-        for i in range(1, rowIndex+1):
-            new_ret = []
-            for j in range(-1, i):
-                if j == -1 or j == i-1:
-                    new_ret.append(1)
-                else:
-                    new_ret.append(ret[j] + ret[j+1])
-            ret = new_ret
-        return ret
+    def getRow(self, numRows: int) -> List[int]:
+        cur_row = [1]
+        for i in range(1, numRows+1):
+            new_row = [1]
+            for i in range(1, len(cur_row)):
+                new_row.append(cur_row[i] + cur_row[i-1])
+            new_row.append(1)
+            cur_row = new_row
+        return cur_row
 ```
+
+DP ways
+build from buttom each row's end
+```py
+class Solution:
+    def getRow(self, rowIndex: int) -> List[int]:
+        # 1 0 0 0 0
+        # 1 1 0 0 0
+        # 1 2 1 0 0
+        # 1 3 3 1 0
+        # 1 4 6 4 1
+
+        res = [0] * (rowIndex + 1)
+        res[0] = 1
+        for i in range(1, rowIndex+1):
+            for j in range(i, 0, -1):
+                res[j] = res[j] + res[j-1]
+
+        return res
+```
+### Tag: #DP
 ---
 ## 120. Triangle｜ 1/26
 
