@@ -19828,7 +19828,7 @@ class Solution:
         return dp[0]
 ```
 ---
-## 122. Best Time to Buy and Sell Stock II｜ 1/27
+## 122. Best Time to Buy and Sell Stock II｜ 1/27 | [ Review * 1 ]
 Say you have an array for which the ith element is the price of a given stock on day i.
 
 Design an algorithm to find the maximum profit. You may complete as many transactions as you like (i.e., buy one and sell one share of the stock multiple times).
@@ -19854,6 +19854,15 @@ Input: [7,6,4,3,1]
 Output: 0
 Explanation: In this case, no transaction is done, i.e. max profit = 0.
 
+### 解題分析
+1. 此題好像無法從 recursive 的方法加上 memo 來 AC
+2. State Changing Machine:
+    - ![](assets/markdown-img-paste-20210630173434180.png)
+    - 只用變數就能完成的 dp
+3. Greedy
+    - ![](assets/markdown-img-paste-20210630174121492.png)
+    - 能賺先賺會比扣著等高價賺的還多
+    - 前提, 能在同一天交易, 意義上就是遇到高價時賣了馬上買
 
 ### 思路
 因為可以同一天買進賣出，
@@ -19865,6 +19874,44 @@ Explanation: In this case, no transaction is done, i.e. max profit = 0.
 因此隔日比今日高就可以賣了不需要DP
 
 ### Code
+Recursive Attempt TLE
+```py
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        def buy(day, hold, summ):
+            if day == len(prices):
+                return summ
+            res = 0
+            for i in range(day, len(prices)):
+                price = prices[i]
+                if hold != None:
+                    if price > hold:
+                        res = max(res, buy(i+1, None, summ+price))
+                    else:
+                        res = max(res, buy(i+1, hold, summ))
+                else:
+                    res = max(res, buy(i+1, price, summ-price), buy(i+1, None, summ))
+            return res
+
+        return buy(0, None, 0)
+```
+
+State Changing Machine(DP)
+```py
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        cur_hold, cur_not_hold = float(-inf), 0 # impossible to sell stock on first day, set -infinity as initial value for cur_hold
+
+        for price in prices:
+            prev_hold, prev_not_hold = cur_hold, cur_not_hold
+
+            cur_hold = max(prev_hold, prev_not_hold - price)
+
+            cur_not_hold = max(cur_not_hold, prev_hold + price)
+
+        return cur_not_hold # max profit will always happen on not hold
+```
+
 ``` py
 class Solution:
     def maxProfit(self, prices: List[int]) -> int:
@@ -19874,6 +19921,7 @@ class Solution:
                 profit += (prices[i] - prices[i-1])
         return profit
 ```
+### Tag: #DP #Greedy
 ---
 ## 123. Best Time to Buy and Sell Stock III｜ 1/28
 Say you have an array for which the ith element is the price of a given stock on day i.
