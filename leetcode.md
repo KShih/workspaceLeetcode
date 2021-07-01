@@ -30229,7 +30229,7 @@ class Solution:
 
 ### Tag: #DP, #Memorization #DFS
 ---
-## 338. Counting Bits｜ 11/7
+## 338. Counting Bits｜ 11/7 | [ Review * 1 ]
 Given a non negative integer number num. For every numbers i in the range 0 ≤ i ≤ num calculate the number of 1's in their binary representation and return them as an array.
 
 Example 1:
@@ -30249,17 +30249,25 @@ Space complexity should be O(n).
 Can you do it like a boss? Do it without using any builtin function like __builtin_popcount in c++ or in any other language.
 ### 思路
 
-![](assets/markdown-img-paste-20201107173445898.png)
-
 1. 長度為 3 的 bit (4~7), 其bit排列是 0~3的結果前面加一個1
     - 把每個階段(總bit位數+1)的結果拿出來+1加到result裡就行
 2. DP 解法
     - 一樣是由前面的結果去更新後面的概念，但不需要多new一個prev陣列
     - res[4] = res[0]+1, res[4+1] = res[1]+1 ...
     - 每個階段的開始都是2的倍數 (1, 2, 4,...)
-3. DP 解法
-    - res[7] = res[7/2] + 1
-    - 111 = 11 + 1
+3. DP 解法 (Use this)
+    - ![](assets/markdown-img-paste-20210701170325468.png)
+    - 後面的結果可以由前面得出
+        - P(n) = P(n//2) + n%2
+        - 先找出最接近該數的 2 的倍數
+        - 餘數只可能是 0 或 1
+    - P(0) = 0
+    - P(1) = 1 => P(1 // 2) + (1 % 2) **1**
+    - P(2) = 1 => P(2 // 2) + (2 % 2) **10**
+    - P(3) = 2 => P(3 // 2) + (3 % 2) **11**
+    - P(4) = 1 => P(4 // 2) + (4 % 2) **100**
+    - P(5) = 2 => P(5 // 2) + (5 % 2) **101**
+    - P(6) = 2 => P(6 // 2) + (6 % 2) **110**
 
 ### Code
 ``` py
@@ -30293,6 +30301,7 @@ class Solution:
         return res
 ```
 
+Optimal
 ```py
 class Solution:
     def countBits(self, num: int) -> List[int]:
@@ -30303,7 +30312,7 @@ class Solution:
         return res
 ```
 
-### Tag: #BitManipulate
+### Tag: #BitManipulate #DP
 ---
 ## 191. Number of 1 Bits｜ 11/7
 
