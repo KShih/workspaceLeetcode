@@ -11979,8 +11979,42 @@ Output: 0
 Explanation: In this case, no transaction is done, i.e. max profit = 0.
 ### 思路
 
+- ![](assets/markdown-img-paste-20210701111531573.png)
+    - initial stage: 財富為零
+    - hold: 為持有股票時的最高財富總額
+    - not_hold: 為未持有股票時的最高財富總額
+- 只能買一次
+    - 維護一個有限狀態機 (2個狀態)
+    - costdown the most
+    - sell the most
+- 帶入例子
+    1. i = 0
+        1. hold = -7
+        2. not_hold = 0
+    2. i = 1
+        1. hold = -1
+        2. not_hold = 0
+    3. i = 2
+        1. hold = -1
+        2. not_hold = 4
+    4. etc..
 
 ### Code
+General Approach
+```py
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        init, hold, not_hold = 0, float(-inf), 0
+
+        for price in prices:
+
+            hold = max(hold, init-price) # maximize hold -> spent less, since hold is always negative
+
+            not_hold = max(not_hold, hold+price)
+
+        return not_hold
+```
+
 ``` py
 class Solution(object):
     def maxProfit(self, prices):
@@ -12009,6 +12043,7 @@ class Solution:
                 res = price-cur_min
         return res
 ```
+### Tag: #DP
 ---
 ## 289. Game of Life｜ 9/6
 According to the Wikipedia's article: "The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970."
@@ -19859,6 +19894,9 @@ Explanation: In this case, no transaction is done, i.e. max profit = 0.
 2. State Changing Machine:
     - ![](assets/markdown-img-paste-20210630173434180.png)
     - 只用變數就能完成的 dp
+    - 能買無限次
+        - 維護一個無線狀態機 (2個狀態)
+        - 每天都嘗試買賣看能不能拿到更高利潤 (奠基在舊狀態上去計算新狀態)
 3. Greedy
     - ![](assets/markdown-img-paste-20210630174121492.png)
     - 能賺先賺會比扣著等高價賺的還多
@@ -19896,20 +19934,21 @@ class Solution:
         return buy(0, None, 0)
 ```
 
-State Changing Machine(DP)
+General Approach (State Changing Machine)
 ```py
 class Solution:
     def maxProfit(self, prices: List[int]) -> int:
-        cur_hold, cur_not_hold = float(-inf), 0 # impossible to sell stock on first day, set -infinity as initial value for cur_hold
+        hold, not_hold = float(-inf), 0
 
         for price in prices:
-            prev_hold, prev_not_hold = cur_hold, cur_not_hold
 
-            cur_hold = max(prev_hold, prev_not_hold - price)
+            prev_hold, prev_not_hold = hold, not_hold
 
-            cur_not_hold = max(cur_not_hold, prev_hold + price)
+            hold = max(prev_hold, prev_not_hold - price)
 
-        return cur_not_hold # max profit will always happen on not hold
+            not_hold = max(prev_not_hold, prev_hold + price)
+
+        return not_hold # max profit will always happen on not hold
 ```
 
 ``` py
@@ -19923,7 +19962,7 @@ class Solution:
 ```
 ### Tag: #DP #Greedy
 ---
-## 123. Best Time to Buy and Sell Stock III｜ 1/28
+## 123. Best Time to Buy and Sell Stock III｜ 1/28 | [ Review * 1 ]
 Say you have an array for which the ith element is the price of a given stock on day i.
 
 Design an algorithm to find the maximum profit. You may complete at most two transactions.
@@ -19949,7 +19988,10 @@ Input: [7,6,4,3,1]
 Output: 0
 Explanation: In this case, no transaction is done, i.e. max profit = 0.
 
-
+### 解題分析
+- ![](assets/markdown-img-paste-20210701111434756.png)
+- 僅能購買兩次
+    - 維護一個有限狀態機 (4個狀態)
 
 ### 思路
 DP(Dynamic Programming) 標準思路: https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/solution/yi-ge-tong-yong-fang-fa-tuan-mie-6-dao-gu-piao-wen/
@@ -19962,6 +20004,22 @@ DP(Dynamic Programming) 標準思路: https://leetcode-cn.com/problems/best-time
 ![](assets/markdown-img-paste-20200128181330698.png)
 
 ### Code
+General Approach
+```py
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        init = 0
+        fst_hold, sec_hold = float(-inf), float(-inf)
+        fst_not_hold, sec_not_hold = 0, 0
+
+        for price in prices:
+            fst_hold     = max(fst_hold, init-price)
+            fst_not_hold = max(fst_not_hold, fst_hold+price)
+            sec_hold     = max(sec_hold, fst_not_hold-price)
+            sec_not_hold = max(sec_not_hold, sec_hold+price)
+        return sec_not_hold
+```
+
 ``` py
 class Solution:
     def maxProfit(self, prices: List[int]) -> int:
@@ -19988,6 +20046,111 @@ class Solution:
 
         return dp[max_day-1][max_trans][0]
 ```
+### Tag: #DP
+---
+## 188. Best Time to Buy and Sell Stock IV｜ 7/1
+You are given an integer array prices where prices[i] is the price of a given stock on the ith day, and an integer k.
+
+Find the maximum profit you can achieve. You may complete at most k transactions.
+
+Note: You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+
+Example 1:
+
+- Input: k = 2, prices = [2,4,1]
+- Output: 2
+- Explanation: Buy on day 1 (price = 2) and sell on day 2 (price = 4), profit = 4-2 = 2.
+
+Example 2:
+
+- Input: k = 2, prices = [3,2,6,5,0,3]
+- Output: 7
+- Explanation: Buy on day 2 (price = 2) and sell on day 3 (price = 6), profit = 6-2 = 4. Then buy on day 5 (price = 0) and sell on day 6 (price = 3), profit = 3-0 = 3.
+
+Constraints:
+
+- 0 <= k <= 100
+- 0 <= prices.length <= 1000
+- 0 <= prices[i] <= 1000
+
+### 解題分析
+- ![](assets/markdown-img-paste-20210701115532450.png)
+- 可以購買 k 次 -> 由購買2次 generalize 而來
+    - 維護一個有限狀態機 (k*2 個狀態)
+    - 實作上為求方便會把他變成 (k+1) *2 個狀態
+        - k=0 就表達誠初始狀態 (相當於 hold=float(-inf), not_hold=0 )
+        - k=1 ~ k 分別為: 在(持有/未持有股票)第 k 個 trans 時的最高財富額
+        - 就像上題一樣, 對於每個 price 我們都讓每個狀態試著求到最大利潤
+            - 唯一不一樣的, 對於 hold[i] 的狀態應該是要由 not_hold[i-1] 而來, 而不是 init
+
+### Code
+General Approach
+``` py
+class Solution:
+    def maxProfit(self, k: int, prices: List[int]) -> int:
+        hold = [float(-inf) for _ in range(k+1)]
+        not_hold = [0 for _ in range(k+1)]
+
+        for price in prices:
+            for i in range(1, k+1):
+                hold[i]     = max(hold[i], not_hold[i-1] - price)
+                not_hold[i] = max(not_hold[i], hold[i]+price)
+        return not_hold[-1]
+```
+
+### Tag: #DP
+---
+## 714. Best Time to Buy and Sell Stock with Transaction Fee｜ 7/1
+You are given an array prices where prices[i] is the price of a given stock on the ith day, and an integer fee representing a transaction fee.
+
+Find the maximum profit you can achieve. You may complete as many transactions as you like, but you need to pay the transaction fee for each transaction.
+
+Note: You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+
+Example 1:
+
+- Input: prices = [1,3,2,8,4,9], fee = 2
+- Output: 8
+- Explanation: The maximum profit can be achieved by:
+- Buying at prices[0] = 1
+- Selling at prices[3] = 8
+- Buying at prices[4] = 4
+- Selling at prices[5] = 9
+- The total profit is ((8 - 1) - 2) + ((9 - 4) - 2) = 8.
+
+Example 2:
+
+- Input: prices = [1,3,7,5,10,3], fee = 3
+- Output: 6
+
+Constraints:
+
+- 1 <= prices.length <= 5 * 104
+- 1 <= prices[i] < 5 * 104
+- 0 <= fee < 5 * 104
+
+### 思路
+- 無限次交易, 但每次賣出要付手續費
+    - 無限交易的code, 在賣出時多扣掉手續費即可
+
+### Code
+``` py
+class Solution:
+    def maxProfit(self, prices: List[int], fee: int) -> int:
+        hold, not_hold = float(-inf), 0
+
+        for price in prices:
+
+            prev_hold, prev_not_hold = hold, not_hold
+
+            hold = max(prev_hold, prev_not_hold - price)
+
+            not_hold = max(prev_not_hold, prev_hold + price - fee)
+
+        return not_hold # max profit will always happen on not hold
+```
+
+### Tag: #DP
 ---
 ## 139. Word Break｜ 1/29 | [Review * 1]
 Given a non-empty string s and a dictionary wordDict containing a list of non-empty words, determine if s can be segmented into a space-separated sequence of one or more dictionary words.
@@ -28831,7 +28994,7 @@ class Solution:
 ```
 ### Tag: #BFS
 ---
-## 309. Best Time to Buy and Sell Stock with Cooldown｜ 10/19
+## 309. Best Time to Buy and Sell Stock with Cooldown｜ 10/19 | [ Review * 1 ]
 Say you have an array for which the ith element is the price of a given stock on day i.
 
 Design an algorithm to find the maximum profit. You may complete as many transactions as you like (ie, buy one and sell one share of the stock multiple times) with the following restrictions:
@@ -28845,6 +29008,14 @@ Input: [1,2,3,0,2]
 Output: 3
 
 Explanation: transactions = [buy, sell, cooldown, buy, sell]
+
+### 解題分析
+- ![](assets/markdown-img-paste-20210701133607117.png)
+- 在購買前要先 cooldown, 可無限次購買
+    - 維護一個無限狀態機 (3個狀態)
+    - 因為是無限狀態機, 操作上都要由上一個狀態而來去計算新的狀態, 因此cooldown要存的也是舊狀態
+        - 換個角度想, cooldown 若拿來存 not_hold, 那等於就沒有 cooldown 了, 因為下個 loop 時, hold 又直接拿來減
+
 ### 思路
 
 1. 使用狀態機轉換
@@ -28866,6 +29037,21 @@ Explanation: transactions = [buy, sell, cooldown, buy, sell]
 
 https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/discuss/108870/most-consistent-ways-of-dealing-with-the-series-of-stock-problems
 ### Code
+General Appraoch
+```py
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        hold, not_hold, cooldown = float(-inf), 0, 0
+
+        for price in prices:
+            prev_hold, prev_not_hold = hold, not_hold
+
+            hold = max(prev_hold, cooldown - price)
+            not_hold = max(prev_not_hold, prev_hold + price)
+            cooldown = prev_not_hold
+        return not_hold
+```
+
 ``` py
 class Solution:
     def maxProfit(self, prices: List[int]) -> int:
@@ -28879,6 +29065,7 @@ class Solution:
             reset = max(reset, pre_sold)
         return max(sold, reset)
 ```
+### Tag: #DP
 ---
 ## 311. Sparse Matrix Multiplication｜ 10/19 | [ Review * 1 ]
 Given two sparse matrices A and B, return the result of AB.

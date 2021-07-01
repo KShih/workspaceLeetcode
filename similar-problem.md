@@ -175,3 +175,147 @@
 ### LC217. Contains Duplicate
 - 而此題是要求 List 中是否有包含重複的元素
 - XOR 派不上用場
+
+## Best Time to Buy and Sell Stock
+
+- 來源:
+    - https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/solution/zui-jian-dan-2-ge-bian-liang-jie-jue-suo-71fe/
+- 由狀態機的概念去想
+    - initial stage: 財富為零
+    - hold: 為持有股票時的最高財富總額
+    - not_hold: 為未持有股票時的最高財富總額
+- 畫出狀態機
+    - 有限 or 無限?
+    - 想法應該是, 這個狀態該由誰怎樣而來 -> 直接可以反應到寫 code 時的邏輯順序
+
+### LC121. Best Time to Buy and Sell Stock
+
+- ![](assets/markdown-img-paste-20210701111531573.png)
+- 只能買一次
+    - 維護一個有限狀態機 (2個狀態)
+    - costdown the most
+    - sell the most
+
+```py
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        init, hold, not_hold = 0, float(-inf), 0
+
+        for price in prices:
+
+            hold = max(hold, init-price) # maximize hold -> spent less, since hold is always negative
+
+            not_hold = max(not_hold, hold+price)
+
+        return not_hold
+```
+
+### LC122. Best Time to Buy and Sell Stock II
+
+- ![](assets/markdown-img-paste-20210630173434180.png)
+- 能買無限次
+    - 維護一個無線狀態機 (2個狀態)
+    - 每天都嘗試買賣看能不能拿到更高利潤 (奠基在舊狀態上去計算新狀態)
+
+```py
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        hold, not_hold = float(-inf), 0
+
+        for price in prices:
+
+            prev_hold, prev_not_hold = hold, not_hold
+
+            hold = max(prev_hold, prev_not_hold - price)
+
+            not_hold = max(prev_not_hold, prev_hold + price)
+
+        return not_hold # max profit will always happen on not hold
+```
+
+### LC123. Best Time to Buy and Sell Stock III
+
+- ![](assets/markdown-img-paste-20210701111434756.png)
+- 僅能購買兩次
+    - 維護一個有限狀態機 (4個狀態)
+
+```py
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        init = 0
+        fst_hold, sec_hold = float(-inf), float(-inf)
+        fst_not_hold, sec_not_hold = 0, 0
+
+        for price in prices:
+            fst_hold     = max(fst_hold, init-price)
+            fst_not_hold = max(fst_not_hold, fst_hold+price)
+            sec_hold     = max(sec_hold, fst_not_hold-price)
+            sec_not_hold = max(sec_not_hold, sec_hold+price)
+        return sec_not_hold
+```
+
+### LC188. Best Time to Buy and Sell Stock IV
+
+- ![](assets/markdown-img-paste-20210701115532450.png)
+- 可以購買 k 次 -> 由購買2次 generalize 而來
+    - 維護一個有限狀態機 (k*2 個狀態)
+    - 實作上為求方便會把他變成 (k+1) *2 個狀態
+        - k=0 就表達誠初始狀態 (相當於 hold=float(-inf), not_hold=0 )
+        - k=1 ~ k 分別為: 在(持有/未持有股票)第 k 個 trans 時的最高財富額
+        - 就像上題一樣, 對於每個 price 我們都讓每個狀態試著求到最大利潤
+            - 唯一不一樣的, 對於 hold[i] 的狀態應該是要由 not_hold[i-1] 而來, 而不是 init
+
+```py
+class Solution:
+    def maxProfit(self, k: int, prices: List[int]) -> int:
+        hold = [float(-inf) for _ in range(k+1)]
+        not_hold = [0 for _ in range(k+1)]
+
+        for price in prices:
+            for i in range(1, k+1):
+                hold[i]     = max(hold[i], not_hold[i-1] - price)
+                not_hold[i] = max(not_hold[i], hold[i]+price)
+        return not_hold[-1]
+```
+
+### LC309. Best Time to Buy and Sell Stock with Cooldown
+
+- ![](assets/markdown-img-paste-20210701133607117.png)
+- 在購買前要先 cooldown, 可無限次購買
+    - 維護一個無限狀態機 (3個狀態)
+    - 因為是無限狀態機, 操作上都要由上一個狀態而來去計算新的狀態, 因此cooldown要存的也是舊狀態
+        - 換個角度想, cooldown 若拿來存 not_hold, 那等於就沒有 cooldown 了, 因為下個 loop 時, hold 又直接拿來減
+```py
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        hold, not_hold, cooldown = float(-inf), 0, 0
+
+        for price in prices:
+            prev_hold, prev_not_hold = hold, not_hold
+
+            hold = max(prev_hold, cooldown - price)
+            not_hold = max(prev_not_hold, prev_hold + price)
+            cooldown = prev_not_hold
+        return not_hold
+```
+
+### LC714. Best Time to Buy and Sell Stock with Transaction Fee
+
+- 無限次交易, 但每次賣出要付手續費
+    - 無限交易的code, 在賣出時多扣掉手續費即可
+
+```py
+class Solution:
+    def maxProfit(self, prices: List[int], fee: int) -> int:
+        hold, not_hold = float(-inf), 0
+
+        for price in prices:
+
+            prev_hold, prev_not_hold = hold, not_hold
+
+            hold = max(prev_hold, prev_not_hold - price)
+
+            not_hold = max(prev_not_hold, prev_hold + price - fee)
+
+        return not_hold # max profit will always happen on not hold
+```
