@@ -319,3 +319,23 @@ class Solution:
 
         return not_hold # max profit will always happen on not hold
 ```
+
+## String Subsequence
+
+### LC392. Is Subsequence
+- 給兩個字串, 問後者是否可由刪除元素來變成前者
+- 可用 greedy 解, 因為只問 True False
+- 或用 DP 存 s[:i], t[:j] 最大可 match 的數量
+
+### LC1143. Longest Common Subsequence
+- 與 392 一樣, 但這題不僅問 True, False, 還問數量, 因此不能用 greedy 去解
+- match 的時候拿過去的 +1
+- 不 match 的時候取最大的
+
+### LC72. Edit Distance
+- 給兩個字串, 透過對任何一個進行增刪改使其變成另一個字串, 問最少的 operation 數
+- 這題 tricky 的地方就在於 intialize dp array 的時候邊界要調整成遞增
+- 這題相反過來 match 的時候直接拿舊的值
+- 不 match 的時候, 編編取小的+1
+
+### LC10. Regular Expression Matching

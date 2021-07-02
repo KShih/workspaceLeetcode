@@ -878,14 +878,20 @@ def DFS(tree):
         - 這邊常用到的技巧是用 dp[i-1] 去更新 dp[i] *(在這個階段請試著往這個方向思考)*
     4. 試著用上面的 "發現", 去改良 (Greedy) *(這步驟比較少見)*
     5. Reference article: https://leetcode.com/problems/jump-game/solution/
+
 1. TopDown
     1. 可以從 Recursive 的解法演化而來
     2. 缺點: 依舊存在 recursive 過多的問題
     3. 題目: LC10, LC44
+
 2. BottonUp
     1. 需直接思考到`如何定義子問題`
     2. `子問題的狀態如何轉移`
     3. 大部分的題
+    4. 空間優化
+        - 寫完後我們可以觀察我們的狀態轉移會使用到過去的值是不是很少, 如果只會用到前 1 個 column, 那麼我們其實可以不用用 2D array 去存所有值
+        - 用兩個一維陣列, previous and current 即可去代表 dp[i-1], dp[i]
+        - 詳見例題: LC1143
 
 ---
 

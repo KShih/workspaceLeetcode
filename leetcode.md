@@ -39096,3 +39096,93 @@ class Solution:
 
 ### Tag: #DP #BinarySeach #HashTable
 ---
+## 1143. Longest Common Subsequence｜ 7/2
+Given two strings text1 and text2, return the length of their longest common subsequence. If there is no common subsequence, return 0.
+
+A subsequence of a string is a new string generated from the original string with some characters (can be none) deleted without changing the relative order of the remaining characters.
+
+For example, "ace" is a subsequence of "abcde".
+A common subsequence of two strings is a subsequence that is common to both strings.
+
+Example 1:
+
+- Input: text1 = "abcde", text2 = "ace"
+- Output: 3
+- Explanation: The longest common subsequence is "ace" and its length is 3.
+
+Example 2:
+
+- Input: text1 = "abc", text2 = "abc"
+- Output: 3
+- Explanation: The longest common subsequence is "abc" and its length is 3.
+
+Example 3:
+
+- Input: text1 = "abc", text2 = "def"
+- Output: 0
+- Explanation: There is no such common subsequence, so the result is 0.
+
+Constraints:
+
+- 1 <= text1.length, text2.length <= 1000
+- text1 and text2 consist of only lowercase English characters.
+
+### 解題分析
+- Space 優化
+    1. 我們可以發現我們需要的資訊只來自於 dp[i], 跟 dp[i-1], 所以理論上我們可以不用整個 dp array 來存, 只要維持這兩個 col 就可以了
+    2. previous 就相當於 dp[i-1], current 就相當於 dp[i]
+    3. 在完成這個 col 後就把 previous 丟給 column, 然後 new 一個新的 column (見註解)
+        0. ![](assets/markdown-img-paste-20210702181420399.png)
+        1. previous = current, 這個沒問題, 但此時我們若不對 cuurent 做任何改變, 他們兩個指針將會指到同一個位址, 這樣後續的修改將會有 side effect
+            1. 做 swap: previous, current = current, previous
+            2. 做 深拷貝: previous = current.copy()
+            3. 或者直接在 new 一個新的 current
+
+### 類似題
+- LC392
+- LC72
+
+### Code
+``` py
+class Solution:
+    def longestCommonSubsequence(self, s: str, t: str) -> int:
+        if not s:
+            return True
+        dp = [[0 for _ in range(len(t)+1)] for _ in range(len(s)+1)]
+        for i in range(1, len(s)+1):
+            for j in range(1, len(t)+1):
+                if s[i-1] == t[j-1]:
+                    dp[i][j] = dp[i-1][j-1] + 1
+                else:
+                    dp[i][j] = max(dp[i][j-1], dp[i-1][j])
+        return dp[-1][-1]
+```
+
+Space 優化版 (Optimal)
+```py
+class Solution:
+    def longestCommonSubsequence(self, s: str, t: str) -> int:
+        if not s:
+            return True
+        if len(s) < len(t):
+            s, t = t, s
+
+        previous = [0 for _ in range(len(t)+1)]
+        current = [0 for _ in range(len(t)+1)]
+        for i in range(1, len(s)+1):
+            for j in range(1, len(t)+1):
+                if s[i-1] == t[j-1]:
+                    current[j] = previous[j-1] + 1
+                else:
+                    current[j] = max(previous[j], current[j-1])
+            previous, current = current, previous # make previous take current's value, and current's should not point to the same array as previous did!
+            ## this would be more clear though need to create array each iteration
+            # previous = current
+            # current = [0 for _ in range(len(t)+1)]
+            ## OR
+            # previous = current.copy()
+        return previous[-1]
+```
+
+### Tag: #DP
+---
