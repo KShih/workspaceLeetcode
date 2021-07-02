@@ -22839,7 +22839,7 @@ class Solution:
 
 ```
 ---
-## 204. Count Primes｜ 3/26
+## 204. Count Primes｜ 3/26 | [ Review * 1 ]
 Count the number of prime numbers less than a non-negative number, n.
 
 Example:
@@ -22848,26 +22848,43 @@ Input: 10 Output: 4
 
 Explanation: There are 4 prime numbers less than 10, they are 2, 3, 5, 7.
 ### 思路
+
 從2開始遍歷到n-1, 根據質數的數去把非質數的數標記出來
 
-2, 4, 6, 8; 然後 3, 9
+1. i=2 去更新 2, 4, 6, 8 ... 2n
+2. 只要 i+1 沒有被標記成非質數, 他就是質數, 再用他的倍數去標記
 
 ### Code
 ``` py
 class Solution:
     def countPrimes(self, n: int) -> int:
-        res = [True] * (n+1)
-        cnt = 0
-        for i in range(2, n):
-            if not res[i]:
-                continue
-            cnt += 1
-            j = 2
-            while i*j <= n:
-                res[i*j] = False
-                j += 1
-        return cnt
+        if n <= 2:
+            return 0
+
+        not_prime = set()
+        for number in range(2, int(sqrt(n))+1):
+            if number not in not_prime:
+                for not_prime_num in range(number*2, n, number): # find less than n
+                    not_prime.add(not_prime_num)
+        # minus 1 and itself
+        return n - len(not_prime) - 2
 ```
+
+```py
+class Solution:
+    def countPrimes(self, n: int) -> int:
+        if n <= 2:
+            return 0
+
+        prime = [1 for _ in range(n)]
+        prime[0] = prime[1] = 0
+        for number in range(2, int(sqrt(n))+1):
+            if prime[number] == 1:
+                for not_prime_num in range(number*2, n, number): # find less than n
+                    prime[not_prime_num] = 0
+        return sum(prime)
+```
+### Tag: #Array
 ---
 ## 205. Isomorphic Strings｜ 3/26 | [ Review * 1 ]
 Given two strings s and t, determine if they are isomorphic.
