@@ -38958,3 +38958,141 @@ class Solution:
 
 ### Tag: #Array
 ---
+## 392. Is Subsequence｜ 7/2
+Given two strings s and t, return true if s is a subsequence of t, or false otherwise.
+
+A subsequence of a string is a new string that is formed from the original string by deleting some (can be none) of the characters without disturbing the relative positions of the remaining characters. (i.e., "ace" is a subsequence of "abcde" while "aec" is not).
+
+Example 1:
+
+- Input: s = "abc", t = "ahbgdc"
+- Output: true
+
+Example 2:
+
+- Input: s = "axc", t = "ahbgdc"
+- Output: false
+
+Constraints:
+
+- 0 <= s.length <= 100
+- 0 <= t.length <= 104
+- s and t consist only of lowercase English letters.
+
+Follow up: Suppose there are lots of incoming s, say s1, s2, ..., sk where k >= 109, and you want to check one by one to see if t has its subsequence. In this scenario, how would you change your code?
+
+### 解題分析
+1. Greedy (Optimal)
+    - 題目要求求出一個 match, 因此我們這裡的策略應該要是 **match as early as possible**
+    - proof of work:
+        - 如果 s 中有個元素是在 t 中沒有包含的
+            - 那麼我們的演算法永遠不會回傳錯的解
+        - 如果 s[i] == t[j]
+            - 那麼此時我們有兩種選擇
+                1. 跳過 (j+1)
+                2. 判定成 match (i+1, j+1)
+            - 而第一個選項會在此例子中失敗, s = "aabc", t = "axabc"
+            - 也就是說跳過元素會使我們失敗的機會增加
+    - O(len(t))
+2. DP
+    - 靈感來自於 LC72. Edit Distance
+    - ![](assets/markdown-img-paste-20210702154751709.png)
+    - dp[i][j] 代表 s[:i] 與 t[:j] 最大可 match 的數量
+    - 如果 s[i] 與 t[j] match
+        - dp[i-1][j-1] + 1
+    - 如果不 match
+        - 我們就不能 match+1, 只好取以下兩者的 max
+            - target without this char and source with this char, or
+            - source without this char and target with this char
+        - 即 dp[i-1][j], dp[i][j-1]
+    - O(len(s)*len(t))
+    - 討論:
+        - 一開始想說要使用 DP 2D-array 存 boolean
+            - 靈感來自於 LC10. Regular Expression Matching
+        - 但後來發現會遇到無法沿用前面的結果
+            - 像是我們這題紀錄了 count, 之前運算的結果就可以被後面沿用
+            - 而這邊 dp[i-1][j-1], dp[i-1][j], dp[i][j-1] 好像沒什麼意義
+3. HashTable + BinarySeach
+    - FollowUp 的問題, s 有很多種, t 只有固定一種時
+    - 這時候就可以考慮可以把 t 存成 HashTable
+    - 然後對於 s 中的每個 char 去 table 中找出 **大於前一個 match_index 的最小 index**
+    - 所以這邊要使用 bisect_right 來跳過重複的可能如 s = "aabc" t = "xaabc", 的第二個 a 處理時可能會遇到的狀況
+    - O(len(s) * log(len(t)))
+
+### 類似題
+- LC72. Edit Distance
+- LC1143. Longest Common Subsequence
+
+- 很像但不一樣
+    - LC10. Regular Expression Matching
+
+### Code
+Naive
+``` py
+class Solution:
+    def isSubsequence(self, s: str, t: str) -> bool:
+        i, j = 0, 0
+        while i < len(s) and j < len(t):
+            if s[i] == t[j]:
+                i, j = i+1, j+1
+            else:
+                j += 1
+        if i == len(s):
+            return True
+        elif j == len(t):
+            return False
+```
+
+Greedy
+``` py
+class Solution:
+    def isSubsequence(self, s: str, t: str) -> bool:
+        i, j = 0, 0
+        while i < len(s) and j < len(t):
+            if s[i] == t[j]:
+                i += 1
+            j += 1
+        return i == len(s)
+```
+
+DP
+``` py
+class Solution:
+    def isSubsequence(self, s: str, t: str) -> bool:
+        if not s:
+            return True
+        dp = [[0 for _ in range(len(t)+1)] for _ in range(len(s)+1)]
+        max_count = 0
+        for i in range(1, len(s)+1):
+            for j in range(1, len(t)+1):
+                if s[i-1] == t[j-1]:
+                    dp[i][j] = dp[i-1][j-1] + 1
+                    if dp[i][j] == len(s):
+                        return True
+                else:
+                    dp[i][j] = max(dp[i][j-1], dp[i-1][j])
+        return False
+```
+
+BinarySeach + HashTable -> good for FollowUp
+```py
+class Solution:
+    def isSubsequence(self, s: str, t: str) -> bool:
+        char2index = defaultdict(list)
+        for i, c in enumerate(t):
+            char2index[c].append(i)
+
+        prev_match = -1
+        for char in s:
+            if char not in char2index:
+                return False
+            indexs = char2index[char]
+            pos = bisect.bisect_right(indexs, prev_match)
+            if pos == len(indexs): # find till the end
+                return False
+            prev_match = indexs[pos]
+        return True
+```
+
+### Tag: #DP #BinarySeach #HashTable
+---
