@@ -37412,6 +37412,48 @@ class TimeMap:
         return cur_list[l][1] if cur_list[l][0] <= timestamp else ""
 ```
 
+Using lib better
+```py
+class TimeMap:
+
+    def __init__(self):
+        self.table = {}
+
+    def set(self, key: str, value: str, timestamp: int) -> None:
+        if key not in self.table:
+            self.table[key] = [[int(timestamp)], [value]]
+        else:
+            self.table[key][0].append(int(timestamp))
+            self.table[key][1].append(value)
+
+    def get(self, key: str, timestamp: int) -> str:
+        if key not in self.table:
+            return ""
+        times, vals = self.table[key]
+        pos = bisect.bisect_right(times, timestamp)
+
+        return vals[pos-1] if times[pos-1] <= timestamp else ""
+```
+
+Using lib
+```py
+class TimeMap:
+
+    def __init__(self):
+        self.table = defaultdict(list)
+
+    def set(self, key: str, value: str, timestamp: int) -> None:
+        self.table[key].append((timestamp, value))
+
+    def get(self, key: str, timestamp: int) -> str:
+        if not self.table[key]:
+            return ""
+        cur_list = self.table[key]
+        pos = bisect.bisect_right(cur_list, (timestamp, "~")) # "~" is greater than A-Z a-z
+
+        return cur_list[pos-1][1] if cur_list[pos-1][0] <= timestamp else ""
+```
+
 ### Tag: #HashTable #BinarySeach
 ---
 ## 1086. High Five｜ 6/23
