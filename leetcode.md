@@ -36689,6 +36689,7 @@ Constraints:
     2. 我們的解題大綱就是 先找到某個位置是互相相等的，在不停地往後移動指針，看能走多遠
     3. 利用這個概念我們可以用 DP 優化解法
 2. DP
+    0. ![](assets/markdown-img-paste-20210704180318403.png)
     1. 由上述的概念我們可以發現, 兩個新指針指到的值若是一樣, 我們就可以將 k+1, 而這個 k 我們其實可以重複利用不必每次都從零計算起, 只要我們能夠取得這兩個新指針各自的前一位所算出的 k
     2. 由上述的想法可以得到 `dp[i+1][j+1] = dp[i][j] + 1 if nums1[i] == nums2[j]`
 3. Sliding Window
@@ -36727,13 +36728,13 @@ DP (Optimal)
 ```py
 class Solution:
     def findLength(self, nums1: List[int], nums2: List[int]) -> int:
-        n1, n2 = len(nums1), len(nums2)
-        dp = [[0 for _ in range(n2+1)] for _ in range(n1+1)]
-        for i in range(n1):
-            for j in range(n2):
-                if nums1[i] == nums2[j]:
-                    dp[i+1][j+1] = dp[i][j]+1
-        return max(max(r) for r in dp)
+        dp = [[0 for _ in range(len(nums1)+1)] for _ in range(len(nums2)+1)]
+
+        for i in range(1, len(nums2)+1):
+            for j in range(1, len(nums1)+1):
+                if nums2[i-1] == nums1[j-1]:
+                    dp[i][j] = dp[i-1][j-1] + 1
+        return max(max(row) for row in dp)
 ```
 
 Sliding Window (Optimal)

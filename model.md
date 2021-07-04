@@ -888,7 +888,20 @@ def DFS(tree):
     1. 需直接思考到`如何定義子問題`
     2. `子問題的狀態如何轉移`
     3. 大部分的題
-    4. 空間優化
+    4. 範例 LC 718. Maximum Length of Repeated Subarray
+        1. ![](assets/markdown-img-paste-20210704180318403.png)
+            ```py
+            class Solution:
+                def findLength(self, nums1: List[int], nums2: List[int]) -> int:
+                    dp = [[0 for _ in range(len(nums1)+1)] for _ in range(len(nums2)+1)]
+
+                    for i in range(1, len(nums2)+1):
+                        for j in range(1, len(nums1)+1):
+                            if nums2[i-1] == nums1[j-1]:
+                                dp[i][j] = dp[i-1][j-1] + 1
+                    return max(max(row) for row in dp)
+            ```
+    5. 空間優化
         - 寫完後我們可以觀察我們的狀態轉移會使用到過去的值是不是很少, 如果只會用到前 1 個 column, 那麼我們其實可以不用用 2D array 去存所有值
         - 用兩個一維陣列, previous and current 即可去代表 dp[i-1], dp[i]
         - 詳見例題: LC1143
