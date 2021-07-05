@@ -1003,6 +1003,29 @@ For example, given n = 3, a solution set is:
   "()(())",
   "()()()"
 ]
+
+### 解題分析
+1. Recursive
+    1. 遞歸法去求解, 給遞歸函式一個額度, 額度用完就可以 append 了
+    2. 這題對於遞歸的限制就是,
+        1. 要使用 左括號, left 一定要有額度 (廢話)
+        2. 要使用 右括號, left 使用的數量一定要 > right, 也就是 right 的剩餘數量一定要 > left
+
+2. DP
+    1. 這種窮舉 combination 的題, 要使用 DP 的話一定是透過前一個狀態的子集合去發展而來, 而這題的規則就是:
+        1. 取出上一個狀態的所有組合
+        2. 只要遇到左括號, 就能在其後增加一組 `"()"`
+        3. 最後一個右括號的右邊, 也要增加一組 `"()"`
+        4. 例子
+            1. 舊狀態: (), 新狀態可得
+                2. (()) -- 在第一個左括後面加
+                3. ()() -- 在最後一個又括號後面加
+        5. 然而, 會有重複的情形, 因此加入前須先在 set 裡檢查:
+            1. 現在這個狀態 `"(()) (())"`, 可由同樣的上個狀態生成而來
+                1. ()(()) -- 在第一個左瓜插入時
+                2. (())() -- 在最後一個左瓜插入時
+
+
 ### 思路
 Backtrack 的精髓就是現在這個解在backtrack之後可以發展出其他可能的解
 Recursion 考慮的三要素：Coice, Constrain, Goal
@@ -1034,6 +1057,27 @@ class Solution:
             self.recursive(comb + ")", left, right-1)
 ```
 
+DP
+```py
+class Solution:
+    def generateParenthesis(self, n: int) -> List[str]:
+        arr = [["()"]]
+        for i in range(1, n):
+            new_combs = []
+            new_combs_set = set()
+            for comb in arr[i-1]:
+                for k, c in enumerate(comb):
+                    if c == '(':
+                        new_comb = comb[:k+1] + "()" + comb[k+1:]
+                        if new_comb not in new_combs_set:
+                            new_combs_set.add(new_comb)
+                            new_combs.append(new_comb)
+            new_combs.append(arr[i-1][-1]+"()")
+            arr.append(new_combs)
+        return arr[n-1]
+```
+
+
 ``` c++
 class Solution {
 public:
@@ -1061,7 +1105,7 @@ private:
     }
 };
 ```
-
+### Tag: #Recursive #DP
 ---
 
 ## 301. Remove Invalid Parentheses
