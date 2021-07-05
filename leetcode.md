@@ -18250,7 +18250,7 @@ class Solution:
 ```
 ### Tag: #DP
 ---
-## 63. Unique Paths II｜ 11/25
+## 63. Unique Paths II｜ 11/25 | [ Review * 1 ]
 A robot is located at the top-left corner of a m x n grid (marked 'Start' in the diagram below).
 
 The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below).
@@ -18275,23 +18275,20 @@ Now consider if some obstacles are added to the grids. How many unique paths wou
 ``` py
 class Solution:
     def uniquePathsWithObstacles(self, obstacleGrid: List[List[int]]) -> int:
-        m, n = len(obstacleGrid), len(obstacleGrid[0])
-        if m == 0 or n == 0 or obstacleGrid[0][0] == 1:
-            return 0
+        r, c = len(obstacleGrid), len(obstacleGrid[0])
+        dp = [[0 for _ in range(c+1)] for _ in range(r+1)]
 
-        dp = [ [0] * (n+1) ] * (m+1)
-
-        for i in range(1, m+1):
-            for j in range(1, n+1):
-                if i == 1 and j == 1:
-                    dp[i][j] = 1
+        for i in range(1, r+1):
+            for j in range(1, c+1):
                 if obstacleGrid[i-1][j-1] == 1:
                     dp[i][j] = 0
+                elif i == 1 and j == 1:
+                    dp[i][j] = 1
                 else:
                     dp[i][j] = dp[i-1][j] + dp[i][j-1]
-
         return dp[-1][-1]
 ```
+### Tag: #DP
 ---
 ## 64. Minimum Path Sum｜ 11/25
 
