@@ -10975,7 +10975,7 @@ Recursive approach
 
 這道題要求兩個已經排好序的數列的中位數。中位數的定義：如果數列有偶數個數，那麼中位數為中間兩個數的平均值；如果數列有奇數個數，那麼中位數為中間的那個數。比如{1，2，3，4，5}的中位數為3。{1，2，3，4，5，6}的中位數為（3+4）/ 2 = 3.5。那麼這題最直接的思路就是將兩個數列合併在一起，然後排序，然後找到中位數就行了。可是這樣最快也要O((m+n)log(m+n))的時間複雜度
 
-首先我們來看如何找到兩個數列的第k小個數，即程序中getKth(A, B , k)函數的實現。用一個例子來說明這個問題：A = {1，3，5，7}；B = {2，4，6，8，9，10}；如果要求第7個小的數，A數列的元素個數為4，B數列的元素個數為6；k/2 = 7/2 = 3，而A中的第3個數A[2]=5；B中的第3個數B[2]=6；而A[2]<B[2]；則A[0]，A[1]，A[2]中必然不可能有第7個小的數。因為A[2]<B[2]，所以比A[2]小的數最多可能為A[0], A[1], B[0], B[1]這四個數，也就是說A[2]最多可能是第5個大的數，由於我們要求的是getKth(A, B, 7)；現在就變成了求getKth(A', B, 4)；即A' = {7}；B不變，求這兩個數列的第4個小的數，因為A[0]，A[1]，A[2]中沒有解，所以我們直接刪掉它們就可以了。
+首先我們來看如何找到兩個數列的第k小個數，即程序中getKth(A, B , k)函數的實現。用一個例子來說明這個問題：A = {1，3，5，7}；B = {2，4，6，8，9，10}；如果要求第7個小的數，A數列的元素個數為4，B數列的元素個數為6；k/2 = 7/2 = 3，而A中的第3個數A[2]=5；B中的第3個數B[2]=6；而A[2]< B[2]；則A[0]，A[1]，A[2]中必然不可能有第7個小的數。因為A[2]< B[2]，所以比A[2]小的數最多可能為A[0], A[1], B[0], B[1]這四個數，也就是說A[2]最多可能是第5個大的數，由於我們要求的是getKth(A, B, 7)；現在就變成了求getKth(A', B, 4)；即A' = {7}；B不變，求這兩個數列的第4個小的數，因為A[0]，A[1]，A[2]中沒有解，所以我們直接刪掉它們就可以了。
 
 ![](assets/markdown-img-paste-20190831094519590.png)
 
@@ -11090,10 +11090,54 @@ class Solution(object):
 ### Tag: #BinarySearch
 
 ---
-## 5. Longest Palindromic Substring｜ 8/31
+## 5. Longest Palindromic Substring｜ 8/31 | [ Review * 1 ]
 Given a string s, find the longest palindromic substring in s. You may assume that the maximum length of s is 1000.
 
 ![](assets/markdown-img-paste-20191003093051775.png)
+
+### 解題分析
+0. Brute Force
+    1. 直接嘗試所有 s[i:j] 的所有組合, 並檢查其是否為回文
+    2. O(N^3)
+1. DP
+    1. 思考:
+        1. 我們先從所求開始, str = s[i:j] 什麼情況為回文?
+        2. 想到回文就要想到, 取出中心區域若是回文, 其前半部、後半部也均為回文
+        3. 以例子 "babbab" -> 若以知 "abba" 為回文的狀況下, 又 "b" == "b" -> 其就是回文
+    2. 狀態轉移式:
+        1. dp[i][j] 為 s[i:j+1] 是否為回文
+        2. dp[i][j] = dp[i+1][j-1] and dp[i] == dp[j]
+    3. Base Case:
+        1. `i == j`: "a" -> 直接為回文
+        2. `i+1 == j` and `s[i+1] == s[j]`: "aa" -> 為回文
+    4. 如何填表:
+        1. 此題 tricky 的 part 就在於我們需要依賴的是未來的結果 (dp[i+1]), 因此我們必須要由後往前填
+            - 因此外層 for loop 由後往前
+        2. 只需填 右上半部的部份因為 `j >= i`
+            - 因此內層 for loop j 由 i 開始填
+    5. 例圖:
+        - ![](assets/markdown-img-paste-20210705144100631.png)
+    6. 優化:
+        - 因為只會用到上一層的結果, 我們就使用模版裡面使用的優化技巧
+        - 結果竟然就 AC 了ㄎㄎ
+    7. Time (優化後):
+        - Time: O(N^2)
+        - Space: O(N)
+
+
+2. TwoPointer
+    2. 透過回文的性質: 對稱中央, 來解題
+    3. 我們透過把每一個點當作中央, 來向兩邊擴張, 求出此點作為中央可生成多大的回文
+    4. 再將 start, end of 此回文記錄下來供最後回傳
+    5. 求出 start, end 的時候就帶入例子
+        - ![](assets/markdown-img-paste-20210705164355426.png)
+    6. Time:
+        - Time: O(N^2)
+        - Space: O(1)
+
+3. 馬拉車算法
+    - 不想研究ㄎㄎ
+
 ### 思路
 中心思想就是用迴圈去找到回文的中心點
 
@@ -11108,8 +11152,71 @@ Time complexity O(n^n)
 https://www.cnblogs.com/grandyang/p/4475985.html
 
 ### Code
-Naive Solution:
+DP Solution (TLE):
+```py
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        dp = [[False for _ in range(len(s))] for _ in range(len(s))]
+        max_str = ""
+        for i in range(len(s)-1, -1, -1):
+            for j in range(i, len(s)):
+                if i == j:
+                    dp[i][j] = True
+                elif i+1 == j:
+                    dp[i][j] = (s[i] == s[j])
+                else:
+                    dp[i][j] = (s[i] == s[j] and dp[i+1][j-1])
 
+                if dp[i][j] and j-i+1 > len(max_str):
+                    max_str = s[i:j+1]
+        return max_str
+```
+
+DP Solution with Space Optimize (AC):
+```py
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        dp = [False for _ in range(len(s))]
+        prev = [False for _ in range(len(s))]
+        max_str = ""
+        for i in range(len(s)-1, -1, -1):
+            for j in range(i, len(s)):
+                if i == j:
+                    dp[j] = True
+                elif i+1 == j:
+                    dp[j] = (s[i] == s[j])
+                else:
+                    dp[j] = (s[i] == s[j] and prev[j-1])
+
+                if dp[j] and j-i+1 > len(max_str):
+                    max_str = s[i:j+1]
+            dp, prev = prev, dp
+        return max_str
+```
+
+TwoPointer (Optimal)
+```py
+class Solution:
+    def longestPalindrome(self, s: str) -> str:
+        self.s = s
+        start, end = 0, 0
+        for i in range(len(s)):
+            even_palin_len = self.spand_from_center(i, i)
+            odd_palin_len = self.spand_from_center(i, i+1)
+            cur_max_len = max(even_palin_len, odd_palin_len)
+            if cur_max_len > end - start:
+                start = i - (cur_max_len-1) // 2
+                end = i + cur_max_len // 2
+        return s[start:end+1]
+
+    def spand_from_center(self, l, r):
+        s = self.s
+        while l >= 0 and r < len(s) and s[l] == s[r]:
+            l, r = l-1, r+1
+        return r-l-1 # d abba c -> 5-0-1
+```
+
+TwoPointer(Naive):
 ``` py
 class Solution(object):
     def longestPalindrome(self, s):
@@ -11137,6 +11244,7 @@ class Solution(object):
         return s[l+1 : r]
 
 ```
+### Tag: #DP #TwoPointer
 ---
 ## 200. Number of Islands｜ 8/31 | [ Review * 1 ]
 Given a 2d grid map of '1's (land) and '0's (water), count the number of islands. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
