@@ -18218,7 +18218,7 @@ class Solution:
 ```
 ### Tag: #LinkedList
 ---
-## 62. Unique Paths｜ 11/25
+## 62. Unique Paths｜ 11/25 | [ Review * 1 ]
 A robot is located at the top-left corner of a m x n grid (marked 'Start' in the diagram below).
 
 The robot can only move either down or right at any point in time. The robot is trying to reach the bottom-right corner of the grid (marked 'Finish' in the diagram below).
@@ -18235,19 +18235,20 @@ How many possible unique paths are there?
 
 現態、次態
 
-![](assets/markdown-img-paste-20191125205915515.png)
+![](assets/markdown-img-paste-20210705205254145.png)
 
 ### Code
 ``` py
 class Solution:
     def uniquePaths(self, m: int, n: int) -> int:
-        dp = [[1] * n]*m
+        dp = [[1 for _ in range(m)] for _ in range(n)]
 
-        for i in range(1, m):
-            for j in range(1, n):
-                dp[i][j] = dp[i][j-1] + dp[i-1][j]
+        for i in range(1, n):
+            for j in range(1, m):
+                dp[i][j] = dp[i-1][j] + dp[i][j-1]
         return dp[-1][-1]
 ```
+### Tag: #DP
 ---
 ## 63. Unique Paths II｜ 11/25
 A robot is located at the top-left corner of a m x n grid (marked 'Start' in the diagram below).
