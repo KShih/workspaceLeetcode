@@ -18290,7 +18290,7 @@ class Solution:
 ```
 ### Tag: #DP
 ---
-## 64. Minimum Path Sum｜ 11/25
+## 64. Minimum Path Sum｜ 11/25 | [ Review * 1 ]
 
 Given a m x n grid filled with non-negative numbers, find a path from top left to bottom right which minimizes the sum of all numbers along its path.
 
@@ -18299,6 +18299,20 @@ Note: You can only move either down or right at any point in time.
 Example:
 
 ![](assets/markdown-img-paste-20191125231504996.png)
+
+### 解題分析
+1. DP
+    1. 狀態轉移:
+        - dp[i][j] = min(上, 左) + cur
+    2. Base Case:
+        - 第一行跟第一列: 均為累積數組 上 or 左 + cur
+        - 這邊可以初始化邊界為 0 就不用去判斷該加上還是左了
+    3. 優化
+        1. 仿造 dp space model 優化空間
+            - Space: O(len(col))
+        2. 直接修改 grid array
+            - Space: O(1)
+
 ### 思路
 
 DP 思維:
@@ -18310,30 +18324,58 @@ DP 思維:
 像這題，能一路走到右 或 一路走到底, 就是已知, 須先初始化
 
 ### Code
+DP
 ``` py
 class Solution:
     def minPathSum(self, grid: List[List[int]]) -> int:
-        if not grid:
-            return 0
-        m, n = len(grid), len(grid[0])
+        r, c = len(grid), len(grid[0])
+        dp = [[0 for _ in range(c+1)] for _ in range(r+1)]
 
-        dp = [[0 for _ in range(n)] for _ in range(m)]
-
-        dp[0][0] = grid[0][0]
-
-        for i in range(1, m):
-            dp[i][0] = dp[i-1][0] + grid[i][0]
-
-        for j in range(1, n):
-            dp[0][j] = dp[0][j-1] + grid[0][j]
-
-
-        for i in range(1, len(grid)):
-            for j in range(1, len(grid[0])):
-                dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i][j]
-
+        for i in range(1, r+1):
+            for j in range(1, c+1):
+                if i == 1 or j == 1:
+                    dp[i][j] = dp[i-1][j] + dp[i][j-1] + grid[i-1][j-1]
+                else:
+                    dp[i][j] = min(dp[i-1][j], dp[i][j-1]) + grid[i-1][j-1]
         return dp[-1][-1]
 ```
+
+DP (Optimal)
+```py
+class Solution:
+    def minPathSum(self, grid: List[List[int]]) -> int:
+        r, c = len(grid), len(grid[0])
+        dp = [0 for _ in range(c+1)]
+        prev = [0 for _ in range(c+1)]
+
+        for i in range(1, r+1):
+            for j in range(1, c+1):
+                if i == 1 or j == 1:
+                    dp[j] = prev[j] + dp[j-1] + grid[i-1][j-1]
+                else:
+                    dp[j] = min(prev[j], dp[j-1]) + grid[i-1][j-1]
+            dp, prev = prev, dp
+        return prev[-1]
+```
+
+DP (Optimal)
+```py
+class Solution:
+    def minPathSum(self, grid: List[List[int]]) -> int:
+        r, c = len(grid), len(grid[0])
+
+        for i in range(r-1, -1, -1):
+            for j in range(c-1, -1, -1):
+                if i == r-1 and j != c-1:
+                    grid[i][j] += grid[i][j+1]
+                elif i != r-1 and j == c-1:
+                    grid[i][j] += grid[i+1][j]
+                elif i != r-1 and j != c-1:
+                    grid[i][j] += min(grid[i+1][j], grid[i][j+1])
+        return grid[0][0]
+```
+
+### Tag: #DP
 ---
 ## 66. Plus One｜ 11/26
 Given a non-empty array of digits representing a non-negative integer, plus one to the integer.
