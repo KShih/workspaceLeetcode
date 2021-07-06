@@ -2478,16 +2478,35 @@ public:
 ```
 ### Tag: #DivideAndConquer #Recursive
 ---
-## !95. Unique Binary Search Trees II(Medium)｜ 4/22
+## 95. Unique Binary Search Trees II｜ 4/22 | [ Review * 1 ]
 
-### 4/28 review(X)
-```c++
-for(l:left){
-    for(r:right){
-        ...
-    }
-}
-```
+Given an integer n, return all the structurally unique BST's (binary search trees), which has exactly n nodes of unique values from 1 to n. Return the answer in any order.
+
+Example 1:
+
+- ![](assets/markdown-img-paste-20210706193141581.png)
+- Input: n = 3
+- Output: [[1,null,2,null,3],[1,null,3,2],[2,1,3],[3,1,null,null,2],[3,2,null,1]]
+
+Example 2:
+
+- Input: n = 1
+- Output: [[1]]
+
+Constraints:
+
+- 1 <= n <= 8
+
+### 解題分析
+
+- DP w/ memo
+    - ![](assets/markdown-img-paste-20210706193317630.png)
+    - 我們可以選擇 start ~ end 的任一點作為跟節點, 那麼其右邊的均為其右子數, 左邊亦然
+    - 那麼對於左右邊的子樹, 我們若能分別找出其可生成的樹的組合, 互相組合起來即為所求
+    - 這就是很典型的 recursive 的問題
+    - Show How memo hits
+        - ![](assets/markdown-img-paste-20210706194605859.png)
+
 ### 思路
 
 如下圖，我們讓1~n的每個數當當看root，並回傳所有可能解
@@ -2503,16 +2522,35 @@ for(l:left){
 ![](assets/markdown-img-paste-20190629234149216.png)
 
 ### Code
+TopDown with memo
+```py
+class Solution:
+    def generateTrees(self, n: int) -> List[TreeNode]:
+        memo = {}
+        def gen_tree(start, end):
+            if start > end:
+                return [None]
+
+            if (start, end) not in memo:
+                res = []
+                for i in range(start, end+1):
+                    left_trees = gen_tree(start, i-1)
+                    right_trees = gen_tree(i+1, end)
+
+                    for left_tree in left_trees:
+                        for right_tree in right_trees:
+                            root = TreeNode(i)
+                            root.left = left_tree
+                            root.right = right_tree
+                            res.append(root)
+                memo[(start, end)] = res
+
+            return memo[(start, end)]
+
+        return gen_tree(1, n)
+```
+
 ``` c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
 class Solution {
 public:
     vector<TreeNode*> generateTrees(int n) {
@@ -2543,7 +2581,7 @@ public:
     }
 };
 ```
-
+### Tag: #DP #Recursive
 ---
 ## !842. Split Array into Fibonacci Sequence(Medium)｜ 4/22 | [Review*1]
 Given a string S of digits, such as S = "123456579", we can split it into a Fibonacci-like sequence [123, 456, 579].
