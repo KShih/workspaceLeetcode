@@ -39396,3 +39396,93 @@ class Solution:
 
 ### Tag: #DP
 ---
+## 980. Unique Paths III｜ 7/6
+On a 2-dimensional grid, there are 4 types of squares:
+
+- 1 represents the starting square.  There is exactly one starting square.
+- 2 represents the ending square.  There is exactly one ending square.
+- 0 represents empty squares we can walk over.
+- -1 represents obstacles that we cannot walk over.
+- Return the number of 4-directional walks from the starting square to the ending square, that walk over every non-obstacle square exactly once.
+
+Example 1:
+
+- Input: [[1,0,0,0],[0,0,0,0],[0,0,2,-1]]
+- Output: 2
+- Explanation: We have the following two paths:
+- 1. (0,0),(0,1),(0,2),(0,3),(1,3),(1,2),(1,1),(1,0),(2,0),(2,1),(2,2)
+- 2. (0,0),(1,0),(2,0),(2,1),(1,1),(0,1),(0,2),(0,3),(1,3),(1,2),(2,2)
+
+Example 2:
+
+- Input: [[1,0,0,0],[0,0,0,0],[0,0,0,2]]
+- Output: 4
+- Explanation: We have the following four paths:
+- 1. (0,0),(0,1),(0,2),(0,3),(1,3),(1,2),(1,1),(1,0),(2,0),(2,1),(2,2),(2,3)
+- 2. (0,0),(0,1),(1,1),(1,0),(2,0),(2,1),(2,2),(1,2),(0,2),(0,3),(1,3),(2,3)
+- 3. (0,0),(1,0),(2,0),(2,1),(2,2),(1,2),(1,1),(0,1),(0,2),(0,3),(1,3),(2,3)
+- 4. (0,0),(1,0),(2,0),(2,1),(1,1),(0,1),(0,2),(0,3),(1,3),(1,2),(2,2),(2,3)
+
+Example 3:
+
+- Input: [[0,1],[2,0]]
+- Output: 0
+- Explanation:
+- There is no path that walks over every empty square exactly once.
+- Note that the starting and ending square can be anywhere in the grid.
+
+Note:
+
+- 1 <= grid.length * grid[0].length <= 20
+
+### 解題分析
+1. 前兩個系列都是 DP, 這題該用 DP 還是 backtrack?
+    1. grid size is no more than 20
+        - 表示 recursion tree 的深度是足夠小可以不會 overflow 的
+        - 那這裡又要提問了, 什麼樣叫做足夠小呢?
+    2. 因為這題可允許4個方向, 且起點也不在 (0, 0)
+        - 這兩個因素加起來會導致無法定義舊狀態與新狀態的關係
+    3. 因此使用 backtrack 才是最正確的解法
+2. 小細節
+    1. 在統計 empty 作為 countdown 時要注意應該要從 1 開始
+    2. 因為我們在最後一步 reach 終點時, empty 也會跟著減1, 這一步也必須算進去
+3. complexity
+    1. Time: 3^n
+        - 理論上應該是 4 個方向, 但其中一個方向 is where we come, 因此那個方向會直接 return
+    2. Space: O(1)
+        - 因為我們用 in memory modify visit, 因此不需額外弄個 visited
+
+### Code
+``` py
+class Solution:
+    def uniquePathsIII(self, grid: List[List[int]]) -> int:
+        def dfs(x0, y0, empty):
+            if not (0 <= x0 < r and 0 <= y0 < c and grid[x0][y0] >= 0):
+                return
+
+            if grid[x0][y0] == 2:
+                self.res += empty == 0
+                return
+            else:
+                grid[x0][y0] = -2
+                dfs(x0+1, y0, empty-1)
+                dfs(x0-1, y0, empty-1)
+                dfs(x0, y0+1, empty-1)
+                dfs(x0, y0-1, empty-1)
+                grid[x0][y0] = 0
+
+        self.res = 0
+        x, y, empty = None, None, 1 # empty should set to 1 not 0, since end should be counted
+        r, c = len(grid), len(grid[0])
+        for i in range(r):
+            for j in range(c):
+                if grid[i][j] == 1:
+                    x, y = i, j
+                elif grid[i][j] == 0:
+                    empty += 1
+        dfs(x, y, empty)
+        return self.res
+```
+
+### Tag: #Recursive
+---
