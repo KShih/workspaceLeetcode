@@ -16643,7 +16643,7 @@ class Solution:
 ```
 ### Tag: #DP
 ---
-## 91. Decode Ways｜ 10/28
+## 91. Decode Ways｜ 10/28 | [ Review * 1 ]
 A message containing letters from A-Z is being encoded to numbers using the following mapping:
 
 'A' -> 1
@@ -16670,6 +16670,40 @@ Input: "226"
 Output: 3
 
 Explanation: It could be decoded as "BZ" (2 26), "VF" (22 6), or "BBF" (2 2 6).
+
+### 解題分析
+1. Recursive
+    1. 有條件式的 Recursive
+2. DP
+    1. 由 recursive 可見後面的結果是前面的結果(idx+1, idx+2), 累加而來 (res += 1)
+    2. 因此此題可以用 dp 去優化
+    3. 那麼想法上就可以在做更明確的改變
+        1. dp[i] 可由 dp[i-1] 再跨一步來
+        2. 或由 dp[i-2] 再跨兩步來
+        3. 因為我們討論的是方法數, 而不是步伐術, 因此這邊不用加上步數
+        4. 所以理論上 dp[i] = dp[i-1] + dp[i-2], 然而卻不能直接加, 因為這題是有限制的
+            1. dp[i] = dp[i-1] if s[i-1] != 0
+                - 條件: 只有在此數不為零時才能繼承上一個狀態
+            2. dp[i] += dp[i-2]
+                - 條件: 前一數+此數, `>= 10`, 且 `<= 26`, 時才能
+                - 注意加入 `>= 10`, 可以順邊幫我們處理掉 `"03"` 這種狀況
+        5. Base Case:
+            - 因為我們是 dp[i] = dp[i-1], 因此 i-1 必須要有值才能有累積的效果
+            - 因此我們的 base case dp[0] 的意義就是, count, 而此題就是 1 or 0
+                - 因此我們先判斷 s[0] 是否不為零, 如果為零的話, 整排都要是無效的結果, 不為零就要讓他有累積1 的效果
+                - You have a string "12" , either you can decode it as '2' or '12'.
+                - Now if you select "12" , then dp[2] += dp[0].
+                - If dp[0] is 0, you wont count '12' as a way to decode. Hence dp[0] needs to be 1.
+        6. Conter Case:
+            - "2301" 的 dp array 會長什麼樣?
+                - [1,1,2,0,0]
+                - 當處理到 0 的時候, 他不會進任何的累加處, 因此會 remain zero
+
+### 類似題
+1. LC63 Unique Paths II
+    - LC63 為由上, 左累加而來
+    - 此題為由前, 前前累加而來
+
 ### 思路
 
 這道題要求解碼方法，跟之前那道 Climbing Stairs 非常的相似，但是還有一些其他的限制條件，比如說一位數時不能為0，兩位數不能大於 26，其十位上的數也不能為0，除去這些限制條件，跟爬梯子基本沒啥區別
@@ -16679,24 +16713,40 @@ dp[i] 表示s中前i個字符組成的子串的解碼方法的個數，長度比
 所以0是個很特殊的存在，若當前位置是0，那麼一定無法單獨拆分出來，即不能加上 dp[i-1]，就只能看否跟前一個數字組成大於等於 10 且小於等於 26 的數，能的話可以加上 dp[i-2]，否則就只能保持為0了
 
 ### Code
+DP
 ``` py
 class Solution:
     def numDecodings(self, s: str) -> int:
-        if s[0] == "0": return 0
-        dp = [0] * (len(s)+1) # 因為是站在後面往前看, 所以要多一個空間
-        dp[0] = 1
+        dp = [0 for _ in range(len(s)+1)]
+        dp[0] = 1 if s[0] != '0' else 0
+        for i in range(1, len(s)+1):
+            if s[i-1] != "0":
+                dp[i] = dp[i-1]
 
-        # 站在下一位往前看 所以才會 i-1, 其實意思就是個位數
-        for i in range(1,len(s)+1):
-            if s[i-1] != "0": # 步伐一步, 個位數為零不能單拆, 但扔然有機會組成10 or 20
-                dp[i] += dp[i-1]
-
-            # 加上十位數之後 range必須在10~26之間
-            if i > 1 and "10" <= s[i-2:i] and s[i-2:i] <= "26":
+            if i-2 >= 0 and "10" <= s[i-2] + s[i-1] <= "26": # 1103 -> 10 will fit, 03 will not fit
                 dp[i] += dp[i-2]
-
         return dp[-1]
 ```
+
+Recursive (TLE)
+```py
+class Solution:
+    def numDecodings(self, s: str) -> int:
+        self.res = 0
+        def recur(idx):
+            if idx > len(s):
+                return
+            if idx == len(s):
+                self.res += 1
+                return
+            if s[idx] != '0':
+                recur(idx+1)
+            if "10" <= s[idx:idx+2] <= "26":
+                recur(idx+2)
+        recur(0)
+        return self.res
+```
+### Tag: #DP
 ---
 ## 202. Happy Number｜ 11/3 | [ Review * 1 ]
 (Easy)
