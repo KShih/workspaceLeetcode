@@ -15378,10 +15378,16 @@ if __name__ == '__main__':
 ---
 #### **Review Tree**
 ---
-## 96. Unique Binary Search Trees｜ 10/18
+## 96. Unique Binary Search Trees｜ 10/18 | [ Review * 1 ]
 Given n, how many structurally unique BST's (binary search trees) that store values 1 ... n?
 
 ![](assets/markdown-img-paste-20191018103446639.png)
+
+### 解題分析
+1. ![](assets/markdown-img-paste-20210707133236478.png)
+2. 參考 LC95 的概念, 1 ~ n, 把每一個都當當看 root, 遞迴左半部, 遞迴右半部
+    - 而左半, 右半我們不在意裡面的值的時候, 我們關心的的就是 **到底 range 多廣**
+    - 因此我們可以把該 range 結果(組合數), 用 dp array 存起來重複利用
 
 ### 思路
 The problem is to get the number of unique structurally BST that stores 1...n.
@@ -15406,22 +15412,18 @@ base case result[0] = 1 which represents an empty tree
 
 ### Code
 ``` py
-class Solution(object):
-    def numTrees(self, n):
-        """
-        :type n: int
-        :rtype: int
-        """
-        if n == 1:  return 1
-        state = [0] * (n+1) # we want state[n] as the answer, so initial to N+1
+class Solution:
+    def numTrees(self, n: int) -> int:
+        dp = [0 for _ in range(n+1)]
+        dp[0] = 1
+        dp[1] = 1
 
-        state[0] = 1 # initial
-        for i in range(1, n+1):
-            for r in range(1, i+1):
-                state[i] += state[r-1] * state[i-r]
-
-        return state[n]
+        for i in range(2, n+1):
+            for root in range(1, i+1):
+                dp[i] += dp[root-1] * dp[i-root]
+        return dp[n]
 ```
+### Tag: #DP
 ---
 ## 105. Construct Binary Tree from Preorder and Inorder Traversal｜ 10/18 | [ Review * 1 ]
 Given preorder and inorder traversal of a tree, construct the binary tree.
