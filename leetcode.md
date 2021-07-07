@@ -20130,7 +20130,7 @@ class Solution:
 ```
 ### Tag: #DP
 ---
-## 120. Triangle｜ 1/26
+## 120. Triangle｜ 1/26 | [ Review * 1 ]
 
 Given a triangle, find the minimum path sum from top to bottom. Each step you may move to adjacent numbers on the row below.
 
@@ -20147,6 +20147,10 @@ The minimum path sum from top to bottom is 11 (i.e., 2 + 3 + 5 + 1 = 11).
 Note:
 
 Bonus point if you are able to do this using only O(n) extra space, where n is the total number of rows in the triangle.
+
+### 解題分析
+
+1. 如果我們知道未來的那條路有多困難, 我們現在就可以選比較好走的 -> 從後面走回去
 
 ### 思路
 
@@ -20207,6 +20211,7 @@ class Solution:
                 dp[j] = min(dp[j], dp[j+1]) + triangle[i][j]
         return dp[0]
 ```
+### Tag: #DP
 ---
 ## 122. Best Time to Buy and Sell Stock II｜ 1/27 | [ Review * 1 ]
 Say you have an array for which the ith element is the price of a given stock on day i.
