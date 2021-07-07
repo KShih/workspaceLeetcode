@@ -19362,7 +19362,7 @@ class Solution(object):
                 m -= 1
 ```
 ---
-## 97. Interleaving String｜ 12/5
+## 97. Interleaving String｜ 12/5 | [ Review * 1 ]
 Given s1, s2, s3, find whether s3 is formed by the interleaving of s1 and s2.
 
 Example 1:
@@ -19376,6 +19376,31 @@ Example 2:
 Input: s1 = "aabcc", s2 = "dbbca", s3 = "aadbbbaccc"
 
 Output: false
+
+### 解題分析
+1. Recursive
+    1. 一樣是 recursive, 然後試著用 memo 優化
+        1. 這裡的 memo 比較不一樣, 因為我們在原始 recursive 的時候寫的是如果 true 直接 return, fail 的話我們嘗試其他的遞迴可能
+        2. 因此我們只需要避免重複計算 fail 的狀況, 所以我們用一個 set 去追蹤處理過的 idx 即可 (如果已經知道是失敗的狀況根本不用再去遞迴嘗試)
+2. DP BottomUp
+    1. s1 = "a", s2 = "b", 可能為 True 的 s3 = "ab" or "ba"
+    2. 我們將 DP[i][j] 定義為 s3[:i+j] 可以與 s1[j:], 與 s2[i:] matching
+        - 也就是說 s3[i+j] 一定為 s1[j] or s2[i] 其中之一
+        - 因為不管是交錯 or One over another, 最後一個字一定是兩種之一
+    3. 轉移式
+        1. dp[i][j] = (dp[i][j-1] and s1[j-1] == s3[i+j-1]) or (dp[i-1][j] and s2[i-1] == s3[i+j-1])
+            - 此態 = 舊狀態 AND match (看圖比較好理解)
+                - 要 match s1的現態, 要檢查 s1[i-1] 的舊狀態
+                - 反之亦然
+            - Base Case:
+                - dp[0][0]
+                    - s1[0:], s2[0:] 可以 match s3[:0]
+                - dp[0][j]
+                    - 只需考慮 j 的狀況
+                - dp[i][0]
+                    - 只需考慮 i 的狀況
+    4. ![](assets/markdown-img-paste-20210707192551499.png)
+    5. 一樣可以只用一個一維去優化
 
 ### 技巧
 
@@ -19412,45 +19437,82 @@ s3 = abbbc
 ``` py
 class Solution:
     def isInterleave(self, s1: str, s2: str, s3: str) -> bool:
-        m, n, mn = len(s1), len(s2), len(s3)
-        if m + n != mn:
-            return False
-        if m == 0 and n == 0 and mn == 0:
+        if not s1 and not s2 and not s3:
             return True
-
-        if m > 0 and s1[0] == s3[0]:
+        if s1 and s3 and s1[0] == s3[0]:
             if self.isInterleave(s1[1:], s2, s3[1:]):
                 return True
-        if n > 0 and s2[0] == s3[0]:
+        if s2 and s3 and s2[0] == s3[0]:
             if self.isInterleave(s1, s2[1:], s3[1:]):
                 return True
         return False
 ```
 
-優化, cache紀錄path
+優化, cache紀錄path, 用idx而不是一直slice
 ``` py
 class Solution:
-    def __init__(self):
-        self.visited = set()
-
     def isInterleave(self, s1: str, s2: str, s3: str) -> bool:
-        m, n, mn = len(s1), len(s2), len(s3)
-        if m + n != mn:
+        n1, n2, n3 = len(s1), len(s2), len(s3)
+        memo = set()
+        def helper(idx1, idx2, idx3):
+            if idx1 == n1 and idx2 == n2 and idx3 == n3:
+                return True
+            if idx1 < n1 and idx3 < n3 and s1[idx1] == s3[idx3]:
+                if (idx1+1, idx2) not in memo:
+                    memo.add((idx1+1, idx2))
+                    if helper(idx1+1, idx2, idx3+1):
+                        return True
+            if idx2 < n2 and idx3 < n3 and s2[idx2] == s3[idx3]:
+                if (idx1, idx2+1) not in memo:
+                    memo.add((idx1, idx2+1))
+                    if helper(idx1, idx2+1, idx3+1):
+                        return True
             return False
-        if m == 0 and n == 0 and mn == 0:
-            return True
+        return helper(0, 0, 0)
+```
 
-        if m > 0 and s1[0] == s3[0]:
-            if (m-1, n) not in self.visited:
-                self.visited.add((m-1, n))
-                if self.isInterleave(s1[1:], s2, s3[1:]):
-                    return True
-        if n > 0 and s2[0] == s3[0]:
-            if (m, n-1) not in self.visited:
-                self.visited.add((m, n-1))
-                if self.isInterleave(s1, s2[1:], s3[1:]):
-                    return True
-        return False
+DP BottomUp (Optimal)
+```py
+class Solution:
+    def isInterleave(self, s1: str, s2: str, s3: str) -> bool:
+        if len(s1) + len(s2) != len(s3):
+            return False
+        dp = [[False for _ in range(len(s1)+1)] for _ in range(len(s2)+1)]
+
+        for i in range(len(s2)+1):
+            for j in range(len(s1)+1):
+                if i == 0 and j == 0:
+                    dp[i][j] = True
+                elif i == 0:
+                    dp[i][j] = dp[i][j-1] and s1[j-1] == s3[i+j-1]
+                elif j == 0:
+                    dp[i][j] = dp[i-1][j] and s2[i-1] == s3[i+j-1]
+                else:
+                    dp[i][j] = (dp[i][j-1] and s1[j-1] == s3[i+j-1]) or (dp[i-1][j] and s2[i-1] == s3[i+j-1])
+        return dp[-1][-1]
+```
+
+BottomUp Optimize (Optimal)
+```py
+class Solution:
+    def isInterleave(self, s1: str, s2: str, s3: str) -> bool:
+        if len(s1) + len(s2) != len(s3):
+            return False
+        dp = [False for _ in range(len(s1)+1)]
+        prev = [False for _ in range(len(s1)+1)]
+
+        for i in range(len(s2)+1):
+            for j in range(len(s1)+1):
+                if i == 0 and j == 0:
+                    dp[j] = True
+                elif i == 0:
+                    dp[j] = dp[j-1] and s1[j-1] == s3[i+j-1]
+                elif j == 0:
+                    dp[j] = prev[j] and s2[i-1] == s3[i+j-1]
+                else:
+                    dp[j] = (dp[j-1] and s1[j-1] == s3[i+j-1]) or (prev[j] and s2[i-1] == s3[i+j-1])
+            dp, prev = prev, dp
+        return prev[-1]
 ```
 
 不使用遞迴, 用stack:
@@ -19470,6 +19532,7 @@ def isInterleave4(self, s1, s2, s3):
             stack.append((x, y+1)); visited.add((x, y+1))
     return False
 ```
+### Tag: #DP #Recursive
 ---
 ## 103. Binary Tree Zigzag Level Order Traversal｜ 12/5 | [ Review * 1 ]
 Given a binary tree, return the zigzag level order traversal of its nodes' values. (ie, from left to right, then right to left for the next level and alternate between).
