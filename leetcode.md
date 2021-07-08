@@ -23456,7 +23456,7 @@ class WordDictionary:
 ```
 ### Tag: #Trie #Recursive #Set
 ---
-## 213. House Robber II｜ 3/27
+## 213. House Robber II｜ 3/27 | [ Review * 1 ]
 You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed. All houses at this place are arranged **in a circle.** That means the first house is the neighbor of the last one. Meanwhile, adjacent houses have security system connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
 
 Given a list of non-negative integers representing the amount of money of each house, determine the maximum amount of money you can rob tonight without alerting the police.
@@ -23476,6 +23476,11 @@ Output: 4
 
 Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
              Total amount you can rob = 1 + 3 = 4.
+
+### 解題分析
+1. 題目給的提示已經夠明顯, 頭跟尾是鄰居, 表示要馬取頭, 要馬取尾, 也就是說相比與上一題, 我們這題限制是更多
+
+
 ### 思路
 
 處理circle的狀況就是只能取頭，或只能取尾
@@ -23498,23 +23503,28 @@ class Solution:
         return max(sums[-1][0], sums[-1][1])
 ```
 
-If not using dp
+dp based on last question (Optimal)
 ``` py
 class Solution:
     def rob(self, nums: List[int]) -> int:
-        if len(nums) <= 1:
-            return nums[0] if len(nums) != 0 else 0
-        return max(self.rob_hourse(nums[1:]), self.rob_hourse(nums[:-1]))
-    def rob_hourse(self, nums):
-        rob, notRob = 0, 0
-        for num in nums:
-            pre_rob = rob
-            pre_notRob = notRob
+        if len(nums) < 2:
+            return nums[0]
+        rob_first = self.rob_simple(nums[:-1])
+        rob_second = self.rob_simple(nums[1:])
+        return max(rob_first, rob_second)
 
-            rob = pre_notRob + num
-            notRob = max(pre_rob, pre_notRob)
-        return max(rob, notRob)
+    def rob_simple(self, nums: List[int]) -> int:
+        if len(nums) < 2:
+            return nums[0]
+        pre_pre = nums[0]
+        pre = max(pre_pre, nums[1])
+
+        for i in range(2, len(nums)):
+            cur = max(pre_pre+nums[i], pre)
+            pre_pre, pre = pre, cur
+        return pre
 ```
+### Tag: #DP
 ---
 ## 9. Palindrome Number｜ 3/28
 Determine whether an integer is a palindrome. An integer is a palindrome when it reads the same backward as forward.
