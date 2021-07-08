@@ -22381,6 +22381,8 @@ Output:
 ]
 
 ### 解題分析
+0. 解題步驟如下
+
 1. Recursive
     1. Goal: s 用光
     2. Choice: s 的每個字元
@@ -22391,6 +22393,22 @@ Output:
     2. Base case 就是 length == 1 or 0 的時候
     3. Backtrack 之後的結果可能會有多個解，就要把這些解串上本來的選擇然後塞進 res，然後寫入 memo
     4. 可以關注一下怎麼從 recursive 轉換過來
+
+3. 優化讓他不要一直 slice, 使用 str index 去傳遞
+    - 其實就只是把 slice 過程全部換成 index操作
+
+4. DP BottomUp
+    1. s = "aab"
+    2. dp = [[["a","a","b"],["aa","b"]],[["a","b"]],[["b"]],[[]]]
+    3. ![](assets/markdown-img-paste-20210708105707508.png)
+
+5. Complexity
+    1. 對於每個字元都可以選擇要:
+        1. 自己成為回文
+        2. 跟前面成為回文
+    2. 因此 recursion tree node 的總數是 2^N, 每個 node 都要去檢驗一次回文 N
+    3. 所以總共是 N * 2^N
+    4. ![](assets/markdown-img-paste-20210708113306121.png)
 
 ### 技巧
 
@@ -22454,65 +22472,51 @@ class Solution:
         return s == s[::-1]
 ```
 
-Same idea, concise solution
+Memoization with no-slice optimize
 ```py
 class Solution:
     def partition(self, s: str) -> List[List[str]]:
         res = []
-        self.combination(s, [], res)
-        return res
+        memo = {}
 
-    def combination(self, s, path, res):
-        if not s:
-            res.append(path[:])
-            return
+        def backtrack(idx, comb):
+            if idx == len(s)-1:
+                return [[s[idx]]]
+            if idx == len(s):
+                return [[]]
 
-        for start in range(1, len(s)+1):
-            if not self.isPalin(s[:start]):
-                continue
-            path.append(s[:start])
-            self.combination(s[start:], path, res)
-            path.pop()
+            res = []
+            if idx not in memo:
+                for i in range(idx, len(s)+1):
+                    if self.isPalin(s, idx, i+1):
+                        cur = [s[idx:i+1]]
+                        results = backtrack(i+1, comb + cur)
 
+                        for result in results:
+                            res.append(cur + result)
+                memo[idx] = res
+            return memo[idx]
 
-    def isPalin(self, s):
-        return s == s[::-1]
-```
-
-Use `int` varible to trace the current position, `Backtracking`
-``` py
-class Solution:
-    def partition(self, s: str) -> List[List[str]]:
-        res = []
-        comb = []
-        self.combination(s, 0, comb, res)
-        return res
-
-    def combination(self, s, start, comb, res):
-        if start == len(s):
-            res.append(comb[:]) # deep copy
-            return
-
-        for i in range(start, len(s)):
-
-            if not self.isPalin(s, start, i):
-                continue
-
-            comb.append(s[start:i+1])
-            self.combination(s, i+1, comb, res)
-            comb.pop()
-
+        return backtrack(0, [])
 
     def isPalin(self, s, start, end):
-        while start < end:
-            if s[start] != s[end]:
-                return False
-            else:
-                start += 1
-                end -= 1
-        return True
+        return s[start:end] == s[start:end][::-1]
 ```
-### Tag: #Recursive #Memoization
+
+DP BottomUp
+```py
+class Solution:
+    def partition(self, s: str) -> List[List[str]]:
+        dp = [[] for _ in range(len(s) + 1)]
+        dp[-1] = [[]]
+        for i in range(len(s) - 1, -1, -1):
+            for j in range(i + 1, len(s) + 1):
+                if s[i:j] == s[i:j][::-1]:
+                    for each in dp[j]:
+                        dp[i].append([s[i:j]] + each)
+        return dp[0]
+```
+### Tag: #Recursive #Memoization #DP
 ---
 ## 132. Palindrome Partitioning II｜ 2/28
 Given a string s, partition s such that every substring of the partition is a palindrome.
