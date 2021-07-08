@@ -21495,7 +21495,7 @@ class Solution:
         return res.rstrip()
 ```
 ---
-## 152. Maximum Product Subarray｜ 3/3 (使用兩個DP數組)
+## 152. Maximum Product Subarray｜ 3/3  | [ Review * 1 ]
 
 Given an integer array nums, find the contiguous subarray within an array (containing at least one number) which has the largest product.
 
@@ -21515,6 +21515,16 @@ Input: [-2,0,-1]
 Output: 0
 
 Explanation: The result cannot be 2, because [-2,-1] is not a subarray.
+
+### 解題分析
+1. 這邊與 53. Maximum Subarray Sum 類似的概念
+    - 比較當前值 vs 含自己的累積
+    - 如果當前的更適合, 果斷切斷
+    - **max(num, ...)**
+2. 而這題 tricky 的地方是因為是使用乘法, 這樣就得考慮 **負數** 跟 **零** 的情況
+3. 如果此數為負數, 乘上之前最小的負數有機會變成最大的數, 因此我們也必須維持當前最小的數
+4. 然後都乘乘看, 最後再用一個 global 去接著
+
 ### 思路
 
 一眼就看出是DP題，感覺還跟背包問題有點關係，
@@ -21535,19 +21545,16 @@ Explanation: The result cannot be 2, because [-2,-1] is not a subarray.
 ``` py
 class Solution:
     def maxProduct(self, nums: List[int]) -> int:
-        pmax, pmin = [], []
-        for num in nums:
-            if not pmax and not pmin:
-                pmax.append(num)
-                pmin.append(num)
-                continue
-            temp_max = max(num * pmin[-1], max(num, num * pmax[-1]))
-            temp_min = min(num * pmin[-1], min(num, num * pmax[-1]))
-            pmax.append(temp_max)
-            pmin.append(temp_min)
+        global_max, prev_max, prev_min = nums[0], nums[0], nums[0]
 
-        return max(pmax)
+        for num in nums[1:]:
+            cur_max = max(num, num * prev_max, num * prev_min)
+            cur_min = min(num, num * prev_max, num * prev_min)
+            prev_max, prev_min = cur_max, cur_min
+            global_max = max(global_max, prev_max)
+        return global_max
 ```
+### Tag: #DP
 ---
 ## 156. Binary Tree Upside Down｜ 3/7 (Tree 的右旋) <缺iterative>
 Given a binary tree where all the right nodes are either leaf nodes with a sibling (a left node that shares the same parent node) or empty, flip it upside down and turn it into a tree where the original right nodes turned into left leaf nodes. Return the new root.
