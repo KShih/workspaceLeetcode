@@ -20578,17 +20578,17 @@ class Solution:
         return backtrack(s)
 ```
 
-DP with sliding window
+DP BottomUp (Optimal)
 ```py
 class Solution:
     def wordBreak(self, s: str, wordDict: List[str]) -> bool:
-        dic = Counter(wordDict)
+        sets = set(wordDict)
         dp = [False for _ in range(len(s)+1)]
         dp[0] = True
 
-        for end in range(len(s)+1):
-            for start in range(end):
-                if dp[start] and dic[s[start:end]] == 1:
+        for start in range(len(s)):
+            for end in range(start, len(s)+1):
+                if dp[start] and s[start:end] in sets:
                     dp[end] = True
         return dp[-1]
 ```
@@ -20615,47 +20615,7 @@ class Solution:
                 return self.recur(totalstr, wordDict, n+1)
 ```
 
-用for遍歷所有word in Dictionary, 而不是使用遞迴的方式
-cached的目的不是判斷true, 而是判斷false來剪枝
-``` py
-class Solution:
-    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
-        cached = {}
-        return self.recur(s, wordDict, cached)
-
-    def recur(self, totalstr, wordDict, cached):
-        if not totalstr:
-            return True
-
-        if totalstr in cached:
-            return cached[totalstr]
-
-        for w in wordDict:
-            if totalstr.startswith(w):
-                if self.recur(totalstr[len(w):], wordDict, cached):
-                    cached[totalstr] = True
-                    return True
-
-        cached[totalstr] = False
-        return False
-```
-
-DP solution, recommended
-``` py
-class Solution:
-    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
-        # dp[i] means s[0:i] is in wordDict. Find dp[n+1]
-        dp = [False for _ in range(len(s)+1)]
-        dp[0] = True
-
-        for end in range(len(s)+1):
-            for start in range(end):
-                if dp[start] and s[start:end] in wordDict:
-                    dp[end] = True
-                    break
-        return dp[-1]
-```
-### Tag: #Recursive #DP #SlidingWindow
+### Tag: #Recursive #DP
 ---
 ## 540. Single Element in a Sorted Array｜ 1/31
 You are given a sorted array consisting of only integers where every element appears exactly twice, except for one element which appears exactly once. Find this single element that appears only once.
