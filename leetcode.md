@@ -22668,14 +22668,29 @@ class Solution:
 ```py
 class Solution:
     def rob(self, nums: List[int]) -> int:
-        if not nums:
-            return 0
-        dp = [0 for _ in range(len(nums)+1)]
-        dp[0], dp[1] = 0, nums[0]
-
-        for i in range(2, len(nums)+1):
-            dp[i] = max(dp[i-1], dp[i-2] + nums[i-1])
+        if len(nums) < 2:
+            return nums[0]
+        dp = [0 for _ in range(len(nums))]
+        dp[0] = nums[0]
+        dp[1] = max(dp[0], nums[1])
+        for i in range(2, len(nums)):
+            dp[i] = max(dp[i-1], nums[i]+dp[i-2])
         return dp[-1]
+```
+
+Two variables
+```py
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        if len(nums) < 2:
+            return nums[0]
+        pre_pre = nums[0]
+        pre = max(pre_pre, nums[1])
+
+        for i in range(2, len(nums)):
+            cur = max(pre_pre+nums[i], pre)
+            pre_pre, pre = pre, cur
+        return pre
 ```
 ### Tag: #DP
 ---
