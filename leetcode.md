@@ -13679,7 +13679,7 @@ public:
 ```
 ### Tag: #UnionFind #DFS
 ---
-## 256. Paint House｜ 10/3
+## 256. Paint House｜ 10/3 | [ Review * 1 ]
 There are a row of n houses, each house can be painted with one of the three colors: red, blue or green. The cost of painting each house with a certain color is different. You have to paint all the houses such that no two adjacent houses have the same color.
 
 The cost of painting each house with a certain color is represented by a n x 3 cost matrix. For example, costs[0][0] is the cost of painting house 0 with color red; costs[1][2] is the cost of painting house 1 with color green, and so on... Find the minimum cost to paint all houses.
@@ -13698,6 +13698,20 @@ dp[i][j] = dp[i][j] + min(dp[i - 1][(j + 1) % 3], dp[i - 1][(j + 2) % 3])；
 **這個也比較好理解，如果當前的房子要用紅色刷，那麼上一個房子只能用綠色或藍色來刷，那麼我們要求刷到當前房子，且當前房子用紅色刷的最小花費就等於當前房子用紅色刷的錢加上刷到上一個房子用綠色和刷到上一個房子用藍色的較小值，這樣當我們算到最後一個房子時，我們只要取出三個累計花費的最小值即可**
 
 ### Code
+DP ez
+```py
+class Solution:
+    def minCost(self, costs: List[List[int]]) -> int:
+        dp = costs[0]
+        for i in range(1, len(costs)):
+            new_dp = [0, 0, 0]
+            new_dp[0] = min(dp[1], dp[2]) + costs[i][0]
+            new_dp[1] = min(dp[0], dp[2]) + costs[i][1]
+            new_dp[2] = min(dp[0], dp[1]) + costs[i][2]
+            dp = new_dp
+        return min(dp)
+```
+
 ``` py
 class Solution(object):
     def minCost(self, costs):
@@ -13715,6 +13729,7 @@ class Solution(object):
 
         return min(dp[n-1][0],min(dp[n-1][1],dp[n-1][2]))
 ```
+### Tag: #DP
 ---
 ## Twitter. Parking Dilemma｜ 10/3
 ![](assets/markdown-img-paste-20191003010711580.png)
