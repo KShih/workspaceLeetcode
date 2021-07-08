@@ -23835,7 +23835,7 @@ class Solution:
 ```
 ### Tag: #HashTable #Bucket
 ---
-## 221. Maximal Square｜ 3/30
+## 221. Maximal Square｜ 3/30 | [ Review * 1 ]
 Given a 2D binary matrix filled with 0's and 1's, find the largest square containing only 1's and return its area.
 
 Example:
@@ -23851,6 +23851,13 @@ Input:
 1 0 0 1 0
 
 Output: 4
+
+### 解題分析
+1. dp 的陣列大小, 應該多 1 因為我們也需要去判斷 first col and first row 是否有包含 '1'
+    - 否則 [[0,1], [1,0]], 會 return 0, 應該要 return 1
+    - 也不能把 maxlen init 為1, 因為 [[0,0], [0,0]] return 0
+    - 見 WA 解法
+
 ### 思路
 
 相對於之前找最大長方形的題，不曉得哪邊是長哪邊是寬，這題相對好處理
@@ -23870,16 +23877,57 @@ class Solution:
         if not matrix or not matrix[0]:
             return 0
         r, c = len(matrix), len(matrix[0])
+        dp = [[0 for _ in range(c+1)] for _ in range(r+1)]
+        max_len = 0
+
+        for i in range(1, r+1):
+            for j in range(1, c+1):
+                if matrix[i-1][j-1] == '1':
+                    dp[i][j] = min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1
+                    max_len = max(max_len, dp[i][j])
+        return max_len**2
+```
+
+DP (Space Optimize)
+```py
+class Solution:
+    def maximalSquare(self, matrix: List[List[str]]) -> int:
+        r, c = len(matrix), len(matrix[0])
+        prev = [0 for _ in range(c+1)]
+        dp = [0 for _ in range(c+1)]
+        max_len = 0
+
+        for i in range(1, r+1):
+            for j in range(1, c+1):
+                if matrix[i-1][j-1] == "1":
+                    dp[j] = min(prev[j], dp[j-1], prev[j-1]) + 1
+                    max_len = max(max_len, dp[j])
+                else:
+                    dp[j] = 0 # Note need to assign to zero or this idx would be dirty
+            dp, prev = prev, dp
+        return max_len**2
+```
+
+WA 解法
+```py
+class Solution:
+    def maximalSquare(self, matrix: List[List[str]]) -> int:
+        if not matrix or not matrix[0]:
+            return 0
+        r, c = len(matrix), len(matrix[0])
         dp = [[0 if matrix[i][j] == '0' else 1 for j in range(c)] for i in range(r)]
+        max_len = 0
 
         for i in range(1, r):
             for j in range(1, c):
                 if dp[i][j] == 1:
                     dp[i][j] = min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1
+                    max_len = max(max_len, dp[i][j])
 
-        res = max(max(row) for row in dp)
-        return res**2
+        return max_len**2
 ```
+
+### Tag: #DP
 ---
 ## 218. The Skyline Problem｜ 3/31 | [ Review * 1 ]
 A city's skyline is the outer contour of the silhouette formed by all the buildings in that city when viewed from a distance. Now suppose you are given the locations and height of all the buildings as shown on a cityscape photo (Figure A), write a program to output the skyline formed by these buildings collectively (Figure B).

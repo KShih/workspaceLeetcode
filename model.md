@@ -887,7 +887,11 @@ def DFS(tree):
 
 2. BottonUp
     1. 需直接思考到`如何定義子問題`
+        - 直接把 dp[-1][-1] 當作最後要 return 的東西
+        - 這樣就可以定義出 dp[i][j] 的意義了
     2. `子問題的狀態如何轉移`
+        - 站在 dp[i][j], 去看 dp[i-1][j], dp[i][j-1], dp[i-1][j-1] 搭配題目的要求看怎麼轉移
+        - 直接套 example 去想轉移式
     3. 大部分的題
     4. 範例 LC 718. Maximum Length of Repeated Subarray
         1. ![](assets/markdown-img-paste-20210704180318403.png)
