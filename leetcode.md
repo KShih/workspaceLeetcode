@@ -13731,6 +13731,107 @@ class Solution(object):
 ```
 ### Tag: #DP
 ---
+## 265. Paint House II｜ 7/10
+There are a row of n houses, each house can be painted with one of the k colors. The cost of painting each house with a certain color is different. You have to paint all the houses such that no two adjacent houses have the same color.
+
+The cost of painting each house with a certain color is represented by an n x k cost matrix costs.
+
+For example, costs[0][0] is the cost of painting house 0 with color 0; costs[1][2] is the cost of painting house 1 with color 2, and so on...
+Return the minimum cost to paint all houses.
+
+Example 1:
+
+- Input: costs = [[1,5,3],[2,9,4]]
+- Output: 5
+- Explanation:
+- Paint house 0 into color 0, paint house 1 into color 2. Minimum cost: 1 + 4 = 5;
+- Or paint house 0 into color 2, paint house 1 into color 0. Minimum cost: 3 + 2 = 5.
+
+Example 2:
+
+- Input: costs = [[1,3],[2,4]]
+- Output: 5
+
+Constraints:
+
+- costs.length == n
+- costs[i].length == k
+- 1 <= n <= 100
+- 1 <= k <= 20
+- 1 <= costs[i][j] <= 20
+
+### 解題分析
+1. WA
+    1. 這個寫法錯的地方就在於, 錯誤的定義 dp array
+2. DP Intuitive
+    1. 應該要站在選擇當前顏色的情況下, 去看上一層的最小
+3. Opimize
+    1. 不需要一直去重複計算 min, 因為只規定不能與旁邊相同, 也就是說我們只需要取出最小跟次小, 如果與最小相同就選擇次小
+
+
+### Code
+
+DP WA
+```py
+class Solution:
+    def minCostII(self, costs: List[List[int]]) -> int:
+        prev, dp = costs[0], costs[0]
+
+        for i in range(1, len(costs)):
+            for j in range(len(costs[0])):
+                min_v = float(inf)
+                for k in range(len(costs[0])):
+                    if j != k:
+                        min_v = min(min_v, costs[i][k])
+                dp[j] = prev[j] + min_v
+            prev, dp = dp, prev
+        return min(dp)
+```
+
+DP Intuitive
+```py
+class Solution:
+    def minCostII(self, costs: List[List[int]]) -> int:
+        k = len(costs[0])
+        n = len(costs)
+
+        for house in range(1, n):
+            for color in range(k):
+                min_v = float(inf)
+                for prev_color in range(k):
+                    if color != prev_color:
+                        min_v = min(min_v, costs[house-1][prev_color])
+                costs[house][color] += min_v
+        return min(costs[-1])
+```
+
+DP (Optimal)
+``` py
+class Solution:
+    def minCostII(self, costs: List[List[int]]) -> int:
+        k = len(costs[0])
+        n = len(costs)
+
+        for house in range(1, n):
+            min_color = sec_min_color = None
+            for prev_color in range(k):
+                prev_cost = costs[house-1][prev_color]
+                if min_color == None or prev_cost < costs[house-1][min_color]:
+                    sec_min_color = min_color
+                    min_color = prev_color
+                elif sec_min_color == None or prev_cost < costs[house-1][sec_min_color]:
+                    sec_min_color = prev_color
+
+            for color in range(k):
+                if color != min_color:
+                    costs[house][color] += costs[house-1][min_color]
+                else:
+                    costs[house][color] += costs[house-1][sec_min_color]
+        return min(costs[-1])
+```
+
+### Tag: #DP
+---
 ## Twitter. Parking Dilemma｜ 10/3
 ![](assets/markdown-img-paste-20191003010711580.png)
 
