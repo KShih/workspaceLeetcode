@@ -26637,6 +26637,86 @@ def nthUglyNumber(self, n):
 ```
 ### Tag: #Heap #DP
 ---
+## 313. Super Ugly Number｜ 7/10
+A super ugly number is a positive integer whose prime factors are in the array primes.
+
+Given an integer n and an array of integers primes, return the nth super ugly number.
+
+The nth super ugly number is guaranteed to fit in a 32-bit signed integer.
+
+Example 1:
+
+- Input: n = 12, primes = [2,7,13,19]
+- Output: 32
+- Explanation: [1,2,4,7,8,13,14,16,19,26,28,32] is the sequence of the first 12 super ugly numbers given primes = [2,7,13,19].
+
+Example 2:
+
+- Input: n = 1, primes = [2,3,5]
+- Output: 1
+- Explanation: 1 has no prime factors, therefore all of its prime factors are in the array primes = [2,3,5].
+
+Constraints:
+
+- 1 <= n <= 106
+- 1 <= primes.length <= 100
+- 2 <= primes[i] <= 1000
+- primes[i] is guaranteed to be a prime number.
+- All the values of primes are unique and sorted in ascending order.
+
+### 解題分析
+0. 分析
+    1. ![](assets/markdown-img-paste-20210710203219654.png)
+    2. 拿本來的質數去乘 dp 的結果
+1. DP + Scan Min
+    1. 這個方法跟上一提的 Optimal 解法類似, 就只是把固定的 ptr 做成 array
+2. DP + Heap
+    1. 先初始化 heap 為 primes, 然後每次 pop 最小的出來 (log(N) better than Scan(O(n)))
+    2. 然後再把拿出來的乘上 dp[idx+1] 塞回去 heap
+    3. 但這裡可能會遇到重複值的情況, 因此還需要一個 seen 去過濾
+
+
+### Code
+DP, O(N*P)
+``` py
+class Solution:
+    def nthSuperUglyNumber(self, n: int, primes: List[int]) -> int:
+        ptrs = [0 for _ in range(len(primes))]
+        dp = [float(inf) for _ in range(n)]
+        dp[0] = 1
+
+        for i in range(1, n):
+            for p in range(len(ptrs)):
+                dp[i] = min(dp[i], primes[p]*dp[ptrs[p]])
+            for p in range(len(ptrs)):
+                if dp[i] == primes[p]*dp[ptrs[p]]:
+                    ptrs[p] += 1
+        return dp[-1]
+```
+
+DP + Heap O(N * log(P)) (Optimal and Easy understand)
+```py
+class Solution:
+    def nthSuperUglyNumber(self, n: int, primes: List[int]) -> int:
+        heap = [(prime, prime, 0) for prime in primes]
+        seen = set(primes)
+        dp = [1 for _ in range(n)]
+
+        for i in range(1, n):
+            min_val, prime, idx = heappop(heap)
+            dp[i] = min_val
+
+            # add next
+            while prime * dp[idx] in seen:
+                idx += 1
+            new_val = prime * dp[idx]
+            seen.add(new_val) # skip duplicate
+            heappush(heap, (new_val, prime, idx))
+        return dp[-1]
+```
+
+### Tag: #DP #Heap
+---
 ## 266. Palindrome Permutation｜ 7/19 | [Review * 1]
 Given a string, determine if a permutation of the string could form a palindrome.
 
