@@ -881,11 +881,13 @@ def DFS(tree):
     5. Reference article: https://leetcode.com/problems/jump-game/solution/
 
 1. TopDown
+    0. 求所有情況的(combination) 類型的題
     1. 可以從 Recursive 的解法演化而來
     2. 缺點: 依舊存在 recursive 過多的問題
     3. 題目: LC10, LC44
 
 2. BottonUp
+    0. 求極值的題, 保存中間狀態從而更新出最大最小
     1. 需直接思考到`如何定義子問題`
         - 直接把 dp[-1][-1] 當作最後要 return 的東西
         - 這樣就可以定義出 dp[i][j] 的意義了

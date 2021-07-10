@@ -39745,3 +39745,132 @@ class Solution:
 
 ### Tag: #Recursive
 ---
+## 276. Paint Fence｜ 7/10
+You are painting a fence of n posts with k different colors. You must paint the posts following these rules:
+
+- Every post must be painted exactly one color.
+- There cannot be three or more consecutive posts with the same color.
+- Given the two integers n and k, return the number of ways you can paint the fence.
+- ![](assets/markdown-img-paste-20210710122551669.png)
+
+- Input: n = 3, k = 2
+- Output: 6
+- Explanation: All the possibilities are shown.
+- Note that painting all the posts red or all the posts green is invalid because there cannot be three posts in a row with the same color.
+
+Example 2:
+
+- Input: n = 1, k = 1
+- Output: 1
+
+Example 3:
+
+- Input: n = 7, k = 2
+- Output: 42
+
+Constraints:
+
+- 1 <= n <= 50
+- 1 <= k <= 105
+- The testcases are generated such that the answer is in the range [0, 231 - 1] for the given n and k.
+
+### 解題分析
+1. 寫出無法 memorize 的 recursive
+2. 改成可 memo 的 recursive
+    - 需要把 termination 的地方改成可回傳值的
+    - 注意, memorize 的時候也需要把 cnt 考慮進去
+3. Top-Down
+    - 首先要先找到 relation
+    - 假設 dp[i] 為 i 個 post 所可產生組合的總數
+    - 即可得, dp[1] = k 種, dp[2] = k * k 種
+    - 那 dp[3] 呢？
+        - dp[3] = 與2不同色的方法 + 與2同色的方法
+            - 不同色: k-1 種塗法
+                - dp[i-1] * k-1
+            - 同色: 1種塗法
+                - 但題目要求不能連續三個同色, 因此這種圖法只能奠基在 i-1 與 i-2 不同色的狀況下
+                - 那麼有多少種狀況呢? 根據上面的不同色塗法, 答案就是 k-1
+                - 1 * dp[i-2] * k-1
+            - `dp[3] = (dp[i-1] * k-1) + (1 * dp[i-2] * k-1)`
+4. 最後在進行 space 優化
+
+### Code
+Cannot Memorization (TLE)
+```py
+class Solution:
+    def numWays(self, n: int, k: int) -> int:
+        self.res = 0
+        def paint(prev, cnt, n):
+            if n == 0:
+                self.res += 1
+                return
+
+            for i in range(k):
+                if i == prev:
+                    if cnt != 0:
+                        paint(i, cnt-1, n-1)
+                else:
+                    paint(i, 1, n-1)
+        paint(None, 0, n)
+        return self.res
+```
+
+Change to memorizable (AC)
+``` py
+class Solution:
+    def numWays(self, n: int, k: int) -> int:
+        memo = {}
+        def paint(prev, cnt, n):
+            if (n, cnt) not in memo:
+                if n == 1:
+                    if cnt+1 < 3:
+                        return k
+                    else:
+                        return k-1
+
+                res = 0
+                for i in range(k):
+                    if i == prev:
+                        if cnt+1 < 3:
+                            res += paint(i, cnt+1, n-1)
+                    else:
+                        res += paint(i, 1, n-1)
+                memo[(n, cnt)] = res
+            return memo[(n, cnt)]
+        return paint(None, 1, n)
+```
+
+Top Down
+```py
+class Solution:
+    def numWays(self, n: int, k: int) -> int:
+        if n == 1:
+            return k
+        elif n == 2:
+            return k*k
+        dp = [0 for _ in range(n)]
+        dp[0] = k
+        dp[1] = k*k
+        for i in range(2, n):
+            # dp[i] = (dp[i-1] * (k-1)) + (1 * dp[i-2] * (k-1)) # diff than i-1 + same as i-1 while i-1 diff from i-2
+            dp[i] = (k-1) * (dp[i-1]+dp[i-2])
+        return dp[n-1]
+```
+
+Top Down Space Optimze(Optimal)
+```py
+class Solution:
+    def numWays(self, n: int, k: int) -> int:
+        if n == 1:
+            return k
+        elif n == 2:
+            return k*k
+        prev_prev, prev = k, k*k
+        for i in range(2, n):
+            cur = (k-1) * (prev + prev_prev)
+            prev, prev_prev = cur, prev
+        return prev
+```
+
+### Tag: #DP #Recursive
+---
