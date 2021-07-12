@@ -32279,7 +32279,7 @@ class Solution:
 
 ### Tag: #DFS #BinaryTree
 ---
-## 343. Integer Break｜ 11/29
+## 343. Integer Break｜ 11/29 | [ Review * 1 ]
 
 Given a positive integer n, break it into the sum of at least two positive integers and maximize the product of those integers. Return the maximum product you can get.
 
@@ -32301,6 +32301,7 @@ Note: You may assume that n is not less than 2 and not larger than 58.
     - 類似 collect coin 那提的概念，如果知道了前面，就可以很快速的算出後面
     - 用button up DP, 從3開始循環到n，並且對於每個數從 1 開始拆分到 i-1
     - 裡面的 j*(i-j) 是拆分為兩個數的情形
+        - 因為我們總是從 i-1 開始切, 也無法紀錄到 i * 0 的情況, 所以需要分開討論
     - j * dp[i-j] 是拆分為多個數字的情況
 2. Math:
     - 題目提示中讓用 O(n) 的時間複雜度來解題，而且告訴我們找7到 10 之間的規律，那麼我們一點一點的來分析：
