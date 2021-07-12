@@ -4929,11 +4929,17 @@ public:
 
 ---
 
-## 337. House Robber III｜ 5/29
+## 337. House Robber III｜ 5/29 | [ Review * 1 ]
 The thief has found himself a new place for his thievery again. There is only one entrance to this area, called the "root." Besides the root, each house has one and only one parent house. After a tour, the smart thief realized that "all houses in this place forms a binary tree". It will automatically contact the police if two directly-linked houses were broken into on the same night.
 
 Determine the maximum amount of money the thief can rob tonight without alerting the police.
 ![](assets/markdown-img-paste-20190630235552337.png)
+
+### 解題分析
+1. 每個節點分為偷當前的, 或者不偷當前的繼承之前偷的
+2. 因此我們需要先從底部開始做, 拿到以前的值才能決定當前要不要偷
+3. 如果我們決定偷了當前, 那麼我們就不能選擇偷上一個的, 只能選擇偷上上個的
+4. 如果我們決定不偷當前, 那麼我們就可以從上一個跟上上個中選出較大的
 
 ### 思路
 這題要求的其實本質上是sum of subtree，
@@ -4947,8 +4953,26 @@ Determine the maximum amount of money the thief can rob tonight without alerting
 2. left + right
 並且在遞迴過程中，都會用一個hash map記錄怎麼選擇對於該節點會是最大的結果
 並且讓樹由下往上生成，即可求解。
+
 ### Code
-``` c++
+Optimal
+```py
+class Solution:
+    def rob(self, root: TreeNode) -> int:
+        return max(self.rob_helper(root))
+
+    def rob_helper(self, node):
+        if not node:
+            return 0, 0
+        l_rob, l_not_rob = self.rob_helper(node.left)
+        r_rob, r_not_rob = self.rob_helper(node.right)
+
+        cur_rob = node.val + l_not_rob + r_not_rob
+        cur_not_rob = max(l_rob, l_not_rob) + max(r_rob, r_not_rob)
+        return cur_rob, cur_not_rob
+```
+
+``` c
 class Solution {
 public:
     int rob(TreeNode* root) {
@@ -4972,6 +4996,7 @@ public:
     }
 };
 ```
+### Tag: #DP
 ---
 
 ## 98. Validate Binary Search Tree｜ 5/30 | [ Review * 1 ]
