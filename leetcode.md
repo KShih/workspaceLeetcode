@@ -40151,3 +40151,45 @@ class Solution(object):
 
 ### Tag: #Recursive #HashTable
 ---
+## 357. Count Numbers with Unique Digits｜ 7/12
+Given an integer n, return the count of all numbers with unique digits, x, where 0 <= x < 10n.
+
+Example 1:
+
+- Input: n = 2
+- Output: 91
+- Explanation: The answer should be the total numbers in the range of 0 ≤ x < 100, excluding 11,22,33,44,55,66,77,88,99
+
+Example 2:
+
+- Input: n = 0
+- Output: 1
+
+Constraints:
+
+- 0 <= n <= 8
+
+### 解題分析
+1. 換個角度想, 給定一個3位數, 求有多少個 Unique Digit
+    - 最左邊: 1~9
+    - 中間: 0~9 扣掉最左邊
+    - 最旁變 0~9 扣掉前面兩個選擇的
+    - ans = `9 * 9 * 8`
+2. 那麼就是把這些 cnt 加總到第 n 位數
+
+
+### Code
+``` py
+class Solution:
+    def countNumbersWithUniqueDigits(self, n: int) -> int:
+        cnt, digit_n_cnt = 1, 1 # only contain 1 num: 0
+        choice = [9, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+
+        for i in range(min(n, 10)): # should not exceed 10
+            digit_n_cnt *= choice[i]
+            cnt += digit_n_cnt
+        return cnt
+```
+
+### Tag: #DP
+---
