@@ -40258,3 +40258,85 @@ class Solution(object):
 
 ### Tag: #BinarySearch
 ---
+## 376. Wiggle Subsequence｜ 7/12
+A wiggle sequence is a sequence where the differences between successive numbers strictly alternate between positive and negative. The first difference (if one exists) may be either positive or negative. A sequence with one element and a sequence with two non-equal elements are trivially wiggle sequences.
+
+- For example, [1, 7, 4, 9, 2, 5] is a wiggle sequence because the differences (6, -3, 5, -7, 3) alternate between positive and negative.
+- In contrast, [1, 4, 7, 2, 5] and [1, 7, 4, 5, 5] are not wiggle sequences. The first is not because its first two differences are positive, and the second is not because its last difference is zero.
+- A subsequence is obtained by deleting some elements (possibly zero) from the original sequence, leaving the remaining elements in their original order.
+
+Given an integer array nums, return the length of the longest wiggle subsequence of nums.
+
+Example 1:
+
+- Input: nums = [1,7,4,9,2,5]
+- Output: 6
+- Explanation: The entire sequence is a wiggle sequence with differences (6, -3, 5, -7, 3).
+
+Example 2:
+
+- Input: nums = [1,17,5,10,13,15,10,5,16,8]
+- Output: 7
+- Explanation: There are several subsequences that achieve this length.
+- One is [1, 17, 10, 13, 10, 16, 8] with differences (16, -7, 3, -3, 6, -8).
+
+Example 3:
+
+- Input: nums = [1,2,3,4,5,6,7,8,9]
+- Output: 2
+
+Constraints:
+
+- 1 <= nums.length <= 1000
+- 0 <= nums[i] <= 1000
+
+Follow up: Could you solve this in O(n) time?
+
+### 解題分析
+1. 對於每個 nums[i] 與 nums[i-1] 的關係都有大於小於等於三種狀況, 再來就是找出其與 wiggle 的關係
+2. 如果 nums[i] > nums[i-1], 如果要將這個狀態加入到當前的 wiggle, 就必須要前一個 wiggle 的狀態是 down, 那假設我們知道他是 down, 且他當前的長度為 N, 我們就能更新我們的最長串列為 N+1, 並且繼續推導下去, 因此我們可以想到使用 兩個 dp array 來做
+    - 這種變號會影響後面結果的, 就必須用兩個 dp array 來做 (之前有某一題也是, 待捕)
+        - up[i] 紀錄到 index i 最大的 wiggle 長度, 且當前的 trend 是 up 的
+        - down[i] 紀錄到 index i 最大的 wiggle 長度, 且當前的 trend 是 down 的
+3. 轉移
+    - 如果 nums[i] > nums[i-1], 那麼我們就能去拿 down 裡面的最長長度來更新為 up 最長長度, 而 down 的最新長度保持不變
+    - 反之亦然
+    - 相等時, 則是都從舊狀態直接拖曳
+4. Space 優化, 用兩個變數存前一個狀態
+
+### Code
+``` py
+class Solution:
+    def wiggleMaxLength(self, nums: List[int]) -> int:
+        up, down = [1 for _ in range(len(nums))], [1 for _ in range(len(nums))]
+
+        for i in range(1, len(nums)):
+            if nums[i] > nums[i-1]:
+                up[i] = down[i-1] + 1
+                down[i] = down[i-1]
+            elif nums[i] < nums[i-1]:
+                up[i] = up[i-1]
+                down[i] = up[i-1]+1
+            else:
+                up[i] = up[i-1]
+                down[i] = down[i-1]
+
+        return max(up[-1], down[-1])
+```
+
+Space Optimize
+```py
+class Solution:
+    def wiggleMaxLength(self, nums: List[int]) -> int:
+        up, down = 1, 1
+
+        for i in range(1, len(nums)):
+            if nums[i] > nums[i-1]:
+                up = down + 1
+            elif nums[i] < nums[i-1]:
+                down = up+1
+        return max(up, down)
+```
+
+### Tag: #DP
+---
