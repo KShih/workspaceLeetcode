@@ -30145,7 +30145,7 @@ class Solution:
 
 ### Tag: backtrack
 ---
-## 322. Coin Change｜ 10/28
+## 322. Coin Change｜ 10/28 | [ Review * 1 ]
 You are given coins of different denominations and a total amount of money amount. Write a function to compute the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.
 
 You may assume that you have an infinite number of each kind of coin.
@@ -30224,7 +30224,7 @@ class Solution:
         return self.memo[target]
 ```
 
-### Tag: DP
+### Tag: #DP
 ---
 ## 323. Number of Connected Components in an Undirected Graph｜ 10/28 | [ Review * 1 ]
 Given n nodes labeled from 0 to n - 1 and a list of undirected edges (each edge is a pair of nodes), write a function to find the number of connected components in an undirected graph.
