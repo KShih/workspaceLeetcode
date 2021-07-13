@@ -40518,3 +40518,92 @@ class Solution:
 
 ### Tag: #DP
 ---
+## 397. Integer Replacement｜ 7/13
+Given a positive integer n, you can apply one of the following operations:
+
+- If n is even, replace n with n / 2.
+- If n is odd, replace n with either n + 1 or n - 1.
+- Return the minimum number of operations needed for n to become 1.
+
+Example 1:
+
+- Input: n = 8
+- Output: 3
+- Explanation: 8 -> 4 -> 2 -> 1
+
+Example 2:
+
+- Input: n = 7
+- Output: 4
+- Explanation: 7 -> 8 -> 4 -> 2 -> 1
+- or 7 -> 6 -> 3 -> 2 -> 1
+
+Example 3:
+
+- Input: n = 4
+- Output: 2
+
+Constraints:
+
+- 1 <= n <= 231 - 1
+
+### 解題分析
+1. Bit 觀念解題
+    - ![](assets/markdown-img-paste-20210713180207639.png)
+    - 首先先觀察題目, 如果是偶數的話無懸念直接除2, 那麼如果是奇數的話, 要選 +1 還是 -1 呢？
+    - 我們用 Bit 的觀念來看, 莫兩數總共有四種可能, 詳見圖
+    - 結論是: 3 是特例, 其餘的狀況除非除四餘 1 要用撿的, 其他都是 +1 會比較好
+
+### Code
+BitManipulation
+``` py
+class Solution:
+    def integerReplacement(self, n: int) -> int:
+        cnt = 0
+
+        while n != 1:
+            if n % 2 == 0:
+                n //= 2
+            elif n == 3 or n % 4 == 1:
+                n -= 1
+            else:
+                n += 1
+            cnt += 1
+        return cnt
+```
+
+DP Top-Down memo
+```py
+class Solution(object):
+    def integerReplacement(self, n):
+        memo = {}
+        def helper(n):
+            if n == 1:
+                return 0
+
+            if n not in memo:
+                if n%2 == 0:
+                    res =  1 + helper(n//2)
+                else:
+                    res = 1 + min(helper(n-1), helper(n+1))
+                memo[n] = res
+            return memo[n]
+        return helper(n)
+```
+
+DP ButtomUP
+```py
+class Solution:
+    def integerReplacement(self, n: int) -> int:
+        dp = [0 for _ in range(n+1)]
+
+        for i in range(2, n+1):
+            if i % 2 == 0:
+                dp[i] = dp[i//2] +1
+            else:
+                dp[i] = 1 + min(dp[i-1], 1 + dp[(i+1)//2]) # 直接計算到 (i+1) // 2 所以要多一個 // 2 的 operation 因此要 +1
+        return dp[-1]
+```
+
+### Tag: #BitManipulation #DP
+---
