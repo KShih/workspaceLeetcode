@@ -877,8 +877,15 @@ def DFS(tree):
     3. 試著去想如何可以不使用 recursive call (BottonUp DP)
         - 試著用 memo 紀錄的資訊當作線索來思考狀態轉移方程式
         - 這邊常用到的技巧是用 dp[i-1] 去更新 dp[i] *(在這個階段請試著往這個方向思考)*
+        - **我們的 Recursive 的作法是從大的階段往前求到 base case 再return回來, 而現在我們就只是要換個方向, 由 base case 出發做到後面**
+            - 轉換的概念詳見 LC377 Combination Sum IV/LC322 Coin Change
     4. 試著用上面的 "發現", 去改良 (Greedy) *(這步驟比較少見)*
     5. Reference article: https://leetcode.com/problems/jump-game/solution/
+    6. 結論:
+        1. TopDown:
+            - 從後往前不停的 recursive 直到 base case, 將結果累積到 result, 最後由前往後存到 memo 中
+        2. BottomUp:
+            - 從 base case 往後做 iterative, 並由前往後累積到 dp 數組中
 
 1. TopDown
     0. 求所有情況的(combination) 類型的題

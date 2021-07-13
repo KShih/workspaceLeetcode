@@ -40340,3 +40340,110 @@ class Solution:
 
 ### Tag: #DP
 ---
+## 377. Combination Sum IV｜ 7/13
+Given an array of distinct integers nums and a target integer target, return the number of possible combinations that add up to target.
+
+The answer is guaranteed to fit in a 32-bit integer.
+
+Example 1:
+
+- Input: nums = [1,2,3], target = 4
+- Output: 7
+- Explanation:
+- The possible combination ways are:
+- (1, 1, 1, 1)
+- (1, 1, 2)
+- (1, 2, 1)
+- (1, 3)
+- (2, 1, 1)
+- (2, 2)
+- (3, 1)
+- Note that different sequences are counted as different combinations.
+
+Example 2:
+
+- Input: nums = [9], target = 3
+- Output: 0
+
+Constraints:
+
+- 1 <= nums.length <= 200
+- 1 <= nums[i] <= 1000
+- All the elements of nums are unique.
+- 1 <= target <= 1000
+
+Follow up: What if negative numbers are allowed in the given array? How does it change the problem? What limitation we need to add to the question to allow negative numbers?
+
+### 解題分析
+1. 很直覺的就把這題拿來用 BottomUp 做了, 但其實是個非常好的例子可以先從 top down 下手
+2. Top Down
+    1. Base Case: remain 等於 0 時, return 1 (共一種方法)
+    2. Choice: 所有在 nums 中的 num
+    3. Constraint: remain - num >= 0
+    4. Start: target
+3. BottomUp
+    1. Base Case: dp[0] = 1
+    2. 範圍: 要計算到 target+1 (Recursive 的 start)
+    3. Choice: 所有在 nums 中的 num
+    4. Constraint: remain - num >= 0
+4. 結論:
+    1. TopDown:
+        - 從後往前不停的 recursive 直到 base case, 將結果累積到 result, 最後由前往後存到 memo 中
+    2. BottomUp:
+        - 從 base case 往後做 iterative, 並由前往後累積到 dp 數組中
+5. 本題的 follow up:
+    1. 如果允許負數, 極有可能存在無限多組解, 如 [-1, 1] target = 0
+        - [-1,1], [-1,-1,1,1] ... etc
+    2. 因此我們需要限制 output 數組的最大長度
+
+### 類似題
+與 LC322. Coin Change 一模一樣
+
+### Code
+TopDown
+```py
+class Solution:
+    def combinationSum4(self, nums: List[int], target: int) -> int:
+        memo = {}
+        def combs(remain):
+            if remain not in memo:
+                if remain == 0:
+                    return 1
+
+                result = 0
+                for num in nums:
+                    if remain - num >= 0:
+                        result += combs(remain - num)
+
+                memo[remain] = result
+            return memo[remain]
+        return combs(target)
+```
+
+BottomUp
+``` py
+class Solution:
+    def combinationSum4(self, nums: List[int], target: int) -> int:
+        dp = [0 for _ in range(target+1)]
+        dp[0] = 1
+        for i in range(1, target+1):
+            for num in nums:
+                if i-num >= 0:
+                    dp[i] += dp[i-num]
+        return dp[-1]
+```
+
+FollowUp
+```py
+class Solution(object):
+    def combinationSum4WithLength(self, nums, target, length, memo=collections.defaultdict(int)):
+        if length <= 0: return 0
+        if length == 1: return 1 * (target in nums)
+        if (target, length) not in memo:
+            for num in nums:
+                memo[target, length] += self.combinationSum4(nums, target - num, length - 1)
+        return memo[target, length]
+```
+
+### Tag: #DP #Recursive
+---
