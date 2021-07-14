@@ -32899,19 +32899,14 @@ Given an input string (s) and a pattern (p), implement regular expression matchi
     1. 透過 i, j 分別去紀錄各個字串的位置可以省去 slice 字串的時間
     2. memorize(i, j) 在這邊好像不會有特別的作用 ... 因為各個recursive都是直線前進，不太會去存取重複的
 7. top-down 可以在精簡化 recursive call 寫成 bottom-up
-    1. ![](assets/markdown-img-paste-20210207220808898.png)
-    2. 此種寫法是與 LC44 LC72 相同的寫法，需學習！
+    1. ![](assets/markdown-img-paste-20210714134900304.png)
     3. 大意上還是狀態轉移
         1. p[j] = s[i] or "." => 直接轉移上個狀態，也就是 dp[i-1][j-1]
         2. p[j] = "*":
-            1. 如果 p[j-1] = s[i] or ".":
-                - 表示此 * 是用來 match 空的, 因此從 `p 的上上個` 狀態轉移過來, dp[i][j-2]
-            2. 否則 * 可用來:
-                - match 空: dp[i][j-2]
-                - match 一個: dp[i][j-1]
-                - match 多個: dp[i-1][j]
-    4. 注意也是需要預處理陣列:
-        - 目標是解決此種 case: ["aab", "c*aab"]
+            1. 此 * 是用來 match 空的, 因此從 `p 的上上個` 狀態轉移過來, dp[i][j-2]
+            2. 或者前一個狀態是 match 的狀況下, 從 `s 的上一個` 狀態轉移過來, dp[i-1][j]
+    4. 然後, BottomUp 不同的是, 我們是需要預處理陣列的 (否則 當 i = 1, dp[i-1][j] 會吃不到正確的值):
+        - 目標是解決 * 拿來處理 leading word 的 case: ["aab", "c*aab"]
         - ![](assets/markdown-img-paste-20210207221505519.png)
 
 
@@ -32985,25 +32980,7 @@ class Solution:
         return dp(0, 0)
 ```
 
-DP bottom-up
-```py
-class Solution(object):
-    def isMatch(self, text, pattern):
-        dp = [[False] * (len(pattern) + 1) for _ in range(len(text) + 1)]
-
-        dp[-1][-1] = True
-        for i in range(len(text), -1, -1):
-            for j in range(len(pattern) - 1, -1, -1):
-                first_match = i < len(text) and pattern[j] in {text[i], '.'}
-                if j+1 < len(pattern) and pattern[j+1] == '*':
-                    dp[i][j] = dp[i][j+2] or first_match and dp[i+1][j]
-                else:
-                    dp[i][j] = first_match and dp[i+1][j+1]
-
-        return dp[0][0]
-```
-
-DP bottom-up 與 LC72, LC44 一樣的寫法
+DP bottom-up 與 TopDown 相近的寫法！ (Optimal)
 ```py
 class Solution:
     def isMatch(self, s: str, p: str) -> bool:
@@ -33011,25 +32988,20 @@ class Solution:
         dp = [[False for _ in range(p_len+1)] for _ in range(s_len+1)]
         dp[0][0] = True
 
-        # for case aab, c*a*b
         for j in range(1, p_len+1):
             if p[j-1] == '*' and dp[0][j-2]:
-                dp[0][j] = True
+                dp[0][j] = True # pre-process for dp[i-1][j]
 
         for i in range(1, s_len+1):
             for j in range(1, p_len+1):
-                if p[j-1] in {s[i-1], '.'}:
-                    dp[i][j] = dp[i-1][j-1]
-                elif p[j-1] == '*':
-                    # j-2 must > 0 since there is no leading *
-                    if p[j-2] not in {s[i-1], '.'}:
-                        dp[i][j] = dp[i][j-2] # match empty
-                    else:
-                        dp[i][j] = dp[i][j-2] or dp[i-1][j] or dp[i][j-1]
+                if p[j-1] == '*':
+                    dp[i][j] = dp[i][j-2] or (p[j-2] in {s[i-1], '.'} and dp[i-1][j])
+                else:
+                    dp[i][j] = p[j-1] in {s[i-1], '.'} and dp[i-1][j-1]
         return dp[-1][-1]
 ```
 
-### Tag: #Recursive, #DP #TopDown #BottonUp
+### Tag: #Recursive, #DP #TopDown #BottomUp
 ---
 ## 44. Wildcard Matching｜ 2/7
 Given an input string (s) and a pattern (p), implement wildcard pattern matching with support for '?' and '*' where:
