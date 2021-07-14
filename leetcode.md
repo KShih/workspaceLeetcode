@@ -11464,6 +11464,7 @@ Given n non-negative integers representing an elevation map where the width of e
 ### 解題分析
 1. MonoStack
     1. ![](assets/markdown-img-paste-20210411173458150.png)
+    2. ![](assets/markdown-img-paste-20210714221119607.png)
         0. 求水平蓄水量
         1. 維護遞減 stack 因為是當此 bar 被『包』起來的時候才能求面積
         2. 左邊包的條件就由遞減 stack 來幫我們維護, 右邊的則是當偵測到暴增元素時
@@ -11474,13 +11475,17 @@ Given n non-negative integers representing an elevation map where the width of e
                     - if you wanted to figure out how many bars are in between 1 and 4 (exclusively), we have indexes 2 and 3 (for a total of 2 bars) or 4 - 1 - 1 = 2.
                 2. 高: min(height[L], height[R]) - height[stack.top()]
 
-2. Scan
+2. Scan (DP)
     1. ![](assets/markdown-img-paste-20210411174404838.png)
+    2. ![](assets/markdown-img-paste-20210714221054266.png)
     2. 求垂直蓄水量
         1. 求出每個位置往左看到的最高, 往右看到的最高, 並求兩者其小, 再減去自身的高度, 即可求出該位置的垂直蓄水量
 
 3. Two Pointer
-    1. 與 Scan 相同的概念, 左右邊求其小 - height, 但這種做法不用 new list
+    1. 與 Scan 相同的概念, 左右邊求其小 - height
+        - 反正都是要求其小, 所以根本不在意 max 有多大
+        - 那對於當前 h, 若 `max > h` -> 可以積水
+        - 若 `max < h` -> 無法積水, 且把 max 更新成當前 h
     2. 初始化 l_max 與 r_max 為頭尾元素
     3. 用兩個 ptr left, right 分別指向第一個元素及倒數第二個元素
     4. 如果 l_max 比較小, 我們就可以用其來算出該點的高
@@ -11545,7 +11550,7 @@ class Solution:
         return res
 ```
 
-Scan:
+Scan (DP):
 ``` py
 class Solution(object):
     def trap(self, height):
@@ -11572,7 +11577,7 @@ class Solution(object):
 
         return res
 ```
-### Tag: #Stack #MonoStack #TwoPointer
+### Tag: #Stack #MonoStack #TwoPointer #DP
 ---
 ## 3. Longest Substring Without Repeating Characters｜ 9/1 | [ Review * 1 ]
 Given a string, find the length of the longest substring without repeating characters.
