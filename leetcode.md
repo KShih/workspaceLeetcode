@@ -17797,7 +17797,7 @@ class Solution:
                 break
 ```
 ---
-## 32. Longest Valid Parentheses｜ 11/21
+## 32. Longest Valid Parentheses｜ 11/21 | [ Review * 1 ]
 Given a string containing just the characters '(' and ')', find the length of the longest valid (well-formed) parentheses substring.
 
 Example 1:
@@ -17815,6 +17815,35 @@ Input: ")()())"
 Output: 4
 
 Explanation: The longest valid parentheses substring is "()()"
+
+### 解題分析
+1. DP
+    - ![](assets/markdown-img-paste-20210714203321345.png)
+    - 求最大最小, 想到使用 DP
+    - 但我們的 dp 陣列無法儲存最大值, 而是必須儲存到這個位置可以產生多少個左右瓜
+    - 並且只有右瓜出現的時候我們才能夠去更新這個值, 但我們必須*多看一個括號*去討論該如何更新
+        0. 加設 i 都是指向當前最右邊的右瓜
+        1. `()`
+            - 這個狀況相對單純, 我們就是去看到 *前一個括弧狀態* 的總計, 加二就行
+            - 而前一個括弧狀態指的是 i-2, 注意, 非 *i-1*, 因為 i-1 肯定為零的(左瓜)
+            - dp[i] = dp[i-2] + 2
+        2. `))`
+            - 這個狀況就稍微複雜一點, 我們知道前一個括號已經被 match 了, 因此我們可以由他的左右瓜數量去求得*前面尚未被 match 的左瓜的位置*
+            - 其 index 就是 `i - dp[i-1] -1`
+                - 若該 potential_index 為左瓜, 表示我們又遇到一個新的 pair 了, 因此我們可以 *dp[i-1] + 2*
+                - 然而這樣是不夠的, 因為前面新倍 match 的左瓜也許之前也有連續可被加入的括號
+                    - 如這個情形 `)()(())`, 這題應該要回傳 6, 但我們如果只加新形成的 pair, 這樣只會回傳 4
+                    - 因此 我們還要加上 dp[potential_index - 1]
+            - dp[i] = dp[i-1] + 2 + dp[potential_match - 1] if s[potential_match] == "("
+            - 注意, potential_match 有可能是負的, 這樣再 python 會 index 到倒數的元素, 因此我們需要加上 check >= 0
+2. Stack
+    - 我們透過左右瓜 match 的概念, 如果出現 invalid 的情況我們將連續 matching 的原點重置成該 invalid index
+    - ![](assets/markdown-img-paste-20210714210728727.png)
+
+3. Two Pointer
+    - 利用 left, right 數量要一致的方法去更新最大連續數量, 出現 invalid 的情況就都重置為零
+    - 然而遇到如 `(()` 的這種狀況, l 與 r 最終都不會相等, 因此我們必須再從右向左 scan 一次把這種狀況給球出來
+
 ### 思路
 
 是要求"連續合法的括號組合的最長"
@@ -17831,39 +17860,76 @@ Explanation: The longest valid parentheses substring is "()()"
 標記完之後遍歷index_list, 求出最大的連續合法
 
 ### Code
+DP
+```py
+class Solution:
+    def longestValidParentheses(self, s: str) -> int:
+        if not s:
+            return 0
+        dp = [0 for _ in range(len(s))]
+        for i in range(1, len(s)):
+            pattern = s[i-1] + s[i]
+            if pattern == "()":
+                dp[i] = dp[i-2] +2
+            elif pattern == "))":
+                potential_match = i-dp[i-1]-1
+                if potential_match >= 0 and s[potential_match] == "(":
+                    dp[i] = dp[i-1] + 2 + dp[i-dp[i-1]-2]
+        return max(dp)
+```
+
+Stack
 ``` py
 class Solution:
     def longestValidParentheses(self, s: str) -> int:
-        stack = []
-        idx_list = [0] * len(s)
-        for i,p in enumerate(s):
-            if p == '(':
+        stack = [-1] # initail cnter from front
+        res = 0
+        for i, c in enumerate(s):
+            if c == '(':
                 stack.append(i)
-            elif p == ')':
-                if stack:
-                    valid_idx = stack.pop() # matching w/ '('
-                    idx_list[valid_idx] = 1 # mark that pos w/ 1
-                else:
-                    idx_list[i] = -1 # mark as invalid, redundant ')'
-
-        # mark as invalid, redundant '('
-        while stack:
-            invalid_idx = stack.pop()
-            idx_list[invalid_idx] = -1
-
-        counter_list = [0] # initialize inorder to call max()
-        counter = 0
-        for idx in idx_list:
-            if idx < 0:
-                counter_list.append(counter) # append current max
-                counter = 0 # reset the continuous count
             else:
-                if idx == 1:
-                    counter += 1
-
-        counter_list.append(counter) # append the rest val in counter
-        return max(counter_list)*2
+                stack.pop()
+                if not stack:
+                    stack.append(i)
+                else:
+                    res = max(res, i-stack[-1])
+        return res
 ```
+
+Two Pointer
+```py
+class Solution:
+    def longestValidParentheses(self, s: str) -> int:
+        res = 0
+
+        l, r = 0, 0
+        for c in s:
+            if c == "(":
+                l += 1
+            else:
+                r += 1
+
+            if l == r:
+                res = max(res, l+r)
+            elif r > l:
+                l, r = 0, 0
+
+        # scan from other side, for case like: "(()"
+        l, r = 0, 0
+        for c in s[::-1]:
+            if c == "(":
+                l += 1
+            else:
+                r += 1
+
+            if l == r:
+                res = max(res, l+r)
+            elif l > r:
+                l, r = 0, 0
+
+        return res
+```
+### Tag: #DP #Stack #TwoPointer
 ---
 ## 36. Valid Sudoku(合法數獨)｜ 11/21 | [ Review * 1 ]
 Determine if a 9x9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
