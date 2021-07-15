@@ -338,4 +338,74 @@ class Solution:
 - 這題相反過來 match 的時候直接拿舊的值
 - 不 match 的時候, 編編取小的+1
 
+### LC44. Wildcard Matching
+- 給 s 跟 p, 問 s 是否可與 p matching
+    - `?` match 一個 char
+    - `*` match 任何字元
+- 使用 BottomUp DP 解
+    - Default DP Base Case Value
+        - 主要都是針對 dp[0][j] 去 設定初始值, 意義就是 **s 為空字串時, 與 p 的 matching**
+        - 因此我們在寫這段的時候就去想 s 為空字串, p[j] 的值怎麼推到 dp 去, 簡單來說就是, **星號是否可以把整個 p 變成空字串**
+            - e.g.: s = "", p = `"***ab*c"`
+            - ..........*, *, *, a, b, *, c
+            - dp = [[T, T, T, T, F, F, F, F]] (第一個 T 為 initial value)
+            - 因此, 只有 `p[j-1] == "*" 且 dp[j-1] == True`, 才能把 dp[0][j] 設為 True
+        - 主迴圈
+            - 當前相同或可 by pass
+                - 直接 assign 成 dp[i-1][j-1]
+            - 當前是 *
+                - 可能用來 match nothing
+                    - dp[i][j-1]
+                - 或者 match 任何字 (ignore current i)
+                    - dp[i-1][j]
+
 ### LC10. Regular Expression Matching
+- 給 s 跟 p, 問 s 是否可與 p matching
+    - `.` match 一個 char
+    - `*` match 0個/多個其前方的字元
+- 使用 BottomUp DP 解
+    - Default DP Base Case Value
+        - 主要都是針對 dp[0][j] 去 設定初始值, 意義就是 **s 為空字串時, 與 p 的 matching**
+        - 因此我們在寫這段的時候就去想 s 為空字串, p[j] 的值怎麼推到 dp 去, 間單來說就是, **星號是否可以把整個 p 變成空字串**
+            - e.g.: s = "", p = `"a*b*ab*c"`
+            - ..........a, *, b, *, a, b, *, c
+            - dp = [[T, F, T, F, T, F, F, F, F]] (第一個 T 為 initial value)
+            - 因此, 只有 `p[j-1] == "*" 且 dp[j-2] == True`, 才能把 dp[0][j] 設為 True
+    - 主迴圈
+        - 當前相同或可 by pass
+            - 直接 assign 成 dp[i-1][j-1]
+        - 當前是 *
+            - 可能用來刪除前一個 p, "ac", "b*ac"
+                - dp[i][j-2]
+            - 或者在前一個 p 的值 match 當前的 s 的狀況下, 去 match 任何字 (ignore current i)
+                - 其實整句話就等價於 `* 用來 match 它前一個字`
+                - `p[j-2] in {s[i-1], '.'}`
+                - `and dp[i-1][j]`
+                - e.g.:
+                    - "aa", "a*"
+                        - True
+                    - "ab", "b*"
+                        - False
+                    - "aaaaa", "a*"
+                        - True
+                    - "aa", "a*****"
+            - 或者 match nothing
+                - "a", "a*"
+
+### 比較 LC10, LC44
+1. Default Base Case
+    1. 參見上面
+2. 主迴圈
+    1. LC10 的 * 是需要去參考到他前一個值, 並且可用來
+        1. match 前一字
+            - `p[j-2] in {s[i-1], '.'} and dp[i-1][j]`
+        2. match nothing
+            - `dp[i][j-1]`
+        3. 刪除前一字
+            - `dp[i][j-2]`
+
+    2. LC44 的 * 可以 用來
+        1. match 任何字
+            - `dp[i-1][j]`
+        2. match nothing
+            - `dp[i][j-1]`

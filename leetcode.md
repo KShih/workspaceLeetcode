@@ -32980,6 +32980,35 @@ Given an input string (s) and a pattern (p), implement regular expression matchi
         - 目標是解決 * 拿來處理 leading word 的 case: ["aab", "c*aab"]
         - ![](assets/markdown-img-paste-20210207221505519.png)
 
+8. 與 LC44 相似的通解 (BottomUp)
+    - 使用 BottomUp DP 解
+        - Default DP Base Case Value
+            - 主要都是針對 dp[0][j] 去 設定初始值, 意義就是 **s 為空字串時, 與 p 的 matching**
+            - 因此我們在寫這段的時候就去想 s 為空字串, p[j] 的值怎麼推到 dp 去, 間單來說就是, **星號是否可以把整個 p 變成空字串**
+                - e.g.: s = "", p = `"a*b*ab*c"`
+                - ..........a, *, b, *, a, b, *, c
+                - dp = [[T, F, T, F, T, F, F, F, F]] (第一個 T 為 initial value)
+                - 因此, 只有 `p[j-1] == "*" 且 dp[j-2] == True`, 才能把 dp[0][j] 設為 True
+            - 主迴圈
+                - 當前相同或可 by pass
+                    - 直接 assign 成 dp[i-1][j-1]
+                - 當前是 *
+                    - 可能用來刪除前一個 p, "ac", "b*ac"
+                        - dp[i][j-2]
+                    - 或者在前一個 p 的值 match 當前的 s 的狀況下, 去 match 任何字 (ignore current i)
+                        - 其實整句話就等價於 `* 用來 match 它前一個字`
+                        - `p[j-2] in {s[i-1], '.'}`
+                        - `and dp[i-1][j]`
+                        - e.g.:
+                            - "aa", "a*"
+                                - True
+                            - "ab", "b*"
+                                - False
+                            - "aaaaa", "a*"
+                                - True
+                            - "aa", "a*****"
+                    - 或者 match nothing
+                        - "a", "a*"
 
 ### Code
 Recursive:
@@ -33066,7 +33095,7 @@ class Solution:
         for i in range(1, s_len+1):
             for j in range(1, p_len+1):
                 if p[j-1] == '*':
-                    dp[i][j] = dp[i][j-2] or (p[j-2] in {s[i-1], '.'} and dp[i-1][j])
+                    dp[i][j] = dp[i][j-2] or (p[j-2] in {s[i-1], '.'} and dp[i-1][j]) or dp[i][j-1]
                 else:
                     dp[i][j] = p[j-1] in {s[i-1], '.'} and dp[i-1][j-1]
         return dp[-1][-1]
@@ -33074,7 +33103,7 @@ class Solution:
 
 ### Tag: #Recursive, #DP #TopDown #BottomUp
 ---
-## 44. Wildcard Matching｜ 2/7
+## 44. Wildcard Matching｜ 2/7 | [ Review * 1 ]
 Given an input string (s) and a pattern (p), implement wildcard pattern matching with support for '?' and '*' where:
 
 '?' Matches any single character.
@@ -33131,6 +33160,7 @@ p contains only lowercase English letters, '?' or '*'.
 3. 用 i, j 去進行 memorization 的優化
     1. 就是將本來用字串操作判斷式的邏輯改為以 index 存取，並多加一層判斷是否已經 memo 過
 4. BottonUp solution:
+    0. 寫法幾乎跟 LC10 一饃一樣
     1. Memorization 最大的缺點就是, recursive 階層還是太多了
     2. 那麼我們只能透過 ButtonUp 的 DP, 也就是狀態的轉移
     3. 首先定義我們的 DP[s_idx][p_idx] 為 s[s_idx] 與 p[p_idx] 是否匹配
@@ -33152,6 +33182,24 @@ p contains only lowercase English letters, '?' or '*'.
             4. 因此若是永遠都找不到解 s_idx 就會不停的 +1 直到結束, 而 p_idx 會永遠停在 star_idx + 1
             5. 因此最後判定 p 從 p_idx 的剩餘是否只存在 star，就結束了
         3. 另外需處理根本沒有 * 卻出現 unmatch 的狀況，不能讓他進入到最後一個 else
+
+
+6. 與 LC10 相似的通解 (BottomUp)
+    - Default DP Base Case Value
+        - 主要都是針對 dp[0][j] 去 設定初始值, 意義就是 **s 為空字串時, 與 p 的 matching**
+        - 因此我們在寫這段的時候就去想 s 為空字串, p[j] 的值怎麼推到 dp 去, 簡單來說就是, **星號是否可以把整個 p 變成空字串**
+            - e.g.: s = "", p = `"***ab*c"`
+            - ..........*, *, *, a, b, *, c
+            - dp = [[T, T, T, T, F, F, F, F]] (第一個 T 為 initial value)
+            - 因此, 只有 `p[j-1] == "*" 且 dp[j-1] == True`, 才能把 dp[0][j] 設為 True
+    - 主迴圈
+        - 當前相同或可 by pass
+            - 直接 assign 成 dp[i-1][j-1]
+        - 當前是 *
+            - 可能用來 match 0 個
+                - dp[i][j-1]
+            - 或者 match 任何字 (ignore current i)
+                - dp[i-1][j]
 
 ### Code
 TLE Recursive
@@ -33219,19 +33267,17 @@ class Solution:
         len_s, len_p = len(s), len(p)
 
         dp = [[False for _ in range(len_p+1)] for _ in range(len_s+1)]
-        for j in range(1, len_p+1):
-            if p[j-1] != "*":
-                break
-            dp[0][j] = True # allow * in the front part of p could be used as match empty
-
         dp[0][0] = True
+        for j in range(1, len_p+1):
+            if p[j-1] == "*" and dp[0][j-1]:
+                dp[0][j] = True # allow * in the front part of p could be used as match empty
 
         for i in range(1, len_s+1):
             for j in range(1, len_p+1):
-                if p[j-1] in {s[i-1] or '?'}:
-                    dp[i][j] = dp[i-1][j-1]
-                elif p[j-1] == "*":
+                if p[j-1] == "*":
                     dp[i][j] = dp[i-1][j] or dp[i][j-1]
+                else:
+                    dp[i][j] = p[j-1] in {s[i-1], '?'} and dp[i-1][j-1]
         return dp[-1][-1]
 ```
 
