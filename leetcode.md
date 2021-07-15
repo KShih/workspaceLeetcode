@@ -19479,6 +19479,25 @@ Given a 2D binary matrix filled with 0's and 1's, find the largest rectangle con
 Example:
 
 ![](assets/markdown-img-paste-20191204172118447.png)
+
+### 解題分析
+1. DP
+    - ![](assets/markdown-img-paste-20210715181259176.png)
+    - 概念: 用 left[j], right[j], height[j] 去紀錄當前 col 的第 j row 先往上擴到最頂, 再去往左往右擴張, 可以擴張到的最大面積
+        - 分別表達為第 j row 的左邊界、右邊界、上邊界
+    - 而為了不重複去看之前的邊界值, 我們用 dp 去紀錄
+        - 如圖中的 m[1][3]
+            - 如果只看單行, 他的左邊界應該是 2, 右邊界應該是4
+            - 然而我們的規則是要先衝到最頂, 因此 m[0][2], m[0][4] 都為 0 的狀況下, 其也不能擴張
+            - 因此我們的轉移式可以寫成: `left[i] = max(left[i], cur_l)`
+        - 用此概念由右到左計算出 right, 並計算出連續的 height, 便可計算出從 i=0 ~ 當前 i 所可形成的最大矩形面積
+    - 需注意的是:
+        - right 我們直接 initial 成 index+1, 方便我們 right-left 就直接求出寬度
+        - 所以她 initial 的時候是 len(m[0])
+        - 再調整 boundary 的時候也直接用 j, 而不是 j-1
+    - 優化:
+        - 內部 for loop 可以縮減成 1~2 個
+
 ### 思路
 之前找histogram 長方形最大值的延伸版
 
@@ -19520,7 +19539,44 @@ class Solution(object):
             stack.append(i)
         return max_a
 ```
-### Tag: #Stack #MonoStack
+
+DP
+```py
+class Solution:
+    def maximalRectangle(self, m: List[List[str]]) -> int:
+        if not m:   return 0
+        r, c = len(m), len(m[0])
+        left, right, height = [0 for _ in range(c)], [c for _ in range(c)], [0 for _ in range(c)]
+        max_a = 0
+
+        for i in range(r):
+            for j in range(c):
+                if m[i][j] == '1':
+                    height[j] += 1
+                else:
+                    height[j] = 0
+
+            cur_l_bound = 0
+            for j in range(c):
+                if m[i][j] == '1':
+                    left[j] = max(left[j], cur_l_bound)
+                else: # adjust cur bound
+                    cur_l_bound = j+1
+                    left[j] = 0
+
+            cur_r_bound = c
+            for j in range(c-1, -1, -1):
+                if m[i][j] == '1':
+                    right[j] = min(right[j], cur_r_bound)
+                else: # adjust cur bound
+                    cur_r_bound = j
+                    right[j] = c
+
+            for j in range(c):
+                max_a = max(max_a, (right[j]-left[j])*height[j])
+        return max_a
+```
+### Tag: #Stack #MonoStack #DP
 ---
 ## 88. Merge Sorted Array｜ 12/5
 Given two sorted integer arrays nums1 and nums2, merge nums2 into nums1 as one sorted array.
