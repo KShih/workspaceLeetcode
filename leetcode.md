@@ -40752,3 +40752,111 @@ class Solution:
 
 ### Tag: #BitManipulation #DP
 ---
+## 354. Russian Doll Envelopes｜ 7/16
+You are given a 2D array of integers envelopes where envelopes[i] = [wi, hi] represents the width and the height of an envelope.
+
+One envelope can fit into another if and only if both the width and height of one envelope are greater than the other envelope's width and height.
+
+Return the maximum number of envelopes you can Russian doll (i.e., put one inside the other).
+
+Note: You cannot rotate an envelope.
+
+Example 1:
+
+- Input: envelopes = [[5,4],[6,4],[6,7],[2,3]]
+- Output: 3
+- Explanation: The maximum number of envelopes you can Russian doll is 3 ([2,3] => [5,4] => [6,7]).
+
+Example 2:
+
+- Input: envelopes = [[1,1],[1,1],[1,1]]
+- Output: 1
+
+Constraints:
+
+- 1 <= envelopes.length <= 5000
+- envelopes[i].length == 2
+- 1 <= wi, hi <= 104
+
+### 解題分析
+1. DP TopDown
+    - Recursive 包含哪些參數, memo 就要記錄哪些
+    - Time: O(N^2)
+2. DP BottomUp
+    - LC300. 的 BottomUp 寫法也差不多長這樣, 因此這題絕對有辦法用 LIS 去解
+    - Time: O(N^2)
+3. LIS (Longest Increasing Subsequence)
+    - 這題並不像 typical 的 LIS 不能重新調整順序, 這題是可以的, 唯一的限制就是每個紅包的寬跟高必須綁在一起, 那麼既然可以調整, 現在的問題就是我們該如何調整可以讓我們的 LIS 找到最佳解
+    - arr = [3,5,4,1,2] 如何可以得到最大長度的 LIS, 如果可以調整順序的話? 答案就是排序
+    - 那麼這題我們如果只是單純的排序, 然後再對 arr[1] 去取 LIS, 在 arr[0] 相等的紅包會不符合題意, 題目不准等於
+        - e.g. [[1,2], [1,3], [1,4]], 我們只對 [2,3,4] 取 lis 會得到 3
+        - 但這個例子正確應該要是 1
+    - 因此我們需要額外的規則來導致 lis 能夠幫我們自動處理這個 case, 這邊利用到的就是 lis 裡面的 `inc[x] = num`
+    - 當如果比較大的元素先出現, 遇到下一個數出現時 lic 就不會去 append 這個元素, 反而是取代
+    - 所以我們這邊在加入`由大到小排序 arr[1]`
+
+
+
+### Code
+TLE Top-Down
+``` py
+class Solution:
+    def maxEnvelopes(self, envelopes: List[List[int]]) -> int:
+        n = len(envelopes)
+        sorted_envelopes = sorted(envelopes)
+        memo = {}
+        def helper(idx, last_max_idx):
+            if idx == n:
+                return 0
+            add, not_add = 0, 0
+            if (idx, last_max_idx) not in memo:
+                if last_max_idx == None or self.can_fit(sorted_envelopes[idx], sorted_envelopes[last_max_idx]):
+                    add = 1 + helper(idx+1, idx)
+                not_add = helper(idx+1, last_max_idx)
+
+                memo[(idx, last_max_idx)] = max(add, not_add)
+            return memo[(idx, last_max_idx)]
+        return helper(0, None)
+
+    def can_fit(self, a, b):
+        return a[0] > b[0] and a[1] > b[1]
+```
+
+TLE BottomUp
+```py
+class Solution:
+    def maxEnvelopes(self, envelopes: List[List[int]]) -> int:
+        n = len(envelopes)
+        sorted_envelopes = sorted(envelopes)
+        dp = [1 for _ in range(n)]
+
+        for i in range(n):
+            for j in range(i):
+                if self.can_fit(sorted_envelopes[i], sorted_envelopes[j]):
+                    dp[i] = max(dp[i], 1+dp[j])
+        return max(dp)
+
+    def can_fit(self, a, b):
+        return a[0] > b[0] and a[1] > b[1]
+```
+
+Sort + LIS (Optimal)
+```py
+class Solution:
+    def maxEnvelopes(self, arr: List[List[int]]) -> int:
+        sorted_arr = sorted(arr, key=lambda k: (k[0], -k[1]))
+        return self.lis([elem2 for _, elem2 in sorted_arr])
+
+    def lis(self, nums):
+        inc = []
+        for num in nums:
+            x = bisect.bisect_left(inc, num)
+            if x == len(inc):
+                inc.append(num)
+            else:
+                inc[x] = num
+        return len(inc)
+```
+
+### Tag: #DP #LIS #Sort
+---
