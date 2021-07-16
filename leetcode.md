@@ -13889,13 +13889,27 @@ def carParkingRoof(cars, k):
     return result
 ```
 ---
-## 647. Palindromic Substrings｜10/3
+## 647. Palindromic Substrings｜10/3 | [ Review * 1 ]
 
 Given a string, your task is to count how many palindromic substrings in this string.
 
 The substrings with different start indexes or end indexes are counted as different substrings even they consist of same characters.
 
 ![](assets/markdown-img-paste-20191003094712419.png)
+
+### 解題分析
+
+1. DP
+    1. 這題**無法**把 dp 陣列直接宣告成回傳, 本來是把 dp[i][j] 定義成 s[i:j] 所總共可以產生的回文數, 但好像這樣沒辦法解
+    2. 而這邊則是把 dp[i][j] 定義成 s[i:j] 是否可以形成回文, 如果可以 cnt + 1
+        - Base Case:
+            - i == j: True
+            - i+1 == j: True if s[i] == s[j]
+        - Transition:
+            - True if s[i] == s[j] and dp[i+1][j-1] == True
+2. TwoPointer
+    1. 把每個位置當作中點, 然後從中點向外擴張
+
 ### 思路
 
 以前找回文的方式：找到中心點後，
@@ -13905,6 +13919,8 @@ l指針向左, r指針向右，找尋其他可能的解
 並且奇數回文、偶數回文都要考慮
 
 ### Code
+
+TwoPointer (Optimal)
 ``` py
 class Solution:
     def countSubstrings(self, s: str) -> int:
@@ -13930,6 +13946,28 @@ class Solution:
         return count
 ```
 
+DP
+```py
+class Solution:
+    def countSubstrings(self, s: str) -> int:
+        n = len(s)
+        dp = [[False for _ in range(n)] for _ in range(n)]
+        cnt = 0
+
+        for i in range(n-1, -1, -1):
+            for j in range(i, n):
+                if i == j:
+                    dp[i][j] = True
+                elif i+1 == j:
+                    dp[i][j] = s[i] == s[j]
+                else:
+                    dp[i][j] = s[i] == s[j] and dp[i+1][j-1]
+
+                cnt += 1 if dp[i][j] else 0
+        return cnt
+```
+
+### Tag: #DP #TwoPointer
 ---
 ## Twitter. SubPalindrome｜ 10/3
 
