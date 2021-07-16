@@ -337,16 +337,15 @@ class Solution:
 ```py
 class Solution:
     def lengthOfLIS(self, nums: List[int]) -> int:
-        n = len(nums)
-        inc = [float(inf)]*(n) # 優化: 使用下面 res 動態擴展的方式
-        res = 0
+        inc = []
 
         for num in nums:
             x = bisect.bisect_left(inc, num)
-            inc[x] = num
-            res = max(res, x+1)
-
-        return res
+            if x == len(inc):
+                inc.append(num)
+            else:
+                inc[x] = num
+        return len(inc)
 ```
 
 ---

@@ -17293,16 +17293,15 @@ Using libary (bisect), binary search
 ```py
 class Solution:
     def lengthOfLIS(self, nums: List[int]) -> int:
-        n = len(nums)
-        inc = [float(inf)]*(n) # 優化: 使用下面 res 動態擴展的方式
-        res = 0
+        inc = []
 
         for num in nums:
             x = bisect.bisect_left(inc, num)
-            inc[x] = num
-            res = max(res, x+1)
-
-        return res
+            if x == len(inc):
+                inc.append(num)
+            else:
+                inc[x] = num
+        return len(inc)
 ```
 
 Binary search with DP (same with above...)
@@ -21109,6 +21108,7 @@ Output:
 3. 解法2 BottonUp:
     1. DP 裡面記錄的就是最後的所求，因此本來只是紀錄 True False, 現在要改成紀錄 List，即 dp[i] 為 s[:i] 所可產生的 combination 組
     2. 本來只是從 dp[start] 裡面取 True False，現在要改成從裡面拿出所有結果並加上當前結果，然後更新到 dp[end]
+    3. 當 "" + " " + str 會變成 " str", 因此需要 `.strip()`
 
 ### 思路
 
