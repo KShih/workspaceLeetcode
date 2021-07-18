@@ -21291,7 +21291,7 @@ class Solution:
 ```
 ### Tag: #Recursive #Memoization #DP
 ---
-## 688. Knight Probability in Chessboard｜ 2/6
+## 688. Knight Probability in Chessboard｜ 2/6 | [ Review * 1 ]
 On an NxN chessboard, a knight starts at the r-th row and c-th column and attempts to make exactly K moves. The rows and columns are 0 indexed, so the top-left square is (0, 0), and the bottom-right square is (N-1, N-1).
 
 A chess knight has 8 possible moves it can make, as illustrated below. Each move is two squares in a cardinal direction, then one square in an orthogonal direction.
@@ -21304,21 +21304,27 @@ The knight continues moving until it has made exactly K moves or has moved off t
 
 Example:
 
-Input: 3, 2, 0, 0
-Output: 0.0625
-Explanation: There are two moves (to (1,2), (2,1)) that will keep the knight on the board.
-From each of those positions, there are also two moves that will keep the knight on the board.
-The total probability the knight stays on the board is 0.0625.
+- Input: 3, 2, 0, 0
+- Output: 0.0625
+- Explanation: There are two moves (to (1,2), (2,1)) that will keep the knight on the board.
+- From each of those positions, there are also two moves that will keep the knight on the board.
+- The total probability the knight stays on the board is 0.0625.
 
 
 Note:
 
-N will be between 1 and 25.
-K will be between 0 and 100.
-The knight always initially starts on the board.
-### 思路
+- N will be between 1 and 25.
+- K will be between 0 and 100.
+- The knight always initially starts on the board.
 
-Recursive 解，但要想到如何cache
+### 解題分析
+1. 最 Naive 的解法就是去算出總共有多少種走法可以不越界, 然後再除總共的走法, 也就是 `valid_cnt / N^8`, 但這種作法在其他種語言可能會超出 int_max
+2. 那麼我們其實可以想像最後一步的八種走法都沒有超出界, 那 `這個位置` 的 `這個步伐` 機率就是 `8/8`, or `0.125 * 8`, 反推如果有一個會超出界, 那就是 `0.125*7`, 先除就可以避免 int 超界
+3. 把 top down 的想法寫成 bottom up
+    1. ![](assets/markdown-img-paste-20210718120148372.png)
+    2. top down memo 紀錄了 3 個資訊, 因此理論上 BottomUp 寫法也是要宣告三圍陣列, 但我們用兩個二維陣列 去做 space 優化, dp 紀錄的是當前的, new_dp 紀錄的是下一個 step 的
+    3. initial start point 為機率 1, 然後由他開始往八個方向擴張, 每個位置被走到的機率就是 0.125
+    4. 重複此擴張步驟 k 次, 並加總整個 dp 陣列答案極為所求
 
 ### Code
 Naive TLE
@@ -21345,67 +21351,65 @@ class Solution:
         return
 ```
 
-Memorization but still very slow (Maybe because still recursive thought return value directly):
+在其他語言會 int out of bound
 ```py
 class Solution:
     def knightProbability(self, N: int, K: int, r: int, c: int) -> float:
         mem = {}
         return self.recur(N, K, r, c, mem) / 8**K
 
-
     def recur(self, n, k, r, c, mem):
         if k == 0:
             return 1.0
-        if (k, r, c) in mem:
-            return mem[(k,r,c)]
-
-        sm = 0
-        for dir in ((1,2), (1,-2), (-1,2), (-1,-2), (2,1), (2,-1), (-2,1), (-2,-1)):
-            if 0 <= r+dir[0] < n and 0 <= c+dir[1] < n:
-                mem[(k-1, r+dir[0], c+dir[1])] = self.recur(n, k-1, r+dir[0], c+dir[1], mem)
-                sm += mem[(k-1, r+dir[0], c+dir[1])]
-
-        return sm
+        if (k, r, c) not in mem:
+            sm = 0
+            for dir in ((1,2), (1,-2), (-1,2), (-1,-2), (2,1), (2,-1), (-2,1), (-2,-1)):
+                if 0 <= r+dir[0] < n and 0 <= c+dir[1] < n:
+                    sm += self.recur(n, k-1, r+dir[0], c+dir[1], mem)
+            mem[(k,r,c)] = sm
+        return mem[(k,r,c)]
 ```
 
-Perfect solution without Cache
+TopDown 直接計算機率
 ```py
 class Solution:
     def knightProbability(self, N: int, K: int, r: int, c: int) -> float:
         mem = {}
         def recur(k, r, c, P):
-            p = 0
-            if 0 <= r < N and 0 <= c < N:
-                if k < K:
-                    for dx, dy in ((1,2), (1,-2), (-1,2), (-1,-2), (2,1), (2,-1), (-2,1), (-2,-1)):
-                        nex_x, nex_y = r + dx, c + dy
-                        p += recur(k+1, nex_x, nex_y, P/8.0)
-                else:
-                    p = P
-            return p
-        return recur(0, r, c, 1.0)
+            if k == 0:
+                return 1.0
+            if (r, c, k) not in mem:
+                res = 0.0
+                for dx, dy in ((1,2), (1,-2), (-1,2), (-1,-2), (2,1), (2,-1), (-2,1), (-2,-1)):
+                    nex_x, nex_y = r + dx, c + dy
+                    if 0 <= nex_x < N and 0 <= nex_y < N:
+                        res += 0.125 * recur(k-1, nex_x, nex_y, P)
+                mem[(r, c, k)] = res
+            return mem[(r, c, k)]
+        return recur(K, r, c, 1.0)
 ```
 
-Perfect solution with Cache
+BottomUp
 ```py
 class Solution:
     def knightProbability(self, N: int, K: int, r: int, c: int) -> float:
-        mem = {}
-        def recur(k, r, c, P):
-            res = 0
-            if 0 <= r < N and 0 <= c < N:
-                if k < K:
-                    for dx, dy in ((1,2), (1,-2), (-1,2), (-1,-2), (2,1), (2,-1), (-2,1), (-2,-1)):
-                        nex_x, nex_y = r + dx, c + dy
+        dirs = [(-1, -2), (-2, -1), (-2, 1), (-1, 2), (1, 2), (2, 1), (2, -1), (1, -2)]
+        dp = [[0 for _ in range(N)] for _ in range(N)]
+        dp[r][c] = 1
 
-                        if (nex_x, nex_y, k+1) not in mem:
-                            mem[(nex_x, nex_y, k+1)] = recur(k+1, nex_x, nex_y, P/8.0)
-                        res += mem[(nex_x, nex_y, k+1)]
-                else:
-                    res = P
-            return res
-        return recur(0, r, c, 1.0)
+        for k in range(K):
+            new_dp = [[0 for _ in range(N)] for _ in range(N)]
+            for i in range(N):
+                for j in range(N):
+                    for dx, dy in dirs:
+                        i2, j2 = i+dx, j+dy
+                        if 0 <= i2 < N and 0 <= j2 < N:
+                            new_dp[i2][j2] += 0.125 * dp[i][j]
+            dp = new_dp
+        return sum(sum(r) for r in dp)
 ```
+
+### Tag: #DP #Recursive
 ---
 ## 863. All Nodes Distance K in Binary Tree｜ 2/27 | [ Review * 1 ]
 We are given a binary tree (with root node root), a target node, and an integer value K.

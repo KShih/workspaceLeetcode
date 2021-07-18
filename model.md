@@ -874,10 +874,12 @@ def DFS(tree):
     1. 先用遞迴/backtrack 解題
     2. 用 Memorization 改良 (Topdown DP)
     3. 試著去想如何可以不使用 recursive call (BottonUp DP)
-        - 試著用 memo 紀錄的資訊當作線索來思考狀態轉移方程式
+        - 試著用 memo 紀錄的資訊當作線索來思考 dp[i][j] 的定義
+        - 試著用 此態到下態的變化方式作為狀態轉移方程式
         - 這邊常用到的技巧是用 dp[i-1] 去更新 dp[i] *(在這個階段請試著往這個方向思考)*
         - **我們的 Recursive 的作法是從大的階段往前求到 base case 再return回來, 而現在我們就只是要換個方向, 由 base case 出發做到後面**
-            - 轉換的概念詳見 LC377 Combination Sum IV/LC322 Coin Change
+            - 轉換的概念詳見 LC377. Combination Sum IV/LC322 Coin Change
+            - 或者 LC688. Knight Probability in Chessboard
     4. 試著用上面的 "發現", 去改良 (Greedy) *(這步驟比較少見)*
     5. Reference article: https://leetcode.com/problems/jump-game/solution/
     6. 結論:
