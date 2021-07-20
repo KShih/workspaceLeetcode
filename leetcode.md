@@ -2245,26 +2245,63 @@ class Solution:
 ```
 ### Tag: #BFS #DFS
 ---
-## 698. Partition to K Equal Sum Subsets(Medium)｜ 4/8
+## 698. Partition to K Equal Sum Subsets｜ 4/8 | [ Review * 1 ]
 Given an array of integers nums and a positive integer k, find whether it's possible to divide this array into k non-empty subsets whose sums are all equal.
-
-
 
 Example 1:
 
-Input: nums = [4, 3, 2, 3, 5, 2, 1], k = 4
-Output: True
-Explanation: It's possible to divide it into 4 subsets (5), (1, 4), (2,3), (2,3) with equal sums.
-
+- Input: nums = [4, 3, 2, 3, 5, 2, 1], k = 4
+- Output: True
+- Explanation: It's possible to divide it into 4 subsets (5), (1, 4), (2,3), (2,3) with equal sums.
 
 Note:
 
-1 <= k <= len(nums) <= 16.
-0 < nums[i] < 10000.
+- 1 <= k <= len(nums) <= 16.
+- 0 < nums[i] < 10000.
+
+### 解題分析
+0. ![](assets/markdown-img-paste-20210720163309428.png)
+1. 按照題目很直覺的宣告大小為 k 的 array, 並試著把所有數放進去, 但條件是不能超過每個subset的平均大小 sum(nums) // k
+2. 如果能放, 我們就嘗試下一個位置, 如果到最後都放得進去表示我們找到解了
+3. 這邊有兩個優化 (Game Changer)
+    1. 由大到小開始放, 可以幫助我們 break early
+        - 比如 [4, 3, 2] k=3, 這種嘗試 4 馬上就會發現他不可能放進任何罐子
+    2. 當放到的是空罐子, 且這種放法沒有解, 就直接 break 了, 因為後面的也都是空罐子且再嘗試其他空罐子也是一樣的結果 (因為我們是從左到右放)
+4. Time:
+    - O(k ^ N)
+        - [1, 1, 1, 1] k = 4
+            - 先放進第一個罐子
+            - 再嘗試把第二個1放進第一個罐子, 發現滿了往後面放
+
 ### 思路
 首先判斷sum是否能整除k，不能整除的話直接返回false。然後需要一個visited數組來記錄哪些數組已經被選中了，然後調用遞歸函數，我們的目標是組k個子集合，是的每個子集合之和為target = sum/k。我們還需要變量start，表示從數組的某個位置開始查找，curSum為當前子集合之和，在遞歸函數中，如果k=1，說明此時只需要組一個子集合，那麼當前的就是了，直接返回true。如果curSum等於target了，那麼我們再次調用遞歸，此時傳入k-1，start和curSum都重置為0，因為我們當前又找到了一個和為target的子集合，要開始繼續找下一個。否則的話就從start開始遍曆數組，如果當前數字已經訪問過了則直接跳過，否則標記為已訪問。然後調用遞歸函數，k保持不變，因為還在累加當前的子集合，start傳入i+1，curSum傳入curSum+nums[i]，因為要累加當前的數字，如果遞歸函數返回true了，則直接返回true。否則就將當前數字重置為未訪問的狀態繼續遍歷
 一些優化：比如先給數組按從大到小的順序排個序，然後在遞歸函數中，我們可以直接判斷，如果curSum大於target了，直接返回false，因為題目中限定了都是正數，並且我們也給數組排序了，後面的數字只能更大
 ### Code
+Greedy
+```py
+class Solution:
+    def canPartitionKSubsets(self, nums: List[int], k: int) -> bool:
+        nums = sorted(nums, reverse=True) # Game Changer1
+        bucks = [0 for _ in range(k)]
+        buck_size = sum(nums) // k
+
+        def insert_buck(idx):
+            if idx == len(nums):
+                return True
+
+            for buck_idx in range(len(bucks)):
+                bucks[buck_idx] += nums[idx]
+                if bucks[buck_idx] <= buck_size and insert_buck(idx+1):
+                    return True
+                bucks[buck_idx] -= nums[idx]
+
+                if bucks[buck_idx] == 0: # Game Changer2
+                    break
+            return False
+
+        return insert_buck(0)
+```
+
 ``` c++
 class Solution {
 public:
@@ -2290,7 +2327,7 @@ public:
     }
 };
 ```
-
+### Tag: #Array #Recursive #Gready
 ---
 ## 93. Restore IP Addresses｜ 4/9 | [Review * 1]
 Given a string containing only digits, restore it by returning all possible valid IP address combinations.
