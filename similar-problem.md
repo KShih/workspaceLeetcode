@@ -332,6 +332,16 @@ class Solution:
 - match 的時候拿過去的 +1
 - 不 match 的時候取最大的
 
+### LC718. Maximum Length of Repeated Subarray
+- 跟上面兩題只差在這題要求連續的長度, 因此我們在不 match 的情況下不用做任何更新 (讓該位置保持 0)
+
+### LC97. Interleaving String
+- 這題要求兩個字串穿插排列是否可以變成第三個字串
+- dp[i][j] -> s1[:i] + s2[:j] 交錯排列是否能成為 s3[:i+j]
+    - 有可能是 s1[i] == s3[i+j] and dp[i-1][j]
+        - 要 match s1 的第 i 個字, s1 的 第 i-1 必須被 match
+    - 也有可能是 s2[j] == s3[i+j] and dp[i][j-1]
+
 ### LC72. Edit Distance
 - 給兩個字串, 透過對任何一個進行增刪改使其變成另一個字串, 問最少的 operation 數
 - 這題 tricky 的地方就在於 intialize dp array 的時候邊界要調整成遞增
