@@ -25503,49 +25503,61 @@ class SummaryRanges:
 ```
 ### Tag: #BinarySeach #Heap
 ---
-## 983. Minimum Cost For Tickets｜ 4/26
+## 983. Minimum Cost For Tickets｜ 4/26 | [ Review * 1 ]
 In a country popular for train travel, you have planned some train travelling one year in advance.  The days of the year that you will travel is given as an array days.  Each day is an integer from 1 to 365.
 
 Train tickets are sold in 3 different ways:
 
-a 1-day pass is sold for costs[0] dollars;
-a 7-day pass is sold for costs[1] dollars;
-a 30-day pass is sold for costs[2] dollars.
-The passes allow that many days of consecutive travel.  For example, if we get a 7-day pass on day 2, then we can travel for 7 days: day 2, 3, 4, 5, 6, 7, and 8.
+- a 1-day pass is sold for costs[0] dollars;
+- a 7-day pass is sold for costs[1] dollars;
+- a 30-day pass is sold for costs[2] dollars.
+- The passes allow that many days of consecutive travel.  For example, if we get a 7-day pass on day 2, then we can travel for 7 days: day 2, 3, 4, 5, 6, 7, and 8.
 
 Return the minimum number of dollars you need to travel every day in the given list of days.
 
-
-
 Example 1:
 
-Input: days = [1,4,6,7,8,20], costs = [2,7,15]
-Output: 11
+- Input: days = [1,4,6,7,8,20], costs = [2,7,15]
+- Output: 11
 
 Explanation:
 
-For example, here is one way to buy passes that lets you travel your travel plan:
-On day 1, you bought a 1-day pass for costs[0] = $2, which covered day 1.
-On day 3, you bought a 7-day pass for costs[1] = $7, which covered days 3, 4, ..., 9.
-On day 20, you bought a 1-day pass for costs[0] = $2, which covered day 20.
-In total you spent $11 and covered all the days of your travel.
+- For example, here is one way to buy passes that lets you travel your travel plan:
+- On day 1, you bought a 1-day pass for costs[0] = $2, which covered day 1.
+- On day 3, you bought a 7-day pass for costs[1] = $7, which covered days 3, 4, ..., 9.
+- On day 20, you bought a 1-day pass for costs[0] = $2, which covered day 20.
+- In total you spent $11 and covered all the days of your travel.
+
 Example 2:
 
-Input: days = [1,2,3,4,5,6,7,8,9,10,30,31], costs = [2,7,15]
-Output: 17
-Explanation:
-For example, here is one way to buy passes that lets you travel your travel plan:
-On day 1, you bought a 30-day pass for costs[2] = $15 which covered days 1, 2, ..., 30.
-On day 31, you bought a 1-day pass for costs[0] = $2 which covered day 31.
-In total you spent $17 and covered all the days of your travel.
+- Input: days = [1,2,3,4,5,6,7,8,9,10,30,31], costs = [2,7,15]
+- Output: 17
+- Explanation:
+- For example, here is one way to buy passes that lets you travel your travel plan:
+- On day 1, you bought a 30-day pass for costs[2] = $15 which covered days 1, 2, ..., 30.
+- On day 31, you bought a 1-day pass for costs[0] = $2 which covered day 31.
+- In total you spent $17 and covered all the days of your travel.
+
+### 解題分析
+1. 分析
+    - dp[i] 表示: 截至第 i 天, 我們通勤的總花費
+        - 我們可以買單日票, 那我們就必須拿出昨天的花費
+        - 我們可以買周票, 那我們就必須拿出一週前的花費
+        - ... 30日票
+    - 因此我們的 dp 大小必須宣告為最後一日
+    - 且每個位置都有可能被 access 到, 所以當此日期不是 travel 日時, 我們仍然要拿昨天的總額來
+2. rolling array 優化
+    - 因為我們最多只會 access 到 i-30, 因此我們可以把不會再用到的地方拿來存
+    - 即把所有會 access 到的地方帶入我們的 lambda function 就可以了
+
 ### 思路
 For each day,
-If you don't have to travel today, then it's strictly better to wait to buy a pass. If you have to travel today, you have up to 3 choices: you must buy either
-a 1-day on 1 day ago, or
-a 7-day,on 7 day ago, or
-a 30-day, on 30-day pass.
+- If you don't have to travel today, then it's strictly better to wait to buy a pass. If you have to travel today, you have up to 3 choices: you must buy either
+- a 1-day on 1 day ago, or
+- a 7-day,on 7 day ago, or
+- a 30-day, on 30-day pass.
 
-dp(i)=min(dp(i-1)+costs[0],dp(i-7)+costs[1],dp(i-30)+costs[2])
+- dp(i)=min(dp(i-1)+costs[0],dp(i-7)+costs[1],dp(i-30)+costs[2])
 
 ### Code
 ``` py
@@ -25554,7 +25566,7 @@ class Solution:
         days_dict = set(days) # for quick look-up
         dp = [0 for _ in range(days[-1]+1)]
 
-        for i in range(1, days[-1]+1):
+        for i in range(days[0], days[-1]+1):
             # If the current day is not present in the travel days dictionary, it takes the previous value
             if i not in days_dict:
                 dp[i] = dp[i-1]
@@ -25568,24 +25580,26 @@ class Solution:
         return dp[-1]
 ```
 
-Optimal(Need understand)
+Optimal(Space Optimize by rolling array)
 ```py
-def mincostTickets(self, days, costs):
-    validity, days_set= [1,7,30], set(days)
-    dp = [0] * (days[-1]+1)
-    for day in range(1,days[-1]+1):
-        if day not in days_set:
-            dp[day] = dp[day-1]
-        else:
-            least_cost = float('inf')
-            for cost,validity_days in zip(costs,validity):
-                prev = 0
-                if day - validity_days >= 0:
-                    prev = dp[day - validity_days]
-                least_cost = min(least_cost, cost + prev)
-            dp[day] = least_cost
-    return dp[-1]
+class Solution:
+    def mincostTickets(self, days: List[int], costs: List[int]) -> int:
+        max_pass_days = 30
+        roll = lambda d: d % max_pass_days
+        days_set = set(days)
+        dp = [0 for _ in range(max_pass_days)]
+
+        for d in range(days[0], days[-1]+1):
+            if d not in days_set:
+                dp[roll(d)] = dp[roll(d-1)]
+            else:
+                dp[roll(d)] = min(
+                    dp[roll(max(0, d-1))]+costs[0],
+                    dp[roll(max(0, d-7))]+costs[1],
+                    dp[roll(max(0, d-30))]+costs[2])
+        return dp[roll(days[-1])]
 ```
+### Tag: #DP
 ---
 ## 229. Majority Element II｜ 5/28 | [ Review * 1 ]
 Given an integer array of size n, find all elements that appear more than ⌊ n/3 ⌋ times.
