@@ -1039,6 +1039,7 @@ Note:
 2. 只有在有一個集合set必須去走訪時，才需要用到for(純粹的遞迴式不一定要存在for的)
 
 ### Code
+Recursive
 ```py
 class Solution:
     def generateParenthesis(self, n: int) -> List[str]:
@@ -1057,7 +1058,25 @@ class Solution:
             self.recursive(comb + ")", left, right-1)
 ```
 
-DP
+Recursive Memorizable Style (但這題 memo 沒用)
+```py
+class Solution:
+    def generateParenthesis(self, n: int) -> List[str]:
+        return self.recursive("", n, n)
+
+    def recursive(self, comb, left, right):
+        if left == 0 and right == 0:
+            return [comb]
+
+        res = []
+        if left > 0:
+            res += self.recursive(comb + "(", left-1, right)
+        if right > left:
+            res += self.recursive(comb + ")", left, right-1)
+        return res
+```
+
+DP (Optimal)
 ```py
 class Solution:
     def generateParenthesis(self, n: int) -> List[str]:
@@ -11233,12 +11252,10 @@ Given a string s, find the longest palindromic substring in s. You may assume th
 
 
 2. TwoPointer
-    2. 透過回文的性質: 對稱中央, 來解題
-    3. 我們透過把每一個點當作中央, 來向兩邊擴張, 求出此點作為中央可生成多大的回文
-    4. 再將 start, end of 此回文記錄下來供最後回傳
-    5. 求出 start, end 的時候就帶入例子
-        - ![](assets/markdown-img-paste-20210705164355426.png)
-    6. Time:
+    1. 透過回文的性質: 對稱中央, 來解題
+    2. 我們透過把每一個點當作中央, 來向兩邊擴張, 求出此點作為中央可生成多大的回文的`開始點與結束點`
+    3. 再將 start, end of 此回文記錄下來供最後回傳
+    4. Time:
         - Time: O(N^2)
         - Space: O(1)
 
@@ -11257,6 +11274,9 @@ Time complexity O(n^n)
 馬拉車算法
 
 https://www.cnblogs.com/grandyang/p/4475985.html
+
+### 類似題
+LC647. Palindromic Substrings
 
 ### Code
 DP Solution (TLE):
@@ -11308,19 +11328,19 @@ class Solution:
         self.s = s
         start, end = 0, 0
         for i in range(len(s)):
-            even_palin_len = self.spand_from_center(i, i)
-            odd_palin_len = self.spand_from_center(i, i+1)
-            cur_max_len = max(even_palin_len, odd_palin_len)
-            if cur_max_len > end - start:
-                start = i - (cur_max_len-1) // 2
-                end = i + cur_max_len // 2
+            even_start, even_end = self.spand_from_center(i, i)
+            if even_end-even_start+1 > end-start+1:
+                start, end = even_start, even_end
+            odd_start, odd_end = self.spand_from_center(i, i+1)
+            if odd_end-odd_start+1 > end-start+1:
+                start, end = odd_start, odd_end
         return s[start:end+1]
 
     def spand_from_center(self, l, r):
         s = self.s
         while l >= 0 and r < len(s) and s[l] == s[r]:
             l, r = l-1, r+1
-        return r-l-1 # d abba c -> 5-0-1
+        return l+1, r-1 # last state
 ```
 
 TwoPointer(Naive):
@@ -13917,6 +13937,9 @@ The substrings with different start indexes or end indexes are counted as differ
 l指針向左, r指針向右，找尋其他可能的解
 
 並且奇數回文、偶數回文都要考慮
+
+### 類似題
+LC5. Longest Palindromic Substring
 
 ### Code
 
@@ -24233,6 +24256,29 @@ class Solution:
                 if dp[i][j] == 1:
                     dp[i][j] = min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1
                     max_len = max(max_len, dp[i][j])
+
+        return max_len**2
+```
+
+修改WA的解法, Space(1) by 修改原陣列值
+```py
+class Solution:
+    def maximalSquare(self, m: List[List[str]]) -> int:
+        if not m or not m[0]:
+            return 0
+        r, c = len(m), len(m[0])
+        for i in range(r):
+            for j in range(c):
+                m[i][j] = 0 if m[i][j] == '0' else 1
+        max_len = 0
+
+        for i in range(r):
+            for j in range(c):
+                if (i == 0 or j == 0) and m[i][j] == 1:
+                    max_len = max(max_len, 1)
+                elif m[i][j] == 1:
+                    m[i][j] = min(m[i-1][j], m[i][j-1], m[i-1][j-1]) + 1
+                    max_len = max(max_len, m[i][j])
 
         return max_len**2
 ```
@@ -37505,6 +37551,15 @@ Constraints:
         #                [1,2,3,2,1]      -->
         #     <--      [3,2,1,4,7]
         ```
+    5. 由上述概念我們可以寫出架構
+        1. 首先這個平移操作共要有幾個? 畫圖就可得知是: `m+n-1` 個
+            - 因此我們用一個回圈去操控這個平移
+            - 那麼底下兩個 ptr 的 starting index 要指定成什麼?
+                - 上面: 從上面的尾開始, 每次遞進 `index-1`, 直到變零後就一直保持零直到下面走到他的尾巴
+                - 下面: 從頭開始, 前 `m-1` 次都不遞進, `m-1次後`開始遞進到下面的尾巴
+                - 上面那個的尾先碰下面的頭, 然後下次回圈就從尾-1, 下下次由尾-2..., 所以上面的尾是 `max(0, (m-1)-i)` (i start from 0)
+                - 而下面則是從零, 經過了 m-1 次的循環後開始遞增,  `max(0, i-(m-1))`
+                    - `i-(m-1)`, 為上面的表達式取補數, 並表達著經過 m-1 次的巡迴後會變成正的
     5. 因此我們可以接著 ptrA, ptrB 的移動, 去求出所有的重合可能 (frames), 並且在每個 frame 裡面試著找出最大的 cnt
     6. 需要小心的地方是, 這種做法 cnt 是不能累積的, 一遇到不合的就要 reset 成 0 (也合理)
 
@@ -37548,7 +37603,7 @@ class Solution(object):
         n = len(B)
         maxLen = 0
         for i in range(m+n-1):
-            ptrA = max(0, m-1-i) # start from last idx of A
+            ptrA = max(0, (m-1)-i) # start from last idx of A
             ptrB = max(0, i-(m-1)) # always start from zero until m iterations
             cnt = 0
             while ptrA < m and ptrB < n:

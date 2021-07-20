@@ -409,3 +409,26 @@ class Solution:
             - `dp[i-1][j]`
         2. match nothing
             - `dp[i][j-1]`
+
+## Palindrome DP Problem
+- 通常都要 dp[i][j], i 都要從尾巴往回走, j 則是從 i 走到 len+1
+- 檢查 Substring 是否為回文兩種方法
+    1. DP 紀錄 s[i:j] 是否可以形成回文
+        - i == j: dp[i][j] = True
+        - i == j+1: dp[i][j] = s[i] == s[j+1]
+        - dp[i][j] = dp[i+1][j-1] and s[i] == s[j]
+    2. 輪流當中心擴散法
+        - spand_from_center(left=i, right=i)
+        - spand_from_center(left=i, right=i+1)
+
+### LC5. Longest Palindromic Substring
+- 求最長的回文子字串
+1. `if dp[i][j] and j-i-1 > len(max_str)` -> update
+2. 擴張法回傳 new_start, new_end
+    - `if new_end - new_start +1 > g_end - g_start +1` -> update start, end
+
+### LC647. Palindromic Substrings
+- 求總共可以形成多少子回文字串
+1. `if dp[i][j]` -> cnt += 1
+2. 擴張法回傳 new_cnt
+    - `cnt += new_cnt`

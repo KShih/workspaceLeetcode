@@ -880,7 +880,7 @@ def DFS(tree):
         - **我們的 Recursive 的作法是從大的階段往前求到 base case 再return回來, 而現在我們就只是要換個方向, 由 base case 出發做到後面**
             - 轉換的概念詳見 LC377. Combination Sum IV/LC322 Coin Change
             - 或者 LC688. Knight Probability in Chessboard
-    4. 試著用上面的 "發現", 去改良 (Greedy) *(這步驟比較少見)*
+    4. Space 優化: 看看 dp 陣列是否有辦法降維a
     5. Reference article: https://leetcode.com/problems/jump-game/solution/
     6. 結論:
         1. TopDown:
