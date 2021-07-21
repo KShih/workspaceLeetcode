@@ -36573,6 +36573,8 @@ Hints:
 2. 然後用一個 arr 去紀錄每個位置, 可以透過一個 tap 去 reach 到其右邊幾個位置
 3. 那麼這個問題就變成了 Jump Game II
     - 唯一不一樣的是, jump game ii 保證了我們一定可以到底, 那這題就加上個檢查 l >= r 時表示這個區間內沒有可以進展的
+4. Time:
+    - O(N)
 
 ### 類似題
 1. LC45
@@ -36666,7 +36668,13 @@ Constraints:
 - 0 <= T <= 100
 
 ### 解題分析
-1. 與 LC1326 相同解法, 唯一不同處在 clips 的 start 可能會大於 T 導致 index outof range
+0. 解題分析
+    1. 若是有多個 starting point 都相同的時候, 我們取最大的那個
+        - [0,3],[0,7],[0,5] -> We pick [0,7]
+    2. 當我們決定好第一部的時候, 下一步就是從我們可到達的區域內選出最大的作為下一步, 然後更新 cnt
+1. Greedy
+    1. 與 LC1326 相同解法, 唯一不同處在 clips 的 start 可能會大於 T 導致 index outof range
+    2. O(max(N, T))
 
 ### 類似題
 1. LC45
