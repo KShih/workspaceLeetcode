@@ -41016,3 +41016,107 @@ class Solution:
 
 ### Tag: #DP #LIS #Sort
 ---
+## 1235. Maximum Profit in Job Scheduling｜ 7/22
+We have n jobs, where every job is scheduled to be done from startTime[i] to endTime[i], obtaining a profit of profit[i].
+
+You're given the startTime, endTime and profit arrays, return the maximum profit you can take such that there are no two jobs in the subset with overlapping time range.
+
+If you choose a job that ends at time X you will be able to start another job that starts at time X.
+
+Example 1:
+
+![](assets/markdown-img-paste-20210722154430457.png)
+
+- Input: startTime = [1,2,3,3], endTime = [3,4,5,6], profit = [50,10,40,70]
+- Output: 120
+- Explanation: The subset chosen is the first and fourth job.
+- Time range [1-3]+[3-6] , we get profit of 120 = 50 + 70.
+
+Example 2:
+
+![](assets/markdown-img-paste-2021072215453619.png)
+
+- Input: startTime = [1,2,3,4,6], endTime = [3,5,10,6,9], profit = [20,20,100,70,60]
+- Output: 150
+- Explanation: The subset chosen is the first, fourth and fifth job.
+- Profit obtained 150 = 20 + 70 + 60.
+
+Example 3:
+
+![](assets/markdown-img-paste-20210722154545513.png)
+
+- Input: startTime = [1,1,1], endTime = [2,3,4], profit = [5,6,4]
+- Output: 6
+
+Constraints:
+
+- 1 <= startTime.length == endTime.length == profit.length <= 5 * 104
+- 1 <= startTime[i] < endTime[i] <= 109
+- 1 <= profit[i] <= 104
+
+### 解題分析
+0. ![](assets/markdown-img-paste-20210722161530717.png)
+1. 破題
+    - 首先我們應該舉個例子, 思考決策的過程是怎樣, 假設我們站在時間 t, 這個位置是某個 job 的結束時間, 我們現在要考慮要不要接受這個 job, 那麼該如何決定呢?
+    - 假設我們要接受, 我們就必須放棄這個 job startTime 以後所獲得的所有利益, 因此我們必須先知道要放棄多少利益 -> dp array 存的東西
+    - 為了確定我們有考量到所有必須放棄的情形, 因此我們必須 **Sort by endTime**, 來保證所有在這個時間之前結束的事件我們都有處理過了
+    - 變數 st, et, vt 為此 job 的開始時間, 結束時間, 價值
+    - 那我們現在就是要比較 vt + dp[st] v.s. dp[t-1] 誰大來決定我們要不要接這個工作, 知道了這個關係之後就可以開始寫 code 了
+2. Naive 實現
+    - 如果按照我們的想法, 這樣必須宣告出長度為 maxEndTime 的 dp 陣列, 不太高校, 我們也能存我們需要的東西就好: EndTime, TotalValue
+    - 所以我們 init 我們的 dp 為 [0, 0], 表示在 EndTime=0 時, TotalValue=0
+    - 面對每個 job, 我們都去先前計算過的 dp 陣列中找出 <= startTime 的最大 value 並加上此 job 的價值, 然後跟目前的最大 value dp[-1][1] 比
+3. BinarySeach 優化
+    - 因為每次都要 linear search 整個 dp 陣列, 因為我們的 dp 陣列是有序的, 因此我們可以用 BinarySearch startTime 來優化
+    - 我們的 search 目標, 小於等於 st 的最大 index, 兩種寫法:
+        - bisect_left(dp, [st+1]) -1
+            - 比較高效
+        - bisect_left(dp, [st, float("inf")]) -1
+4. 其他說明:
+    - 為何要 bisect_left(dp, [st+1])?
+        - ![](assets/markdown-img-paste-20210722153130326.png)
+        - 我們的目標是找到 max index, which startTime <= st
+        - 假設我們現在 st=3, 我們真正想找的是 [3, 300] 也就是index=3, 所以 idx-1 之前我們期待的值應該要是 4
+        - 但如果我們只找 `[3]`, 會找到 [3, 250], 因為 [3] < [3, 250]
+        - 因此我們要馬找 [3, float("inf")] or [4]
+
+
+### Code
+Naive TLE (N^2)
+``` py
+class Solution:
+    def jobScheduling(self, startTime: List[int], endTime: List[int], profit: List[int]) -> int:
+
+        jobs = sorted(zip(startTime, endTime, profit), key=lambda k: k[1])
+
+        dp = [[0, 0]] # inital endTime=0, sumProfit=0
+
+        for st, et, vt in jobs:
+            max_prev_vt = 0 # we want to accept this job, so we need to find max profit before st
+            for prev_et, prev_vt in dp:
+                if prev_et <= st: # prev_job need to end before this start
+                    max_prev_vt = max(max_prev_vt, prev_vt)
+            if max_prev_vt+vt > dp[-1][1]:
+                dp.append([et, max_prev_vt+vt])
+        return dp[-1][1]
+```
+
+Optize w/ BinarySeach (Optimal)
+```py
+class Solution:
+    def jobScheduling(self, startTime: List[int], endTime: List[int], profit: List[int]) -> int:
+
+        jobs = sorted(zip(startTime, endTime, profit), key=lambda k: k[1])
+
+        dp = [[0, 0]] # inital endTime=0, sumProfit=0
+
+        for st, et, vt in jobs:
+            prev_idx_lte_st = bisect.bisect_left(dp, [st, float("inf")])-1
+            # prev_idx_lte_st = bisect.bisect_left(dp, [st+1])-1 # Better Performance
+            if dp[prev_idx_lte_st][1]+vt > dp[-1][1]:
+                dp.append([et, dp[prev_idx_lte_st][1]+vt])
+        return dp[-1][1]
+```
+
+### Tag: #DP #BinarySeach
+---
