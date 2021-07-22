@@ -41120,3 +41120,57 @@ class Solution:
 
 ### Tag: #DP #BinarySeach
 ---
+## 646. Maximum Length of Pair Chain｜ 7/22
+You are given an array of n pairs pairs where pairs[i] = [lefti, righti] and lefti < righti.
+
+A pair p2 = [c, d] follows a pair p1 = [a, b] if b < c. A chain of pairs can be formed in this fashion.
+
+Return the length longest chain which can be formed.
+
+You do not need to use up all the given intervals. You can select pairs in any order.
+
+Example 1:
+
+- Input: pairs = [[1,2],[2,3],[3,4]]
+- Output: 2
+- Explanation: The longest chain is [1,2] -> [3,4].
+
+Example 2:
+
+- Input: pairs = [[1,2],[7,8],[4,5]]
+- Output: 3
+- Explanation: The longest chain is [1,2] -> [4,5] -> [7,8].
+
+Constraints:
+
+- n == pairs.length
+- 1 <= n <= 1000
+- -1000 <= lefti < righti < 1000
+
+### 解題分析
+1. 如果每個 pair 沒有權重之分, 只求越多越好, 那我們可以用 greedy 來解
+2. 要形成 chain 前提是 p1.end < p2.start, 但我們無從比較起, **因此我們只能先固定一個順序 -> sort by end, 然後再去討論 start**
+3. 那現在 p1.end < p2.end, 我們可以討論情況:
+    1. p1.start < p2.start -> 那我們肯定直接選 p1 來加
+    2. p1.start >= p2.start, 這個情況就只能擇其一 p1 or p2 來加, 而且任何一種選法都是讓 chain +1, 那我們怎麼選呢？
+    3. **我們肯定要選 p1, 因為他的 end 較小, 會讓 current tail 較小, 給後面更多的機會去 append**
+
+### 類似題
+1. LC1235. Maximum Profit In Job Scheduling
+
+### Code
+``` py
+class Solution:
+    def findLongestChain(self, pairs: List[List[int]]) -> int:
+        pairs = sorted(pairs, key=lambda k: k[1])
+        last_end, cnt = float(-inf), 0
+
+        for st, et in pairs:
+            if st > last_end:
+                cnt += 1
+                last_end = et
+        return cnt
+```
+
+### Tag: #Greedy
+---
