@@ -41174,3 +41174,120 @@ class Solution:
 
 ### Tag: #Greedy
 ---
+## 871. Minimum Number of Refueling Stops｜ 7/22
+A car travels from a starting position to a destination which is target miles east of the starting position.
+
+There are gas stations along the way. The gas stations are represented as an array stations where stations[i] = [positioni, fueli] indicates that the ith gas station is positioni miles east of the starting position and has fueli liters of gas.
+
+The car starts with an infinite tank of gas, which initially has startFuel liters of fuel in it. It uses one liter of gas per one mile that it drives. When the car reaches a gas station, it may stop and refuel, transferring all the gas from the station into the car.
+
+Return the minimum number of refueling stops the car must make in order to reach its destination. If it cannot reach the destination, return -1.
+
+Note that if the car reaches a gas station with 0 fuel left, the car can still refuel there. If the car reaches the destination with 0 fuel left, it is still considered to have arrived.
+
+Example 1:
+
+- Input: target = 1, startFuel = 1, stations = []
+- Output: 0
+- Explanation: We can reach the target without refueling.
+
+Example 2:
+
+- Input: target = 100, startFuel = 1, stations = [[10,100]]
+- Output: -1
+- Explanation: We can not reach the target (or even the first gas station).
+
+Example 3:
+
+- Input: target = 100, startFuel = 10, stations = [[10,60],[20,30],[30,30],[60,40]]
+- Output: 2
+- Explanation: We start with 10 liters of fuel.
+- We drive to position 10, expending 10 liters of fuel.  We refuel from 0 liters to 60 liters of gas.
+- Then, we drive from position 10 to position 60 (expending 50 liters of fuel), and refuel from 10 liters to 50 liters of gas.  We then drive to and reach the target.
+- We made 2 refueling stops along the way, so we return 2.
+
+Constraints:
+
+- 1 <= target, startFuel <= 109
+- 0 <= stations.length <= 500
+- 0 <= positioni <= positioni+1 < target
+- 1 <= fueli < 109
+
+### 解題分析
+1. DP
+    0. ![](assets/markdown-img-paste-20210723142529135.png)
+    1. 可能會想說我的 dp 陣列要存答案, 也就是 dp[target] = k, k 即是次數, target 為 position, 但這種方式沒辦法寫轉移式, 且要耗費相當大的 dp 空間(target)
+    2. 所以換一個角度想, 我的 dp 可以存花費多少次數可以到達的最遠距離
+        - 但有可能會有反悔的可能性, 比如我今天怎麼知道其實 [10, 60] 就可以接到後面的 [60, 40] 而不用考慮中間的 station?
+        - 因此我們就需要用到二維陣列+窮舉取此 station or not 的所有可能性
+    3. dp[i][j] 表達的是, 總共用 i 個 station, 我只用 j 個時可以走到的最遠距離是多少 (因為只考慮距離, 所以不用紀錄花費的油m, 只需要在轉移式中判斷是否能到達即可)
+        - 因此解為 dp[n] 中, 最小的 j 其值 >= target
+        - 我們想的是, 上一個狀態可以走的最遠距離, 是否能夠達到當前的 station 並且能取這裡的油呢
+        - dp[i-1][j]: 表達我選擇跳過這個 station
+        - dp[i-1][j-1] + stations[i-1][1]: 表達我接受這個 station 的 fuel
+            - 但有個前提是上一個狀態所能走的距離要能夠到達這個 station
+                - dp[i-1][j-1] >= stations[i-1][0]
+
+2. Heap + Gready
+    1. 其實有更貪婪的做法, 如果可以允許我們回朔, 我們其實只要油還夠, 就繼續往前開就行了, 等到真的不夠了, 我們再把當初已經經過能加最多油的地方取出來
+    2. 這樣能保證我們使用最少的加油站, 因為我們每次都只取最多油的加
+    3. 我們需要:
+        1. 一個 capacity, 去紀錄我們還剩下多少油, 如果小於零了就必須取
+        2. 一個 max-heap, 去取出最大的加油站
+        3. 一個 prev, 來標示我們上一個 station 到這裡走了多少路程, 才能去更新 cap
+        4. 我們不需要去判斷是否到達終點了, 我們只要在 stations 中增加了 target, 並把其 fuel 量設為無限大, 那我們就可以把它當作 station 的一種來跑判斷式
+            1. dist-prev: 去判斷之前的油夠不夠跑到這裡
+            2. cap < 0: 此題不會用到, 因為保證了所有的 station 都在 target 之前, 但如果有些 station 在 target 之後, 這邊也會直接將 cap 加到無限大讓後面的不再進來
+
+### Code
+DP (N^2)
+``` py
+class Solution:
+    def minRefuelStops(self, target: int, startFuel: int, stations: List[List[int]]) -> int:
+        n = len(stations)
+        dp = [[0 for _ in range(n+1)] for _ in range(n+1)] # refuel j times of total i stations -> ans: min of j where dp[n][j] >= target
+
+        for i in range(n+1): # initial refuel zero times(j=0) for there's total 0~n stations
+            dp[i][0] = startFuel
+
+        for i in range(1, n+1):
+            for j in range(1, i+1):
+                # case1, no new station taken
+                dp[i][j] = dp[i-1][j]
+
+                # case2, take this station from #j-1 times
+                if dp[i-1][j-1] >= stations[i-1][0]:
+                    dp[i][j] = max(dp[i][j], dp[i-1][j-1] + stations[i-1][1])
+
+        for j, max_reach in enumerate(dp[n]):
+            if max_reach >= target:
+                return j
+        return -1
+```
+
+(Optimal)Heap + Greedy (N log N)
+```py
+class Solution:
+    def minRefuelStops(self, target: int, startFuel: int, stations: List[List[int]]) -> int:
+        cnt = 0
+        cap = startFuel
+        prev = 0
+        heap = []
+        # to let the dist-prev find out if target is reachable, and set the gas to float(inf) to mark it's already goal and no cap < 0 will ever met
+        stations.append([target, float(inf)])
+
+        for dist, fuel in stations:
+            cap -= (dist - prev)
+            while cap < 0:
+                if heap:
+                    cap += heapq.heappop(heap) * -1
+                    cnt += 1
+                else:
+                    return -1
+            heapq.heappush(heap, -1 * fuel)
+            prev = dist
+        return cnt
+```
+
+### Tag: #DP
+---
