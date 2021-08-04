@@ -30926,7 +30926,7 @@ class Solution:
 
 ### Tag: #Backtrack, #Heap, #Hash, #TopologicalSort
 ---
-## 333. Largest BST Subtree｜ 11/5
+## 333. Largest BST Subtree｜ 11/5 | [ Review * 1 ]
 Given the root of a binary tree, find the largest subtree, which is also a Binary Search Tree (BST), where the largest means subtree has the largest number of nodes.
 
 A Binary Search Tree (BST) is a tree in which all the nodes follow the below-mentioned properties:
@@ -30938,6 +30938,18 @@ Note: A subtree must include all of its descendants.
 Follow up: Can you figure out ways to solve it with O(n) time complexity?
 
 ![](assets/markdown-img-paste-20201105091312102.png)
+
+### 解題分析
+1. 解題關鍵:
+    1. 要知道左右子樹是否是 valid 的
+    2. 要知道是否是 valid 就必須要能拿到各自的 min, max, 才能去判斷 `left_max < root.val < right_min`
+2. Recursive 分析:
+    0. Purpose: 回傳以當前節點為 root, 可以產生的最大子樹的大小, 以及此數中最小/最大的數字
+    1. Goal: not root
+    2. Choice: root.left, root.right
+    3. Constraint:
+        1. left tree and right tree are valid
+3. 我們可以透過分別 call dfs(left), dfs(right) 拿回來的資訊去判斷 left/right 是否 valid, 並且維護 current_min, max 以供上層使用
 
 ### 思路
 
@@ -30972,6 +30984,37 @@ class Solution:
     def count(self, root) -> int:
         if not root: return 0
         return self.count(root.left) + self.count(root.right) + 1
+```
+
+Bottom Up, Easy Understand (Optimal)
+```py
+class Solution:
+    def largestBSTSubtree(self, root: TreeNode) -> int:
+        self.res = 0
+        def dfs(node):
+            if not node:
+                return 0, None, None # cnt, min, max
+
+            lcnt, lmin, lmax = dfs(node.left)
+            rcnt, rmin, rmax = dfs(node.right)
+
+            lvalid, rvalid, curmin, curmax = False, False, None, None
+            if lcnt >= 0:
+                lvalid = lmax < node.val if lmax else True
+                curmin = lmin if lcnt > 0 else node.val
+
+            if rcnt >= 0:
+                rvalid = node.val < rmin if rmin else True
+                curmax = rmax if rcnt > 0 else node.val
+
+            if lvalid and rvalid:
+                n = lcnt+rcnt+1
+                self.res = max(self.res, n)
+                return n, curmin, curmax
+            else:
+                return -1, None, None
+        dfs(root)
+        return self.res
 ```
 
 Button Up, Going up from leftmost node: O(n)
