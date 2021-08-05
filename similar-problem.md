@@ -442,3 +442,20 @@ class Solution:
 1. `if dp[i][j]` -> cnt += 1
 2. 擴張法回傳 new_cnt
     - `cnt += new_cnt`
+
+## Coin Add-up DP Problem
+
+### LC377. Combination Sum IV
+- 給一個數字, 給你幾種硬幣幣值, 問有幾種方法可以形成該數字
+- 與 LC322. Coin Change 一模一樣
+- 解法
+    - dp[i] += dp[i-coin]
+
+### LC343. Integer Break
+- 給一個數字, 讓你去拆成多個數的和, 問這些數的最大乘積
+- 分析:
+    - 這題沒有給 coin base, 所以 base 就是從 1 ~ i
+    - 且我們在切割時, dp[i] 紀錄的是至少拆成 1 * (i-1), 並沒有紀錄 0 * i, 因此 dp[i-j] 同樣也沒有包含 `i-j` 單獨成立的情形, 因此 我們需要額外考慮 j * (i-j)
+- 解法
+    - 需分兩種 case 討論, 兩數 及 大於兩數
+    - dp[i] = max(dp[i], j * (i-j), j * dp[i-j]), j in range (1, i)

@@ -1952,34 +1952,38 @@ class Solution:
 
 ### Tag: #BFS
 ---
-## 542. 01 Matrix (Medium)｜ 4/7 | [ Review * 1 ]
+## 542. 01 Matrix｜ 4/7 | [ Review * 1 ]
 Given a matrix consists of 0 and 1, find the distance of the nearest 0 for each cell.
 
 The distance between two adjacent cells is 1.
+
 Example 1:
-Input:
 
-0 0 0
-0 1 0
-0 0 0
-Output:
-0 0 0
-0 1 0
-0 0 0
+- Input:
+- 0 0 0
+- 0 1 0
+- 0 0 0
+- Output:
+- 0 0 0
+- 0 1 0
+- 0 0 0
+
 Example 2:
-Input:
 
-0 0 0
-0 1 0
-1 1 1
-Output:
-0 0 0
-0 1 0
-1 2 1
+- Input:
+- 0 0 0
+- 0 1 0
+- 1 1 1
+- Output:
+- 0 0 0
+- 0 1 0
+- 1 2 1
+
 Note:
-The number of elements of the given matrix will not exceed 10,000.
-There are at least one 0 in the given matrix.
-The cells are adjacent in only four directions: up, down, left and right.
+- The number of elements of the given matrix will not exceed 10,000.
+- There are at least one 0 in the given matrix.
+- The cells are adjacent in only four directions: up, down, left and right.
+
 ### 解題分析
 1. BFS
     1. 此種最短路徑題型一律從已知去拜訪未知, 而不要去 scan 整個 matrix
@@ -4996,6 +5000,10 @@ Determine the maximum amount of money the thief can rob tonight without alerting
 2. 因此我們需要先從底部開始做, 拿到以前的值才能決定當前要不要偷
 3. 如果我們決定偷了當前, 那麼我們就不能選擇偷上一個的, 只能選擇偷上上個的
 4. 如果我們決定不偷當前, 那麼我們就可以從上一個跟上上個中選出較大的
+5. 可能犯的錯:
+    - 本來是想說能不能把每一層樹的值記錄下來, 但後來發現這樣萬一: 左節點很大, 又節點很小, 但又節點的子節點很大, 這個 testcase 會不過
+        - [1,4,1,1,1,null,5]
+    - 所以還是只能 recursive, 然後 cur_not_rob 裡面要去看 prev_rob, prev_not_rob 誰大
 
 ### 思路
 這題要求的其實本質上是sum of subtree，
@@ -30943,13 +30951,19 @@ Follow up: Can you figure out ways to solve it with O(n) time complexity?
 1. 解題關鍵:
     1. 要知道左右子樹是否是 valid 的
     2. 要知道是否是 valid 就必須要能拿到各自的 min, max, 才能去判斷 `left_max < root.val < right_min`
+    3. 因此我們的 recursive function 回傳: cnt, min, max
 2. Recursive 分析:
     0. Purpose: 回傳以當前節點為 root, 可以產生的最大子樹的大小, 以及此數中最小/最大的數字
     1. Goal: not root
     2. Choice: root.left, root.right
     3. Constraint:
         1. left tree and right tree are valid
-3. 我們可以透過分別 call dfs(left), dfs(right) 拿回來的資訊去判斷 left/right 是否 valid, 並且維護 current_min, max 以供上層使用
+3. 實作
+    1. Naive:
+        - 我們可以透過分別 call dfs(left), dfs(right) 拿回來的資訊去判斷 left/right 是否 valid, 並且維護 current_min, max 以供上層使用
+    2. Optimal:
+        - 我們透過調整回傳的 min, max 去縮減程式碼
+        - 說明詳見思路
 
 ### 思路
 
@@ -30986,7 +31000,7 @@ class Solution:
         return self.count(root.left) + self.count(root.right) + 1
 ```
 
-Bottom Up, Easy Understand (Optimal)
+Bottom Up (Naive)
 ```py
 class Solution:
     def largestBSTSubtree(self, root: TreeNode) -> int:
@@ -31017,7 +31031,7 @@ class Solution:
         return self.res
 ```
 
-Button Up, Going up from leftmost node: O(n)
+Button Up (Optimal)
 ```py
 class Solution:
     def largestBSTSubtree(self, root: TreeNode) -> int:
@@ -32594,15 +32608,16 @@ Given a positive integer n, break it into the sum of at least two positive integ
 
 Example 1:
 
-Input: 2
-Output: 1
-Explanation: 2 = 1 + 1, 1 × 1 = 1.
+- Input: 2
+- Output: 1
+- Explanation: 2 = 1 + 1, 1 × 1 = 1.
+
 Example 2:
 
-Input: 10
-Output: 36
-Explanation: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36.
-Note: You may assume that n is not less than 2 and not larger than 58.
+- Input: 10
+- Output: 36
+- Explanation: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36.
+- Note: You may assume that n is not less than 2 and not larger than 58.
 
 ### 思路
 
@@ -32610,7 +32625,7 @@ Note: You may assume that n is not less than 2 and not larger than 58.
     - 類似 collect coin 那提的概念，如果知道了前面，就可以很快速的算出後面
     - 用button up DP, 從3開始循環到n，並且對於每個數從 1 開始拆分到 i-1
     - 裡面的 j*(i-j) 是拆分為兩個數的情形
-        - 因為我們總是從 i-1 開始切, 也無法紀錄到 i * 0 的情況, 所以需要分開討論
+        - 我們在切割時, dp[i] 紀錄的是至少拆成 1 * (i-1), 並沒有紀錄 0 * i, 因此 dp[i-j] 同樣也沒有包含 `i-j` 不拆分的情形, 因此 我們需要額外考慮 j * (i-j)
     - j * dp[i-j] 是拆分為多個數字的情況
 2. Math:
     - 題目提示中讓用 O(n) 的時間複雜度來解題，而且告訴我們找7到 10 之間的規律，那麼我們一點一點的來分析：
@@ -32697,8 +32712,17 @@ Placing a bomb at (1,1) kills 3 enemies.
     - 建立好這個累加數組後，對於任意位置 (i, j)，其可以炸死的最多敵人數就是 v1[i][j] + v2[i][j] + v3[i][j] + v4[i][j]，最後通過比較每個位置的累加和，就可以得到結果
 2. DP
     - ![](assets/markdown-img-paste-20201129183822446.png)
-    - 主要透過兩個變數 rowCount 跟 colCount[]
-    - 水平掃描整個 map
+    - 主要透過兩個變數 rowCount 跟 colCount[] + 水平掃描整個 map
+    - 優化上面的解法
+        - 思路: 為了不使用那麼多的空間去存, 我們希望能 1 pass 就解, 那這樣就必須要一次就算出整行的 E 數 + 整列的 E 數, 並且要使這些結果可被復用
+            - 這樣聽起來是 O(M * N * (M+N))
+            - 然而其實還是 O(M * N), 準確點來說 O(3 * M * N)
+                - 我們從每個點實際需要去被拜訪幾次來算
+                    1. `if grid[i][j] == '0':` 這行
+                    2. 計算 rowCount 時, (只會有一次!)
+                    3. 計算 colCount 時, (只會有一次!)
+        - 我們一次就去計算此行及此點有多少個 E, 直到撞到牆
+        - 又因為我們是水平掃描, 因此我們除非遇到 W, 不然此行的 enemy 數可以直接用 rowCount 存下, 然而垂直的數量就必須要用 array 保存了,
         - rowCount 迴圈的去計算此行的 E 數
         - colCount[j] 迴圈的去計算此列的 E 數
         - 何時需重新計數?
@@ -32757,7 +32781,7 @@ class Solution:
         return res
 ```
 
-DP:
+DP: (Optimal O(MN))
 ```py
 class Solution:
     def maxKilledEnemies(self, grid: List[List[str]]) -> int:
