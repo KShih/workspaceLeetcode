@@ -32899,6 +32899,20 @@ Output: [1,2,4,8]
         - 但我們 dp[i] 只要放最長的數組就好，所以我們還要去檢查是否 dp[j]+1 > dp[i]
         - 若大於 我們更新 dp[i] = dp[j] + [num]
     - 這題其實是 LIS 的變形
+    - complexity
+        - Time: O(N^2)
+        - Space: O(N)
+
+2. DP 優化:
+    - 我們可以進一步優化空間
+    - 想法是, 我們不直接保存結果, 我們只記錄到該 index 所可形成的最大 subset 的長度, 並同步更新當前最大的 subset 大小及其 index為何
+    - 走完一遍之後, 我們在透過 maxSize, maxIndex 去 `trace back` 來重新建造這個最大的 subset
+    - 如何 reconstruct?
+        - 我們 dp[i] 紀錄的是 nums[i] 所屬的最大 subset 的 size
+        - 我們可以從後往前去尋找元素, 每找到一個`符合`的元素, 就去更新 currSize 跟 currTail, 以讓我們去尋找下一個, 符合的條件如下
+            1. currSize == dp[i]
+            2. currTail % nums[i] == 0
+        - 當找到元素後我們要更新這兩個變數, 遞減 currSize, 更新 currTail
 
 - Followup:
     - why we need to sort?
@@ -32954,6 +32968,35 @@ class Solution:
             if len(dp[i]) > len(maxDP):
                 maxDP = dp[i]
         return maxDP
+```
+
+DP (Space Optimize)
+```py
+class Solution:
+    def largestDivisibleSubset(self, nums: List[int]) -> List[int]:
+        if not nums:
+            return []
+
+        nums = sorted(nums)
+        N = len(nums)
+        dp = [1 for _ in range(N)]
+        maxSize, maxIdx = 1, 0
+
+        for i in range(N):
+            for j in range(i):
+                if nums[i] % nums[j] == 0 and dp[j]+1 > dp[i]:
+                    dp[i] = dp[j]+1
+                if dp[i] >= maxSize:
+                    maxSize, maxIdx = dp[i], i
+
+        # reconstruct max subset
+        res = []
+        currSize, currTail = maxSize, nums[maxIdx]
+        for i in range(maxIdx, -1, -1):
+            if dp[i] == currSize and currTail % nums[i] == 0:
+                res.append(nums[i])
+                currSize, currTail = currSize-1, nums[i]
+        return res
 ```
 ### Tag: #DP, #LIS
 ---
