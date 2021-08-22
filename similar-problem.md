@@ -403,6 +403,8 @@ class Solution:
                 - "a", "a*"
 
 ### 比較 LC10, LC44
+0. 共同解題的關鍵:
+    - **分析 * 的用途**
 1. Default Base Case
     1. 參見上面
 2. 主迴圈

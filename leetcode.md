@@ -2271,6 +2271,9 @@ Note:
     1. 由大到小開始放, 可以幫助我們 break early
         - 比如 [4, 3, 2] k=3, 這種嘗試 4 馬上就會發現他不可能放進任何罐子
     2. 當放到的是空罐子, 且這種放法沒有解, 就直接 break 了, 因為後面的也都是空罐子且再嘗試其他空罐子也是一樣的結果 (因為我們是從左到右放)
+4. 盲點:
+    - 複習時常是要用 greedy 的做法去解題, 但這題並不能這麼做
+    - 比如你有 5 個 bucket, 然後有一個數是 509, 若這個 509 是必須要放到第三個罐子中此題才有解, 但你的第二個罐子此時也放得下, 在 greedy 的做法下就會放到第二個罐子去了, 然而這並不是我們想要的結果
 4. Time:
     - O(k ^ N)
         - [1, 1, 1, 1] k = 4
@@ -2281,7 +2284,7 @@ Note:
 首先判斷sum是否能整除k，不能整除的話直接返回false。然後需要一個visited數組來記錄哪些數組已經被選中了，然後調用遞歸函數，我們的目標是組k個子集合，是的每個子集合之和為target = sum/k。我們還需要變量start，表示從數組的某個位置開始查找，curSum為當前子集合之和，在遞歸函數中，如果k=1，說明此時只需要組一個子集合，那麼當前的就是了，直接返回true。如果curSum等於target了，那麼我們再次調用遞歸，此時傳入k-1，start和curSum都重置為0，因為我們當前又找到了一個和為target的子集合，要開始繼續找下一個。否則的話就從start開始遍曆數組，如果當前數字已經訪問過了則直接跳過，否則標記為已訪問。然後調用遞歸函數，k保持不變，因為還在累加當前的子集合，start傳入i+1，curSum傳入curSum+nums[i]，因為要累加當前的數字，如果遞歸函數返回true了，則直接返回true。否則就將當前數字重置為未訪問的狀態繼續遍歷
 一些優化：比如先給數組按從大到小的順序排個序，然後在遞歸函數中，我們可以直接判斷，如果curSum大於target了，直接返回false，因為題目中限定了都是正數，並且我們也給數組排序了，後面的數字只能更大
 ### Code
-Greedy
+Backtrack
 ```py
 class Solution:
     def canPartitionKSubsets(self, nums: List[int], k: int) -> bool:
@@ -2304,6 +2307,28 @@ class Solution:
             return False
 
         return insert_buck(0)
+```
+
+Greedy 的方法會錯 (WA)
+```py
+class Solution:
+    def canPartitionKSubsets(self, nums: List[int], k: int) -> bool:
+        nums = sorted(nums, reverse=True)
+        bucks = [0 for _ in range(k)]
+        buck_size = sum(nums) // k
+
+        for num in nums:
+            for i in range(k):
+                is_insert = False
+                if bucks[i] + num <= buck_size:
+                    bucks[i] += num
+                    is_insert = True
+                    break
+                elif bucks[i] == 0:
+                    return False
+            if not is_insert:
+                return False
+        return True
 ```
 
 ``` c++
@@ -17984,7 +18009,7 @@ class Solution:
             elif pattern == "))":
                 potential_match = i-dp[i-1]-1
                 if potential_match >= 0 and s[potential_match] == "(":
-                    dp[i] = dp[i-1] + 2 + dp[i-dp[i-1]-2]
+                    dp[i] = dp[i-1] + 2 + dp[potential_match -1]
         return max(dp)
 ```
 
@@ -21266,16 +21291,20 @@ class Solution:
 ```py
 class Solution:
     def wordBreak(self, s: str, wordDict: List[str]) -> bool:
-        dic = Counter(wordDict)
+        dic = set(wordDict)
         dp = [[] for _ in range(len(s)+1)]
         dp[0] = [""]
 
         for end in range(len(s)+1):
             subList = []
             for start in range(end):
-                if len(dp[start]) > 0 and dic[s[start:end]] == 1:
+                substr = s[start:end]
+                if substr in dic:
                     for comb in dp[start]:
-                        subList.append((comb + " " + s[start:end]).strip())
+                        if comb != "":
+                            subList.append((comb + " " + substr))
+                        else:
+                            subList.append(substr)
                     dp[end] = subList
         return dp[-1]
 ```
