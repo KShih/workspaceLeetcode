@@ -19458,6 +19458,35 @@ class Solution:
         return res
 
 ```
+
+### 類似題
+
+若此時題目改成要求求正方型
+
+### 思路
+
+- 正方形必須要等寬等高, 因此我們就對寬高取其小, 在更新 res 即可
+
+### Code
+
+```py
+class Solution:
+    def largestRectangleArea(self, heights: List[int]) -> int:
+        stack = [-1]
+        heights.append(0)
+        res = 0
+        for i, h in enumerate(heights):
+            while stack and h < heights[stack[-1]]:
+                deal = stack.pop()
+                if stack:
+                    _width = i - stack[-1] - 1
+                    _height = heights[deal]
+                    sq_len = min(_width, _height)
+                    res = max(res, sq_len * sq_len)
+            stack.append(i)
+        return res
+```
+
 ### Tag: #Stack #MonoStack
 ---
 ## 86. Partition List｜ 12/3 | [Review * 1]
