@@ -10753,7 +10753,7 @@ public:
 ```
 ### Tag: #PrefixSum #Array
 ---
-## 54. Spiral Matrix｜ 8/28
+## 54. Spiral Matrix｜ 8/28 | [ Review * 1 ]
 Given a matrix of m x n elements (m rows, n columns), return all elements of the matrix in spiral order.
 
 ![](assets/markdown-img-paste-20190828135501163.png)
@@ -10786,6 +10786,32 @@ Trick here: HOW TO INITIALIZE 2-D matrix
 如果不該超過的邊界，超過了，就是要break的時候了。
 
 ### Code
+```py
+class Solution:
+    def spiralOrder(self, matrix: List[List[int]]) -> List[int]:
+        ans = []
+        si, sj, ei, ej = 0, 0, len(matrix)-1, len(matrix[0])-1
+
+        while si <= ei and sj <= ej:
+            if si <= ei and sj <= ej:
+                for j in range(sj, ej+1): ans.append(matrix[si][j])
+                si += 1
+
+            if si <= ei and sj <= ej:
+                for i in range(si, ei+1): ans.append(matrix[i][ej])
+                ej -= 1
+
+            if si <= ei and sj <= ej:
+                for j in range(ej, sj-1, -1): ans.append(matrix[ei][j])
+                ei -= 1
+
+            if si <= ei and sj <= ej:
+                for i in range(ei, si-1, -1): ans.append(matrix[i][sj])
+                sj += 1
+
+        return ans
+```
+
 ``` c
 /*
     edge case:
@@ -10829,6 +10855,8 @@ public:
     }
 };
 ```
+
+### Tag: #Array
 ---
 ## 885. Spiral Matrix III｜ 8/28
 On a 2 dimensional grid with R rows and C columns, we start at (r0, c0) facing east.
