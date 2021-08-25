@@ -12146,7 +12146,7 @@ class Solution(object):
 
 ```
 ---
-## 238. Product of Array Except Self｜ 9/2
+## 238. Product of Array Except Self｜ 9/2 | [ Review * 1 ]
 
 Given an array nums of n integers where n > 1,  return an array output such that output[i] is equal to the product of all the elements of nums except nums[i].
 
@@ -12161,6 +12161,32 @@ Note: Please solve it without division and in O(n).
 Follow up:
 
 Could you solve it with constant space complexity? (The output array does not count as extra space for the purpose of space complexity analysis.)
+
+### 解題分析
+
+1. 我們可以用累積乘積來解題
+    - 對於位置 i, res[i] = product_sum_to_its_left[i-1] * product_sum_to_its_right[i+1]
+    - 那麼我們只要走訪並求出 product_sum_to_its_left and right 就可以解了
+2. 但題目 follow up 要求 constant space
+    - 我們只能考慮用 return arr 去做操作
+    - 初始化後, 我們首先先把 return_arr 當作是 product_sum_to_its_left
+        - res[i] = res[i-1] * nums[i-1]
+        - res[0] = 1
+    - 然後再用一個常數存 product to its right, 然後用它來更新 res 使得 res 變成兩個方向都乘了
+        - res[i] *= R
+            - init R = 1
+            - i from i-1 to 0, res[n-1] * 1, 因為在 nums[n-1] 右邊沒東西
+        - 然後再更新常數 R
+            - R *= nums[i]
+3. 暴力解
+    - 討論三種狀況
+        - 沒有 0
+            - total // nums[i]
+        - 一個 0
+            - 除了 0 的位置是乘積, 其餘都是 0
+        - 一個以上 0
+            - return 全零陣列
+
 ### 思路
 
 __思考如何求出特定的數 A[3]__
@@ -12220,6 +12246,32 @@ class Solution(object):
             afterMult *= nums[i+1]
             res[i] *=  afterMult
 
+        return res
+```
+
+Naive 暴力解 O(1)
+```py
+class Solution:
+    def productExceptSelf(self, nums: List[int]) -> List[int]:
+        has_zero, zero_idx = False, 0
+        _total = 1
+        for i, num in enumerate(nums):
+            if num == 0:
+                if has_zero:
+                    return [0] * len(nums)
+                has_zero, zero_idx = True, i
+            else:
+                _total *= num
+        res = []
+        if has_zero:
+            for i in range(len(nums)):
+                if i != zero_idx:
+                    res.append(0)
+                else:
+                    res.append(_total)
+        else:
+            for num in nums:
+                res.append(_total // num)
         return res
 ```
 ---
