@@ -11588,10 +11588,15 @@ Given n non-negative integers representing an elevation map where the width of e
         2. 左邊包的條件就由遞減 stack 來幫我們維護, 右邊的則是當偵測到暴增元素時
         3. deal 邏輯:
             1. 求長方形面積:
+                0. 從 mono queue 被破壞時可形成的三個變數去找答案
+                    1. poped_item
+                    2. breaker -> R
+                    3. top_after_poped -> L
                 1. 寬: (L, R) 也就是兩個把中間包起來的 bar 的長度 (均不包括自己)
-                    - the length of [l, r] is r - l + 1, thus that of (l, r) is r - l + 1 - 2
-                    - if you wanted to figure out how many bars are in between 1 and 4 (exclusively), we have indexes 2 and 3 (for a total of 2 bars) or 4 - 1 - 1 = 2.
-                2. 高: min(height[L], height[R]) - height[stack.top()]
+                    - R - L -1
+                        - the length of [l, r] is r - l + 1, thus that of (l, r) is r - l + 1 - 2
+                        - if you wanted to figure out how many bars are in between 1 and 4 (exclusively), we have indexes 2 and 3 (for a total of 2 bars) or 4 - 1 - 1 = 2.
+                2. 高: min(height[L], height[R]) - height[popped_item]
 
 2. Scan (DP)
     1. ![](assets/markdown-img-paste-20210411174404838.png)
@@ -17984,8 +17989,8 @@ Explanation: The longest valid parentheses substring is "()()"
     - ![](assets/markdown-img-paste-20210714203321345.png)
     - 求最大最小, 想到使用 DP
     - 但我們的 dp 陣列無法儲存最大值, 而是必須儲存到這個位置可以產生多少個左右瓜
-    - 並且只有右瓜出現的時候我們才能夠去更新這個值, 但我們必須*多看一個括號*去討論該如何更新
-        0. 加設 i 都是指向當前最右邊的右瓜
+    - 並且只有右瓜出現的時候我們才能夠去更新這個值, 但為了要能知道前面已經累積了多少, 我們必須*多看一個括號*去討論該如何更新
+        0. 加設 i 都是指向當前最右邊的右瓜, i-1 那個括號是我們處理過的, dp[i-1] 就是個可以透露我們到它時已經累積了多少
         1. `()`
             - 這個狀況相對單純, 我們就是去看到 *前一個括弧狀態* 的總計, 加二就行
             - 而前一個括弧狀態指的是 i-2, 注意, 非 *i-1*, 因為 i-1 肯定為零的(左瓜)
@@ -33327,16 +33332,16 @@ Given an input string (s) and a pattern (p), implement regular expression matchi
 
     - Input: s = "ab", p = ".*"
     - Output: true
-    - Explanation: ".*" means "zero or more (*) of any character (.)".
+    - Explanation: ".* " means "zero or more (*) of any character (.)".
 
 - Example 4:
 
-    - Input: s = "aab", p = "c*a*b"
+    - Input: s = "aab", p = "c* a *b"
     - Output: true
     - Explanation: c can be repeated 0 times, a can be repeated 1 time. Therefore, it matches "aab".
 - Example 5:
 
-    - Input: s = "mississippi", p = "mis*is*p*."
+    - Input: s = "mississippi", p = "mis* is * p *."
     - Output: false
 
 
@@ -33520,7 +33525,7 @@ Example 4:
 
 Input: s = "adceb", p = "*a*b"
 Output: true
-Explanation: The first '*' matches the empty sequence, while the second '*' matches the substring "dce".
+Explanation: The first '* ' matches the empty sequence, while the second '*' matches the substring "dce".
 Example 5:
 
 Input: s = "acdcb", p = "a*c?b"
@@ -41258,6 +41263,7 @@ Constraints:
     - 為了確定我們有考量到所有必須放棄的情形, 因此我們必須 **Sort by endTime**, 來保證所有在這個時間之前結束的事件我們都有處理過了
     - 變數 st, et, vt 為此 job 的開始時間, 結束時間, 價值
     - 那我們現在就是要比較 vt + dp[st] v.s. dp[t-1] 誰大來決定我們要不要接這個工作, 知道了這個關係之後就可以開始寫 code 了
+        - 有個重點, 這個 st 並不一定存在 dp 陣列裡, 因為我們是根據 endTime 去存, 因此我們才必須使用 BinarySeach 來找到這個最好的 index
 2. Naive 實現
     - 如果按照我們的想法, 這樣必須宣告出長度為 maxEndTime 的 dp 陣列, 不太高校, 我們也能存我們需要的東西就好: EndTime, TotalValue
     - 所以我們 init 我們的 dp 為 [0, 0], 表示在 EndTime=0 時, TotalValue=0
