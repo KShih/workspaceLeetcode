@@ -22041,7 +22041,7 @@ class Solution:
         return res.rstrip()
 ```
 ---
-## 152. Maximum Product Subarray｜ 3/3  | [ Review * 1 ]
+## 152. Maximum Product Subarray｜ 3/3  | [ Review * 2 ]
 
 Given an integer array nums, find the contiguous subarray within an array (containing at least one number) which has the largest product.
 
@@ -22070,6 +22070,9 @@ Explanation: The result cannot be 2, because [-2,-1] is not a subarray.
 2. 而這題 tricky 的地方是因為是使用乘法, 這樣就得考慮 **負數** 跟 **零** 的情況
 3. 如果此數為負數, 乘上之前最小的負數有機會變成最大的數, 因此我們也必須維持當前最小的數
 4. 然後都乘乘看, 最後再用一個 global 去接著
+5. 複習時盲點:
+    1. cur_max跟 cur_min 的更新有可能來自 prev_max 跟 prev_min，不能只用 prev_max 去更新 cur_max
+    2. cur_max, prev_max 必須分開, 用同一個值的話會有 side effect 到下面的 cur_min 運算中
 
 ### 思路
 
