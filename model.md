@@ -217,6 +217,10 @@ class Solution:
 
 ## Sliding Window
 
+0. 要 apply sliding window 的思考點
+    1. 何時縮左邊 -> 最關鍵
+    2. 縮了左邊要做什麼事
+    3. global_max 該在哪裡維持 -> 最好就是放最外面
 0. 模板
     ```py
     # LC904

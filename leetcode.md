@@ -11899,6 +11899,15 @@ Follow up:
     - find out the max subarray less than k
         - GO to #363, optimal solution's function.
 
+### 複習
+1. 複習1:
+    1. 這次思考的是如何用 sliding window 解, 卻沒有想到用 kadane
+    2. sliding window 應該思考的是, 什麼情況下需要去 shrink left
+        - 當 next int > cur_sum + cur_num 時
+    3. res 跟 cur_sum 都應該要初始化成 nums[0], 否則此 testcase
+        - [-1] -> should return -1 instead of 0
+    4. 計算 global_max 必須在 if else 外, 不能只放在累加 cur_sum 的那邊, 否則
+        - [-2, 1] -> should return 1 instead of -2
 
 ### 思路
 
@@ -11934,6 +11943,22 @@ T(n) = 2T(n/2) + O(n) => T(n) = O(nlogn)
 - 需用兩個 sliding window, local 跟 global, global 的跟著 global_max 一起更新
 
 ### Code
+
+Sliding Window's way - easy to think
+```py
+def maxSubArray(self, nums: List[int]) -> int:
+    res, cur_sum = nums[0], nums[0]
+
+    for num in nums[1:]:
+        if num > cur_sum + num:
+            cur_sum = num
+        else:
+            cur_sum += num
+        res = max(res, cur_sum)
+    return res
+```
+
+
 Kadane
 ``` py
 class Solution:
