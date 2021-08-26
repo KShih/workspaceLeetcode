@@ -263,13 +263,21 @@ class Solution:
 
 ## Binary Search
 
-1. Always use right = len(nums) -1, because you may want to access arr[right]!
-    - 在宣告時就已經朝著 "l" 跟 "r" 都有可能是可能解的方向, 所以在限縮左右邊界時也要保持這個特性
+1. 性質
+    1. (l, r) 所匡起來的區域，都要是可能的解
+        1. 所以初始化 r 為 `len(nums) - 1`
+        2. `l+1`, `r-1` 是用來協助我們排除已知不可能的部分，因此其 condition 須為`確切排除`
+        3. `l = mid`, `r = mid` 此為合法條件，因此在跳出 while loop 後回傳他就對了
+    2. 查找什麼就縮什麼
+        1. 查找左邊界 -> `l = mid+1`
+        2. 查找右邊界 -> `r = mid-1`
+
 2. 最單純的binary search, 查找特定的值:
     - l <= r
     - mid == target: break
     - l = mid + 1
     - r = mid - 1
+
 3. 查找左邊界:
     - l < r
     - l = mid +1
@@ -287,17 +295,8 @@ class Solution:
         - 同上，其所屬的條件及為言語上的所求，例如 LC34 的第二個 bs
     - r = mid - 1
     - **return l**
-5. 注意查找左右邊界的if判斷式寫法:
-    - **if 判斷式均要寫成 >= or <=**
-        - **因此當在選擇要使用左邊界右邊界時，應該要以能滿足寫出此種 if 的條件去選擇**
-        - 例 LC981 的 get(key, ts)
-            - 我們既可以解讀成
-                1. 尋找不大於 ts 的右邊界
-                2. 尋找大於 ts 的左邊界
-            - 但此時我們只能選擇 *1.尋找不大於 ts 的右邊界*
-    - 詳見LC34三刷code
 
-6. 實作 bisect (使用查找特定值模板)
+5. 實作 bisect (使用查找特定值模板)
     - 官方 implement https://github.com/python/cpython/blob/3.9/Lib/bisect.py#L15-L35
     - 比較
         ```py
