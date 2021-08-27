@@ -6149,7 +6149,7 @@ public:
 };
 ```
 ---
-## 33. Search in Rotated Sorted Array｜ 6/17 | [Review * 1]
+## 33. Search in Rotated Sorted Array｜ 6/17 | [Review * 2]
 Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
 
 (i.e., [0,1,2,4,5,6,7] might become [4,5,6,7,0,1,2]).
@@ -6202,7 +6202,7 @@ we can find out:
 ### 解題分析
 
 1. 對於已經排序過的或部分排序的陣列 我們首先思考能不能使用binary search來解
-2. 假設我們已經知道轉則點在哪，我們就能知道左右半邊哪邊是遞增排列，進而才能去判斷此target在不在這個半邊裡
+2. 我們只能對完全排序的地方使用 BS, 所以第一步就是要去找出哪邊完全排序
 3. 思考遞增排列的性質可以發現最右邊永遠大於最左邊
 4. 找到哪邊是遞增之後就能進而去檢查此target在不在這半邊裡，如果不在的話就改到另一半邊去
 5. 要注意 nums[r] 必須要是 inclusive的，不然像 [1,3] 這個例子就會爆
@@ -6261,6 +6261,8 @@ class Solution:
         # search on the left side
         return search(0, rotate_index)
 ```
+
+(Use this solution)
 ```py
 class Solution:
     def search(self, nums: List[int], target: int) -> int:
