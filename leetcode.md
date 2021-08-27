@@ -9395,7 +9395,7 @@ public:
 ```
 ### Tag: #Set #TwoPointer
 ---
-## 15. 3Sum｜ 8/18 | [ Review * 1 ]
+## 15. 3Sum｜ 8/18 | [ Review * 2 ]
 Given an array nums of n integers, are there elements a, b, c in nums such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
 
 Note:
@@ -9499,6 +9499,7 @@ class Solution:
         return res
 ```
 
+(Optimal)
 Two Pointer+Sort Solution based on Two Sum II: O(N^2)
 ```py
 class Solution:
@@ -9525,8 +9526,7 @@ class Solution:
                 l += 1
             else:
                 res.append([nums[idx], nums[l], nums[r]])
-                l += 1
-                r -= 1
+                l, r = l+1, r-1
                 while l < r and nums[l] == nums[l-1]: # 選一邊去跳過 duplicate 就可以了，因此同樣也可以去判斷 r 跟 r+1
                     l += 1
         return res
