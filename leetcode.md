@@ -12772,12 +12772,21 @@ class Solution(object):
 ```
 ### Tag: #HashTable
 ---
-## 11. Container With Most Water｜ 9/10
+## 11. Container With Most Water｜ 9/10 | [ Review * 1 ]
 Given n non-negative integers a1, a2, ..., an , where each represents a point at coordinate (i, ai). n vertical lines are drawn such that the two endpoints of line i is at (i, ai) and (i, 0). Find two lines, which together with x-axis forms a container, such that the container contains the most water.
 
 Note: You may not slant the container and n is at least 2.
 
 ![](assets/markdown-img-paste-20190910105030855.png)
+
+### 解題分析
+
+1. 只是要問切線過去的最大面積不需要使用到 mono-stack
+2. 沒有什麼想法的話找最大值就試試看 greedy 吧
+3. 面積長 * 寬, 我們能先固定的就是寬, 此時的寬是最大的, 那長就是頭尾高度取小
+4. 要繼續 move 的話我們必須從 l 跟 r 裡面選一個前進
+5. 我們選的是把小的那個去掉, 因為留下大的比較有可能繼續形成最大面積
+
 ### 思路
 
 Since we know area = length * min (height_a, height_b), to maximize the area we want to maximize both height and length.
@@ -12810,6 +12819,7 @@ class Solution(object):
 
         return res
 ```
+### Tag: #Greedy
 ---
 ## ***[Start to LinkedIn High Freq]***
 ---
