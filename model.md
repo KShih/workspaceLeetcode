@@ -429,6 +429,12 @@ class Solution:
     # z y x w v u t s r q p o n m l k j i h g f e d c b a
     # ps: get_str_mask("apple") == get_str_mask("apppppple") -> True
     ```
+2. 當沒有想法的時候先試試看 XOR 吧!
+    - a ^ b 的意義
+        1. a + b 不考慮 carry
+            - carry = (a & b) << 1
+        2. a - b 不考慮 borrow
+            - borrow = ((~a) & b) << 1
 1. https://medium.com/techie-delight/bit-manipulation-interview-questions-and-practice-problems-27c0e71412e7
 
 ---

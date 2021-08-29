@@ -41586,3 +41586,74 @@ class Solution:
 
 ### Tag: #DP
 ---
+
+## 371. Sum of Two Integers｜ 8/29
+Given two integers a and b, return the sum of the two integers without using the operators + and -.
+
+Example 1:
+
+Input: a = 1, b = 2
+
+Output: 3
+
+Example 2:
+
+Input: a = 2, b = 3
+
+Output: 5
+
+Constraints:
+
+-1000 <= a, b <= 1000
+
+### 解題分析
+1. 不能用 + - , 應該就是 bit 的題型
+2. 不知道怎麼做就先用 XOR, 我們先假設 a b 都是正數的情況
+    1. a XOR b 就是 a + b 不考慮進位的情況
+        - ![](assets/markdown-img-paste-20210829093318264.png)
+
+3. 下一步就是找出進位, 會出現要進位的地方就是當 a b 的該位置都是 1 的時候, 我們先用 AND 把那些位置找出來, 並把他向左平移一位, 來形成我們做加法時會做的操作 (寫 0 進 1)
+    1. (a AND b) << 1
+        - ![](assets/markdown-img-paste-20210829093645849.png)
+
+4. 我們把 2 的結果加上 3 的結果就是所求
+    - 因此我們可以把 2 的結果 assign 給 a
+    - 3的結果 assign 給b
+    - 並用一個 while 一直對新 ab 操作直到進位 bit 為零
+
+5. 以上的情形是 a b 均為正數的情況, 負數的話會有以下的情況需要討論
+    1. a, b 都是負
+        - 我們可以用一個 sign 去標示, 並 abs(a) + abs(b), 最後再加上 sign 就好, 操作跟上面一樣
+    2. a, b 其中一個為負
+        - ![](assets/markdown-img-paste-20210829101145868.png)
+        - 我們希望用補數的方式去做, 所以我們希望 a 永遠是正的
+        - 跟加法一樣, a ^ b 是減法未考慮 borrow bit 的情況
+        - 因此我們要想, 在哪個狀況下會去借, a 的 bit 為`0`, b 的 bit 為`1`的情況下
+            - 第一步就是先找出此位置
+                - 我們透過 (~a) & b 可以找到哪些位置需要借(先把 a 零的地方變成 1, 再跟 b 的 1 的位置 and)
+            - 然後向左平移
+                - 這個操作是為了下個 iteration 鋪路, 因為變 1 之後, 在下次的 xor 該位置就會被歸零了 (見圖)
+
+
+### Code
+``` py
+class Solution:
+    def getSum(self, a: int, b: int) -> int:
+        x, y = abs(a), abs(b) # 我們希望都對正數操作
+        if x < y:
+            return self.getSum(b, a) # 並且希望 abs(a) > abs(b)
+
+        sign = 1 if a > 0 else -1 # 但還是要記錄結果的正負
+
+        if a * b > 0: # 兩個正, 兩個負 的情況
+            while y != 0:
+                x, y = x^y, (x&y) << 1
+        else: # 一正一負
+            while y != 0:
+                x, y = x^y, ((~x) & y) << 1
+
+        return sign * x
+```
+
+### Tag: #BitManipulation
+---
