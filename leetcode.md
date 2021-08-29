@@ -31368,7 +31368,7 @@ class Solution:
 
 ### Tag: #DP, #Memorization #DFS
 ---
-## 338. Counting Bits｜ 11/7 | [ Review * 1 ]
+## 338. Counting Bits｜ 11/7 | [ Review * 2 ]
 Given a non negative integer number num. For every numbers i in the range 0 ≤ i ≤ num calculate the number of 1's in their binary representation and return them as an array.
 
 Example 1:
@@ -31388,7 +31388,7 @@ Space complexity should be O(n).
 Can you do it like a boss? Do it without using any builtin function like __builtin_popcount in c++ or in any other language.
 ### 思路
 
-1. 長度為 3 的 bit (4~7), 其bit排列是 0~3的結果前面加一個1
+1. 長度為 3 的 bit (4->7), 其bit排列是 0->3的結果前面加一個1
     - 把每個階段(總bit位數+1)的結果拿出來+1加到result裡就行
 2. DP 解法
     - 一樣是由前面的結果去更新後面的概念，但不需要多new一個prev陣列
@@ -31440,6 +31440,26 @@ class Solution:
         return res
 ```
 
+Follow up solution of LC191. Number of 1 bits
+O(n log n) not the best
+```py
+class Solution:
+    def countBits(self, n: int) -> List[int]:
+
+        def pop_count(x: int) -> int:
+            count = 0
+            while x != 0:
+                x &= x - 1 # zeroing out the least significant nonzero bit
+                count += 1
+            return count
+
+        ans = [0] * (n + 1)
+        for x in range(n + 1):
+            ans[x] = pop_count(x)
+
+        return ans
+```
+
 Optimal
 ```py
 class Solution:
@@ -31453,7 +31473,7 @@ class Solution:
 
 ### Tag: #BitManipulate #DP
 ---
-## 191. Number of 1 Bits｜ 11/7
+## 191. Number of 1 Bits｜ 11/7 | [ Review * 1 ]
 
 Write a function that takes an unsigned integer and returns the number of '1' bits it has (also known as the Hamming weight).
 
@@ -31493,6 +31513,9 @@ The input must be a binary string of length 32
     - 111 & 110 = 110
     - 110 & 101 = 100
     - 100 & 011 = 000
+3. Follow Up
+    - Precompute each number to result in O(1) solution
+    - LC338 is the answer
 
 ### Code
 ```py
