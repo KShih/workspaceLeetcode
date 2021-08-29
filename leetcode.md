@@ -34766,7 +34766,7 @@ class Solution:
 
 ### Tag: #SlidingWindow #TwoPinter
 ---
-## 133. Clone Graph｜ 3/27
+## 133. Clone Graph｜ 3/27 | [ Review * 1 ]
 Given a reference of a node in a connected undirected graph.
 
 Return a deep copy (clone) of the graph.
@@ -34788,8 +34788,11 @@ Adjacency list is a collection of unordered lists used to represent a finite gra
 The given node will always be the first node with val = 1. You must return the copy of the given node as a reference to the cloned graph.
 
 ![](assets/markdown-img-paste-20210327184328367.png)
-### 思路
-
+### 解題分析
+1. 複習盲點
+    1. DFS 的 iterative 寫不出來
+    2. Recursive 的解法:
+        - `self.map[node] = newNode` 這行不能放在遞迴 neighbor 之後, 否則會無窮 recursive
 
 ### Code
 DFS recursive:
