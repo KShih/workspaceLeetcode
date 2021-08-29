@@ -27364,7 +27364,7 @@ class Solution:
 ```
 ### Tag: #Recursive
 ---
-## 268. Missing Number｜ 7/19
+## 268. Missing Number｜ 7/19 | [ Review * 1 ]
 
 Given an array containing n distinct numbers taken from 0, 1, 2, ..., n, find the one that is missing from the array.
 
@@ -27394,6 +27394,11 @@ Once we have every number in its correct place, we can iterate the array to find
 
 - 如果給定的數組是排序過的，使用binary search解
 
+- Bit Solution:
+    - ![](assets/markdown-img-paste-20210829120337888.png)
+    - 利用 a XOR b = 0 if a == b 的性質
+    - 把每個值 xor 他的 index, 缺少的就是 missing number
+
 ### Code
 Counting sort solution:
 ``` py
@@ -27410,6 +27415,16 @@ class Solution:
             if nums[i] != i:
                 return i
         return len(nums)
+```
+
+Bit Solution:
+```py
+class Solution:
+    def missingNumber(self, nums: List[int]) -> int:
+        miss = len(nums)
+        for i in range(len(nums)):
+            miss = miss ^ i ^ nums[i]
+        return miss
 ```
 
 Sum solution:
@@ -27438,6 +27453,7 @@ class Solution:
                 l = mid+1
         return l
 ```
+### Tag: #CountingSort, #BitManipulate
 ---
 ## 269. Alien Dictionary｜ 8/1
 There is a new alien language which uses the latin alphabet. However, the order among letters are unknown to you. You receive a list of non-empty words from the dictionary, where words are sorted lexicographically by the rules of this new language. Derive the order of letters in this language.
