@@ -875,6 +875,11 @@ def DFS(tree):
                 1. Path Compression
                 2. 在 找到 root 後, 把路途中的所有節點全部修正指向 root
                 3. 在 union 的階段, 不直接 hard-code root_map[root_y] = root_x, 而是 phase3 先判斷各自樹的大小, 再把小的依附到大的下
+        2. DFS
+            1. edge 的兩端各自建立對對方的連線
+            2. 跟有向圖找環一樣, DFS with visited set 去檢測是否拜訪過了
+            3. DFS 要帶入 cur, pre, 用來避免把 backedge 誤判為 cycle
+            4. 例題 LC261
 
     2. 無向圖找 connected component
         1. Union Find

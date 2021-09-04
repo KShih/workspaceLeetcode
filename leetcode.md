@@ -26858,7 +26858,7 @@ class Solution:
 ```
 ### Tag: #HashTable
 ---
-## 261. Graph Valid Tree｜ 7/11 | [ Review * 1 ]
+## 261. Graph Valid Tree｜ 7/11 | [ Review * 2 ]
 Given n nodes labeled from 0 to n-1 and a list of undirected edges (each edge is a pair of nodes), write a function to check whether these edges make up a valid tree.
 
 Example 1:
@@ -26908,32 +26908,30 @@ Union Find 在這邊的應用就是找出共同的root 並assign給該root!
 
 
 ### Code
-dfs:
+dfs, 無向圖找環:
 ``` py
-from collections import defaultdict
 class Solution:
     def validTree(self, n: int, edges: List[List[int]]) -> bool:
-        maps = defaultdict(list)
-        visit = defaultdict(lambda: False)
-        for e in edges:
-            maps[e[0]].append(e[1])
-            maps[e[1]].append(e[0])
-        if not self.dfs(maps, visit, 0, -1):
-            return False
-        for a in range(n):
-            if not visit[a]:
-                return False
-        return True
+        self.adj_list = defaultdict(list)
+        for a, b in edges:
+            self.adj_list[a].append(b)
+            self.adj_list[b].append(a)
 
-    def dfs(self, maps, visit, cur, pre):
-        if visit[cur]:
+        self.visited = set()
+        if self.exist_circle(cur=0, pre=None):
             return False
-        visit[cur] = True
-        for e in maps[cur]:
-            if e != pre:
-                if not self.dfs(maps, visit, e, cur):
-                    return False
-        return True
+
+        return len(self.visited) == ns
+
+    def exist_circle(self, cur, pre):
+        if cur in self.visited:
+            return True
+
+        self.visited.add(cur)
+        for neib in self.adj_list[cur]:
+            if neib != pre and self.exist_circle(neib, cur):
+                return True
+        return False
 ```
 
 dfs with iterative O(N+E):
@@ -27007,10 +27005,8 @@ class Solution:
         return True
 
     def find_root(self, x):
-        if self.root_map[x] == x:
-            return x
-
-        self.root_map[x] = self.find_root(self.root_map[x]) # path compression
+        if self.root_map[x] != x:
+            self.root_map[x] = self.find_root(self.root_map[x]) # path compression
         return self.root_map[x]
 
     def find_root_iterative(self, x):
@@ -27021,9 +27017,9 @@ class Solution:
 
         # 2. phase2: path compress
         while x != root:
-            path = self.root_map[x]
+            next = self.root_map[x]
             self.root_map[x] = root
-            x = path
+            x = next
         return root
 ```
 ### Tag: #Graph #UnionFind
