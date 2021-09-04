@@ -23377,7 +23377,7 @@ class Solution:
         return dum.next
 ```
 ---
-## 207. Course Schedule｜ 3/25 | [ Review * 1 ]
+## 207. Course Schedule｜ 3/25 | [ Review * 2 ]
 There are a total of numCourses courses you have to take, labeled from 0 to numCourses-1.
 
 Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
@@ -23427,6 +23427,72 @@ we visit: 1-2-3-4-5, 2-3-4-5, 3-4-5 ...
 so that we use cached to note that there is no cycle in 5, 4, 3, 2, 1
 
 ### Code
+DFS without cache
+```py
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        graph = defaultdict(list)
+        node_status = {} # 0: not visit, 1: visited
+
+        # check if exist circle in all prerequest
+        def exist_circle(node):
+            if node_status.get(node) == 1:
+                return True
+            node_status[node] = 1
+
+            # the next prerequest need to take
+            for neib in graph[node]:
+                if exist_circle(neib):
+                    return True
+            node_status[node] = 0
+            return False
+
+        for cur, pre in prerequisites:
+            graph[pre].append(cur)
+
+        for pre in list(graph.keys()):
+            if exist_circle(pre):
+                return False
+        return True
+```
+
+DFS with cache
+```py
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        graph = defaultdict(list)
+        node_status = {} # 0: not visit, 1: visited
+        cache = {}
+
+        def exist_circle(node):
+            if node in cache:
+                return cache[node]
+
+            if node_status.get(node) == 1:
+                return True
+            node_status[node] = 1
+
+            # the next prerequest need to take
+            for neib in graph[node]:
+                if exist_circle(neib):
+                    cache[node] = True
+                    return True
+            node_status[node] = 0
+            cache[node] = False
+            return False
+
+        # build graph
+        for cur, pre in prerequisites:
+            graph[pre].append(cur)
+
+        # check if exist circle in all prerequest
+        for pre in list(graph.keys()):
+            if exist_circle(pre):
+                return False
+        return True
+```
+
+
 Backtracking solution to find cycle in graph
 ``` py
 from collections import defaultdict
