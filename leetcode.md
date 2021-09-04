@@ -27485,7 +27485,7 @@ class Solution:
 ```
 ### Tag: #CountingSort, #BitManipulate
 ---
-## 269. Alien Dictionary｜ 8/1
+## 269. Alien Dictionary｜ 8/1 | [ Review * 1 ]
 There is a new alien language which uses the latin alphabet. However, the order among letters are unknown to you. You receive a list of non-empty words from the dictionary, where words are sorted lexicographically by the rules of this new language. Derive the order of letters in this language.
 
 Example 1:
@@ -27543,6 +27543,20 @@ There may be multiple valid order of letters, return any one of them is fine.
         - 因為我們需回傳所有出現過字母的順序，因此我們 topo_sort 的對象應該要是所有節點，因此我們維護一個 node_set
     3. 剩下的就是經典的 topo sort, 與 LC210 一樣的作法
 
+4. 複習盲點:
+    1. 對於為什麼我們不用管拜訪 node 的順序, 可以直接將取得的順序加到 res 裡
+        0. 題目對於無法判斷的順序, 放在哪個位置都沒差
+        1. 因為 adj_list 幫我們維持順序
+        2. 我們採取了倒著添加, 導致哪個點先拜訪都沒差
+        3. 例子 A -> B -> C -> D, 正確應該要輸出 "ABCD"
+            1. 今天假設我們先拜訪了 B
+                - 我們可以得到 [D, C, B] 的 path
+                - 我們直接加到 res 裡, res = "DCB"
+                - 後面遇到了 A, 也會在嘗試 visit B 時被停下來, 導致 res 裡只再加一個 A, 變 DCBA
+            2. 今天假設我們先拜訪 A
+                - 那更好, 一次得到 res = DCBA
+            3. 最後再將 res 整個反轉
+
 
 ### Code
 ``` py
@@ -27556,27 +27570,26 @@ class Solution:
         res = ""
         self.visited = {}
         for node in node_set:
-            path = []
-            if self.existCircle(node, path):
+            path = [] # to get the sorting order
+            has_cycle = self.topo_sort(node, path)
+            if has_cycle:
                 return ""
             res += "".join(path)
-        return res[::-1] if len(res) == len(node_set) else ""
+        return res[::-1]
 
     def build_adjList(self, words):
         adjList = defaultdict(list)
         for i in range(len(words)-1):
             word1, word2 = words[i], words[i+1]
-            if len(word1) > len(word2) and word1.startswith(word2): # not allow ["ab", "abc"]
+            if len(word1) > len(word2) and word1.startswith(word2): # not allow ["abc", "ab"]
                 return None, False
             for j in range(len(word1)):
                 if word1[j] != word2[j]:
                     adjList[word1[j]].append(word2[j])
                     break
-                else:
-                    continue
         return adjList, True
 
-    def existCircle(self, node, path):
+    def topo_sort(self, node, path):
         if self.visited.get(node) == 1:
             return True
         if self.visited.get(node) == -1:
@@ -27584,7 +27597,8 @@ class Solution:
 
         self.visited[node] = 1
         for _next in self.adjList[node]:
-            if self.existCircle(_next, path):
+            has_cycle = self.topo_sort(_next, path)
+            if has_cycle:
                 return True
         self.visited[node] = -1
         path += [node]
