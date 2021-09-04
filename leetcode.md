@@ -35104,7 +35104,7 @@ class Solution:
 
 ### Tag: #UnionFind #DFS #Graph
 ---
-## 128. Longest Consecutive Sequence｜ 4/12
+## 128. Longest Consecutive Sequence｜ 4/12 | [ Review * 1 ]
 Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.
 
 Example 1:
@@ -35156,22 +35156,51 @@ class Solution:
         return res
 ```
 
-UnionFind
+UnionFind 簡化版
+```py
+class Solution:
+    def longestConsecutive(self, nums: List[int]) -> int:
+        if not nums:
+            return 0
+        self.root_map = {num: num for num in nums}
+        self.size = {num: 1 for num in nums}
+
+        for num in nums:
+            if num - 1 in self.root_map:
+                self.union(num, num-1)
+
+            if num + 1 in self.root_map:
+                self.union(num, num+1)
+        return max(self.size.values())
+
+    def union(self, x, y):
+        root_x, root_y = self.find(x), self.find(y)
+        if root_x == root_y:
+            return
+        self.root_map[root_y] = self.root_map[root_x]
+        self.size[root_x] += self.size[root_y]
+
+    def find(self, x):
+        if self.root_map[x] != x:
+            self.root_map[x] = self.find(self.root_map[x])
+        return self.root_map[x]
+```
+
+UnionFind Size比較優化版
 ```py
 class Solution:
     def longestConsecutive(self, nums: List[int]) -> int:
         if not nums:
             return 0
 
-        num_set = set(nums)
         self.root_map = {num: num for num in nums}
         self.sizes = {num: 1 for num in nums}
 
         for num in nums:
-            if num-1 in num_set:
+            if num-1 in self.root_map:
                 self.union(num, num-1)
 
-            if num+1 in num_set:
+            if num+1 in self.root_map:
                 self.union(num, num+1)
         return max(self.sizes.values())
 

@@ -835,16 +835,22 @@ def DFS(tree):
             self.sizes = [1 for id in range(node_cnt)]
 
         def union(self, x, y):
-            self.root_map[self.find(y)] = self.find(x) # for simplicity, didn't compare the size
+            root_x, root_y = self.find(x), self.find(y)
+            if root_x == root_y:
+                return
+            self.root_map[root_y] = root_x # for simplicity, didn't compare the size
+            self.sizes[root_x] += self.sizes[root_y]
             # # Size compare optimize:
-            # root_x, root_y = self.find(x), self.find(y)
-            # if self.sizes(root_x) < self.sizes(root_y):
-            #     if self.sizes[root_x] < self.sizes[root_y]:
-            #         self.root_map[root_x] = root_y
-            #         self.sizes[root_y] += root_x
-            #     else:
-            #         self.root_map[root_y] = root_x
-            #         self.sizes[root_x] += root_y
+            # if root_x == root_y:
+            #     # Should not process with this condition since we've process w/ it before and it will make the size go wrong e.g. union(1, 2) and union(2, 1)
+            #     return
+            #
+            # if self.sizes[root_x] >= self.sizes[root_y]:
+            #     self.root_map[root_y] = root_x
+            #     self.sizes[root_x] += self.sizes[root_y]
+            # else:
+            #     self.root_map[root_x] = root_y
+            #     self.sizes[root_y] += self.sizes[root_x]
 
         def find(self, x):
             if self.root_map[x] != x:
