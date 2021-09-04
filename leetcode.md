@@ -23456,29 +23456,25 @@ class Solution:
         return True
 ```
 
-DFS with cache
+DFS with cache (Optimal)
 ```py
 class Solution:
     def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
         graph = defaultdict(list)
-        node_status = {} # 0: not visit, 1: visited
-        cache = {}
+        node_status = {} # 0: not visit, 1: visited, -1: previous visit, but no cycle detect
 
         def exist_circle(node):
-            if node in cache:
-                return cache[node]
-
             if node_status.get(node) == 1:
                 return True
+            if node_status.get(node) == -1:
+                return False
             node_status[node] = 1
 
             # the next prerequest need to take
             for neib in graph[node]:
                 if exist_circle(neib):
-                    cache[node] = True
                     return True
-            node_status[node] = 0
-            cache[node] = False
+            node_status[node] = -1
             return False
 
         # build graph
@@ -23492,38 +23488,6 @@ class Solution:
         return True
 ```
 
-
-Backtracking solution to find cycle in graph
-``` py
-from collections import defaultdict
-class Solution:
-    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
-        self.order = defaultdict(list)
-        for cur, pre in prerequisites:
-            self.order[pre].append(cur)
-
-        self.visited = {}
-        self.cache = dict()
-        for pre in list(self.order.keys()):
-            if self.existCircle(pre):
-                return False
-        return True
-
-    def existCircle(self, pre):
-        if pre in self.cache:
-            return self.cache[pre]
-        if self.visited.get(pre) == 1:
-            return True
-
-        self.visited[pre] = 1
-        for _next in self.order[pre]:
-            if self.existCircle(_next):
-                self.cache[pre] = True
-                return True
-        self.cache[pre] = False
-        self.visited[pre] = 0
-        return False
-```
 ### Tag: #Graph #DFS
 ---
 ## 210. Course Schedule II｜ 3/25
