@@ -30765,10 +30765,18 @@ class Solution:
 
 ### Tag: #DP
 ---
-## 323. Number of Connected Components in an Undirected Graph｜ 10/28 | [ Review * 1 ]
+## 323. Number of Connected Components in an Undirected Graph｜ 10/28 | [ Review * 2 ]
 Given n nodes labeled from 0 to n - 1 and a list of undirected edges (each edge is a pair of nodes), write a function to find the number of connected components in an undirected graph.
 
 ![](assets/markdown-img-paste-20201028230708405.png)
+
+### 解題分析
+1. 就是直接使用 union find, 但是最後再判斷 connected component 的時候不能直接去判斷 set(root_map.values()) 的數量
+    1. 例子: [[0,1], [2,3], [1,2]]
+        - 這個如果直接去拿 value裡的長度, 會得到 2
+        - 原因: 0跟1 建立, 2跟3 建立, 1再去連2的時候並不會改到 2跟3建立的
+2. 正確的作法應該是去看有多少的 key 是等於 value 的 (root的數量)
+
 ### 思路
 
 1. Way1: 圖論先建立 adjList, 然後考慮用 DFS or BFS 解
@@ -30829,29 +30837,28 @@ Union Find Path Compression:
 ```py
 class Solution:
     def countComponents(self, n: int, edges: List[List[int]]) -> int:
-        self.root_map = [i for i in range(n)]
-        self.sizes = [1] * n
+        self.root_map = {i: i for i in range(n)}
+        self.sizes = {i: 1 for i in range(n)}
+        for a, b in edges:
+            self.union(a, b)
 
-        for x, y in edges:
-            root_x = self.find(x)
-            root_y = self.find(y)
-            if root_x == root_y:
-                continue
+        # return len(set(self.root_map.values()))
+        return len([k for k, v in self.root_map.items() if k == v])
 
-            if self.sizes[root_x] < self.sizes[root_y]:
-                self.root_map[root_x] = root_y
-                self.sizes[root_y] += self.sizes[root_x]
-            else:
-                self.root_map[root_y] = root_x
-                self.sizes[root_x] += self.sizes[root_y]
-
-        return len([i for i in range(len(self.root_map)) if i == self.root_map[i]])
+    def union(self, x, y):
+        root_x, root_y = self.find(x), self.find(y)
+        if root_x == root_y:
+            return
+        if self.sizes[root_x] >= self.sizes[root_y]:
+            self.root_map[root_y] = root_x
+            self.sizes[root_x] += self.sizes[root_y]
+        else:
+            self.root_map[root_x] = root_y
+            self.sizes[root_y] += self.sizes[root_x]
 
     def find(self, x):
-        if self.root_map[x] == x:
-            return x
-
-        self.root_map[x] = self.find(self.root_map[x]) # path compression
+        if self.root_map[x] != x:
+            self.root_map[x] = self.find(self.root_map[x])
         return self.root_map[x]
 ```
 
