@@ -29956,6 +29956,9 @@ arrow 為 區間的 end 值，下一個區間想要被這個 arrow 穿過 其區
 
 ![](assets/markdown-img-paste-20201010190919352.png)
 
+### 類似題
+- LC435. Non-overlapping Intervals
+
 ### Code
 ``` py
 class Solution:
@@ -41876,4 +41879,62 @@ class Solution:
 ```
 
 ### Tag: #BitManipulation
+---
+## 435. Non-overlapping Intervals｜ 9/5
+Given an array of intervals intervals where intervals[i] = [starti, endi], return the minimum number of intervals you need to remove to make the rest of the intervals non-overlapping.
+
+Example 1:
+
+- Input: intervals = [[1,2],[2,3],[3,4],[1,3]]
+- Output: 1
+- Explanation: [1,3] can be removed and the rest of the intervals are non-overlapping.
+
+Example 2:
+
+- Input: intervals = [[1,2],[1,2],[1,2]]
+- Output: 2
+- Explanation: You need to remove two [1,2] to make the rest of the intervals non-overlapping.
+
+Example 3:
+
+- Input: intervals = [[1,2],[2,3]]
+- Output: 0
+- Explanation: You don't need to remove any of the intervals since they're already non-overlapping.
+
+Constraints:
+
+- 1 <= intervals.length <= 105
+- intervals[i].length == 2
+- -5 * 104 <= starti < endi <= 5 * 104
+
+### 解題分析
+1. 此題屬於經典的 Greedy 問題: interval schedule problem
+2. 我們希望最小化 removal 的數量, 換個角度想就是最大化無覆蓋區域
+3. 這個想法可以讓要求的解回到 interval 身上, 那我們如何最大化無覆蓋呢？
+4. 我們可以 sort by endtime, 並維護一個 cur_end 來追蹤目前處理到的 interval 中最晚結束的時間
+5. 這樣就可以讓早結束的先用掉, 這樣可以保證我們可以盡可能的不要讓我們的 cur_end 擴張的太快
+6. 證明:
+    1. 如果有兩個 event x 跟 y, 結束時間是 y 比較晚
+    2. 那麼我們就沒有道理選 y, 因為 y 肯定比 x 更高機率的會覆蓋到其他人
+
+### 類似題
+- LC452. Minimum Number of Arrows to Burst Balloons
+
+### Code
+``` py
+class Solution:
+    def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:
+        intervals = sorted(intervals, key=lambda k: k[1])
+        cur_end = float("-inf")
+        removal = 0
+
+        for start, end in intervals:
+            if start >= cur_end:
+                cur_end = end
+            else:
+                removal += 1
+        return removal
+```
+
+### Tag: #Interval #Greedy
 ---
