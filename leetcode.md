@@ -26481,7 +26481,7 @@ class Vector2D:
         return False
 ```
 ---
-## 252. Meeting Rooms｜ 6/17 | [ Review * 1 ]
+## 252. Meeting Rooms｜ 6/17 | [ Review * 2 ]
 Given an array of meeting time intervals consisting of start and end times [[s1,e1],[s2,e2],...] (si < ei), determine if a person could attend all meetings.
 
 Example 1:
@@ -26493,18 +26493,19 @@ Example 2:
 Input: [[7,10],[2,4]]
 Output: true
 
-### 思路
-
+### 解題分析
+1. 讓早結束的先出來, 因此我們可以用最緩慢的速度 (sort by end) 去更新 cur_end
+2. 如果都這麼緩慢的更新了, 還是有 start 會重疊到, 表示一定會有重疊
 
 ### Code
 ``` py
 class Solution:
     def canAttendMeetings(self, intervals: List[List[int]]) -> bool:
         prev = 0
-        for start, end in sorted(intervals):
+        for start, end in sorted(intervals, key=lambda k: k[1]):
             if prev > start:
                 return False
-            prev = max(prev, end)
+            prev = end
         return True
 ```
 
