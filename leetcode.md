@@ -26494,15 +26494,30 @@ Input: [[7,10],[2,4]]
 Output: true
 
 ### 解題分析
-1. 讓早結束的先出來, 因此我們可以用最緩慢的速度 (sort by end) 去更新 cur_end
-2. 如果都這麼緩慢的更新了, 還是有 start 會重疊到, 表示一定會有重疊
-
+1. Sort by end
+    1. 讓早結束的先出來, 因此我們可以用最緩慢的速度 (sort by end) 去更新 cur_end
+    2. 如果都這麼緩慢的更新了, 還是有 start 會重疊到, 表示一定會有重疊
+2. Sort by start
+    1. 只維護一間 meeting room 並按時間軸去走, 如果下個 meeting 時間到了可是上一個還沒有結束就 gg
 ### Code
+Sort by end
 ``` py
 class Solution:
     def canAttendMeetings(self, intervals: List[List[int]]) -> bool:
         prev = 0
         for start, end in sorted(intervals, key=lambda k: k[1]):
+            if prev > start:
+                return False
+            prev = end
+        return True
+```
+
+Sort by start
+``` py
+class Solution:
+    def canAttendMeetings(self, intervals: List[List[int]]) -> bool:
+        prev = 0
+        for start, end in sorted(intervals):
             if prev > start:
                 return False
             prev = end
@@ -26530,7 +26545,7 @@ class Solution:
 ```
 ### Tag: #Heap, #Sort, #Greedy
 ---
-## 253. Meeting Rooms II｜ 6/17 | [ Review * 1 ]
+## 253. Meeting Rooms II｜ 6/17 | [ Review * 2 ]
 
 Given an array of meeting time intervals consisting of start and end times [[s1,e1],[s2,e2],...] (si < ei), find the minimum number of conference rooms required.
 
@@ -26547,10 +26562,11 @@ Output: 1
 
 1. Heap:
 
-heap 裡面放此meeting 的結束時間，
-如果下個開始時間彼此結束時間還要早，則必須再開一間
+- 需要 sort by start, 因為我們需要靠著下一個 start 去 pop 掉 outdated 的 room_end_time
+- heap 裡面放此meeting 的結束時間，
+- 如果下個開始時間彼此結束時間還要早，則必須再開一間
 
-如果比這個時間還要晚，表時timeline已經移動到那個開始時間，則必須pop (否則timeline永遠不會前進)
+- 如果比這個時間還要晚，表時timeline已經移動到那個開始時間，則必須pop (否則timeline永遠不會前進)
 
 2. TreeMap:
 
@@ -26563,11 +26579,11 @@ min Heap:
 class Solution:
     def minMeetingRooms(self, intervals: List[List[int]]) -> int:
         intervals = sorted(intervals)
-        heap = [intervals[0][1]]
-        res = 1
-        for start, end in intervals[1:]:
+        heap = []
+        res = 0
+        for start, end in intervals:
             while heap and start >= heap[0]:
-                heapq.heappop(heap)
+                heapq.heappop(heap) # outdated room
             heapq.heappush(heap, end)
             res = max(res, len(heap))
         return res

@@ -461,3 +461,60 @@ class Solution:
 - 解法
     - 需分兩種 case 討論, 兩數 及 大於兩數
     - dp[i] = max(dp[i], j * (i-j), j * dp[i-j]), j in range (1, i)
+
+## Greedy Interval Question
+- 共通點都是要先 sort
+- LC435.
+    - 要我們求最小的 overlapping
+- LC452.
+    - 要我們求最小的 non-overlapping
+- LC253.
+    - 要我們求最小的 overlapping
+
+### LC435. Non-overlapping intervals
+- sort by end 可以保證當後面 start 比當前的 end 還小的時候就是出現重疊了
+```py
+class Solution:
+    def eraseOverlapIntervals(self, intervals: List[List[int]]) -> int:
+        intervals = sorted(intervals, key=lambda k: k[1])
+        cur_end, removal = float("-inf"), 0
+
+        for start, end in intervals:
+            if start >= cur_end:
+                cur_end = end
+            else:
+                removal += 1
+        return removal
+```
+
+### LC452. Minimum Number of Arrows to Burst Balloons
+- sort by end 可以保證當後面 start 比當前的 end 還大的時候就是出現非重疊了
+```py
+class Solution:
+    def findMinArrowShots(self, points: List[List[int]]) -> int:
+        intervals = sorted(intervals, key=lambda k: k[1])
+        arrow, res = None, 0
+
+        for start, end in intervals:
+            if not arrow or start > arrow:
+                res += 1
+                arrow = end
+        return res
+```
+
+### LC253. Meeting Rooms II
+- sort by start 因為我們需要靠著 heap 去維繫當前的時間軸
+- Start time matters! 會議開始了就一定要給他 room.
+```py
+class Solution:
+    def minMeetingRooms(self, intervals: List[List[int]]) -> int:
+        intervals = sorted(intervals)
+        heap = []
+        res = 0
+        for start, end in intervals:
+            while heap and start >= heap[0]: # outdated room
+                heapq.heappop(heap)
+            heapq.heappush(heap, end)
+            res = max(res, len(heap))
+        return res
+```
