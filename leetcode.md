@@ -8826,16 +8826,57 @@ class Solution {
 ## 257. Binary Tree Paths
 Asking for iterative way in interview.
 ---
-## 57. Insert Interval｜ 7/18
+## 57. Insert Interval｜ 7/18 | [ Review * 1 ]
 Given a set of non-overlapping intervals, insert a new interval into the intervals (merge if necessary).
 
 You may assume that the intervals were initially sorted according to their start times.
 ![](assets/markdown-img-paste-20190811100643921.png)
+
+### 解題分析
+1. 我們分析可能會有多種的 overlap 情況需要去處理, 比較好處理的方法就是透過更新 end 來做延伸
+2. 要只關注 end 的話, 我們就必須先處理絕對不會有重疊的狀況, 也就是說我們必須先讓 front 小的進 output (也就是 sort by front 類似的概念)
+3. 所以程式的第一部份就是先把 front < new_front 的部分都先放進去
+4. 第二部分就要來討論 overlapping 的狀況了, 新的 interval 之於 output 的 end 有幾種狀況:
+    1. 完全不重合
+    2. 部分重合
+    3. 完全重合
+    4. ![](assets/markdown-img-paste-20210905114904951.png)
+5. 在這部分我們的目的是要插入 new_interval, 因此完全重合的狀況可以不用討論, 因為就直接被 output[-1] 給完全吃掉了
+6. 插入完 new_interval 剩下的部分就是把後面的也都放進來, 我們也是透過延伸 end 去處理後段重合的狀況, 跟上一步的做法類似
+
 ### 思路
 
 這道題讓我們在一系列非重疊的區間中插入一個新的區間，可能還需要和原有的區間合併，我們可以對給定的區間集進行一個一個的遍歷比較，那麼會有兩種情況，重疊或是不重疊，不重疊的情況最好，直接將新區間插入到對應的位置即可，重疊的情況比較複雜，有時候會有多個重疊，我們需要更新新區間的範圍以便包含所有重疊，之後將新區間加入結果 res，最後將後面的區間再加入結果 res 即可。具體思路是，我們用一個變量 cur 來遍歷區間，如果當前 cur 區間的結束位置小於要插入的區間的起始位置的話，說明沒有重疊，則將 cur 區間加入結果 res 中，然後 cur 自增1。直到有 cur 越界或有重疊 while 循環退出，然後再用一個 while 循環處理所有重疊的區間，每次用取兩個區間起始位置的較小值，和結束位置的較大值來更新要插入的區間，然後 cur 自增1。直到 cur 越界或者沒有重疊時 while 循環退出。之後將更新好的新區間加入結果 res，然後將 cur 之後的區間再加入結果 res 中即可，
 
 ### Code
+```py
+class Solution:
+    def insert(self, intervals: List[List[int]], newInterval: List[int]) -> List[List[int]]:
+        output = []
+        idx = 0
+        n = len(intervals)
+        new_start, new_end = newInterval
+
+        while idx < n and new_start > intervals[idx][0]:
+            output.append(intervals[idx])
+            idx += 1
+
+        # deal with overlap
+        if len(output) == 0 or new_start > output[-1][1]: # no overlap
+            output.append(newInterval)
+        elif new_end > output[-1][1]:
+            output[-1][1] = new_end
+
+        # deal with the rest
+        while idx < n:
+            if output[-1][1] < intervals[idx][0]:
+                output.append(intervals[idx])
+            elif intervals[idx][1] > output[-1][1]:
+                output[-1][1] = intervals[idx][1]
+            idx += 1
+        return output
+```
+
 ``` c
 class Solution {
 public:
@@ -8867,6 +8908,7 @@ public:
     }
 };
 ```
+### Tag: #Interval
 ---
 ## 766. Toeplitz Matrix｜ 8/11
 A matrix is Toeplitz if every diagonal from top-left to bottom-right has the same element.
