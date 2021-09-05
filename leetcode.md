@@ -10961,7 +10961,7 @@ public:
 };
 ```
 ---
-## 56. Merge Intervals｜ 8/28
+## 56. Merge Intervals｜ 8/28 | [ Review * 1 ]
 Given a collection of intervals, merge all overlapping intervals.
 
 ![](assets/markdown-img-paste-20190828171623852.png)
@@ -10976,6 +10976,18 @@ Trick here:
 
 把第一個區間存入結果中，然後從第二個開始遍歷區間集，如果結果中最後一個區間和遍歷的當前區間無重疊，直接將當前區間存入結果中，如果有重疊，將結果中最後一個區間的 end 值更新為結果中最後一個區間的 end 和當前 end 值之中的較大值，然後繼續遍歷區間集
 ### Code
+```py
+class Solution:
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        intervals = sorted(intervals) # sort by front
+        output = []
+        for start, end in intervals:
+            if not output or output[-1][1] < start:
+                output.append([start, end])
+            elif end > output[-1][1]:
+                output[-1][1] = end
+        return output
+```
 ``` c
 class Solution {
 public:
