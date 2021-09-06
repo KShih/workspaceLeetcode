@@ -7103,7 +7103,7 @@ public:
 ```
 ### Tag: #LinkedList
 ---
-## 206. Reverse Linked List｜ 8/13 | [Review * 1]
+## 206. Reverse Linked List｜ 8/13 | [Review * 2]
 Reverse a singly linked list.
 ![](assets/markdown-img-paste-20190813130546783.png)
 
@@ -7188,7 +7188,7 @@ public:
 };
 ```
 ---
-## 141. Linked List Cycle｜ 7/4
+## 141. Linked List Cycle｜ 7/4 | [ Review * 1 ]
 Given a linked list, determine if it has a cycle in it.
 
 To represent a cycle in the given linked list, we use an integer pos which represents the position (0-indexed) in the linked list where tail connects to. If pos is -1, then there is no cycle in the linked list.
@@ -7203,6 +7203,17 @@ we write fast at " fast = "
 and write fast->next at "fast->next->next"
 
 ### Code
+```py
+class Solution:
+    def hasCycle(self, head: ListNode) -> bool:
+        slow, fast = head, head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+            if slow == fast:
+                return True
+        return False
+```
 ``` c
 class Solution {
 public:
