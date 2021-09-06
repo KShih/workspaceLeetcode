@@ -381,6 +381,7 @@ class Solution:
 4. 快慢指針存取*倒數第 n 個*節點
     1. 快指針先走 n 步, 再讓兩者同時前進
     2. 當快指針走到底時，慢指針的位置即為所求
+    3. 如果需要站在倒數第 n+1 個點, 那就是判斷 fast.next 走到盡頭, 此時的 slow.next 就是倒數第n (LC19)
 5. 旋轉 LinkedList
     1. 頭尾相接，然後做兩件事：找出新頭, 斷尾
 6. 跳者走訪 LinkedList
@@ -390,6 +391,7 @@ class Solution:
     1. stack 協助
     2. reverse in place
         ```py
+        ptr = head
         revHead = None # started of the reverse list
 
         while ptr:

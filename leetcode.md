@@ -16448,7 +16448,7 @@ def removeEnd(self,head):
     return prev.next
 ```
 ---
-## 19. Remove Nth Node From End of List｜ 10/21 | [Review * 1]
+## 19. Remove Nth Node From End of List｜ 10/21 | [Review * 2]
 Given a linked list, remove the n-th node from the end of list and return its head.
 
 Example:
