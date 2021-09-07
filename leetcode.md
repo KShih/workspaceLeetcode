@@ -19183,10 +19183,21 @@ class Solution:
 ```
 ### Tag: #DP
 ---
-## 73. Set Matrix Zeroes｜ 11/27
+## 73. Set Matrix Zeroes｜ 11/27 | [ Review * 1 ]
 Given a m x n matrix, if an element is 0, set its entire row and column to 0. Do it in-place.
 
 ![](assets/markdown-img-paste-20191127132705334.png)
+
+### 解題分析
+1. O(1) Space 的方法
+    1. 概念上就是我們要省下標記的 memory, 所以我們必須得用自身 matrix 內的空間來作為標記, 也就是用 0 row, 0 col 來作為標記區
+    2. 但是如果我們先 process 了第0, 這樣會把整個 matrix 都變成 0, 所以我們必須先跳過第 0
+    3. 然而我們也不想要標記區的結果讓我們忘記本來的 0rol 0col 是否需為零, 所以我們用了兩個 flag 先標好, 最後再來處理 0rol, 0col 的 assign
+    4. 演算法
+        1. 標記 0rol, 0col (外圈)
+        2. 標記 rol[1:], col[1:] (內圈)
+        3. 處理 rol[1:], col[1:]
+        4. 處理 0rol, 0col
 
 ### 思路
 
@@ -19222,6 +19233,48 @@ class Solution:
                 matrix[i][zero_index] = 0
 
         return matrix
+```
+
+Optimal Space
+```py
+class Solution:
+    def setZeroes(self, m: List[List[int]]) -> None:
+        # 因為我們要用第一行/列來作為此行/列是否需全為零的標記, 所以我們須先把這區是否為零的結果存下來, 最後再處理
+        # 且在 process 內圈的過程中, 我們會把標記區跟資料區分開, 因此會從 1 開始往後檢查
+
+        r, c = len(m), len(m[0])
+        # Step1: 紀錄第一行/列是否在最後需要全部弄為零(標記外圈)
+        should_first_row_zero, should_first_col_zero = False, False
+        for i in range(r):
+            if m[i][0] == 0:
+                should_first_row_zero = True
+                break
+
+        for j in range(c):
+            if m[0][j] == 0:
+                should_first_col_zero = True
+                break
+
+        # Step2: 標記內圈
+        for i in range(1, r):
+            for j in range(1, c):
+                if m[i][j] == 0: # 標記
+                    m[0][j], m[i][0] = 0, 0
+
+        # Step3: 給零內圈
+        for i in range(1, r):
+            for j in range(1, c):
+                if m[0][j] == 0 or m[i][0] == 0: # assign
+                    m[i][j] = 0
+
+        # Step4: 給外圈零
+        if should_first_row_zero:
+            for i in range(r):
+                m[i][0] = 0
+        if should_first_col_zero:
+            for j in range(c):
+                m[0][j] = 0
+
 ```
 ---
 ## 1087. Brace Expansion｜ 12/1
