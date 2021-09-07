@@ -1430,7 +1430,7 @@ class Solution:
 ### Tag: #Recursive
 ---
 
-## 79. Word Search(Medium) ｜ 4/1 | [Review * 1]
+## 79. Word Search ｜ 4/1 | [Review * 2]
 
 Given a 2D board and a word, find if the word exists in the grid.
 
@@ -1453,6 +1453,9 @@ Given word = "ABCB", return false.
 2. 一筆畫的概念就能夠使用遞迴的解法，這個字在這個位置存在的情況下去看上下左右是否存在下個字，遇到死路就回到上一步繼續找其他方向
 3. Main function: 找起點
 4. 用過的不能再用：標記為'#'，若是不歸路 要改回原來的字
+5. Time: O(N * 3^L)
+    - N 為 chars 的總數
+    - L 為 總共有多少個字需要被 match
 ### Code
 ```py
 class Solution:
@@ -1475,7 +1478,7 @@ class Solution:
 
         for i in range(row):
             for j in range(col):
-                if recur(i, j, 0):
+                if board[i][j] == word[0] and recur(i, j, 0):
                     return True
         return False
 ```
@@ -18567,7 +18570,7 @@ class Solution:
 
 ```
 ---
-## 48. Rotate Image｜ 11/23
+## 48. Rotate Image｜ 11/23 | [ Review * 1 ]
 
 You are given an n x n 2D matrix representing an image.
 
@@ -18580,6 +18583,11 @@ You have to rotate the image in-place, which means you have to modify the input 
 Example 1:
 
 ![](assets/markdown-img-paste-20191123132512109.png)
+
+### 解題分析
+- 矩陣透過 swap 可以很容易做到逆時針旋轉
+- 要順時針的話就是先逆，再 swap
+- 注意 inner loop 的 j 是從 i+1 開始
 
 ### 思路
 
@@ -18624,6 +18632,7 @@ class Solution:
                 matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
             matrix[i] = matrix[i][::-1]
 ```
+### Tag: #Matrix
 ---
 ## 59. Spiral Matrix II｜ 11/24
 Given a positive integer n, generate a square matrix filled with elements from 1 to n2 in spiral order.
@@ -19276,6 +19285,7 @@ class Solution:
                 m[0][j] = 0
 
 ```
+### Tag: #Matrix
 ---
 ## 1087. Brace Expansion｜ 12/1
 A string S represents a list of words.
