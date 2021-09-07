@@ -42031,3 +42031,60 @@ class Solution:
 
 ### Tag: #Interval #Greedy
 ---
+## 424. Longest Repeating Character Replacement｜ 9/7
+You are given a string s and an integer k. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most k times.
+
+Return the length of the longest substring containing the same letter you can get after performing the above operations.
+
+Example 1:
+
+- Input: s = "ABAB", k = 2
+- Output: 4
+- Explanation: Replace the two 'A's with two 'B's or vice versa.
+
+Example 2:
+
+- Input: s = "AABABBA", k = 1
+- Output: 4
+- Explanation: Replace the one 'A' in the middle with 'B' and form "AABBBBA".
+- The substring "BBBB" has the longest repeating letters, which is 4.
+
+Constraints:
+
+- 1 <= s.length <= 105
+- s consists of only uppercase English letters.
+- 0 <= k <= s.length
+
+### 解題分析
+
+1. 用 sliding window 解的話我們目標是盡可能的有最大的 frame, 並且裡面的 non-reapeated elem == k, 這樣就能定義出 left 的縮時機
+2. 剩下的就是去定義 non-repeated elem, 為 `r-l+1 - the_most_freq_elem_cnt`
+3. 我們用 most_fq_char 去記錄目前最大的 cnt, 並去算出 non-reapeated-elem 的值, 只要其大於 k, l 就不用縮
+4. 而 cnter 紀錄的是當前 frame 裡面 char 的 cnter
+5. 可能會有疑問為什麼不用一直去更新 most_fq_char
+    1. most_fq_char 沒有因為縮左邊而更新? 沒關係不影響我們的答案, 因為當我們需要縮左邊時, 表示我們可能已經找到一個最大的答案了, 縮了左邊之後下一次右邊又+1, 這樣相當於保持當前的 window 繼續往後平移, 就是說會一直 right 1 left 1, 直到 **我們累積比當前 most_fq_char 還多的 repeated char**, 只有在這個時候我們的 l 才不需要繼續平移, 此時才有可能出現下一個最佳解
+
+### Code
+``` py
+class Solution:
+    def characterReplacement(self, s: str, k: int) -> int:
+        most_fq_char = 0
+        cnter = Counter()
+        l = 0
+        res = 0
+
+        for r, ch in enumerate(s):
+            cnter[ch] += 1
+            most_fq_char = max(most_fq_char, cnter[ch])
+
+            needed_to_change = (r-l+1) - most_fq_char
+            if needed_to_change > k:
+                cnter[s[l]] -= 1
+                l += 1
+            else:
+                res = max(res, r-l+1)
+        return res
+```
+
+### Tag: #SlidingWindow
+---
