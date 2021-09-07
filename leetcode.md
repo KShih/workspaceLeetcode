@@ -11773,7 +11773,7 @@ class Solution(object):
 ```
 ### Tag: #Stack #MonoStack #TwoPointer #DP
 ---
-## 3. Longest Substring Without Repeating Characters｜ 9/1 | [ Review * 1 ]
+## 3. Longest Substring Without Repeating Characters｜ 9/1 | [ Review * 2 ]
 Given a string, find the length of the longest substring without repeating characters.
 
 ![](assets/markdown-img-paste-2019090113545995.png)
@@ -11797,6 +11797,8 @@ Given a string, find the length of the longest substring without repeating chara
             - 因此我們這邊需多加一個 `pos_map[c] >= left` 去表達重複元素必須要在 frame 中才去觸發 `找到重複元素的事件`
         - 如果沒遇到重複元素, 我們就去更新 res 的長度
         - 最後把元素更新到 pos_map 中
+3. 複習盲點
+    - 忘記要加上 `pos_map[c] >= left` 了
 
 
 ### 思路

@@ -829,6 +829,7 @@ def DFS(tree):
             2. 但像是如果單純找環, 那麼孤島節點肯定沒有環，因此也不需要去 loop 了
 2. 無向圖
     0. Union Find
+    1. Time: O(theta(N)), theta很小, 所以通常是說 O(N)
         ```py
         def init(self, node_cnt):
             self.root_map = [id for id in range(node_cnt)] # each node points to itself, (could also use dict)
