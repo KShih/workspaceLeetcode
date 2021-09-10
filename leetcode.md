@@ -9198,7 +9198,7 @@ public:
 };
 ```
 ---
-## 76. Minimum Window Substring｜ 8/15 | [ Review * 1 ]
+## 76. Minimum Window Substring｜ 8/15 | [ Review * 2 ]
 Given a string S and a string T, find the minimum window in S which will contain all the characters in T in complexity O(n).
 
 ![](assets/markdown-img-paste-20190815125352744.png)
@@ -9212,20 +9212,16 @@ Given a string S and a string T, find the minimum window in S which will contain
 
 3. 那麼對於第一個問題我們可以用 Counter + 一個變數 miss 去追蹤
     - 先用 target 去 init 我們的 Counter, 此時 Counter 裡紀錄的正是我們缺乏的元素, miss 的數量也初始化為 target 的長度
-    - 接著對於每個新遇到的元素我們都把 count -= 1, 這裡可以討論三種情況
-        - 對的元素, 而且我們也缺 ( `-= 1` 後的 count 還是 > 0, 因為我們有事先 init 過了) :
+    - 接著對於在 t 裡面的新元素我們把其 count -= 1, 再來討論兩種情況
+        - 對的元素, 而且我們也缺:
             - miss -= 1
-        - 對的元素, 但我們不缺 (`-= 1` 後的 count 會 < 0):
-            - do nothing
-        - 不對的元素:
+        - 對的元素, 但我們不缺:
             - do nothing
 
 4. 此時如果 miss 已經歸零了, 表示我們找到了所有我們需要的元素, 但這裡面也許包含一些不必要的東西, 因此我們開始縮減 l:
     1. 如果當前長度比 global 還小, 我們更新 res
     2. 如同我們 r 遇到元素就把 count -= 1的操作, 我們這邊要把 l 遇到的元素都 += 1 回去
-        - 縮到 target 的元素, 但我們 window 裡還足夠 (count 還是小於零)
-            - do nothing
-        - 縮到不是 target 的元素
+        - 縮到 target 的元素, 但我們 window 裡還足夠 (count 還是小於等於零)
             - do nothing
         - 縮到 target, 且已經不夠了 (count > 0):
             - miss += 1 -> 去 break while loop, 然後繼續擴展右邊
@@ -9250,25 +9246,27 @@ LC 438
 ```py
 class Solution:
     def minWindow(self, s: str, t: str) -> str:
-        res = ""
-        minLen = float(inf)
-        l = 0
-
-        targetCounter = Counter(t) # initial 我們還需要多少某個元素
         miss = len(t)
+        miss_cnter = Counter(t)
+        min_len = float("inf")
+        l = 0
+        res = ""
+
         for r, c in enumerate(s):
-            targetCounter[c] -= 1
-            if targetCounter[c] >= 0: # 會通過這個 if 表示我們找到了需要的元素, 若是過多了會小於零 不會通過 if, 因此 cnt 不會誤算
-                miss -= 1
+            if c in miss_cnter:
+                if miss_cnter[c] > 0:
+                    miss -= 1
+                miss_cnter[c] -= 1
 
-            while miss == 0: # means we collect enough
-                if r-l+1 < minLen:
+            while miss == 0:
+                if r-l+1 < min_len:
                     res = s[l:r+1]
-                    minLen = r-l+1
+                    min_len = r-l+1
 
-                targetCounter[s[l]] += 1
-                if targetCounter[s[l]] > 0: # 大於零表示我們缺乏這個元素了
-                    miss += 1
+                if s[l] in miss_cnter:
+                    miss_cnter[s[l]] += 1
+                    if miss_cnter[s[l]] > 0:
+                        miss += 1
                 l += 1
         return res
 ```
