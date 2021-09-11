@@ -26158,7 +26158,7 @@ class Solution:
 ```
 ### Tag: #BinarySearch
 ---
-## 242. Valid Anagram｜ 6/10 | [ Review * 1 ]
+## 242. Valid Anagram｜ 6/10 | [ Review * 2 ]
 Given two strings s and t , write a function to determine if t is an anagram of s.
 
 Example 1:
@@ -26195,15 +26195,17 @@ class Solution:
         if len(s) != len(t):
             return False
 
-        arr = [0 for _ in range(26)]
+        to_idx = lambda c: ord(c) - 97
+        arr = [0] * 26
+
         for c in s:
-            arr[ord(c)-97] += 1
+            arr[to_idx(c)] += 1
 
         for c in t:
-            arr[ord(c)-97] -= 1
-            if arr[ord(c)-97] < 0:
+            idx = to_idx(c)
+            arr[idx] -= 1
+            if arr[idx] < 0:
                 return False
-
         return True
 ```
 ### Tag: #HashTable
