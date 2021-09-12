@@ -42107,3 +42107,50 @@ class Solution:
 
 ### Tag: #SlidingWindow
 ---
+## 226. Invert Binary Tree｜ 9/12
+Given the root of a binary tree, invert the tree, and return its root.
+
+Example 1:
+
+![](assets/markdown-img-paste-20210912190411824.png)
+
+- Input: root = [4,2,7,1,3,6,9]
+- Output: [4,7,2,9,6,3,1]
+
+Example 2:
+
+![](assets/markdown-img-paste-20210912190419758.png)
+
+- Input: root = [2,1,3]
+- Output: [2,3,1]
+
+Example 3:
+
+- Input: root = []
+- Output: []
+
+Constraints:
+
+- The number of nodes in the tree is in the range [0, 100].
+- -100 <= Node.val <= 100
+
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def invertTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
+        stack = [root]
+
+        while stack:
+            cur_node = stack.pop()
+            if cur_node:
+                cur_node.left, cur_node.right = cur_node.right, cur_node.left
+                stack.append(cur_node.left)
+                stack.append(cur_node.right)
+        return root
+```
+
+### Tag: #Tree
+---
