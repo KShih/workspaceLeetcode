@@ -3333,7 +3333,7 @@ public:
 ```
 ### Tag: #Tree #BFS
 ---
-## 104. Maximum Depth of Binary Tree｜ 4/23 | [ Review * 1 ]
+## 104. Maximum Depth of Binary Tree｜ 4/23 | [ Review * 2 ]
 Given a binary tree, find its maximum depth.
 
 The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
@@ -3345,11 +3345,37 @@ Example:
 Given binary tree [3,9,20,null,null,15,7]
 ![](assets/markdown-img-paste-20190629234520350.png)
 return its depth = 3
-### 4/29 review
+### 解題分析
+- Recursive 跟 iterative 的轉換
+    - stack 裡面就是要放`狀態`跟`回傳`
+
 ### 思路
 
 使用層序遍歷二叉樹，然後計數總層數，即為二叉樹的最大深度
 ### Code
+Recursive to Iterative
+```py
+class Solution:
+    def maxDepth2(self, root):
+        stack = [(root, 1)] # stack 紀錄 recursive 的狀態跟回傳
+        depth = 0
+        while stack:
+            cur_root, cur_depth = stack.pop()
+            if cur_root:
+                depth = max(depth, cur_depth)
+                stack.append((cur_root.right, cur_depth+1))
+                stack.append((cur_root.left, cur_depth+1))
+        return depth
+
+    def maxDepth(self, root: Optional[TreeNode]) -> int:
+        if not root:
+            return 0
+        l = 1 + self.maxDepth(root.left)
+        r = 1 + self.maxDepth(root.right)
+        return max(l, r)
+```
+
+
 Recursive Post order
 ```py
 class Solution:
