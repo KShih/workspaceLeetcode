@@ -4582,7 +4582,7 @@ public:
 };
 ```
 ---
-## 124. Binary Tree Maximum Path Sum｜ 5/1 | [ Review * 1 ]
+## 124. Binary Tree Maximum Path Sum｜ 5/1 | [ Review * 2 ]
 Given a non-empty binary tree, find the maximum path sum.
 
 For this problem, a path is defined as any sequence of nodes from some starting node to any node in the tree along the parent-child connections. The path must contain at least one node and does not need to go through the root.
@@ -4599,6 +4599,11 @@ For this problem, a path is defined as any sequence of nodes from some starting 
     2. 因此在取各自最大的時候還要再與 0 去做比較，這樣做就可以直接放心加上去
 2. 因此需要先求出左右，才能更新本身的作法為使用後序遍歷
 3. 需要注意的是，更新此數值並不能作為回傳值，回傳值只能左邊、右邊選一邊加上自己的值
+4. Iterative:
+    1. 因為此題必須要用 post_order, 所以我們要馬要用 two stack 做, 要馬是先取得 order 再反轉
+    2. 這邊選擇反轉的這種 post order traverse 的方法
+    3. 取得 order 後我們就逐一拜訪, 理論上就會從業結點開始往上去走, 我們必須讓父節點能取得子結點的 max 值, 所以我們用一個 hashmap 去紀錄
+    4. 再按照 recursive 的邏輯去更新 maximum 值跟 hashmap 裡的值就可以了
 
 ### 5/6review
 在宣告result時要宣告成INT_MIN來防止[-3] 這種testcase
@@ -4624,6 +4629,33 @@ class Solution:
 
         helper(root)
         return self.res
+```
+
+Iterative
+```py
+def maxPathSum(self, root: TreeNode) -> int:
+        def getPostorder(root):
+            stack = [root]
+            order = []
+            while stack:
+                top = stack.pop()
+                order.append(top)
+                if top.left:
+                    stack.append(top.left)
+                if top.right:
+                    stack.append(top.right)
+            return order[::-1]
+
+        postorder = getPostorder(root)
+
+        ans = float("-inf")
+        hashmap = {}
+        for node in postorder:
+            leftmax = max(0, hashmap.get(node.left, 0))
+            rightmax = max(0, hashmap.get(node.right, 0))
+            hashmap[node] = max(leftmax, rightmax) + node.val
+            ans = max(ans, leftmax + node.val + rightmax)
+        return ans
 ```
 
 ``` c++
