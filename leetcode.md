@@ -12106,7 +12106,7 @@ class Solution(object):
 ```
 ### Tag: #SlidingWindow #DivideAndConquer #DP
 ---
-## 20. Valid Parentheses｜ 9/2 | [ Review * 1 ]
+## 20. Valid Parentheses｜ 9/2 | [ Review * 2 ]
 Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
 
 An input string is valid if:
@@ -12125,6 +12125,9 @@ Note that an empty string is also considered valid.
 
 - if char in dict.keys():
 - if char in dict.values():
+
+### 複習盲點
+- 以為用 counter 去計算就可以了，但 `([)]` 這個例子應該要 return False,  因此還是得用 stack 來做
 
 ### 思路
 
