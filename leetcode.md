@@ -27978,7 +27978,11 @@ Do not use class member/global/static variables to store states. Your encode and
 Do not rely on any library method such as eval or serialize methods. You should implement your own encode/decode algorithm.
 ### 思路
 
-split it with non ascii chr: chr(257)
+1. split it with non ascii chr: chr(257)
+2. 不用 split 的, 就是得找出字串的資訊, 長度就是最好可以拿來用的方法
+    - 因為題目說每個最長的長度都不會超過 200, 表示可以 fit 近一個 single byte
+    - 因此我們可以用 chr(), 去把長度的資訊存起來, 注意事 chr(), 不是 str()
+    - 然後在解譯的時候, 我們就是讀取一個 str 的長度, 這樣就算是雙數位的長度, 因為我們前面用的是 chr(), 所以這邊在讀取上不會有問題, 就是固定讀一個就對了, 然後再調整 offset 繼續讀
 ### Code
 ``` py
 class Codec:
@@ -27997,6 +28001,32 @@ class Codec:
         """
 
         return s.split(chr(257))
+```
+
+不用 split 的
+```py
+class Codec:
+    def encode(self, strs: [str]) -> str:
+        """Encodes a list of strings to a single string.
+        """
+        msg = ''
+        for s in strs:
+            msg += chr(len(s))
+            msg += s
+        return msg
+
+
+    def decode(self, s: str) -> [str]:
+        """Decodes a single string to a list of strings.
+        """
+        ofs = 0
+        strs = []
+        while ofs < len(s):
+            l = ord(s[ofs])
+            ofs += 1
+            strs.append(s[ofs:ofs+l])
+            ofs += l
+        return strs
 ```
 ---
 ## 277. Find the Celebrity｜ 8/11
