@@ -3653,14 +3653,76 @@ public:
 ```
 ### Tag: #BFS #DFS #Tree
 ---
-## *572. Subtree of Another Tree｜ 4/24
+## 572. Subtree of Another Tree｜ 4/24 | [ Review * 1 ]
 Given two non-empty binary trees s and t, check whether tree t has exactly the same structure and node values with a subtree of s. A subtree of s is a tree consists of a node in s and all of this node's descendants. The tree s could also be considered as a subtree of itself.
 ![](assets/markdown-img-paste-20190629234613777.png)
 ![](assets/markdown-img-paste-20190629234639193.png)
 
-### 思路
+### 解題分析
+1. Recursive
+    - 我們必須走訪過所有 root 的節點, 把每一個都當頭看看, 因此這邊需要 recursive 自己
+2. 序列化
+    - 將 root, subRoot 的序列化值拿到
+    - 再去比較是否 subRoot array 在 root array 裡
+    - TODO: 找兩個 array 是否重合的優化解法
 
 ### Code
+Recursive
+```py
+class Solution:
+    def isSubtree(self, root: Optional[TreeNode], subRoot: Optional[TreeNode]) -> bool:
+        if not root:
+            return False
+        if self.isSame(root, subRoot):
+            return True
+        return self.isSubtree(root.left, subRoot) or self.isSubtree(root.right, subRoot)
+
+    def isSame(self, s, t):
+        if not s and not t:
+            return True
+        elif (not s and t) or (not t and s):
+            return False
+        elif s.val != t.val:
+            return False
+        else:
+            return self.isSame(s.left, t.left) and self.isSame(s.right, t.right)
+```
+
+Iterative (Better)
+```py
+class Solution:
+    def isSubtree(self, root: Optional[TreeNode], subRoot: Optional[TreeNode]) -> bool:
+        serial_root = self.get_serialize(root)
+        serial_subroot = self.get_serialize(subRoot)
+
+        len_i, len_j = len(serial_root), len(serial_subroot)
+
+        for i in range(len_i):
+            if serial_root[i] == serial_subroot[0]:
+                temp_i = i+1
+                for j in range(1, len_j):
+                    if serial_root[temp_i] != serial_subroot[j]:
+                        break
+                    temp_i += 1
+                if temp_i - i == len_j:
+                    return True
+        return False
+
+
+    def get_serialize(self, root):
+        data = []
+        def rserialize(root):
+            if not root:
+                data.append('None')
+                return
+            data.append(str(root.val))
+            rserialize(root.left)
+            rserialize(root.right)
+
+        rserialize(root)
+        return data
+```
+
 Recursive
 ``` c++
 /**
@@ -3687,7 +3749,7 @@ public:
     }
 };
 ```
-
+### Tag: #Tree
 ---
 ## @965. Univalued Binary Tree｜ 4/24
 A binary tree is univalued if every node in the tree has the same value.
