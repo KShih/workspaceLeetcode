@@ -4959,16 +4959,118 @@ public:
 };
 ```
 ---
-## 297. Serialize and Deserialize Binary Tree｜ 5/28
+## 297. Serialize and Deserialize Binary Tree｜ 5/28 | [ Review * 1 ]
 Serialization is the process of converting a data structure or object into a sequence of bits so that it can be stored in a file or memory buffer, or transmitted across a network connection link to be reconstructed later in the same or another computer environment.
 
 Design an algorithm to serialize and deserialize a binary tree. There is no restriction on how your serialization/deserialization algorithm should work. You just need to ensure that a binary tree can be serialized to a string and this string can be deserialized to the original tree structure.
 ![](assets/markdown-img-paste-20190630235527668.png)
 
+### 解題分析
+0. 分析
+    1. 只要拜訪的規則一樣就可以了, 這邊採用先序
+    2. 建樹的時候則是使用先進先出的觀念
+        - 序列化 -> [Queue] -> 反序列化
+1. Serialize:
+    - 可使用 stack 版/ recursive 版的先序遍歷
+2. Deserialize:
+    - 使用 recursive 版的先序遍歷
+    - 遍歷 data 可使用 idx access 或者 queue
 
 ### 思路
 先序遍歷的遞歸解法，非常的簡單易懂，我們需要接入輸入和輸出字符串流istringstream和ostringstream，對於序列化，我們從根節點開始，如果節點存在，則將值存入輸出字符串流，然後分別對其左右子節點遞歸調用序列化函數即可。對於去序列化，我們先讀入第一個字符，以此生成一個根節點，然後再對根節點的左右子節點遞歸調用去序列化函數即可
 ### Code
+More Clear both recursive
+```py
+class Codec:
+
+    def serialize(self, root):
+        """Encodes a tree to a single string.
+
+        :type root: TreeNode
+        :rtype: str
+        """
+        data = []
+        def rserialize(root):
+            if not root:
+                data.append('None')
+                return
+            data.append(str(root.val))
+            rserialize(root.left)
+            rserialize(root.right)
+
+        rserialize(root)
+        return ','.join(data)
+
+    def deserialize(self, data):
+        """Decodes your encoded data to tree.
+
+        :type data: str
+        :rtype: TreeNode
+        """
+        nodes = data.split(',')
+        self.idx = 0
+
+        def rdeserialize():
+            if nodes[self.idx] == 'None':
+                self.idx += 1
+                return None
+
+            root = TreeNode(nodes[self.idx])
+            self.idx += 1
+            root.left = rdeserialize()
+            root.right = rdeserialize()
+            return root
+
+        root = rdeserialize()
+        return root
+```
+
+```py
+class Codec:
+
+    def serialize(self, root):
+        """Encodes a tree to a single string.
+
+        :type root: TreeNode
+        :rtype: str
+        """
+        strs = ""
+        stack, ptr = [], root
+        while ptr or stack:
+            if ptr:
+                strs += str(ptr.val) + ','
+                stack.append(ptr)
+                ptr = ptr.left
+            else:
+                strs += 'None,'
+                top = stack.pop()
+                ptr = top.right
+
+        return strs+'None'
+
+    def deserialize(self, data):
+        """Decodes your encoded data to tree.
+
+        :type data: str
+        :rtype: TreeNode
+        """
+        nodes = data.split(',')
+        self.idx = 0
+
+        def rdeserialize():
+            if nodes[self.idx] == 'None':
+                self.idx += 1
+                return None
+
+            root = TreeNode(nodes[self.idx])
+            self.idx += 1
+            root.left = rdeserialize()
+            root.right = rdeserialize()
+            return root
+
+        root = rdeserialize()
+        return root
+```
 ``` c++
 class Codec {
 public:
