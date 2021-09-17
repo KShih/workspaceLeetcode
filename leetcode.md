@@ -3720,7 +3720,7 @@ public:
 };
 ```
 ---
-## 102. Binary Tree Level Order Traversal｜ 4/25 | [ Review * 1 ]
+## 102. Binary Tree Level Order Traversal｜ 4/25 | [ Review * 2 ]
 Given a binary tree, return the level order traversal of its nodes' values. (ie, from left to right, level by level).
 
 For example:
@@ -3729,6 +3729,7 @@ For example:
 ### 思路
 Level order BFS
 ### Code
+BFS
 ```py
 def levelOrder(self, root):
     ret = []
@@ -3748,6 +3749,29 @@ def levelOrder(self, root):
 
     return ret
 ```
+
+DFS
+```py
+class Solution:
+    def levelOrder(self, root: TreeNode) -> List[List[int]]:
+        while not root:
+            return []
+        stack = [(root, 0)]
+        levels = []
+
+        while stack:
+            node, level = stack.pop()
+            if level == len(levels):
+                levels.append([])
+
+            levels[level].append(node.val)
+            if node.right:
+                stack.append((node.right, level+1))
+            if node.left:
+                stack.append((node.left, level+1))
+        return levels
+```
+
 Iterative
 ``` c++
 class Solution {
