@@ -42583,3 +42583,78 @@ class Solution:
 
 ### Tag: #Tree
 ---
+## 1109. Corporate Flight Bookings｜ 9/18
+There are n flights that are labeled from 1 to n.
+
+You are given an array of flight bookings bookings, where bookings[i] = [firsti, lasti, seatsi] represents a booking for flights firsti through lasti (inclusive) with seatsi seats reserved for each flight in the range.
+
+Return an array answer of length n, where answer[i] is the total number of seats reserved for flight i.
+
+Example 1:
+
+- Input: bookings = [[1,2,10],[2,3,20],[2,5,25]], n = 5
+- Output: [10,55,45,25,25]
+- Explanation:
+- Flight labels:        1   2   3   4   5
+- Booking 1 reserved:  10  10
+- Booking 2 reserved:      20  20
+- Booking 3 reserved:      25  25  25  25
+- Total seats:         10  55  45  25  25
+- Hence, answer = [10,55,45,25,25]
+
+Example 2:
+
+- Input: bookings = [[1,2,10],[2,2,15]], n = 2
+- Output: [10,25]
+- Explanation:
+- Flight labels:        1   2
+- Booking 1 reserved:  10  10
+- Booking 2 reserved:      15
+- Total seats:         10  25
+- Hence, answer = [10,25]
+
+Constraints:
+
+- 1 <= n <= 2 * 104
+- 1 <= bookings.length <= 2 * 104
+- bookings[i].length == 3
+- 1 <= firsti <= lasti <= n
+- 1 <= seatsi <= 104
+
+### 解題分析
+1. 如果暴力解會超時, 就要來想想看哪裡還能優化
+2. 能優化的地方就是第二層的 for loop, 我們能不能想到什麼方法可以不去 loop 每個位置
+3. 就是透過標記 start, end+1 的地方去做 +cnt 跟 -cnt, 然後再一次跑 cumulative
+4. [[1,2,10]], n=5，正確的return 應該是 [10,10,0,0,0], 但在我們的標記之下會變成 [10, 0, -10, 0, 0]
+5. 對所有的 bookings 都標記過後, 再一次跑 cumulative 就可以得到答案
+6. Trick 是這題給的數字是 index=1 based, 所以我們的 `start` 要變成 `n-1`, 標記 `end+1`的地方就維持 end
+7. 因此我們要宣告 n+1 的 array, 但只 return 前 n 個
+
+### Code
+Cumulative Sum
+```py
+class Solution:
+    def corpFlightBookings(self, bookings: List[List[int]], n: int) -> List[int]:
+        reserves = [0 for _ in range(n+1)]
+        for first, last, cnt in bookings:
+            reserves[first-1] += cnt
+            reserves[last] -= cnt
+
+        for i in range(1, n):
+            reserves[i] += reserves[i-1]
+        return reserves[:n]
+```
+
+Naive TLE
+``` py
+class Solution:
+    def corpFlightBookings(self, bookings: List[List[int]], n: int) -> List[int]:
+        reserves = [0 for _ in range(n)]
+        for first, last, cnt in bookings:
+            for j in range(first-1, last):
+                reserves[j] += cnt
+        return reserves
+```
+
+### Tag: #CumulativeSum
+---
