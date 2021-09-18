@@ -4990,7 +4990,7 @@ public:
 };
 ```
 ---
-## 235. Lowest Common Ancestor of a Binary Search Tree｜ 5/28
+## 235. Lowest Common Ancestor of a Binary Search Tree｜ 5/28 | [ Review * 1 ]
 Given a binary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST.
 
 According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).”
@@ -5002,6 +5002,44 @@ According to the definition of LCA on Wikipedia: “The lowest common ancestor i
 若中間結點小於p跟q，表示pq均落在右子數
 反之 p q 分布於左右兩邊，則此種情況，中間節點即為解
 ### Code
+```py
+class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        # fix p < q
+        if p.val > q.val:
+            return self.lowestCommonAncestor(root, q, p)
+
+        if p.val < root.val < q.val:
+            return root
+        elif p.val > root.val: # 連最小的都比 root 大, 那其一定在右
+            return self.lowestCommonAncestor(root.right, p, q)
+        elif q.val < root.val: # 連最大的都比 root 小, 那其一定在左
+            return self.lowestCommonAncestor(root.left, p, q)
+        else: # 其他: p < root = q
+            return root
+```
+
+Stack optimize
+```py
+class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        # fix p < q
+        if p.val > q.val:
+            return self.lowestCommonAncestor(root, q, p)
+
+        stack = [root]
+        while stack:
+            node = stack.pop()
+            if p.val < node.val < q.val:
+                return node
+            elif p.val > node.val:
+                stack.append(node.right)
+            elif q.val < node.val:
+                stack.append(node.left)
+            else:
+                return node
+```
+
 ``` c++
 class Solution {
 public:
