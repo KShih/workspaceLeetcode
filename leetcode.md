@@ -5340,6 +5340,9 @@ Assume a BST is defined as follows:
 ### 思路
 這道驗證二叉搜索樹有很多種解法，可以利用它本身的性質來做，即左<根<右，也可以通過利用中序遍歷結果為有序數列來做，下面我們先來看最簡單的一種，就是利用其本身性質來做，初始化時帶入系統最大值和最小值，在遞歸過程中換成它們自己的節點值，用long代替int就是為了包括int的邊界條件
 
+### 類似題
+LC333. Largest BST Subtree
+
 ### Code
 ```py
 class Solution:
