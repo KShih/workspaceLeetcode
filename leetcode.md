@@ -4907,6 +4907,26 @@ class Solution:
         recur(root, "")
         return res
 ```
+
+補充, 找特定節點的 path
+```py
+def get_path(self, node, target, path):
+    if not node:
+        return path, False
+
+    if node == target:
+        return path+[node], True
+
+    left_path, is_find_left = self.get_path(node.left, target, path+[node])
+    right_path, is_find_right = self.get_path(node.right, target, path+[node])
+    if is_find_left:
+        return left_path, True
+    elif is_find_right:
+        return right_path, True
+    else:
+        return path, False
+```
+
 Recursive:
 ``` c++
 class Solution {
@@ -4965,11 +4985,27 @@ public:
 ```
 ### Tag: #Tree #DFS
 ---
-## 236. Lowest Common Ancestor of a Binary Tree｜ 5/28
+## 236. Lowest Common Ancestor of a Binary Tree｜ 5/28 | [ Review * 1 ]
 Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
 
 According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).”
 ![](assets/markdown-img-paste-2019063023550117.png)
+
+### 解題分析
+1. 解法1, Backtrack counting the True
+    1. 原理就是我們使用 backtrack, 當找到 target 的時候沿路 return True 回去, 當有第一個 node 收到了兩個 True時, 其就是最小的 ancestor
+    2. 因此把 recursive func 設為是否找到了, 並且分別找其左右
+    3. 然後需要再多考慮一個狀況, 該 node 就是 target 的狀況
+    4. 綜合三種 True/False, 我們把他們相加, 只要 >= 2, 就表示我們收到了兩票以上, 那我們就更新 global 的 res
+    5. 圖示
+        1. ![](assets/markdown-img-paste-20210917231344177.png)
+        2. ![](assets/markdown-img-paste-20210917231321715.png)
+        3. ![](assets/markdown-img-paste-20210917231251241.png)
+
+2. 解法2, Parent Pointer
+    1. 先建立好 parent dict
+    2. 把 p 到 root 的 path 使用 parent map tracing, 加入到一個 set 中
+    3. 再換 q 開始走, 遇到的第一個出現在 set 裡的, 就是解
 
 ### 思路
 由題可知，p和q只有三種情況
@@ -4977,6 +5013,98 @@ According to the definition of LCA on Wikipedia: “The lowest common ancestor i
 2. p q 都在左，那我們便只需要找出p和q最高的位置，也就是遞迴第一個碰到p or q的root，此時left便等於該root，且right必為空
 3. p q 都在右，(同上)，right便等於該root，且left必為空
 ### Code
+
+Recursive by counting the True
+```py
+class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        res = None
+
+        def is_found(node):
+            if not node:
+                return False
+
+            find_l = is_found(node.left)
+            find_r = is_found(node.right)
+            find_myself = node == p or node == q
+
+            if find_l + find_r + find_myself >= 2: # 此 node 收到兩個 true
+                nonlocal res
+                res = node
+            return find_l or find_r or find_myself
+        is_found(root)
+        return res
+```
+
+Iterative by parent pointer
+```py
+class Solution:
+
+    def lowestCommonAncestor(self, root, p, q):
+        # Stack for tree traversal
+        stack = [root]
+
+        # Dictionary for parent pointers
+        parent = {root: None}
+
+        # Iterate until we find both the nodes p and q
+        while p not in parent or q not in parent:
+
+            node = stack.pop()
+
+            # While traversing the tree, keep saving the parent pointers.
+            if node.left:
+                parent[node.left] = node
+                stack.append(node.left)
+            if node.right:
+                parent[node.right] = node
+                stack.append(node.right)
+
+        # Ancestors set() for node p.
+        ancestors = set()
+
+        # Process all ancestors for node p using parent pointers.
+        while p:
+            ancestors.add(p)
+            p = parent[p]
+
+        # The first ancestor of q which appears in
+        # p's ancestor set() is their lowest common ancestor.
+        while q not in ancestors:
+            q = parent[q]
+        return q
+```
+
+Recursive 找 path (MLE)
+```py
+class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        path_p, _ = self.get_path(root, p, [])
+        path_q, _ = self.get_path(root, q, [])
+        set_p = set(path_p)
+
+        for node in path_q[::-1]:
+            if node in set_p:
+                return node
+
+
+    def get_path(self, node, target, path):
+        if not node:
+            return path, False
+
+        if node == target:
+            return path+[node], True
+
+        left_path, is_find_left = self.get_path(node.left, target, path+[node])
+        right_path, is_find_right = self.get_path(node.right, target, path+[node])
+        if is_find_left:
+            return left_path, True
+        elif is_find_right:
+            return right_path, True
+        else:
+            return path, False
+```
+
 ``` c++
 class Solution {
 public:
@@ -4989,6 +5117,7 @@ public:
     }
 };
 ```
+### Tag: #Tree #Backtrack
 ---
 ## 235. Lowest Common Ancestor of a Binary Search Tree｜ 5/28 | [ Review * 1 ]
 Given a binary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST.
@@ -9125,8 +9254,6 @@ class Solution {
 }
 ```
 ---
-## 257. Binary Tree Paths
-Asking for iterative way in interview.
 ---
 ## 57. Insert Interval｜ 7/18 | [ Review * 1 ]
 Given a set of non-overlapping intervals, insert a new interval into the intervals (merge if necessary).
