@@ -5518,7 +5518,7 @@ public:
 ```
 
 ---
-## 230. Kth Smallest Element in a BST｜ 6/3 | [Review * 1]
+## 230. Kth Smallest Element in a BST｜ 6/3 | [Review * 2]
 Given a binary search tree, write a function kthSmallest to find the kth smallest element in it.
 
 Note:
@@ -5529,6 +5529,8 @@ You may assume k is always valid, 1 ≤ k ≤ BST's total elements.
 1. 講到 Binary Search Tree 應該要想到他的 rank 的性質
 2. 本題就是透過左子結點個數去得到當前結點的 rank 的基本題
 3. 對於 follow-up，可以透過對每個節點增加`其子節點的個數`資訊，這樣就不用每次做增刪改查時都要從新跑 getCount 了
+4. 或者樹節點中再存一個 node 節點的資訊, 然後把整個樹變成 doubly linked list, 這樣就可以做到 O(H) insert/delete, O(k) find kth smallest
+    - ![](assets/markdown-img-paste-20210917220852161.png)
 
 ### 思路
 search in BST -> INORDER
@@ -5537,9 +5539,18 @@ both Recursive use counting way to find the answer
 2. Iterative use counting-up way. Counting til k, then break the while-loop.
 3. Divide and Conquer way is the optimal solution. If the k <= the number of node in the left tree means ans is on the left tree.
    if k > the number of node in the left tree means ans is on the right tree. if k = count + 1 means the root of this state is the ans.
-4. Follow UP: 這道題的Follow up中說假設該BST被修改的很頻繁，而且查找第k小元素的操作也很頻繁，問我們如何優化。其實最好的方法還是像上面的解法那樣利用分治法來快速定位目標所在的位置，但是每個遞歸都遍歷左子樹所有結點來計算個數的操作並不高效，所以我們應該修改原樹結點的結構，使其保存包括當前結點和其左右子樹所有結點的個數，這樣我們使用的時候就可以快速得到任何左子樹結點總數來幫我們快速定位目標值了。
+
 
 ### Code
+Optimal, Inorder traversal
+```py
+class Solution:
+    def kthSmallest(self, root, k):
+        def inorder(r):
+            return inorder(r.left) + [r.val] + inorder(r.right) if r else []
+
+        return inorder(root)[k - 1]
+```
 
 ```py
 class Solution:
