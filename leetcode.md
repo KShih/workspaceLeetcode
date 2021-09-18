@@ -16177,7 +16177,7 @@ class Solution:
         for i, val in enumerate(inorder): inorder_map[val] = i
         def helper(l, r):
             if l > r: return None
-            root = TreeNode(preorder.pop(0))
+            root = TreeNode(preorder.pop(0)) # 可以用 deque 更加優化
             mid = inorder_map[root.val]
             root.left = helper(l, mid-1)
             root.right = helper(mid+1, r)
@@ -20588,6 +20588,10 @@ For example, given
     1. 先建立 inorder {value:idx} 的 mapping 取代 .index()
     2. 然後使用原始 post order 的訪問順序, 因此只要一直取 postorder 的最後 -> 不用做切割
     3. left, right 的切割也可以適用上圖的位置概念 -> 用來終止遞迴
+3. 複習時的疑問
+    1. 為何我們必須先向右拜訪呢?
+    2. 因為我們的拜訪順序是{左右中}, 現在我們用 pop 的從後面存取(逆序拜訪), 中現在拜訪完了 pop 出來, 下一個點就會是{右}, 因此我們遞迴時的邏輯也要符合這樣
+    3. 而相反的, 105, preorder 我們是順序拜訪, 因此就符合{中左右}就可以了
 
 ### 思路
 
