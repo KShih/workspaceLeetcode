@@ -8320,60 +8320,6 @@ public:
 };
 ```
 ---
-## 277. Find the Celebrity($ Lint: 645)｜ 7/12
-Suppose you are at a party with n people (labeled from 0 to n - 1) and among them, there may exist one celebrity. The definition of a celebrity is that all the other n - 1 people know him/her but he/she does not know any of them.
-
-Now you want to find out who the celebrity is or verify that there is not one. The only thing you are allowed to do is to ask questions like: "Hi, A. Do you know B?" to get information of whether A knows B. You need to find out the celebrity (or verify there is not one) by asking as few questions as possible (in the asymptotic sense).
-
-You are given a helper function bool knows(a, b) which tells you whether A knows B. Implement a function int findCelebrity(n), your function should minimize the number of calls to knows.
-![](assets/markdown-img-paste-20190712115756318.png)
-Notice
-There will be exactly one celebrity if he/she is in the party.
-Return the celebrity's label if there is a celebrity in the party. If there is no celebrity, return -1
-### 思路
-![](assets/markdown-img-paste-20190712115959586.png)
-
-### Code
-``` c
-// Forward declaration of the knows API.
-bool knows(int a, int b);
-
-class Solution {
-public:
-
-     // * @param n a party with n people
-     // * @return the celebrity's label or -1
-
-    int findCelebrity(int n) {
-        int cnt_false = 0;
-        int cnt_true = 0;
-        for (int i=0; i<n; i++){ // named i as celebrity
-            // check false
-            for (int j=0; j<n; j++){
-                if (i==j)   continue;
-                if (knows(i,j)){    // i knows anyone then i is not
-                    cnt_false = 0;
-                    break;
-                }
-                else cnt_false++;
-            }
-            if (cnt_false != n-1)   continue;
-
-            for (int j=0; j<n; j++){
-                if (i==j)   continue;
-                if (!knows(j,i)){
-                    cnt_true = 0;
-                    break;
-                }
-                else cnt_true++;
-            }
-            if (cnt_true == n-1)    return i;
-        }
-        return -1;
-    }
-};
-```
----
 ## 189. Rotate Array｜ 7/12
 Given an array, rotate the array to the right by k steps, where k is non-negative.
 
@@ -28400,7 +28346,7 @@ class Codec:
         return strs
 ```
 ---
-## 277. Find the Celebrity｜ 8/11
+## 277. Find the Celebrity｜ 8/11 | [ Review * 1 ]
 Suppose you are at a party with n people (labeled from 0 to n - 1) and among them, there may exist one celebrity. The definition of a celebrity is that all the other n - 1 people know him/her but he/she does not know any of them.
 
 Now you want to find out who the celebrity is or verify that there is not one. The only thing you are allowed to do is to ask questions like: "Hi, A. Do you know B?" to get information of whether A knows B. You need to find out the celebrity (or verify there is not one) by asking as few questions as possible (in the asymptotic sense).
@@ -28409,6 +28355,23 @@ You are given a helper function bool knows(a, b) which tells you whether A knows
 
 ![](assets/markdown-img-paste-20200811182056537.png)
 ![](assets/markdown-img-paste-20200811182109644.png)
+
+### 解題分析
+1. 如果沒有 assumption 只有一個名人的話，這題會是 n^2 複雜度
+2. 如果只有一個名人的話我們就可以用 greedy 解題，透過 API 的回傳結果我們先找出規則
+    0. 名人的定義: 所有人都認識他，但他不認識任何人
+    1. konws(A, B) = True:
+        - A is not 名人, B可能是
+    2. knows(A, B) = False:
+        - B is not 名人, A可能是
+3. 因此我們可以先假定一個候選人，然後對候選人 call knows(idx), 如果回傳 True, 則符合條件1, 我們就必須將目前的候選人更新成 idx, 如果 False, 我們就繼續檢查其他的
+4. 最後倖存的就有可能是那個唯一候選人，但我們不能排除*更新到他前的狀態*, 因此我們必須在對他檢查一次，如果還是沒有問題那他就是唯一的解
+5. 我們透過 (3.) 檢查了所有的人, 並每次都能排除掉其中一個人絕對不可能是名人
+6. ![](assets/markdown-img-paste-20210919111120762.png)
+    - But do we actually know for sure that this person is a celebrity? (Remember, it's possible there's no celebrity, in which case we'd return -1).
+    - Nope! It's still possible that 0 doesn't know 4, or perhaps 4 knows 3. We can't rule these possibilities out from the information we have uncovered so far.
+    - So, what can we do? We can use our isCelebrity(...) function on 4 to check whether or not they are a celebrity. If they are, our function will return 4. If not, then it should return -1.
+
 ### 思路
 
 設定候選人 res 為0，原理是先遍歷一遍，對於遍歷到的人i，若候選人 res 認識i，則將候選人 res 設為i，完成一遍遍歷後，來檢測候選人 res 是否真正是名人，如果判斷不是名人，則返回 -1，如果並沒有衝突，返回 res
@@ -28419,15 +28382,16 @@ You are given a helper function bool knows(a, b) which tells you whether A knows
 ``` py
 class Solution:
     def findCelebrity(self, n: int) -> int:
-        res = 0
+        candidate = 0
         for i in range(1,n):
-            if knows(res, i):
-                res = i
+            if knows(candidate, i):
+                candidate = i
         for i in range(n):
-            if (knows(res, i) or not knows(i, res)) and res != i:
+            if (knows(candidate, i) or not knows(i, candidate)) and res != i:
                 return -1
-        return res
+        return candidate
 ```
+### Tag: #Greedy #Graph
 ---
 ## 279. Perfect Squares｜ 8/12 | [ Review * 1 ]
 Given a positive integer n, find the least number of perfect square numbers (for example, 1, 4, 9, 16, ...) which sum to n.
