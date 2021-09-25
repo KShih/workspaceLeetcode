@@ -1127,7 +1127,7 @@ private:
 ### Tag: #Recursive #DP
 ---
 
-## 301. Remove Invalid Parentheses
+## 301. Remove Invalid Parentheses | [ Review * 1 ]
 Remove the minimum number of invalid parentheses in order to make the input string valid. Return all possible results.
 
 Note: The input string may contain letters other than the parentheses ( and ).
@@ -4161,7 +4161,7 @@ public:
 ```
 ### Tag: #DFS #HashMap
 ---
-## *814. Binary Tree Pruning｜ 4/30
+## 814. Binary Tree Pruning｜ 4/30 | [ Review * 1 ]
 We are given the head node root of a binary tree, where additionally every node's value is either a 0 or a 1.
 
 Return the same tree where every subtree (of the given tree) not containing a 1 has been removed.
@@ -4174,7 +4174,26 @@ Return the same tree where every subtree (of the given tree) not containing a 1 
 對於例子2來說，如果移除了第三行的3個葉結點後，那麼第二行的那個值為0的結點也變成了葉結點，繼續移除即可，所以與其找值全為0的子樹，我們可以不斷的移除值為0的葉結點，全都移除後那麼值全為0的子樹也就都被移除了。
 對於玩二叉樹的題，十有八九都是用遞歸，所以我們應該首先就考慮遞歸的解法，然後再想按什麼順序來遍歷二叉樹呢？層序，先序，中序，還是後序？根據這道題的特點，我們要從末尾來一層一層的移除值為0的葉結點，所以天然時候用後序遍歷。分別對左右子結點調用遞歸函數，此時判斷，如果當前結點是值為0的葉結點，那麼移除該結點，即返回空，否則返回原結點即可
 ### Code
-``` c++
+```py
+class Solution:
+    def pruneTree(self, root: TreeNode) -> TreeNode:
+        def contains_one(node: TreeNode) -> bool:
+            if not node:
+                return False
+
+            left_contains_one = contains_one(node.left)
+            right_contains_one = contains_one(node.right)
+
+            if not left_contains_one:
+                node.left = None
+            if not right_contains_one:
+                node.right = None
+
+            return node.val or left_contains_one or right_contains_one
+
+        return root if contains_one(root) else None
+```
+``` c
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
