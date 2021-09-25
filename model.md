@@ -290,7 +290,8 @@ class Solution:
 4. 查找右邊界:
     - l < r
     - **mid = l + (r-l)//2 + 1**
-        - 倘若被問到為何這邊要+1, 因為 `l < r` 的條件下, 若 `l == r` 會導致 `mid = l`, 然後若是進到了 `l = mid`, 將會形成無窮迴圈
+        - 倘若被問到為何這邊要+1, 因為 在偶數個個數的情況下, 我們本來的公式 mid 的選擇是偏左, 再搭配上我們 `l = mid`, 會導致 l == mid == k, 然後 nums[mid] 又一直進到 `l=mid` 形成無窮迴圈
+            - [0, 1, 2, 3, 4, 5],倘若一直進到 `l=mid`, mid 的變化 2->3->4->4->4...4
     - **l = mid**
         - 同上，其所屬的條件及為言語上的所求，例如 LC34 的第二個 bs
     - r = mid - 1
@@ -298,6 +299,11 @@ class Solution:
 
 5. 實作 bisect (使用查找特定值模板)
     - 官方 implement https://github.com/python/cpython/blob/3.9/Lib/bisect.py#L15-L35
+    - 記憶:
+        - 宣告時, lo 是合法, hi 是不合法
+        - 我們都是 return lo
+        - 所以我們都是對 lo 做 mid+1
+        - 都使用絕對小於
     - 比較
         ```py
         from bisect import bisect_left, bisect_right
@@ -321,7 +327,7 @@ class Solution:
 
     - biset_right
         ```py
-        def bisect_left(a, x):
+        def bisect_right(a, x):
             lo, hi = 0, len(a)
 
             while lo < hi:

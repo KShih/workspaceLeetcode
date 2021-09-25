@@ -25649,7 +25649,7 @@ class Solution:
         return (r-l)*(t-b) != 0
 ```
 ---
-## 224. Basic Calculator ｜ 4/10 | [ Review * 1 ]
+## 224. Basic Calculator ｜ 4/10 | [ Review * 2 ]
 
 Implement a basic calculator to evaluate a simple expression string.
 
@@ -25713,39 +25713,37 @@ Do not use the eval built-in library function.
 - Solution2 通解, O(n), 但會有 recursive call
 
 ### Code
+乾淨的寫法, 但不適用於乘除
 ``` py
 class Solution:
     def calculate(self, s: str) -> int:
+        cur_sum = 0
+        digit = ""
+        sign = 1
         stack = []
-        operand = 0
-        sign = 1 # 1 means positive, -1 means negative
-        res = 0 # for the ongoing result
 
-        for c in s:
-            if c.isdigit():
-                operand = 10 * operand +  int(c) # forming the number more than one digit
-
-            elif c == '+' or c == '-':
-                res += operand * sign # update the current result with its previous save sign status
-                operand = 0
-                sign = 1 if c == '+' else -1 # update the current sign status for case if next c is '('
-
-            elif c == '(':
-                stack.append(res)
-                stack.append(sign) # save the current sign
-                # reset everything since will start a new calculation
-                res = 0
-                operand = 0
-                sign = 1
-
-            elif c == ')':
-                res += operand * sign
-                sign = stack.pop() # the previous sign " - (2+4) "
-                res = sign * res + stack.pop()
-                operand = 0
-                sign = 1
-
-        return res + operand*sign
+        for ch in s:
+            if ch == ' ':
+                continue
+            if ch.isdigit():
+                digit += ch
+            else:
+                if digit:
+                    cur_sum += sign * int(digit)
+                    digit = ""
+                if ch == '+':
+                    sign = 1
+                elif ch == '-':
+                    sign = -1
+                elif ch == '(':
+                    stack.append((cur_sum, sign))
+                    cur_sum, sign = 0, 1
+                elif ch == ')':
+                    prev_sum, prev_sign = stack.pop()
+                    cur_sum = cur_sum*prev_sign + prev_sum
+        if digit:
+            cur_sum += sign*int(digit)
+        return cur_sum
 ```
 
 General Solution
