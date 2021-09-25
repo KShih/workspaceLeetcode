@@ -4214,14 +4214,28 @@ public:
 };
 ```
 ---
-## *669. Trim a Binary Search Tree｜ 4/30
+## 669. Trim a Binary Search Tree｜ 4/30 | [ Review * 1 ]
 Given a binary search tree and the lowest and highest boundaries as L and R, trim the tree so that all its elements lies in [L, R] (R >= L). You might need to change the root of the tree, so the result should return the new root of the trimmed binary search tree.
 ![](assets/markdown-img-paste-20190629234927864.png)
 
 ### 思路
 正確方法其實應該是在遍歷的過程中就修改二叉樹，移除不合題意的結點。當然對於二叉樹的題，十有八九都是要用遞歸來解的。首先判斷如果root為空，那麼直接返回空即可。然後就是要看根結點是否在範圍內，如果根結點值小於L，那麼返回對其右子結點調用遞歸函數的值；如果根結點大於R，那麼返回對其左子結點調用遞歸函數的值。如果根結點在範圍內，將其左子結點更新為對其左子結點調用遞歸函數的返回值，同樣，將其右子結點更新為對其右子結點調用遞歸函數的返回值。最後返回root即可
 ### Code
-``` c++
+```py
+class Solution:
+    def trimBST(self, root: Optional[TreeNode], low: int, high: int) -> Optional[TreeNode]:
+        if not root:
+            return None
+        if root.val < low:
+            return self.trimBST(root.right, low, high)
+        elif root.val > high:
+            return self.trimBST(root.left, low, high)
+        else:
+            root.left = self.trimBST(root.left, low, high)
+            root.right = self.trimBST(root.right, low, high)
+            return root
+```
+``` c
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
