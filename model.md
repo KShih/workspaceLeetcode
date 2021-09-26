@@ -31,6 +31,13 @@ Solution Model
 4. 要取出一個整數中的各個位數，使用 `while n > 0: n, digit = divmod(n, 10)`
 5. 取出 dic 中 value 最大的 key
     - `max(dic, key=dic.get)`
+6. 矩陣旋轉
+    1. `np.transporse(arr_2d)`
+    2. `zip(*arr_2d)`
+        - `*` 是解偶
+            - `*[[1,2,3], [4,5,6]]` = [1,2,3], [4,5,6]
+        - 再 zip 起來就會變成
+            - [(1,4), (2,5), (3,6)]
 
 ## Combination
 1. 固定長度
