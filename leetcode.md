@@ -29632,7 +29632,7 @@ class Solution:
 ```
 ### Tag: #Recursive #Memorization
 ---
-## 298. Binary Tree Longest Consecutive Sequence｜ 8/31
+## 298. Binary Tree Longest Consecutive Sequence｜ 8/31 | [ Review * 1 ]
 Given a binary tree, find the length of the longest consecutive sequence path.
 
 The path refers to any sequence of nodes from some starting node to any node in the tree along the parent-child connections. The longest consecutive path need to be from parent to child (cannot be the reverse).
@@ -29668,29 +29668,99 @@ Output: 2
 
 Explanation: Longest consecutive sequence path is 2-3, not 3-2-1, so return 2.
 ### 思路
-
+1. 先預設是可擴充的, 發現不可擴充再初始為零
 
 ### Code
 ``` py
 class Solution:
     def longestConsecutive(self, root: TreeNode) -> int:
-        if not root:
-            return 0
-        self.curMax = 1
-        self.getDepth(root, None, 0)
-        return self.curMax
+        res = 0
+        def dfs(root):
+            if not root:
+                return 0
 
-    def getDepth(self, cur, par, dep):
-        if not cur:
-            return
-        if not par or par.val+1 == cur.val:
-            dep = dep+1
-        else:
-            dep = 1
-        self.curMax = max(dep, self.curMax)
-        self.getDepth(cur.left, cur, dep)
-        self.getDepth(cur.right, cur, dep)
+            nonlocal res
+            l = dfs(root.left)+1
+            r = dfs(root.right)+1
+
+            if root.left and root.val+1 != root.left.val:
+                l = 1
+            if root.right and root.val+1 != root.right.val:
+                r = 1
+
+            length = max(l, r)
+            res = max(res, length)
+            return length
+        dfs(root)
+        return res
 ```
+---
+## 549. Binary Tree Longest Consecutive Sequence II｜ 9/25
+Given the root of a binary tree, return the length of the longest consecutive path in the tree.
+
+A consecutive path is a path where the values of the consecutive nodes in the path differ by one. This path can be either increasing or decreasing.
+
+For example, [1,2,3,4] and [4,3,2,1] are both considered valid, but the path [1,2,4,3] is not valid.
+On the other hand, the path can be in the child-Parent-child order, where not necessarily be parent-child order.
+
+Example 1:
+
+![](assets/markdown-img-paste-2021092522275170.png)
+
+- Input: root = [1,2,3]
+- Output: 2
+- Explanation: The longest consecutive path is [1, 2] or [2, 1].
+
+Example 2:
+
+- Input: root = [2,1,3]
+- Output: 3
+- Explanation: The longest consecutive path is [1, 2, 3] or [3, 2, 1].
+
+Constraints:
+
+- The number of nodes in the tree is in the range [1, 3 * 104].
+- -3 * 104 <= Node.val <= 3 * 104
+
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def longestConsecutive(self, root: Optional[TreeNode]) -> int:
+        res = 0
+        def dfs(root):
+            if not root:
+                return 0, 0
+
+            nonlocal res
+            l = dfs(root.left)
+            r = dfs(root.right)
+            inc_l, dec_l = l[0]+1, l[1]+1
+            inc_r, dec_r = r[0]+1, r[1]+1
+
+            if root.left:
+                if root.val+1 != root.left.val:
+                    inc_l = 1
+                if root.val-1 != root.left.val:
+                    dec_l = 1
+            if root.right:
+                if root.val+1 != root.right.val:
+                    inc_r = 1
+                if root.val-1 != root.right.val:
+                    dec_r = 1
+
+            max_inc = max(inc_l, inc_r)
+            max_dec = max(dec_l, dec_r)
+
+            res = max(res, max_inc+max_dec-1)
+            return max_inc, max_dec
+        dfs(root)
+        return res
+```
+
+### Tag: #Tree
 ---
 ## 303. Range Sum Query - Immutable｜ 8/31 | [ Review * 1 ]
 Given an integer array nums, find the sum of the elements between indices i and j (i ≤ j), inclusive.
