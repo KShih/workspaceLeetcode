@@ -42976,3 +42976,74 @@ class Solution:
 
 ### Tag: #Array #String
 ---
+## 2017. Grid Game｜ 9/26
+You are given a 0-indexed 2D array grid of size 2 x n, where grid[r][c] represents the number of points at position (r, c) on the matrix. Two robots are playing a game on this matrix.
+
+Both robots initially start at (0, 0) and want to reach (1, n-1). Each robot may only move to the right ((r, c) to (r, c + 1)) or down ((r, c) to (r + 1, c)).
+
+At the start of the game, the first robot moves from (0, 0) to (1, n-1), collecting all the points from the cells on its path. For all cells (r, c) traversed on the path, grid[r][c] is set to 0. Then, the second robot moves from (0, 0) to (1, n-1), collecting the points on its path. Note that their paths may intersect with one another.
+
+The first robot wants to minimize the number of points collected by the second robot. In contrast, the second robot wants to maximize the number of points it collects. If both robots play optimally, return the number of points collected by the second robot.
+
+Example 1:
+
+![](assets/markdown-img-paste-20210926120346537.png)
+
+- Input: grid = [[2,5,4],[1,5,1]]
+- Output: 4
+- Explanation: The optimal path taken by the first robot is shown in red, and the optimal path taken by the second robot is shown in blue.
+- The cells visited by the first robot are set to 0.
+- The second robot will collect 0 + 0 + 4 + 0 = 4 points.
+
+Example 2:
+
+![](assets/markdown-img-paste-2021092612035781.png)
+
+- Input: grid = [[3,3,1],[8,5,2]]
+- Output: 4
+- Explanation: The optimal path taken by the first robot is shown in red, and the optimal path taken by the second robot is shown in blue.
+- The cells visited by the first robot are set to 0.
+- The second robot will collect 0 + 3 + 1 + 0 = 4 points.
+
+Example 3:
+
+![](assets/markdown-img-paste-20210926120405202.png)
+
+- Input: grid = [[1,3,1,15],[1,3,3,1]]
+- Output: 7
+- Explanation: The optimal path taken by the first robot is shown in red, and the optimal path taken by the second robot is shown in blue.
+- The cells visited by the first robot are set to 0.
+- The second robot will collect 0 + 1 + 3 + 3 + 0 = 7 points.
+
+Constraints:
+
+- grid.length == 2
+- n == grid[r].length
+- 1 <= n <= 5 * 104
+- 1 <= grid[r][c] <= 105
+
+### 解題分析
+1. 一開始的做法是用機器人走迷宮先求出 A 的 max 路徑, 然後把沿路都標成 0, 然後再求一次 B 的路徑
+2. 但這樣做有可能會忽略掉有多條路線都是可以讓 A 拿到最大的, 但是只有一條是可以讓 B 也拿到最少
+3. 正確的做法是用 prefix_sum
+    1. 因為題目說只有上下兩排, 因此我們只要考慮 A 什麼時候往下切
+        1. 如果再 m[1][0] 的時候就往下切, 那麼此時 B 的 sum 就是 m[0][1:n]
+        2. 如果再 m[1][1] 的時候就往下切, 那麼此時 B 的 sum 就是 max(m[1][:1] ,m[0][2:n])
+    2. 因此所求就是求出 B 的最小, 我們用 cur_min 去維護
+
+### Code
+``` py
+class Solution:
+    def gridGame(self, grid: List[List[int]]) -> int:
+        upper_sum = sum(grid[0])
+        lower_sum = 0
+        cur_min = upper_sum
+        for i, lower_num in enumerate(grid[1]):
+            upper_sum -= grid[0][i]
+            cur_min = min(cur_min, max(upper_sum, lower_sum))
+            lower_sum += lower_num
+        return cur_min
+```
+
+### Tag: #AccumulatedSum
+---
