@@ -33974,7 +33974,7 @@ class Solution:
 
 ### Tag: #Math
 ---
-## 68. Text Justification｜ 1/30
+## 68. Text Justification｜ 1/30 | [ Review * 1 ]
 Given an array of words and a width maxWidth, format the text such that each line has exactly maxWidth characters and is fully (left and right) justified.
 
 You should pack your words in a greedy approach; that is, pack as many words as you can in each line. Pad extra spaces ' ' when necessary so that each line has exactly maxWidth characters.
@@ -34043,6 +34043,14 @@ words[i] consists of only English letters and symbols.
 1 <= maxWidth <= 100
 words[i].length <= maxWidth
 
+### 解題分析
+1. 每行的最後一個字不能分配空白, 因此我們在判斷是否超過的時候先預設分配一個空白給每個再 list 裡的字, 再去加上目前想加入的字去判斷是否超過
+2. 如果超過了我們就先不加入此字, 就剩下的去分配空白
+3. 分配的方式是用 mod 去做 round robin, 但這邊我們需要 mod `len(cur_line) -1`, 因為我們不打算分配給最後一個字
+    - 三個字, 3-1 = 2, mod 2 的話只會有 0, 1 的結果
+4. 分配好之後就可以加進去 res 裡了, 因為我們這邊自己手動插入空格所以用 `"".join` 就可
+5. 都處理完之後就剩下最後一行
+6. 最後一行每個都只有一個空白, 其餘的空白加到最後面, 所以我們這邊用 `" ".join`
 
 ### 思路
 
@@ -34057,24 +34065,26 @@ words[i].length <= maxWidth
 ``` py
 class Solution:
     def fullJustify(self, words: List[str], maxWidth: int) -> List[str]:
-        curWords, curLen, res = [], 0, []
+        res = []
+        cur_line, cur_len = [], 0
 
         for word in words:
-            if curLen + len(curWords) + len(word) > maxWidth:
-                curCnt = len(curWords)
-                restSpace = maxWidth - curLen
-                for i in range(restSpace):
-                    curWords[ i % (curCnt-1 or 1) ] += ' ' # 0 or 1 = 1
-                res.append(''.join(curWords))
-                curWords, curLen = [], 0
-            curWords += [word]
-            curLen += len(word)
+            cur_len_with_space = cur_len + len(cur_line)
+            if len(word) + cur_len_with_space > maxWidth:
+                remain_space = maxWidth - cur_len
+                for i in range(remain_space):
+                    cur_line[i % (len(cur_line)-1 or 1)] += ' ' # -1 for ignore the last word
+                res.append("".join(cur_line))
+                cur_line, cur_len = [], 0
 
-        # the last line will still be stored in curWords
-        res.append(' '.join(curWords))
-        remainSpace = maxWidth - len(res[-1])
-        for _ in range(remainSpace):
-            res[-1] += ' '
+            cur_line.append(word)
+            cur_len += len(word)
+
+        # parse last line
+        last_line = " ".join(cur_line)
+        for _ in range(maxWidth - len(last_line)):
+            last_line += ' '
+        res.append(last_line)
         return res
 ```
 
