@@ -4510,7 +4510,7 @@ public:
 ```
 ### Tag: #Tree #PrefixSum #DFS
 ---
-## @543. Diameter of Binary Tree｜ 5/1 (W2D4)
+## 543. Diameter of Binary Tree｜ 5/1 (W2D4) | [ Review * 1 ]
 ![](assets/markdown-img-paste-20190630235236837.png)
 
 ### 二刷思路
@@ -4533,21 +4533,19 @@ public:
 ### Code
 ```py
 class Solution:
-    def __init__(self):
-        self.max_path = 0
+    def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:
+        res = 0
+        def dfs(node):
+            nonlocal res
+            if not node:
+                return 0
 
-    def diameterOfBinaryTree(self, root: TreeNode) -> int:
-        self.get_max_depth(root)
-        return self.max_path
-
-    def get_max_depth(self, node):
-        if not node:
-            return 0
-        left = self.get_max_depth(node.left)
-        right = self.get_max_depth(node.right)
-        self.max_path = max(self.max_path, left+right) # update the max val
-
-        return 1 + max(left, right) # return the depth
+            l = dfs(node.left)
+            r = dfs(node.right)
+            res = max(res, l+r) # 不用+1 因為題目給的性質就是如此計算的
+            return max(l, r)+1
+        dfs(root)
+        return res
 ```
 多此一舉用了兩個recursive，過不了測資
 ``` c++
