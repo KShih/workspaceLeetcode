@@ -4633,6 +4633,65 @@ public:
 };
 ```
 ---
+## 1522. Diameter of N-Ary Tree｜ 9/25
+Given a root of an N-ary tree, you need to compute the length of the diameter of the tree.
+
+The diameter of an N-ary tree is the length of the longest path between any two nodes in the tree. This path may or may not pass through the root.
+
+(Nary-Tree input serialization is represented in their level order traversal, each group of children is separated by the null value.)
+
+Example 1:
+
+![](assets/markdown-img-paste-20210925214546468.png)
+
+- Input: root = [1,null,3,2,4,null,5,6]
+- Output: 3
+- Explanation: Diameter is shown in red color.
+
+Example 2:
+
+- Input: root = [1,null,2,null,3,4,null,5,null,6]
+- Output: 4
+
+Example 3:
+
+- Input: root = [1,null,2,3,4,5,null,null,6,7,null,8,null,9,10,null,null,11,null,12,null,13,null,null,14]
+- Output: 7
+
+Constraints:
+
+- The depth of the n-ary tree is less than or equal to 1000.
+- The total number of nodes is between [1, 104].
+### 解題分析
+1. 修改 LC543. Binary Tree 的版本, 成求前兩長的
+
+### Code
+``` py
+class Solution:
+    def diameter(self, root):
+        res = 0
+        def dfs(node):
+            nonlocal res
+            if not node:
+                return 0
+
+            first_max, second_max = 0, 0
+            for child in node.children:
+                child_len = dfs(child)
+                if child_len > first_max:
+                    second_max = first_max
+                    first_max = child_len
+                elif child_len > second_max:
+                    second_max = child_len
+
+            res = max(res, first_max+second_max)
+            return first_max +1
+        dfs(root)
+        return res
+```
+
+### Tag: #Tree
+---
 ## *687. Longest Univalue Path｜ 5/1
 Given a binary tree, find the length of the longest path where each node in the path has the same value. This path may or may not pass through the root.
 
