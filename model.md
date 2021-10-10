@@ -1001,6 +1001,7 @@ class Solution:
     2. 去進行 partition algorithm
     3. 如果回傳的 perfect pivot 位置 == k -> 即為所求
     4. 位置 < k -> 還需要補入更多數 -> 對右半邊運算, 反之左半邊
+    5. **特別注意, 如果我們要尋找第 k 小的數, 第一次傳入 quickselect 的數應該要是 `k-1`, 主因是我們 partition 回傳的是 idx, 是 based-0 的!**
 2. Partion Algorithm
     1. Work for unique elem
         1. 先紀錄 pivot index 所代表的意義 (frequency or sth)
