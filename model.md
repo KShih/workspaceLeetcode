@@ -644,6 +644,15 @@ class Trie(object):
 ```
 ---
 
+## Recursive
+- Prefer 用 global var 去紀錄, recursive function 內部寫 return statement
+    - inner function 可以用 `nonlocal`
+    - outer function 可以用 `self`
+- 完整的 iterative -> recursive 寫法變化可以參考 LC339. Nested List Weight Sum
+
+
+---
+
 ## BFS
 
 ```py

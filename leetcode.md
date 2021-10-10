@@ -17414,7 +17414,7 @@ class Solution:
 ```
 ### Tag: #LinkedList
 ---
-## 339. Nested List Weight Sum｜ 10/27 | [ Review * 1 ]
+## 339. Nested List Weight Sum｜ 10/27 | [ Review * 2 ]
 Given a nested list of integers, return the sum of all integers in the list weighted by their depth.
 
 Each element is either an integer, or a list -- whose elements may also be integers or other lists.
@@ -17442,6 +17442,13 @@ Explanation: One 1 at depth 1, one 4 at depth 2, and one 6 at depth 3; 1 + 4*2 +
     - 兩個有關聯的東西可以使用Tuple
         - 此例: sublist 跟 Depth深度
 
+### 解題分析
+1. 先確定 stack 裡面放的是什麼: List(NestedInt)
+2. 所以我們 pop 出來的時候就是個 list, 因此可以直接走訪 (不用 getList)
+    - 此時走訪的 item 就是個 nestedInt
+    - 此時我們就可以調用 class 定義的方法
+    - 遇到非 int 的我們要塞回去 stack, 但我們為了確保 stack element 的一致性 (List(NestedInt)), 因此塞的時候要 call getList()
+
 ### 思路
 
 Recursive就是很Naive的思路
@@ -17455,45 +17462,109 @@ Iterative:
 所以用Tuple把他們包在一起
 
 ### Code
-Recursive:
-``` py
-class Solution:
-    def depthSum(self, nestedList: List[NestedInteger]) -> int:
-        def dfs(sublist, depth, sum1):
-            for ei in sublist:
-                if ei.isInteger():
-                    sum1 += depth*ei.getInteger()
-                else:
-                    sum1 = dfs(ei.getList(), depth+1, sum1)
-            return sum1
+```py
+class NestedInteger:
+   def __init__(self, value=None):
+       """
+       If value is not specified, initializes an empty list.
+       Otherwise initializes a single integer equal to value.
+       """
 
-        sum1 = 0 # [[1,1],2,[1,1]]
-        for ei in nestedList: #[1,1]
-            if ei.isInteger():
-                sum1 += ei.getInteger()
-            else:
-                sum1 += dfs(ei.getList(), 2, 0)
-        return sum1
+   def isInteger(self):
+       """
+       @return True if this NestedInteger holds a single integer, rather than a nested list.
+       :rtype bool
+       """
+
+   def add(self, elem):
+       """
+       Set this NestedInteger to hold a nested list and adds a nested integer elem to it.
+       :rtype void
+       """
+
+   def setInteger(self, value):
+       """
+       Set this NestedInteger to hold a single integer equal to value.
+       :rtype void
+       """
+
+   def getInteger(self):
+       """
+       @return the single integer that this NestedInteger holds, if it holds a single integer
+       Return None if this NestedInteger holds a nested list
+       :rtype int
+       """
+
+   def getList(self):
+       """
+       @return the nested list that this NestedInteger holds, if it holds a nested list
+       Return None if this NestedInteger holds a single integer
+       :rtype List[NestedInteger]
+       """
 ```
 
-Iterative:
+Iterative DFS:
 ``` py
 class Solution:
     def depthSum(self, nestedList: List[NestedInteger]) -> int:
-        stack = []
-        res = 0
-        for ei in nestedList:
-            stack.append((ei, 1)) # first layer
-
+        stack = [(nestedList, 1)] # (List[NestedInt], depth)
+        _sum = 0
         while stack:
-            top, depth = stack.pop()
-            if top.isInteger():
-                res += top.getInteger() * depth
-            else:
-                for ei in top.getList():
-                    stack.append((ei, depth+1))
-        return res
+            nested_list, depth = stack.pop()
+            for item in nested_list:
+                if item.isInteger():
+                    _sum += item.getInteger() * depth
+                else:
+                    stack.append((item.getList(), depth+1))
+        return _sum
 ```
+
+Iterative BFS:
+```py
+class Solution:
+    def depthSum(self, nestedList: List[NestedInteger]) -> int:
+        queue = deque([(nestedList, 1)]) # (List[NestedInt], depth)
+        _sum = 0
+        while queue:
+            nested_list, depth = queue.popleft()
+            for nestedInt in nested_list:
+                if nestedInt.isInteger():
+                    _sum += nestedInt.getInteger() * depth
+                else:
+                    queue.append((nestedInt.getList(), depth+1))
+        return _sum
+```
+
+Recursive DFS:
+```py
+class Solution:
+    def depthSum(self, nestedList: List[NestedInteger]) -> int:
+        _sum = 0
+        def dfs(nested_list, depth):
+            nonlocal _sum
+            for nestedInt in nested_list:
+                if nestedInt.isInteger():
+                    _sum += nestedInt.getInteger() * depth
+                else:
+                    dfs(nestedInt.getList(), depth+1)
+        dfs(nestedList, 1)
+        return _sum
+```
+
+傳參數版 Recursive DFS:
+```py
+class Solution:
+    def depthSum(self, nestedList: List[NestedInteger]) -> int:
+        def dfs(nested_list, depth, _sum):
+            for nestedInt in nested_list:
+                if nestedInt.isInteger():
+                    _sum += nestedInt.getInteger() * depth
+                else:
+                    _sum = dfs(nestedInt.getList(), depth+1, _sum)
+            return _sum
+        return dfs(nestedList, 1, 0)
+```
+
 ### Tag: #Recursive, #DFS
 ---
 ## 70. Climbing Stairs｜ 10/28 | [ Review * 1 ]
