@@ -43204,3 +43204,107 @@ class Solution:
 
 ### Tag: #
 ---
+## 1197. Minimum Knight Moves｜ 10/10
+In an infinite chess board with coordinates from -infinity to +infinity, you have a knight at square [0, 0].
+
+A knight has 8 possible moves it can make, as illustrated below. Each move is two squares in a cardinal direction, then one square in an orthogonal direction.
+![](assets/markdown-img-paste-20211010120138837.png)
+Return the minimum number of steps needed to move the knight to the square [x, y]. It is guaranteed the answer exists.
+
+Example 1:
+
+- Input: x = 2, y = 1
+- Output: 1
+- Explanation: [0, 0] → [2, 1]
+
+Example 2:
+
+- Input: x = 5, y = 5
+- Output: 4
+- Explanation: [0, 0] → [2, 1] → [4, 2] → [3, 4] → [5, 5]
+
+Constraints:
+
+- -300 <= x, y <= 300
+- 0 <= |x| + |y| <= 300
+
+### 解題分析
+0. 第一個方法就是 plane BFS, 但 TLE
+1. 第二個方法透過 Symmetric 優化
+    - 將 target 映射到第一象限
+    - 連帶著可以減少 dirs 數量
+    - 並且可以用 Prune 去減少 search space
+2. 加入 Visited 的時機優化
+    - 盡早入 set 來避免同一輪的其他點又再把它加入一次
+3. 想法:
+    - search problem 的優化不外乎就是減少 search space
+    - 這題減少的方式就是透過映射到第一象限, 來限縮有效的走訪範圍
+4. Prune 優化
+    - ![](assets/markdown-img-paste-20211010115737679.png)
+    - 假設:   已知目標在原點的右上方
+    - Claim: 若是要移動到 x<-1 or y<-1, 都是無意義的移動
+    - 理由:   假設第一部移動到 (-2,1), 下一步正方向最多走到 (0,2) or (-1, 3)
+        - (0,2) : 可透過 (2,1) -> dx(-2,-1) 到達
+        - (-1,3): 不可能是解 (因為我們的假設)
+    - 但 -1 是有意義的移動喔！
+        - 因為假設我們的目標在 (1,1), 那我們只能透過先去(-1,2) -> dx(2,-1) or (2,-1) -> dx(-1,2) 到達
+        - 因此 -1 的邊界是我們必須 include 的
+    - 同樣的道理可以 apply 到終點
+        - 對於終點來說超過 2 的位置就是無效 move, 因為其再來產生的 move space 是可由更小的位置來形成
+5. FollowUp
+    - 如果棋盤中有障礙物, 那麼就不能用映射+剪枝了, 因為兩邊方向的障礙物也必須 symetric
+
+
+### Code
+TLE
+``` py
+class Solution:
+    def minKnightMoves(self, x: int, y: int) -> int:
+        layer = [(0, 0)]
+        step = 0
+        visited = set()
+        dirs = [(1,2), (1,-2), (-1,2), (2,1), (2,-1), (-2,1)] # eliminate (-1, -2), (-2,-1) since we symetric x, y
+
+        while layer:
+            new_layer = []
+            for x0, y0 in layer:
+                if (x0, y0) == (x,y):
+                    return step
+                visited.add((x0, y0))
+                for dx, dy in dirs:
+                    new_node = (x0+dx, y0+dy)
+                    if new_node not in visited:
+                        new_layer.append(new_node)
+            layer = new_layer
+            step += 1
+        return -1
+```
+
+Search Space Optimization
+```py
+class Solution:
+    def minKnightMoves(self, x: int, y: int) -> int:
+        layer = [(0, 0)]
+        step = 0
+        visited = set([(0,0)])
+        dirs = [(1,2), (1,-2), (-1,2), (2,1), (2,-1), (-2,1)] # eliminate (-1, -2), (-2,-1) since we symetric x, y
+        x, y = abs(x), abs(y)
+
+        while layer:
+            new_layer = []
+            for x0, y0 in layer:
+                if (x0, y0) == (x,y):
+                    return step
+                for dx, dy in dirs:
+                    new_node = (x0+dx, y0+dy)
+                    # 我們賭定 -1, target+2 以外的位置都是無效的移動, 見圖
+                    if new_node not in visited and -1 <= new_node[0] <= x+2 and -1 <= new_node[1] <= y+2:
+                        visited.add(new_node) # 應該要越早加入 visited 越好, 避免其他點的不同方向走法又讓他入queue一次
+                        new_layer.append(new_node)
+            layer = new_layer
+            step += 1
+        return -1
+```
+
+### Tag: #BFS
+---
