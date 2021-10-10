@@ -12557,7 +12557,7 @@ class Solution(object):
 ```
 ### Tag: #SlidingWindow #DivideAndConquer #DP
 ---
-## 20. Valid Parentheses｜ 9/2 | [ Review * 2 ]
+## 20. Valid Parentheses｜ 9/2 | [ Review * 3 ]
 Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
 
 An input string is valid if:
@@ -12598,36 +12598,6 @@ Note that an empty string is also considered valid.
 
 ### Code
 
-雙Stack法:
-``` py
-class Solution(object):
-    def isValid(self, s):
-        """
-        :type s: str
-        :rtype: bool
-        """
-        if not s: return True
-        dic = {'{': '}', '[':']', '(':')' }
-
-        inStack = []
-        outStack = []
-        for c in s:
-            inStack.append(c)
-
-        while inStack:
-            out = inStack.pop()
-            if out == '}' or out == ']' or out == ')':
-                outStack.append(out)
-            elif out == '[' or out == '(' or out == '{':
-                if not outStack:    return False
-                elif outStack.pop() != dic[out]: return False
-
-        if not outStack:
-            return True
-        else:
-            return False
-```
-
 大神版：
 ```py
 class Solution:
@@ -12635,13 +12605,54 @@ class Solution:
         mapp = {'{':'}', '(':')', '[':']'}
         stack = []
         for c in s:
-            if c in mapp.keys():
+            if c in mapp:
                 stack.append(c)
             else:
                 if not stack or c != mapp[stack.pop()]:
                     return False
         return len(stack) == 0
 ```
+
+Without Stack - Use pointer to simulate stack's top
+```py
+class Solution:
+    def isValid(self, s: str) -> bool:
+        mapp = {'}':'{', ')':'(', ']':'['}
+        tops = ['' for _ in range(len(s))]
+        top = 0
+
+        for c in s:
+            if c not in mapp: # it's ( or [ or {
+                tops[top] = c
+                top += 1
+            else:
+                need = mapp[c]
+                top -= 1
+                if top < 0 or tops[top] != need:
+                    return False
+        return top == 0
+```
+
+或者直接用 s 當作空間, 但因為 python 的 string 不能 assign, 因此要先轉乘 list
+```py
+class Solution:
+    def isValid(self, s: str) -> bool:
+        mapp = {'}':'{', ')':'(', ']':'['}
+        s = list(s)
+        top = 0
+
+        for c in s:
+            if c not in mapp: # it's ( or [ or {
+                s[top] = c
+                top += 1
+            else:
+                need = mapp[c]
+                top -= 1
+                if top < 0 or s[top] != need:
+                    return False
+        return top == 0
+```
+
 ### Tag: #Stack
 ---
 ## 937. Reorder Log Files｜ 9/2
