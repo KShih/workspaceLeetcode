@@ -21757,6 +21757,8 @@ Output: false
     2. dp[i] = True
         - 代表 s[0:i] 都存在於 wordDict
     3. 用 Sliding Window 的方式去走訪所有可能
+3. BFS
+    - ![](assets/markdown-img-paste-20211013104631122.png)
 
 ### 思路
 
@@ -21775,7 +21777,7 @@ DP 法:
 ![](assets/markdown-img-paste-20200129180122745.png)
 
 ### Code
-Concise
+Concise, O(n^3)
 ```py
 class Solution:
     def wordBreak(self, s: str, wordDict: List[str]) -> bool:
@@ -21796,19 +21798,43 @@ class Solution:
         return backtrack(s)
 ```
 
-DP BottomUp (Optimal)
+DP BottomUp (Optimal), O(N^3)
 ```py
 class Solution:
     def wordBreak(self, s: str, wordDict: List[str]) -> bool:
-        sets = set(wordDict)
-        dp = [False for _ in range(len(s)+1)]
+        word_set = set(wordDict)
+        n = len(s)
+        dp = [False for _ in range(n+1)]
         dp[0] = True
 
-        for start in range(len(s)):
-            for end in range(start, len(s)+1):
-                if dp[start] and s[start:end] in sets:
+        for end in range(1, n+1):
+            for start in range(end):
+                if dp[start] and s[start:end] in word_set:
                     dp[end] = True
         return dp[-1]
+```
+
+BFS, O(N^3)
+```py
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        queue = deque([0])
+        visited = set([0])
+        word_set = set(wordDict)
+        n = len(s)
+
+        while queue:
+            start = queue.popleft()
+            if start == n:
+                return True
+            for end in range(start+1, n+1):
+
+                if end not in visited:
+                    frame = s[start:end]
+                    if frame in word_set:
+                        visited.add(end)
+                        queue.append(end)
+        return False
 ```
 
 TLE, 且無法cached的方法
