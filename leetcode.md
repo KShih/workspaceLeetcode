@@ -43371,7 +43371,7 @@ class Solution:
         layer = [(0, 0)]
         step = 0
         visited = set()
-        dirs = [(1,2), (1,-2), (-1,2), (2,1), (2,-1), (-2,1)] # eliminate (-1, -2), (-2,-1) since we symetric x, y
+        dirs = [(1,2), (1,-2), (-1,2), (2,1), (2,-1), (-2,1), (-1, -2), (-2,-1)]
 
         while layer:
             new_layer = []
@@ -43415,4 +43415,63 @@ class Solution:
 ```
 
 ### Tag: #BFS
+---
+## 887. Super Egg Drop｜ 10/17
+You are given k identical eggs and you have access to a building with n floors labeled from 1 to n.
+
+You know that there exists a floor f where 0 <= f <= n such that any egg dropped at a floor higher than f will break, and any egg dropped at or below floor f will not break.
+
+Each move, you may take an unbroken egg and drop it from any floor x (where 1 <= x <= n). If the egg breaks, you can no longer use it. However, if the egg does not break, you may reuse it in future moves.
+
+Return the minimum number of moves that you need to determine with certainty what the value of f is.
+
+Example 1:
+
+- Input: k = 1, n = 2
+- Output: 2
+- Explanation:
+- Drop the egg from floor 1. If it breaks, we know that f = 0.
+- Otherwise, drop the egg from floor 2. If it breaks, we know that f = 1.
+- If it does not break, then we know f = 2.
+- Hence, we need at minimum 2 moves to determine with certainty what the value of f is.
+
+Example 2:
+
+- Input: k = 2, n = 6
+- Output: 3
+
+Example 3:
+
+- Input: k = 3, n = 14
+- Output: 4
+
+Constraints:
+
+- 1 <= k <= 100
+- 1 <= n <= 104
+### 思路
+1. dp[m][k] 的定義:
+    - 給我 k 個蛋, 讓我丟 m 次, 我最多可以 confirm 的最高樓層
+    - 那麼 dp[m][k] 只要 >= N, 那麼我們就能確定 m 就是個最小需要嘗試的次數
+    - 對於每次嘗試我們都有兩種可能, 破掉跟沒破
+        - 破掉就代表 -> 次數-1, 蛋也-1
+        - 沒破就代表 -> 次數-1, 蛋量不變
+    - 把這兩個結果加起來, 再 +1 (因為我們也確定這樓的結果了), 就是我們最高可以確認的樓層
+
+
+### Code
+``` py
+class Solution:
+    def superEggDrop(self, K: int, N: int) -> int:
+        dp = [[0 for _ in range(K+1)] for _ in range(N+1)]
+
+        for m in range(1, N+1):
+            for k in range(1, K+1):
+                dp[m][k] = dp[m-1][k-1] + dp[m-1][k] +1
+
+                if dp[m][k] >= N:
+                    return m
+```
+
+### Tag: #DP
 ---
