@@ -43642,3 +43642,94 @@ class Solution:
 
 ### Tag: #Tree
 ---
+## 1249. Minimum Remove to Make Valid Parentheses｜ 10/19
+Given a string s of '(' , ')' and lowercase English characters.
+
+Your task is to remove the minimum number of parentheses ( '(' or ')', in any positions ) so that the resulting parentheses string is valid and return any valid string.
+
+Formally, a parentheses string is valid if and only if:
+
+- It is the empty string, contains only lowercase characters, or
+- It can be written as AB (A concatenated with B), where A and B are valid strings, or
+- It can be written as (A), where A is a valid string.
+
+Example 1:
+
+- Input: s = "lee(t(c)o)de)"
+- Output: "lee(t(c)o)de"
+- Explanation: "lee(t(co)de)" , "lee(t(c)ode)" would also be accepted.
+
+Example 2:
+
+- Input: s = "a)b(c)d"
+- Output: "ab(c)d"
+
+Example 3:
+
+- Input: s = "))(("
+- Output: ""
+- Explanation: An empty string is also valid.
+
+Example 4:
+
+- Input: s = "(a(b(c)d)"
+- Output: "a(b(c)d)"
+
+Constraints:
+
+- 1 <= s.length <= 105
+- s[i] is either'(' , ')', or lowercase English letter.
+
+### 思路
+1. 按照 LC20 的概念, 這題甚至還不需要考慮其他種括號匹配的方式
+2. 那麼下一步想的是我們該怎麼保留括號? 本來是想說只要符合就 append 上去但這樣字串的順序都亂了
+3. 那就回過頭來想, 我們該怎麼把這個括號標記成 valid 的括號呢? 記下 index 是一種方式
+4. 沒辦法一邊押入 stack 一邊組字串, 那就分成兩步驟進行
+
+- Note: 盡量不要用 str += ch, 因為這樣時間複雜度較高 (複製字串 O(N))
+- 應該使用 list.append, 最後再一次 join 起來
+
+### Code
+Naive
+``` py
+class Solution:
+    def minRemoveToMakeValid(self, s: str) -> str:
+        stack = []
+        res = []
+        NEEDED, IDX = 0, 1
+        should_keep = set()
+        for i, ch in enumerate(s):
+            if ch == "(":
+                stack.append(i)
+            elif ch == ")" and stack:
+                idx = stack.pop()
+                should_keep.add(i)
+                should_keep.add(idx)
+
+        for i, ch in enumerate(s):
+            if ch.isalpha() or i in should_keep:
+                res.append(ch)
+        return "".join(res)
+```
+
+Optimal
+```py
+class Solution:
+    def minRemoveToMakeValid(self, s: str) -> str:
+        s = list(s)
+        stack = []
+        for i, char in enumerate(s):
+            if char == '(':
+                stack.append(i)
+            elif char == ')':
+                if stack:
+                    stack.pop()
+                else:
+                    s[i] = ''
+        while stack:
+            s[stack.pop()] = ''
+        return ''.join(s)
+```
+
+### Tag: #Stack
+---
