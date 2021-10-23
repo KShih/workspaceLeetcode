@@ -15041,7 +15041,7 @@ if __name__ == "__main__":
     rename(input)
 ```
 ---
-## 399. Evaluate Division(*****)｜ 10/7
+## 399. Evaluate Division｜ 10/7 | [ Review * 1 ]
 Equations are given in the format A / B = k, where A and B are variables represented as strings, and k is a real number (floating point number). Given some queries, return the answers. If the answer does not exist, return -1.0.
 
 Example:
@@ -15055,6 +15055,15 @@ return [6.0, 0.5, -1.0, 1.0, -1.0 ].
 The input is: vector<pair<string, string>> equations, vector<double>& values, vector<pair<string, string>> queries , where equations.size() == values.size(), and the values are positive. This represents the equations. Return vector<double>.
 
 ![](assets/markdown-img-paste-20191008011643858.png)
+
+### 解題分析
+1. 就是先建立圖, 在 dfs 去找答案
+2. a/b=2, b/c=3, 我們可以建立
+    1. 單向: a->b, b->c
+    2. 迴向: b->a, c->b
+3. 如果要找 a/c, 就是在單向裡面找
+4. 如果要找 b/a, 就可以在迴向裡面找
+5. 因為有迴向, 所以要用 visited 去紀錄路徑不然會變 cycle
 
 ### 思路
 
@@ -15077,6 +15086,46 @@ Construct a dictionary = {"a": {"a":1, "e":4}, "b": {"b":1, "e":3}, "e": {"a": 1
 Follow the path: dct["a"] => dct["e"] => dct["b"], we have query [["a", "b"]] = 4 x 1/3 = 4/3
 
 ### Code
+```py
+class Solution:
+    def calcEquation(self, equations: List[List[str]], values: List[float], queries: List[List[str]]) -> List[float]:
+        dic = defaultdict(list)
+        for eq, v in zip(equations, values):
+            divider, divisor = eq
+            dic[divider].append((divisor,v))
+            dic[divisor].append((divider,1/v))
+
+        res = []
+        for divider, divisor in queries:
+            if divider not in dic:
+                res.append(-1.0)
+                continue
+            divisor_list = dic[divider]
+            for cur_divisor, val in divisor_list:
+                cur_res = self.dfs(divisor, cur_divisor, val, dic, set())
+                if cur_res:
+                    break
+            if cur_res:
+                res.append(cur_res)
+            else:
+                res.append(-1)
+        return res
+
+    def dfs(self, expected_divisor, divider, path_sum, dic, visited):
+        if divider in visited or divider not in dic:
+            return None
+        visited.add(divider)
+        if divider == expected_divisor:
+            return path_sum
+
+        divisor_list = dic[divider]
+        for cur_divisor, val in divisor_list:
+            res = self.dfs(expected_divisor, cur_divisor, path_sum*val, dic, visited)
+            if res != None:
+                return res
+        return res
+```
+
 ``` py
 class Solution:
     def calcEquation(self, equations: List[List[str]], values: List[float], queries: List[List[str]]) -> List[float]:
@@ -15135,6 +15184,7 @@ class Solution(object):
 
         return [float(n) for n in res]
 ```
+### Tag: #Graph
 ---
 ## 695. Max Area of Island｜ 10/8 | [ Review * 1 ]
 Given a non-empty 2D array grid of 0's and 1's, an island is a group of 1's (representing land) connected 4-directionally (horizontal or vertical.) You may assume all four edges of the grid are surrounded by water.
