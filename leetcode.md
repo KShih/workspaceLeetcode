@@ -676,7 +676,7 @@ private:
 ---
 
 
-## 46. Permutations | [Review * 1]
+## 46. Permutations | [Review * 2]
 Given a collection of distinct integers, return all possible permutations.
 
 Example:
@@ -752,6 +752,26 @@ class Solution:
 
         permute(nums, [])
         return res
+```
+
+Without using any global varible
+```py
+class Solution:
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        n = len(nums)
+        def dfs(visited, cur_list):
+            if len(cur_list) == n:
+                return [cur_list]
+
+            result = []
+            for i in range(len(nums)):
+                if i not in visited:
+                    visited.add(i)
+                    result += dfs(visited, cur_list+[nums[i]])
+                    visited.remove(i)
+            return result
+
+        return dfs(set(), [])
 ```
 
 Otimize Bruteforce with set
@@ -13079,7 +13099,7 @@ class Solution(object):
         return 0 <= x < M and 0 <= y < N
 ```
 ---
-## 49. Group Anagrams｜ 9/7 | [ Review * 1 ]
+## 49. Group Anagrams｜ 9/7 | [ Review * 2 ]
 Given an array of strings, group anagrams together.
 
 ![](assets/markdown-img-paste-20190908000144185.png)
@@ -13117,6 +13137,20 @@ sorted("apple") => ['a','e','l','p','p']
 - Update: just use tuple (or string) to make list hashable
 
 ### Code
+Optimal
+```py
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        dic = defaultdict(list)
+
+        for str1 in strs:
+            counts = [0] * 26
+            for ch in str1:
+                counts[ord(ch)-ord('a')] += 1
+            dic[tuple(counts)].append(str1)
+        return dic.values()
+```
+
 ```py
 class Solution:
     def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
@@ -43453,11 +43487,16 @@ Constraints:
 1. dp[m][k] 的定義:
     - 給我 k 個蛋, 讓我丟 m 次, 我最多可以 confirm 的最高樓層
     - 那麼 dp[m][k] 只要 >= N, 那麼我們就能確定 m 就是個最小需要嘗試的次數
-    - 對於每次嘗試我們都有兩種可能, 破掉跟沒破
-        - 破掉就代表 -> 次數-1, 蛋也-1
-        - 沒破就代表 -> 次數-1, 蛋量不變
-    - 把這兩個結果加起來, 再 +1 (因為我們也確定這樓的結果了), 就是我們最高可以確認的樓層
+    - dp[m][k] = dp[m - 1][k - 1] + dp[m - 1][k] + 1,
+    - assume, dp[m-1][k-1] = n0, dp[m-1][k] = n1
+    - the first floor to check is n0+1.
+        - if egg breaks, F must be in [1,n0] floors, we can use m-1 moves and k-1 eggs to find out F is which one.
+        - if egg doesn't breaks and F is in [n0+2, n0+n1+1] floors, we can use m-1 moves and k eggs to find out F is which one.
+    - So, with m moves and k eggs, we can find out F in n0+n1+1 floors, whichever F is.
 
+2. Time:
+    - K log N
+        - dp[m][k] is the number of combinations and it increase exponentially to N
 
 ### Code
 ``` py
@@ -43732,4 +43771,139 @@ class Solution:
 ```
 
 ### Tag: #Stack
+---
+## 463. Island Perimeter｜ 10/23
+You are given row x col grid representing a map where grid[i][j] = 1 represents land and grid[i][j] = 0 represents water.
+
+Grid cells are connected horizontally/vertically (not diagonally). The grid is completely surrounded by water, and there is exactly one island (i.e., one or more connected land cells).
+
+The island doesn't have "lakes", meaning the water inside isn't connected to the water around the island. One cell is a square with side length 1. The grid is rectangular, width and height don't exceed 100. Determine the perimeter of the island.
+
+Example 1:
+
+![](assets/markdown-img-paste-20211023155333190.png)
+
+- Input: grid = [[0,1,0,0],[1,1,1,0],[0,1,0,0],[1,1,0,0]]
+- Output: 16
+- Explanation: The perimeter is the 16 yellow stripes in the image above.
+
+Example 2:
+
+- Input: grid = [[1]]
+- Output: 4
+
+Example 3:
+
+- Input: grid = [[1,0]]
+- Output: 4
+
+Constraints:
+
+- row == grid.length
+- col == grid[i].length
+- 1 <= row, col <= 100
+- grid[i][j] is 0 or 1.
+- There is exactly one island in grid.
+
+### 思路
+1. Intuitive
+    - 只要連接觸不是陸地就能+1邊
+    - 優化:
+        - 與其做 8 個 if, 可以只做 4 個
+2. Optimal
+    - ![](assets/markdown-img-paste-20211023155246820.png)
+    - ![](assets/markdown-img-paste-2021102315525914.png)
+
+### Code
+Intuitive
+``` py
+class Solution:
+    def islandPerimeter(self, grid: List[List[int]]) -> int:
+        m, n = len(grid), len(grid[0])
+        res = 0
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == 1:
+                    cnt = self.get_boarder_and_water_cnt(i, j, grid)
+                    res += cnt
+        return res
+
+    def get_boarder_and_water_cnt(self, i, j, grid):
+        m, n = len(grid), len(grid[0])
+        boarder_cnt = 0
+        boarder_cnt += 1 if i == m-1 else 0
+        boarder_cnt += 1 if j == n-1 else 0
+        boarder_cnt += 1 if i == 0 else 0
+        boarder_cnt += 1 if j == 0 else 0
+        water_cnt = 0
+        if i+1 < m and grid[i+1][j] == 0:
+            water_cnt += 1
+        if 0 <= i-1 and grid[i-1][j] == 0:
+            water_cnt += 1
+        if j+1 < n and grid[i][j+1] == 0:
+            water_cnt += 1
+        if 0 <= j-1 and grid[i][j-1] == 0:
+            water_cnt += 1
+        return water_cnt + boarder_cnt
+```
+
+Intuitive Optimize
+```py
+class Solution:
+    def islandPerimeter(self, grid: List[List[int]]) -> int:
+
+        rows = len(grid)
+        cols = len(grid[0])
+
+        result = 0
+
+        for r in range(rows):
+            for c in range(cols):
+                if grid[r][c] == 1:
+                    if r == 0:
+                        up = 0
+                    else:
+                        up = grid[r-1][c]
+                    if c == 0:
+                        left = 0
+                    else:
+                        left = grid[r][c-1]
+                    if r == rows-1:
+                        down = 0
+                    else:
+                        down = grid[r+1][c]
+                    if c == cols-1:
+                        right = 0
+                    else:
+                        right = grid[r][c+1]
+
+                    result += 4-(up+left+right+down)
+
+        return result
+```
+
+只比較兩邊 (optimal)
+```py
+class Solution:
+    def islandPerimeter(self, grid: List[List[int]]) -> int:
+        rows = len(grid)
+        cols = len(grid[0])
+
+        result = 0
+
+        for r in range(rows):
+            for c in range(cols):
+                if grid[r][c] == 1:
+                    result += 4
+
+                    if r > 0 and grid[r-1][c] == 1:
+                        result -= 2
+
+                    if c > 0 and grid[r][c-1] == 1:
+                        result -= 2
+
+        return result
+```
+
+### Tag: #
 ---
