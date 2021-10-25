@@ -44147,7 +44147,7 @@ class Solution:
         return "".join(stack)
 ```
 
-### Tag: #
+### Tag: #Stack
 ---
 ## 1091. Shortest Path in Binary Matrix｜ 10/25
 Given an n x n binary matrix grid, return the length of the shortest clear path in the matrix. If there is no clear path, return -1.
@@ -44253,5 +44253,93 @@ class Solution:
         return dp[-1][-1] if dp[-1][-1] != float(inf) else -1
 ```
 
-### Tag: #
+### Tag: #BFS
+---
+## 1209. Remove All Adjacent Duplicates in String II｜ 10/25
+You are given a string s and an integer k, a k duplicate removal consists of choosing k adjacent and equal letters from s and removing them, causing the left and the right side of the deleted substring to concatenate together.
+
+We repeatedly make k duplicate removals on s until we no longer can.
+
+Return the final string after all such duplicate removals have been made. It is guaranteed that the answer is unique.
+
+Example 1:
+
+- Input: s = "abcd", k = 2
+- Output: "abcd"
+- Explanation: There's nothing to delete.
+
+Example 2:
+
+- Input: s = "deeedbbcccbdaa", k = 3
+- Output: "aa"
+
+Explanation:
+- First delete "eee" and "ccc", get "ddbbbdaa"
+- Then delete "bbb", get "dddaa"
+- Finally delete "ddd", get "aa"
+
+Example 3:
+
+- Input: s = "pbbcggttciiippooaais", k = 2
+- Output: "ps"
+
+Constraints:
+
+- 1 <= s.length <= 105
+- 2 <= k <= 104
+- s only contains lower case English letters.
+
+### 解題分析
+1. 如何從 TLE 優化過來?
+    - 我們在 TLE 的解法中用兩個 q 去追蹤, 並且只用一個 has_dup 去紀錄這輪是否有操作, 這樣時間複雜度是 O(N^2)
+    - 要優化就只能朝如何掃描一次就把所有 dup 處理完
+    - 那 TLE 的侷限就在, 我們只能關注當前的 dup_cnt, 當當前的 pop 完之後我們不知道前一組的 dup_cnt 是多少
+    - 因此只要可以記錄每個元素在 stack 裡的 dup_cnt 狀態, 就能掃一次就找到答案
+
+2. 那麼與其每個元素都 append 一個, 我們可以多用一個 freq 狀態去紀錄當前字母的 freq 狀況, 有遇到一樣的我們就累加 freq 就好了
+
+
+### Code
+``` py
+class Solution:
+    def removeDuplicates(self, s: str, k: int) -> str:
+        stack = []
+        CHAR, FREQ = 0, 1
+        for ch in s:
+            if stack and stack[-1][CHAR] == ch:
+                stack[-1][FREQ] += 1
+            else:
+                stack.append([ch, 1])
+
+            if stack[-1][FREQ] == k:
+                stack.pop()
+
+        return "".join(ch * freq for ch, freq in stack)
+```
+
+Naive TLE
+```py
+class Solution:
+    def removeDuplicates(self, s: str, k: int) -> str:
+        src = deque(s)
+        dst = deque([])
+        has_dup = True
+        while has_dup:
+            has_dup, dup_cnt = False, 1
+            while src:
+                pop_item = src.popleft()
+                if dst and pop_item == dst[-1]:
+                    dup_cnt += 1
+                else:
+                    dup_cnt = 1
+                dst.append(pop_item)
+                if dup_cnt == k:
+                    has_dup = True
+                    for _ in range(k):
+                        dst.pop()
+            src, dst = dst, deque([])
+        return "".join(src)
+```
+
+### Tag: #Stack
 ---
