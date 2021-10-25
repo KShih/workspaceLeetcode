@@ -44149,3 +44149,109 @@ class Solution:
 
 ### Tag: #
 ---
+## 1091. Shortest Path in Binary Matrix｜ 10/25
+Given an n x n binary matrix grid, return the length of the shortest clear path in the matrix. If there is no clear path, return -1.
+
+A clear path in a binary matrix is a path from the top-left cell (i.e., (0, 0)) to the bottom-right cell (i.e., (n - 1, n - 1)) such that:
+
+- All the visited cells of the path are 0.
+- All the adjacent cells of the path are 8-directionally connected (i.e., they are different and they share an edge or a corner).
+- The length of a clear path is the number of visited cells of this path.
+
+Example 1:
+
+- Input: grid = [[0,1],[1,0]]
+- Output: 2
+
+Example 2:
+
+![](assets/markdown-img-paste-20211025124433857.png)
+
+- Input: grid = [[0,0,0],[1,1,0],[1,1,0]]
+- Output: 4
+
+Example 3:
+
+- Input: grid = [[1,0,0],[1,1,0],[1,1,0]]
+- Output: -1
+
+Constraints:
+
+- n == grid.length
+- n == grid[i].length
+- 1 <= n <= 100
+- grid[i][j] is 0 or 1
+
+### 思路
+
+1. bfs
+2. 雙向 BFS
+3. A*
+4. 錯誤想法
+    1. 不能用 DP, 因為 DP 須保證上到下的順序拜訪
+        ```
+        [
+        [0,1,1,0,0,0],
+        [0,1,0,1,1,0],
+        [0,1,1,0,1,0],
+        [0,0,0,1,1,0],
+        [1,1,1,1,1,0],
+        [1,1,1,1,1,0]]
+        ```
+    2. 下面這個例子在 (3,2) 這個位置就沒辦法讓 DP 往上走
+
+### Code
+``` py
+class Solution:
+    def shortestPathBinaryMatrix(self, grid: List[List[int]]) -> int:
+        if grid[0][0] == 1 or grid[-1][-1] == 1:
+            return -1
+
+        m, n = len(grid), len(grid[0])
+        def is_valid(i, j):
+            return 0 <= i < m and 0 <= j < n and grid[i][j] != 1
+
+        dirs = [(0,1),(1,0), (0,-1), (-1,0), (1,1), (1,-1), (-1,1), (-1,-1)]
+        layer, cnt = [(0,0)], 0
+        grid[0][0] = 1 # mark visited
+        while layer:
+            new_layer = []
+            for node in layer:
+                if node == (m-1, n-1):
+                    return cnt+1
+                for dx, dy in dirs:
+                    if is_valid(node[0]+dx, node[1]+dy):
+                        x1, y1 = node[0]+dx, node[1]+dy
+                        grid[x1][y1] = 1 # mark visited
+                        new_layer.append((x1, y1))
+            layer, cnt = new_layer, cnt+1
+        return -1
+```
+
+DP, Wrong Answer
+```py
+class Solution:
+    def shortestPathBinaryMatrix(self, grid: List[List[int]]) -> int:
+        if grid[0][0] == 1 or grid[-1][-1] == 1:
+            return -1
+
+        m, n = len(grid), len(grid[0])
+        def is_valid(i, j):
+            return 0 <= i < m and 0 <= j < n and grid[i][j] != 1
+
+        dp = [[float(inf) for _ in range(n)] for _ in range(m)]
+        dirs = [(0,1),(1,0), (0,-1), (-1,0), (1,1), (1,-1), (-1,1), (-1,-1)]
+        for i in range(m):
+            for j in range(n):
+                if i == 0 and j == 0:
+                    dp[i][j] = 1
+                else:
+                    for dx, dy in dirs:
+                        x1, y1 = i+dx, j+dy
+                        if is_valid(x1, y1):
+                            dp[i][j] = min(dp[i][j], dp[x1][y1]+1)
+        return dp[-1][-1] if dp[-1][-1] != float(inf) else -1
+```
+
+### Tag: #
+---
