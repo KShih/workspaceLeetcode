@@ -44426,3 +44426,57 @@ class Solution:
 
 ### Tag: #
 ---
+## 939. Minimum Area Rectangle｜ 10/25
+You are given an array of points in the X-Y plane points where points[i] = [xi, yi].
+
+Return the minimum area of a rectangle formed from these points, with sides parallel to the X and Y axes. If there is not any such rectangle, return 0.
+
+Example 1:
+
+![](assets/markdown-img-paste-20211025195351625.png)
+
+- Input: points = [[1,1],[1,3],[3,1],[3,3],[2,2]]
+- Output: 4
+
+Example 2:
+
+![](assets/markdown-img-paste-20211025195402877.png)
+
+- Input: points = [[1,1],[1,3],[3,1],[3,3],[4,1],[4,3]]
+- Output: 2
+
+Constraints:
+
+- 1 <= points.length <= 500
+- points[i].length == 2
+- 0 <= xi, yi <= 4 * 104
+- All the given points are unique.
+
+### 解題分析
+1. 把遇到的點都加進 sets, 並假設之前的點是對角線的點 x1, y1
+2. 如果真的是, 那我們可以再接著尋找 (x, y1), (x1, y), 如果這些點也都存在於 sets 中表示我們可以計算面積了
+3. `if (x, y1) in sets and (x1, y) in sets`, 這行的意義在於尋找三個東西
+    1. 先猜測 x1, y1 即是對腳點
+    2. 交換雙方的 x, y 來尋找另外兩點是否存在在 sets 中
+
+4. Time: O(N^2)
+
+
+### Code
+``` py
+class Solution:
+    def minAreaRect(self, points: List[List[int]]) -> int:
+        sets = set()
+        res = float(inf)
+        for x, y in points:
+            for x1, y1 in sets:
+                if (x, y1) in sets and (x1, y) in sets:
+                    area = abs(x-x1) * abs(y-y1)
+                    if area < res:
+                        res = area
+            sets.add((x,y))
+        return res if res < float(inf) else 0
+```
+
+### Tag: #Set
+---
