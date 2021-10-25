@@ -44343,3 +44343,27 @@ class Solution:
 
 ### Tag: #Stack
 ---
+## 1614. Maximum Nesting Depth of the Parentheses｜ 10/25
+
+求一個字串表達式中的括號最大深度
+
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def maxDepth(self, s: str) -> int:
+        max_depth = 0
+        cur_depth = 0
+        for ch in s:
+            if ch == "(":
+                cur_depth += 1
+                max_depth = max(max_depth, cur_depth)
+            elif ch == ")":
+                cur_depth -= 1
+        return max_depth
+```
+
+### Tag: #
+---
