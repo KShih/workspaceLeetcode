@@ -45109,3 +45109,121 @@ class Solution:
 
 ### Tag: #
 ---
+## 1353. Maximum Number of Events That Can Be Attended｜ 10/26
+Given an array of events where events[i] = [startDayi, endDayi]. Every event i starts at startDayi and ends at endDayi.
+
+You can attend an event i at any day d where startTimei <= d <= endTimei. Notice that you can only attend one event at any time d.
+
+Return the maximum number of events you can attend.
+
+- Input: events = [[1,2],[2,3],[3,4]]
+- Output: 3
+- Explanation: You can attend all the three events.
+- One way to attend them all is as shown.
+- Attend the first event on day 1.
+- Attend the second event on day 2.
+- Attend the third event on day 3.
+
+Example 2:
+
+- Input: events= [[1,2],[2,3],[3,4],[1,2]]
+- Output: 4
+
+Example 3:
+
+- Input: events = [[1,4],[4,4],[2,2],[3,4],[1,1]]
+- Output: 4
+
+Example 4:
+
+- Input: events = [[1,100000]]
+- Output: 1
+
+Example 5:
+
+- Input: events = [[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7]]
+- Output: 7
+
+Constraints:
+
+- 1 <= events.length <= 105
+- events[i].length == 2
+- 1 <= startDayi <= endDayi <= 105
+
+### 解題分析
+1. 越早開始的先拜訪, 這沒問題, 所以我們 sortby start time
+2. 那我們該怎麼決定要在哪天拜訪哪個 event 呢?
+    - 因此我們也許可以用一個變數 day 去當作 current time
+    - 那 start time 相同的 event 我們該先拜訪誰? 因為每拜訪了一個, time 都會 +1, [[1,2],[1,1]] 這個條件下我們一定得先拜訪 [1,1], 不然我們要是給 [1,2] day=1, 到了 [1,1] 就會被我們誤判為過期
+    - 因此, **越早結束的越早拜訪**
+    - 那是不是 sort 就好?
+        - [[1,2],[1,2],[3,3],[1,5],[1,5]]
+        - 這個例子下, 如果只 sort 然後順序走放, 我們會先把 day3, day4 分配給[1,5], 然後 [3,3] 就沒有空間了
+    - 因此我們大概有個雛形了, 我們不能用 for 迴圈拜訪, 我們必須用 while day 拜訪
+    - 然後在該 day 時, 我們把當天開始的所有 event.end 放進 heap 裡, 然後越早結束的越早拜訪
+    - 在注意下有可能會有過期的 event 要先 pop 掉
+3. 總結:
+    - sort event, 可以讓我們越早把 event 加進 heap 裡面去規劃執行順序
+    - 當 heap 裡面有眾多 event 可以執行時, 我們選一個最早結束的執行, 這樣可以保證後面比較有可能還有空間執行其他 event
+    - 每分配一個 event, day+1, 當已經沒有 event 可分配時(heap空), 直接跳到下一個未入 heap 的時間
+    - 如果我們已經把所有 event 都入 heap 過了, 就可以提前結束了
+
+
+### Code
+``` py
+class Solution:
+    def maxEvents(self, events: List[List[int]]) -> int:
+        attend_cnt = 0
+        events = sorted(events)
+        n = len(events)
+        event_id = 0
+        day, max_day = events[event_id][0], max(event[1] for event in events)
+        heap = []
+
+        while day <= max_day:
+            while event_id < n and events[event_id][0] <= day:
+                heappush(heap, events[event_id][1])
+                event_id += 1
+
+            while heap and heap[0] < day: # 過期
+                heappop(heap)
+
+            if heap:
+                heappop(heap)
+                attend_cnt += 1
+            day += 1
+        return attend_cnt
+```
+
+Optimal (加入一些剪枝)
+```py
+class Solution:
+    def maxEvents(self, events: List[List[int]]) -> int:
+        attend_cnt = 0
+        events = sorted(events)
+        n = len(events)
+        event_id = 0
+        day, max_day = events[event_id][0], max(event[1] for event in events)
+        heap = []
+
+        while day <= max_day:
+            while event_id < n and events[event_id][0] <= day:
+                heappush(heap, events[event_id][1])
+                event_id += 1
+
+            while heap and heap[0] < day:
+                heappop(heap)
+
+            if heap:
+                heappop(heap)
+                attend_cnt += 1
+                day += 1
+            elif event_id < n: # heap 缺乏 event 的情況下直接 move to that day
+                day = events[event_id][0]
+            else: # heap 是空的, 且最後一個 event 也已經被 process了, 直接結束
+                break
+        return attend_cnt
+```
+
+### Tag: #Heap #Greedy
+---
