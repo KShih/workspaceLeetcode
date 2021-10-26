@@ -44647,3 +44647,94 @@ class Solution:
 
 ### Tag: #SlidingWindow
 ---
+## 670. Maximum Swap｜ 10/25
+You are given an integer num. You can swap two digits at most once to get the maximum valued number.
+
+Return the maximum valued number you can get.
+
+Example 1:
+
+- Input: num = 2736
+- Output: 7236
+- Explanation: Swap the number 2 and the number 7.
+
+Example 2:
+
+- Input: num = 9973
+- Output: 9973
+- Explanation: No swap.
+
+Constraints:
+
+- 0 <= num <= 108
+
+### 解題分析
+1. 我們的目標就是要找最靠右邊的最大數值, 跟最左邊小於此數值的交換
+2. Naive 的寫法就是先從右到左掃描, 再從左到右找第一個小於的
+3. One pass:
+    - 從右到左掃, 維護一個 max_idx
+    - 當找到比她小的時, 紀錄一下當前的狀態 x, y 用於後續的更新
+    - 錯誤的做法:
+        - 直接拿 max_idx 來做更新, 這樣在 98368 這個 testcase 也會錯
+            - 因為 max_idx 到最後更新的位置是 i=0, 9的位置
+            - 但我們其實預期的是 x=2, y=4
+4. 錯誤的想法: 直接在陣列裡找 max, 然後跟最左邊的交換
+    - 98368 正確答案應該是 98863
+
+
+### Code
+Naive
+``` py
+class Solution:
+    def maximumSwap(self, num: int) -> int:
+        num_char = list(str(num))
+        n = len(num_char)
+        right_scan = [""] * n
+        right_scan[-1] = (num_char[-1], n-1)
+
+        for i in range(n-2, -1, -1):
+            if num_char[i] > right_scan[i+1][0]:
+                right_scan[i] = (num_char[i], i)
+            else:
+                right_scan[i] = right_scan[i+1]
+
+        for i in range(n):
+            if num_char[i] < right_scan[i][0]:
+                idx = right_scan[i][1]
+                num_char[i], num_char[idx] = num_char[idx], num_char[i]
+                break
+        return "".join(num_char)
+```
+
+WA
+```py
+class Solution:
+    def maximumSwap(self, num: int) -> int:
+        num_char = list(str(num))
+        max_num = max(num_char)
+        for i in range(len(num_char)-1, -1, -1):
+            if num_char[i] == max_num:
+                num_char[0], num_char[i] = num_char[i], num_char[0]
+        return "".join(num_char)
+```
+
+Optimal
+```py
+class Solution:
+    def maximumSwap(self, num: int) -> int:
+        num_char = list(str(num))
+        n = len(num_char)
+        max_idx = n-1
+        x, y = 0, 0
+        for i in range(n-1, -1, -1):
+            if num_char[i] > num_char[max_idx]:
+                max_idx = i
+            elif num_char[i] < num_char[max_idx]:
+                x, y = i, max_idx
+        num_char[x], num_char[y] = num_char[y], num_char[x] # 不能直接用 max_idx 來更新, 因為我們要更新的是一個合法的狀態
+
+        return "".join(num_char)
+```
+
+### Tag: #
+---
