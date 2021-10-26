@@ -44957,3 +44957,72 @@ class Solution:
 
 ### Tag: #
 ---
+## 938. Range Sum of BST｜ 10/26
+Given the root node of a binary search tree and two integers low and high, return the sum of values of all nodes with a value in the inclusive range [low, high].
+
+Example 1:
+
+- Input: root = [10,5,15,3,7,null,18], low = 7, high = 15
+- Output: 32
+- Explanation: Nodes 7, 10, and 15 are in the range [7, 15]. 7 + 10 + 15 = 32.
+
+Example 2:
+
+- Input: root = [10,5,15,3,7,13,18,1,null,6], low = 6, high = 10
+- Output: 23
+- Explanation: Nodes 6, 7, and 10 are in the range [6, 10]. 6 + 7 + 10 = 23.
+
+Constraints:
+
+- The number of nodes in the tree is in the range [1, 2 * 104].
+- 1 <= Node.val <= 105
+- 1 <= low <= high <= 105
+- All Node.val are unique.
+### 思路
+
+
+### Code
+Iterative Optimal
+``` py
+class Solution:
+    def rangeSumBST(self, root: Optional[TreeNode], low: int, high: int) -> int:
+        cur_sum = 0
+        stack = [root]
+        while stack:
+            node = stack.pop()
+            if not node:
+                continue
+            if low <= node.val <= high:
+                cur_sum += node.val
+                stack.append(node.left)
+                stack.append(node.right)
+            elif node.val < low:
+                stack.append(node.right)
+            elif node.val > high:
+                stack.append(node.left)
+        return cur_sum
+```
+
+Recursive
+```py
+class Solution:
+    def rangeSumBST(self, root: Optional[TreeNode], low: int, high: int) -> int:
+        cur_sum = [0]
+        self.find_sum(root, low, high, cur_sum)
+        return cur_sum[0]
+
+    def find_sum(self, node, l, h, cur_sum):
+        if l <= node.val <= h:
+            cur_sum[0] += node.val
+            if node.left:
+                self.find_sum(node.left, l, h, cur_sum)
+            if node.right:
+                self.find_sum(node.right, l, h, cur_sum)
+        elif node.val < l and node.right:
+                self.find_sum(node.right, l, h, cur_sum)
+        elif node.val > h and node.left:
+                self.find_sum(node.left, l, h, cur_sum)
+```
+
+### Tag: #Tree
+---
