@@ -23626,7 +23626,7 @@ class Solution:
 ```
 ### Tag: #HashTable
 ---
-## 155. Min Stack｜ 3/16 | [ Review * 1 ]
+## 155. Min Stack｜ 3/16 | [ Review * 2 ]
 
 Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.
 
@@ -23645,6 +23645,33 @@ push時，當新的value比現在這個value還小時push進min stack
 pop時，如果要pop的是最小value，則min stack裡的也要跟著pop
 
 ### Code
+Use One stack, 隨時記錄當前的最小
+```py
+class MinStack:
+    def __init__(self):
+        self.stack = []
+
+    def push(self, x: int) -> None:
+        # If the stack is empty, then the min value
+        # must just be the first value we add
+        if not self.stack:
+            self.stack.append((x, x))
+            return
+
+        current_min = self.stack[-1][1]
+        self.stack.append((x, min(x, current_min)))
+
+    def pop(self) -> None:
+        self.stack.pop()
+
+    def top(self) -> int:
+        return self.stack[-1][0]
+
+    def getMin(self) -> int:
+        return self.stack[-1][1]
+```
+
+Use two stack, 只記錄該紀錄的最小, 缺點重複的最小值一直出現
 ``` py
 class MinStack:
 
@@ -23671,6 +23698,41 @@ class MinStack:
     def getMin(self) -> int:
         return self.min_stack[-1]
 ```
+
+Optimal
+```py
+class MinStack:
+
+    def __init__(self):
+        self.stack = []
+        self.min_stack = []
+
+    def push(self, x: int) -> None:
+        self.stack.append(x)
+
+        if not self.min_stack or x < self.min_stack[-1][0]:
+            self.min_stack.append([x, 1])
+
+        elif x == self.min_stack[-1][0]:
+            self.min_stack[-1][1] += 1
+
+
+    def pop(self) -> None:
+        if self.min_stack[-1][0] == self.stack[-1]:
+            self.min_stack[-1][1] -= 1
+
+        if self.min_stack[-1][1] == 0:
+            self.min_stack.pop()
+
+        self.stack.pop()
+
+    def top(self) -> int:
+        return self.stack[-1]
+
+    def getMin(self) -> int:
+        return self.min_stack[-1][0]
+```
+
 ### Tag: #Stack
 ---
 ## 131. Palindrome Partitioning<Backtrack>｜ 3/16 | [Review * 1]
