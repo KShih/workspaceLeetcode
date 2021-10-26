@@ -44848,3 +44848,65 @@ class Solution:
 
 ### Tag: #
 ---
+## 528. Random Pick with Weight｜ 10/26
+You are given a 0-indexed array of positive integers w where w[i] describes the weight of the ith index.
+
+You need to implement the function pickIndex(), which randomly picks an index in the range [0, w.length - 1] (inclusive) and returns it. The probability of picking an index i is w[i] / sum(w).
+
+For example, if w = [1, 3], the probability of picking index 0 is 1 / (1 + 3) = 0.25 (i.e., 25%), and the probability of picking index 1 is 3 / (1 + 3) = 0.75 (i.e., 75%).
+
+Example 1:
+
+- Input
+- ["Solution","pickIndex"]
+- [[[1]],[]]
+- Output
+- [null,0]
+
+Explanation
+- Solution solution = new Solution([1]);
+- solution.pickIndex(); // return 0. The only option is to return 0 since there is only one element in w.
+
+Example 2:
+
+- Input
+- ["Solution","pickIndex","pickIndex","pickIndex","pickIndex","pickIndex"]
+- [[[1,3]],[],[],[],[],[]]
+- Output
+- [null,1,1,1,1,0]
+
+Constraints:
+
+- 1 <= w.length <= 104
+- 1 <= w[i] <= 105
+- pickIndex will be called at most 104 times.
+
+### 解題分析
+1. 反正題意就是要我們做 sample, 一開始的想法是擴張 array, [1,3] -> [0,1,1,1], 然後再從這個 array 裡面取樣
+2. 這想法很直覺但可以用相同概念很容易的優化
+3. 上面的想法是
+    1. 0~3 的範圍隨便挑一個 idx
+    2. 0 的話就是回傳 0, 1~3的話就是回傳 1
+4. 那我們稍微調整範圍成 1~4, 如果 1的話就是 0, 2~4的話就是1
+5. 這樣可以用 prefix sum + binary search
+
+
+### Code
+``` py
+class Solution:
+
+    def __init__(self, w: List[int]):
+        self.prefix_weight = []
+        self.prefix_sum = 0
+        for weight in w:
+            self.prefix_sum += weight
+            self.prefix_weight.append(self.prefix_sum)
+
+    def pickIndex(self) -> int:
+        target = self.prefix_sum * random.random()
+        idx = bisect.bisect_left(self.prefix_weight, target)
+        return idx
+```
+
+### Tag: #
+---
