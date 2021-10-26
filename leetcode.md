@@ -44480,3 +44480,75 @@ class Solution:
 
 ### Tag: #Set
 ---
+## 680. Valid Palindrome II｜ 10/25
+Given a string s, return true if the s can be palindrome after deleting at most one character from it.
+
+Example 1:
+
+- Input: s = "aba"
+- Output: true
+
+Example 2:
+
+- Input: s = "abca"
+- Output: true
+- Explanation: You could delete the character 'c'.
+
+Example 3:
+
+- Input: s = "abc"
+- Output: false
+
+Constraints:
+
+- 1 <= s.length <= 105
+- s consists of lowercase English letters.
+
+### 思路
+
+- Time: O(2N)
+- General Approach: Time: O(N*2^k)
+
+### Code
+``` py
+class Solution:
+    def validPalindrome(self, s: str) -> bool:
+        i, j = 0, len(s)-1
+        while i < j:
+            if s[i] == s[j]:
+                i, j = i+1, j-1
+            else:
+                return self.rest_validPalindrome(s, i+1, j) or self.rest_validPalindrome(s, i, j-1)
+        return True
+
+    def rest_validPalindrome(self, s, i, j):
+        while i < j:
+            if s[i] == s[j]:
+                i, j = i+1, j-1
+            else:
+                return False
+        return True
+```
+
+推廣到 k
+```py
+class Solution:
+    def validPalindrome(self, s: str, k: int) -> bool:
+
+        def helper(left, right, errorLimit):
+            while left < right:
+                if s[left] != s[right]:
+                    if errorLimit == 0:
+                        return False
+                    else:
+                        return helper(left + 1, right, errorLimit - 1) or helper(left, right - 1, errorLimit - 1)
+                left += 1
+                right -= 1
+            return True
+
+        k = 1 # k is the number of replacement we can have
+        return helper(0, len(s) - 1, k)
+```
+
+### Tag: #
+---
