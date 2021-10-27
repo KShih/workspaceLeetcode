@@ -45227,3 +45227,114 @@ class Solution:
 
 ### Tag: #Heap #Greedy
 ---
+## 862. Shortest Subarray with Sum at Least K｜ 10/26
+Given an integer array nums and an integer k, return the length of the shortest non-empty subarray of nums with a sum of at least k. If there is no such subarray, return -1.
+
+A subarray is a contiguous part of an array.
+
+Example 1:
+
+- Input: nums = [1], k = 1
+- Output: 1
+
+Example 2:
+
+- Input: nums = [1,2], k = 4
+- Output: -1
+
+Example 3:
+
+- Input: nums = [2,-1,2], k = 3
+- Output: 3
+
+Constraints:
+
+- 1 <= nums.length <= 105
+- -105 <= nums[i] <= 105
+- 1 <= k <= 109
+### 思路
+1. 基本想法:
+    - 如果這題改成沒有負數的情況, 那就是用基本的 SlidingWindow + AccumulatedSum (見LC209)
+        - 關鍵就在沒有負數時, 我們縮左邊可以保證我們正在朝最佳解前進 (總合變小了, 但長度也變短了, 然後看看這個總合能不能 fit answer), 也跟都是正數時累積和一定是正成長有關, 所以我們可以這樣比較武斷的搞
+    - 但現在是負數, 有可能我們現在是負數的和, 扣掉前面正數的和反而越來越小, 但我們的目標是要 >= K
+        - 因此我們現在需要一個數據結構能夠幫我們達成
+            1. 當前的值是否可以透過扣掉前面的和後還能夠 >= K, 不管前面是正數還是負數
+            2. 因此我們需要一種部份排序的演算法, 來讓我們知道扣到何時該停
+        - 那麼就是用 heap 把前面的累積和還有其對應的 idx 記錄下來
+2. 雙向隊列的解法
+    - 沒看懂...
+    - Explanation
+        - Calculate prefix sum B of list A.
+        - B[j] - B[i] represents the sum of subarray A[i] ~ A[j-1]
+        - Deque d will keep indexes of increasing B[i].
+        - For every B[i], we will compare B[i] - B[d[0]] with K.
+    - Complexity:
+        - Every index will be pushed exactly once.
+        - Every index will be popped at most once.
+
+        - Time O(N)
+        - Space O(N)
+
+    - How to think of such solutions?
+        - Basic idea, for array starting at every A[i], find the shortest one with sum at leat K.
+        - In my solution, for B[i], find the smallest j that B[j] - B[i] >= K.
+        - Keep this in mind for understanding two while loops.
+
+    - What is the purpose of first while loop?
+        - For the current prefix sum B[i], it covers all subarray ending at A[i-1].
+        - We want know if there is a subarray, which starts from an index, ends at A[i-1] and has at least sum K.
+        - So we start to compare B[i] with the smallest prefix sum in our deque, which is B[D[0]], hoping that [i] - B[d[0]] >= K.
+        - So if B[i] - B[d[0]] >= K, we can update our result res = min(res, i - d.popleft()).
+        - The while loop helps compare one by one, until this condition isn't valid anymore.
+
+    - Why we pop left in the second while loop?
+        - This the most tricky part that improve my solution to get only O(N).
+        - D[0] exists in our deque, it means that before B[i], we didn't find a subarray whose sum at least K.
+        - B[i] is the first prefix sum that valid this condition.
+        - In other words, A[D[0]] ~ A[i-1] is the shortest subarray starting at A[D[0]] with sum at least K.
+        - We have already find it for A[D[0]] and it can't be shorter, so we can drop it from our deque.
+
+    - What is the purpose of second while loop?
+        - To keep B[D[i]] increasing in the deque.
+
+    - Why keep the deque increase?
+        - If B[i] <= B[d.back()] and moreover we already know that i > d.back(), it means that compared with d.back(),
+        - B[i] can help us make the subarray length shorter and sum bigger. So no need to keep d.back() in our deque.
+
+### Code
+O(NlogN)
+``` py
+from heapq import heappush, heappop
+class Solution:
+    def shortestSubarray(self, A: List[int], K: int) -> int:
+        curSum, res = 0, float("inf")
+        heap = []
+        for i, num in enumerate(A):
+            curSum += num
+            if curSum >= K:
+                res = min(res, i+1)
+            while heap and curSum - heap[0][0] >= K:
+                _sum, idx = heappop(heap)
+                res = min(res, i-idx)
+            heappush(heap, (curSum, i))
+        return res if res < float("inf") else -1
+```
+
+O(N)
+```py
+class Solution:
+    def shortestSubarray(self, A, K):
+        d = collections.deque([[0, 0]]) # idx, accSum
+        res, cur = float('inf'), 0
+        for i, a in enumerate(A):
+            cur += a
+            while d and cur - d[0][1] >= K:
+                res = min(res, i + 1 - d.popleft()[0])
+            while d and cur <= d[-1][1]:
+                d.pop()
+            d.append([i + 1, cur])
+        return res if res < float('inf') else -1
+```
+
+### Tag: #
+---
