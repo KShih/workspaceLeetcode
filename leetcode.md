@@ -28410,7 +28410,7 @@ class Solution:
 ```
 ### Tag: #Graph #topologicalSort #DFS
 ---
-## 270. Closest Binary Search Tree Value｜ 8/1 | [Review * 1]
+## 270. Closest Binary Search Tree Value｜ 8/1 | [Review * 2]
 Given a non-empty binary search tree and a target value, find the value in the BST that is closest to the target.
 
 Note:
@@ -28440,17 +28440,48 @@ Output: 4
 ### Code
 ``` py
 class Solution:
-    def closestValue(self, root: TreeNode, target: float) -> int:
-        res = [-1, float('inf')]
+    def closestValue(self, root: Optional[TreeNode], target: float) -> int:
+        cur_min = [None, float("inf")]
+        NODE, DIFF = 0, 1
         while root:
-            diff = abs(target - root.val)
-            if diff < res[1]:
-                res = [root.val, diff]
-            if target < root.val:
-                root = root.left
-            else:
+            if abs(root.val-target) < cur_min[DIFF]:
+                cur_min = [root.val, abs(root.val-target)]
+            if root.right and root.val < target:
                 root = root.right
-        return res[0]
+            else:
+                root = root.left
+        return cur_min[NODE]
+```
+
+求 low and high bound, 好像想複雜了
+```py
+class Solution:
+    def closestValue(self, root: Optional[TreeNode], target: float) -> int:
+        bound = [None, None]
+        LOWER, UPPER = 0, 1
+        todo = [root]
+        while todo:
+            node = todo.pop()
+            if not node:
+                continue
+            if node.val >= target:
+                if not bound[UPPER] or node.val - target < bound[UPPER]-target:
+                    bound[UPPER] = node.val
+                todo.append(node.left)
+            else:
+                if not bound[LOWER] or target - node.val < target - bound[LOWER]:
+                    bound[LOWER] = node.val
+                todo.append(node.right)
+
+        res = float("inf")
+        if bound[LOWER] != None:
+            res = bound[LOWER]
+        if bound[UPPER] != None:
+            if bound[LOWER] == None:
+                res = bound[UPPER]
+            elif bound[UPPER] and bound[UPPER]-target < target-res:
+                res = bound[UPPER]
+        return res
 ```
 ### Tag: #BinarySeach #BinarySearchTree
 ---
