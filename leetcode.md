@@ -4530,128 +4530,85 @@ public:
 ```
 ### Tag: #Tree #PrefixSum #DFS
 ---
-## 543. Diameter of Binary Tree｜ 5/1 (W2D4) | [ Review * 1 ]
-![](assets/markdown-img-paste-20190630235236837.png)
+## 543. Diameter of Binary Tree｜ 5/1 (W2D4) | [ Review * 2 ]
+Given the root of a binary tree, return the length of the diameter of the tree.
 
-### 二刷思路
+The diameter of a binary tree is the length of the longest path between any two nodes in a tree. This path may or may not pass through the root.
 
-我們要求的就是某一點的左右子樹 各自的最大深度和，而該點不需要為根節點
+The length of a path between two nodes is represented by the number of edges between them.
 
-使用 post order traversal 去更新父結點的 max_depth
+Example 1:
 
-並同時更新全域變數max_path
+![](assets/markdown-img-paste-2021103017222190.png)
 
-### 思路
-拆解題目後：求根結點的左右兩個子樹的深度之和
-但題目並不限定一定要通過root，
-因此我們可以直接參考方法2，
-在計算深度時同時紀錄最深的節點，
-透過方法3的hashmap可以去除重複計算的情形。
+- Input: root = [1,2,3,4,5]
+- Output: 3
+- Explanation: 3 is the length of the path [4,2,1,3] or [5,2,1,3].
 
-可以從方法1歸納出：當不限於root時，就是recursive main function with root->left and root->right
+Example 2:
+
+- Input: root = [1,2]
+- Output: 1
+
+Constraints:
+
+- The number of nodes in the tree is in the range [1, 104].
+- -100 <= Node.val <= 100
+
+### 解題分析
+
+1. Recursive function 能求的跟題目要求的結果不一樣, 因此我們必須傳入一個可被更新的變數
+    - dfs(node.left): 求出左半邊的最長 path **不可轉彎**
+        - 不可轉彎, 所以我們在 return 的時候只能用 max(l, r)
+    - max_val: 左半邊+右半邊 **可轉彎**
+        - 可轉彎, 所以我們直接把左右邊加起來
+2. Iterative:
+    - 在思考如何從 recursive 轉換過來, 我們可以發現 max_val 只能在 node.l, node.r 都已經做完的情況下才能被更新
+    - 因此我們順著這個思路想到我們需要用一個 hashmap 去存 node -> depth
+    - 並且在其左右邊都做完的情況下去更新該 node 的 depth
+    - max_val 的更新則跟 recursive 一樣
 
 ### Code
+Recursive
 ```py
 class Solution:
     def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:
-        res = 0
-        def dfs(node):
-            nonlocal res
-            if not node:
-                return 0
+        max_val = [0]
+        self.dfs(root, max_val)
+        return max_val[0]
 
-            l = dfs(node.left)
-            r = dfs(node.right)
-            res = max(res, l+r) # 不用+1 因為題目給的性質就是如此計算的
-            return max(l, r)+1
-        dfs(root)
-        return res
+    def dfs(self, node, max_val):
+        if not node.left and not node.right:
+            return 1
+        left_val = self.dfs(node.left, max_val) if node.left else 0
+        right_val = self.dfs(node.right, max_val) if node.right else 0
+        max_val[0] = max(max_val[0], left_val+right_val)
+        return max(left_val, right_val)+1
 ```
-多此一舉用了兩個recursive，過不了測資
-``` c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
-class Solution {
-public:
-    int diameterOfBinaryTree(TreeNode* root) {
-        if(!root)   return 0;
-        int res = getDeep(root->left) + getDeep(root->right); // assume the longest path
-        // but the answer not limited to path the root
-        return max(res, max(diameterOfBinaryTree(root->left), diameterOfBinaryTree(root->right)));
-    }
-    int getDeep(TreeNode* node){
-        if(!node)   return 0;
-        if(deepOFnode.count(node))  return deepOFnode[node];
-        int h = 1 + max(getDeep(node->left), getDeep(node->right));
-        return deepOFnode[node] = h;
-    }
-private:
-    unordered_map<TreeNode*, int> deepOFnode; // use hash map to record the deep of particular node to avoid duplicate computation
-};
+
+Iterative
+```py
+class Solution:
+    def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:
+        stack = [root]
+        depth_map = {}
+        max_val = 0
+
+        while stack:
+            top = stack[-1]
+            if top.left and top.left not in depth_map:
+                stack.append(top.left)
+            elif top.right and top.right not in depth_map:
+                stack.append(top.right)
+            else:
+                node = stack.pop()
+                l_val = depth_map[node.left] if node.left else 0
+                r_val = depth_map[node.right] if node.right else 0
+                max_val = max(max_val, l_val+r_val)
+                depth_map[node] = max(l_val, r_val)+1
+        return max_val
 ```
-將兩個Recursive合併成一個，計算深度時順便存下最深
-``` c++
-/*
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
-class Solution {
-public:
-    int diameterOfBinaryTree(TreeNode* root) {
-        int res=0;
-        getDepth(root, res);
-        return res;
-    }
-    int getDepth(TreeNode* node, int& res){
-        if(!node)   return 0;
-        int left = getDepth(node->left, res);
-        int right = getDepth(node->right, res);
-        res = max(res, left+right); // record the Max depth
-        return 1 + max(left, right); // count the Depth
-    }
-};
-```
-利用hash map優化這個方法
-``` c++
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
- * };
- */
-class Solution {
-public:
-    unordered_map<TreeNode*, int> deepOFnode;
-    int diameterOfBinaryTree(TreeNode* root) {
-        int res=0;
-        getDepth(root, res);
-        return res;
-    }
-    int getDepth(TreeNode* node, int& res){
-        if(!node)   return 0;
-        if (deepOFnode.count(node)) return deepOFnode[node];
-        int left = getDepth(node->left, res);
-        int right = getDepth(node->right, res);
-        res = max(res, left+right); // record the Max depth
-        return deepOFnode[node] = 1 + max(left, right); // count the Depth
-    }
-};
-```
+### Tag: #Tree
 ---
 ## 1522. Diameter of N-Ary Tree｜ 9/25
 Given a root of an N-ary tree, you need to compute the length of the diameter of the tree.
