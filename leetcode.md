@@ -5052,7 +5052,7 @@ public:
 ```
 ### Tag: #Tree #DFS
 ---
-## 236. Lowest Common Ancestor of a Binary Tree｜ 5/28 | [ Review * 1 ]
+## 236. Lowest Common Ancestor of a Binary Tree｜ 5/28 | [ Review * 2 ]
 Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
 
 According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).”
@@ -5106,40 +5106,31 @@ class Solution:
 Iterative by parent pointer
 ```py
 class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        parents = self.build_parents(root)
+        visited = set()
+        parent = p
+        while parent:
+            visited.add(parent)
+            parent = parents[parent]
 
-    def lowestCommonAncestor(self, root, p, q):
-        # Stack for tree traversal
-        stack = [root]
+        parent = q
+        while parent and parent not in visited:
+            parent = parents[parent]
+        return parent
 
-        # Dictionary for parent pointers
-        parent = {root: None}
-
-        # Iterate until we find both the nodes p and q
-        while p not in parent or q not in parent:
-
-            node = stack.pop()
-
-            # While traversing the tree, keep saving the parent pointers.
+    def build_parents(self, root):
+        parents = {root: None}
+        todo = [root]
+        while todo:
+            node = todo.pop()
             if node.left:
-                parent[node.left] = node
-                stack.append(node.left)
+                parents[node.left] = node
+                todo.append(node.left)
             if node.right:
-                parent[node.right] = node
-                stack.append(node.right)
-
-        # Ancestors set() for node p.
-        ancestors = set()
-
-        # Process all ancestors for node p using parent pointers.
-        while p:
-            ancestors.add(p)
-            p = parent[p]
-
-        # The first ancestor of q which appears in
-        # p's ancestor set() is their lowest common ancestor.
-        while q not in ancestors:
-            q = parent[q]
-        return q
+                parents[node.right] = node
+                todo.append(node.right)
+        return parents
 ```
 
 Recursive 找 path (MLE)
