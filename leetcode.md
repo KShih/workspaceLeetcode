@@ -35438,7 +35438,7 @@ class Solution:
 
 ### Tag: #DFS
 ---
-## 1382. Balance a Binary Search Tree｜ 3/7 | [ Review * 1 ]
+## 1382. Balance a Binary Search Tree｜ 3/7 | [ Review * 2 ]
 Given a binary search tree, return a balanced binary search tree with the same node values.
 
 A binary search tree is balanced if and only if the depth of the two subtrees of every node never differ by more than 1.
@@ -35451,26 +35451,86 @@ If there is more than one answer, return any of them.
 1. 先用 inorder 把排序後的值取出來
 2. 那麼此題就變成 LC 108, convert sorted arr to BST
 3. Time: O(N)
+4. Iterative 版 build tree:
+    - 需要先創立新節點並建立好連結, 再把此新節點送進 stack 裡
 
 ### Code
 ``` py
 class Solution:
-    def isBalanced(self, root: TreeNode) -> bool:
-        def maxDep(node):
-            if not node:
-                return 0
+    def balanceBST(self, root: TreeNode) -> TreeNode:
+        inorder = self.get_inorder(root)
+        n = len(inorder)
+        new_root = self.build_tree(inorder)
+        return new_root
 
-            left_cnt = maxDep(node.left)
-            if left_cnt < 0: return -1
-            right_cnt = maxDep(node.right)
-            if right_cnt < 0: return -1
+    def build_tree(self, order):
+        if len(order) == 0:
+            return None
+        mid = len(order)//2
+        root = TreeNode(order[mid])
+        root.left = self.build_tree(order[:mid])
+        root.right = self.build_tree(order[mid+1:])
+        return root
 
-            if abs(left_cnt - right_cnt) > 1:
-                return -1
+    def get_inorder(self, root):
+        res = []
+        p, stack = root, []
+        while p or stack:
+            if p:
+                stack.append(p)
+                p = p.left
             else:
-                return max(left_cnt, right_cnt)+1
+                node = stack.pop()
+                res.append(node.val)
+                p = node.right
+        return res
+```
 
-        return maxDep(root) >= 0
+Iterative 版的 build tree
+```py
+class Solution:
+    def balanceBST(self, root: TreeNode) -> TreeNode:
+        inorder = self.get_inorder(root)
+        return self.build_tree(inorder)
+
+    def build_tree(self, order):
+        n = len(order)
+        l, r = 0, n-1
+        mid = l+(r-l)//2
+        root = TreeNode(order[mid])
+        stack = [(root, l, r)]
+        while stack:
+            node, l, r = stack.pop()
+            mid = l+(r-l)//2
+            if mid != l:
+                new_l, new_r = l, mid-1
+                new_mid = new_l+ (new_r-new_l)//2
+                node.left = TreeNode(order[new_mid])
+                stack.append((node.left, new_l, new_r))
+            else:
+                node.left = None
+
+            if mid != r:
+                new_l, new_r = mid+1, r
+                new_mid = new_l+ (new_r-new_l)//2
+                node.right = TreeNode(order[new_mid])
+                stack.append((node.right, new_l, new_r))
+            else:
+                node.right = None
+        return root
+
+    def get_inorder(self, root):
+        res = []
+        p, stack = root, []
+        while p or stack:
+            if p:
+                stack.append(p)
+                p = p.left
+            else:
+                node = stack.pop()
+                res.append(node.val)
+                p = node.right
+        return res
 ```
 
 ### Tag: #BST
