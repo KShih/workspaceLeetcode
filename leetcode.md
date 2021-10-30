@@ -24096,7 +24096,7 @@ class Solution:
 ```
 ### Tag: #DP
 ---
-## 199. Binary Tree Right Side View｜ 3/19 | [ Review * 1 ]
+## 199. Binary Tree Right Side View｜ 3/19 | [ Review * 2 ]
 Given a binary tree, imagine yourself standing on the right side of it, return the values of the nodes you can see ordered from top to bottom.
 
 Example:
@@ -24130,19 +24130,20 @@ class Solution:
 bfs iterative
 ```py
 class Solution:
-    def rightSideView(self, root: TreeNode) -> List[int]:
-        lev_node = []
-        queue = [(root, 0)]
-
-        while queue:
-            node, level = queue.pop(0)
-            if node:
-                if len(lev_node) == level:
-                    lev_node.append([])
-                lev_node[level].append(node.val)
-                queue.append((node.left, level+1))
-                queue.append((node.right, level+1))
-        return [x[-1] for x in lev_node]
+    def rightSideView(self, root: Optional[TreeNode]) -> List[int]:
+        if not root: return []
+        layer = [root]
+        res = []
+        while layer:
+            new_layer = []
+            res.append(layer[-1].val)
+            for node in layer:
+                if node.left:
+                    new_layer.append(node.left)
+                if node.right:
+                    new_layer.append(node.right)
+            layer = new_layer
+        return res
 ```
 ### Tag: #Tree #BFS
 ---
