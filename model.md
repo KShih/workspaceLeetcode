@@ -309,8 +309,9 @@ class Solution:
     - 記憶:
         - 宣告時, lo 是合法, hi 是不合法
         - 我們都是 return lo
-        - 所以我們都是對 lo 做 mid+1
+        - 我們都是對 lo 做 mid+1
         - 都使用絕對小於
+        - left -> a[mid] 在左; right -> a[mid] 在右
     - 比較
         ```py
         from bisect import bisect_left, bisect_right

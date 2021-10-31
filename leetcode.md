@@ -18105,7 +18105,7 @@ determine the building placement to minimize the distance of the most distant em
 
 ```
 ---
-## 300. Longest Increasing Subsequence｜ 11/14 | [Review * 1]
+## 300. Longest Increasing Subsequence｜ 11/14 | [Review * 2]
 Given an unsorted array of integers, find the length of longest increasing subsequence.
 
 Example:
@@ -18158,6 +18158,30 @@ class Solution:
             else:
                 inc[x] = num
         return len(inc)
+```
+
+bisect, self implement
+```py
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        inc = []
+        for num in nums:
+            idx = self.bisect_left(inc, num)
+            if idx == len(inc):
+                inc.append(num)
+            else:
+                inc[idx] = num
+        return len(inc)
+
+    def bisect_left(self, a, x):
+        l, r = 0, len(a)
+        while l < r:
+            mid = (l+r)//2
+            if a[mid] < x:
+                l = mid+1
+            else:
+                r = mid
+        return l
 ```
 
 Binary search with DP (same with above...)
