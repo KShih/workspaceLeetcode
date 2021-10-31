@@ -40938,7 +40938,7 @@ class Solution:
 
 ### Tag: #HashTable
 ---
-## 1570. Dot Product of Two Sparse Vectors｜ 6/28
+## 1570. Dot Product of Two Sparse Vectors｜ 6/28 | [ Review * 1 ]
 Given two sparse vectors, compute their dot product.
 
 Implement class SparseVector:
@@ -40992,7 +40992,7 @@ class SparseVector:
         return res
 ```
 
-先比較大小
+Optimal, 先比較大小
 ```py
 class SparseVector:
     def __init__(self, nums: List[int]):
