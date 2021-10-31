@@ -6848,7 +6848,7 @@ public:
 };
 ```
 ---
-## 153. Find Minimum in Rotated Sorted Array｜ 6/17 | [Review * 2]
+## 153. Find Minimum in Rotated Sorted Array｜ 6/17 | [Review * 3]
 Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
 
 (i.e.,  [0,1,2,4,5,6,7] might become  [4,5,6,7,0,1,2]).
@@ -6862,9 +6862,11 @@ You may assume no duplicate exists in the array.
 
 1. 此題不要糾結於到底要怎麼找左右邊界，因為並不符合我們的模板有給你一個特定的值要你去找左右邊界
 2. 所以我們要站在更高的思維，利用維持 (l, r) 所包圍的區域是我們想要繼續尋找的區域去想
-2. 最小值會出現的區域有著特性: `nums[mid] <= nums[r]`
-3. 因此我們可以很快的想到 if nums[mid] > nums[r]，表示 mid 左半邊是**較大的遞增矩陣**，因此我們必須排除他
-4. 所以我們寫下 `if nums[mid] > nums[r] : l = mid+1`
+3. 那麼, 最小值會出現在哪裡呢? 懸崖處! (最大值的下一個值)
+4. 那麼, 再不 revert 的狀況下, 何處是懸崖? nums[r], 所以我們應該是要讓我們的搜索範圍一直朝著懸崖靠近
+5. 當 nums[mid] > nums[r] 時, 我們就可以知道這半邊怪怪的, 我們也就確定懸崖出現在這邊
+6. 此時我們應該就要縮到這個範圍內, 且此時我們確定 nums[mid] 不可能是解, 所以我們可以 mid = l+1
+7. 那麼 else 裡面就可以很自然的寫下 r = mid, 並且最後 return nums[r]
 
 ### 思路
 We can find out the smallest elem at the reverting point or the decending point
