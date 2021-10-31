@@ -32737,7 +32737,7 @@ class TicTacToe:
 
 ### Tag: #Array
 ---
-## 340. Longest Substring with At Most K Distinct Characters｜ 11/13 | [ Review * 1 ]
+## 340. Longest Substring with At Most K Distinct Characters｜ 11/13 | [ Review * 2 ]
 Given a string, find the length of the longest substring T that contains at most k distinct characters.
 
 Example 1:
@@ -32763,12 +32763,39 @@ Explanation: T is "aa" which its length is 2.
 4. 再來考慮如何縮編, 一開始是想說是縮 l 那個元素的最新的位置, 但這個縮法會有錯誤
     - "eceeeeeebbbbb", k=2 -> 如果按照我們的縮法, 會直接把 left 移到 b 的位址
 5. 正確的做法, 因為 e 在後面還會出現, 我們也要給他機會跟後面的字組合, 這邊讓我們終止的其實是 c, 也就是*最近遇到的字元中最小的那個 index* (e 在後面被更新所以大於 c)
+6. Optimal 優化:
+    - 我們就操控 k 代表我們還可以允許多個 different ch 在我們的 frame 中
+    - 如果 k 還 >= 0 表示目前是 valid 的 window, 就可以計算 res
+    - 而如果 k < 0 我們就必須要移動 l
+    - 然而我們並不用使用 while 一次把 l 移到正確的位置, 因為我們求的是最大 frame, 我們就讓這個 frame 持續移動就行 (右1左1), 直到我們左邊已經完全移出不合的 char 時, 此時我們就可以不用再縮左, 在 sliding window 中這個技巧蠻常見的
 
 ### 思路
 
 第159題的延伸
 
 ### Code
+Optimal
+```py
+class Solution:
+    def lengthOfLongestSubstringKDistinct(self, s: str, k: int) -> int:
+        if k == 0:
+            return 0
+        frame = defaultdict(int)
+        l, res = 0, 0
+        for r, ch in enumerate(s):
+            if frame[ch] == 0:
+                k -= 1
+            frame[ch] += 1
+            if k >= 0:
+                res = max(res, r-l+1)
+            else:
+                frame[s[l]] -= 1
+                if frame[s[l]] == 0:
+                    k += 1
+                l += 1
+        return res
+```
+
 ``` py
 class Solution:
     def lengthOfLongestSubstringKDistinct(self, s: str, k: int) -> int:
