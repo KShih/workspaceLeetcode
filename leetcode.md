@@ -4841,7 +4841,7 @@ public:
 ```
 ### Tag: #Tree #DFS
 ---
-## 129. Sum Root to Leaf Numbers｜ 5/3 | [ Review * 1 ]
+## 129. Sum Root to Leaf Numbers｜ 5/3 | [ Review * 2]
 Given a binary tree containing digits from 0-9 only, each root-to-leaf path could represent a number.
 
 An example is the root-to-leaf path 1->2->3 which represents the number 123.
@@ -4854,6 +4854,23 @@ Note: A leaf is a node with no children.
 ### 思路
 這道求根到葉節點數字之和的題跟之前的求 Path Sum 很類似，都是利用DFS遞歸來解，這道題由於不是單純的把各個節點的數字相加，而是每遇到一個新的子結點的數字，要把父結點的數字擴大10倍之後再相加。
 ### Code
+```py
+class Solution:
+    def sumNumbers(self, root: Optional[TreeNode]) -> int:
+        cur_sum = 0
+        stack = [(root, str(root.val))]
+        while stack:
+            node, cur_val = stack.pop()
+            if not node.left and not node.right:
+                cur_sum += int(cur_val)
+                continue
+            if node.left:
+                stack.append((node.left, cur_val + str(node.left.val)))
+            if node.right:
+                stack.append((node.right, cur_val + str(node.right.val)))
+        return cur_sum
+```
+
 ```py
 class Solution:
     def sumNumbers(self, root: TreeNode) -> int:
