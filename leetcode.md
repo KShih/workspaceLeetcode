@@ -45371,3 +45371,77 @@ class Solution:
 
 ### Tag: #
 ---
+## 1060. Missing Element in Sorted Array｜ 10/31
+Given an integer array nums which is sorted in ascending order and all of its elements are unique and given also an integer k, return the kth missing number starting from the leftmost number of the array.
+
+Example 1:
+
+- Input: nums = [4,7,9,10], k = 1
+- Output: 5
+- Explanation: The first missing number is 5.
+
+Example 2:
+
+- Input: nums = [4,7,9,10], k = 3
+- Output: 8
+- Explanation: The missing numbers are [5,6,8,...], hence the third missing number is 8.
+
+Example 3:
+
+- Input: nums = [1,2,4], k = 3
+- Output: 6
+- Explanation: The missing numbers are [3,5,6,7,...], hence the third missing number is 6.
+
+Constraints:
+
+- 1 <= nums.length <= 5 * 104
+- 1 <= nums[i] <= 107
+- nums is sorted in ascending order, and all the elements are unique.
+- 1 <= k <= 108
+
+Follow up: Can you find a logarithmic time complexity (i.e., O(log(n))) solution?
+### 思路
+1. O(N) 解法
+    - 就是最簡單的想法一直扣 k 直到不夠扣
+2. O(Nlog(N))
+    - 一開始認為這個方法行不通, 因為我們得先求出 missing numb 的 array, 這樣掃描一遍是 O(N)
+    - 後來發現可以用 num2 - num1 - num2.index(), 這樣我們就求得出前面共有多少 missing 了
+    - 那麼我們就可以用 BinarySeach 定位出我們要從哪個位置往上加 missing
+        - orig_arr = [4, 7, 9, 10]
+        - miss_arr = [0, 2, 3, 3]
+    - 搜索完後 r 會停在 9 的位置, 那麼我們要的是 7+(3-2) 也就是 num[r-1] + (k-missing(r-1))
+
+### Code
+O(N)
+``` py
+class Solution:
+    def missingElement(self, nums: List[int], k: int) -> int:
+        for i in range(1, len(nums)):
+            cur, nxt = nums[i-1], nums[i]
+            if k > nxt-cur-1:
+                k -= (nxt-cur-1)
+            else:
+                return cur+k
+        return nums[-1]+k
+```
+
+Optimal, O(Nlog(N))
+```py
+class Solution:
+    def missingElement(self, nums: List[int], k: int) -> int:
+        missing = lambda idx: nums[idx]-nums[0]-idx
+        l, r = 0, len(nums)-1
+        if missing(r) < k:
+            return nums[r] + (k-missing(r))
+
+        while l < r:
+            mid = l +(r-l)//2
+            if missing(mid) < k:
+                l = mid+1
+            else:
+                r = mid
+        return nums[r-1] + (k-missing(r-1))
+```
+
+### Tag: #BinarySeach
+---
