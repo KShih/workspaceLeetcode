@@ -6644,7 +6644,7 @@ public:
 };
 ```
 ---
-## 33. Search in Rotated Sorted Array｜ 6/17 | [Review * 2]
+## 33. Search in Rotated Sorted Array｜ 6/17 | [Review * 3]
 Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
 
 (i.e., [0,1,2,4,5,6,7] might become [4,5,6,7,0,1,2]).
@@ -6694,6 +6694,11 @@ we can find out:
  combining these two conditions, we can finally said that
  to decide whether the target is in the left or the right side of the array.
 
+### 重刷盲點
+1. 我們在判斷 mid 是否為 target 完很容易直接寫上判斷 mid 跟 target 的大小比較，但這個想法是錯的！
+2. 最關鍵的原因是我們**只能在 sorted 的 list 裡面做搜索**, 因此我們應該先找出哪部分是 sorted 的
+3. 找出來後試著在這半邊找解, 條件裡應該要包含 **mid, target, 邊界**
+
 ### 解題分析
 
 1. 對於已經排序過的或部分排序的陣列 我們首先思考能不能使用binary search來解
@@ -6705,86 +6710,28 @@ we can find out:
 7. 最後就是基本的找特定值的模板了
 
 ### Code
-Naive solution: find out the rotation point and search in each part
-```py
-class Solution:
-    def search(self, nums, target):
-
-        def find_rotate_index(left, right):
-            if nums[left] < nums[right]: # if there is no rotaion
-                return 0
-
-            while left <= right:
-                pivot = (left + right) // 2
-                if nums[pivot] > nums[pivot + 1]:
-                    return pivot + 1
-                else:
-                    if nums[pivot] < nums[left]:
-                        right = pivot - 1
-                    else:
-                        left = pivot + 1
-
-        def search(left, right):
-            # search for the target in the ascending order
-            while left <= right:
-                pivot = (left + right) // 2
-                if nums[pivot] == target:
-                    return pivot
-                else:
-                    if target < nums[pivot]:
-                        right = pivot - 1
-                    else:
-                        left = pivot + 1
-            return -1
-
-        #  ----- main ----
-        n = len(nums)
-        if n == 0:
-            return -1
-        if n == 1:
-            return 0 if nums[0] == target else -1
-
-        rotate_index = find_rotate_index(0, n - 1)
-
-        # if array is not rotated, search in the entire array
-        if rotate_index == 0:
-            return search(0, n - 1)
-
-        if target < nums[0]:
-            # search on the right side
-            return search(rotate_index, n - 1)
-        # search on the left side
-        return search(0, rotate_index)
-```
-
 (Use this solution)
 ```py
 class Solution:
     def search(self, nums: List[int], target: int) -> int:
-        # first target: find the searching region
         l, r = 0, len(nums)-1
 
         while l <= r:
-            mid = l + (r-l)//2
+            mid = l+(r-l)//2
             if nums[mid] == target:
                 return mid
-
-            # to certain it is ascending order
-            elif nums[mid] < nums[r]:
-                # TODO: Why we need the right bound?
-                # Because we have to be certain the target do exist in this range!
-                if nums[mid] < target <= nums[r]: # 5 6 7 8 9 1 3, 1
+            # 一定要先確定搜尋的範圍是 sorted 的
+            elif nums[mid] <= nums[r]:
+                if nums[mid] < target <= nums[r]:
                     l = mid+1
                 else:
-                    r = mid-1 # the case that target is not in ascending order side
+                    r = mid-1
             else:
-                if nums[mid] > target and target >= nums[l]:
+                if nums[l] <= target < nums[mid]:
                     r = mid-1
                 else:
                     l = mid+1
         return -1
-
-
 ```
 ``` c
 class Solution {
