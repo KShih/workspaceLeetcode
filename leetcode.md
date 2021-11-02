@@ -45469,3 +45469,110 @@ class Solution:
 
 ### Tag: #BinarySeach
 ---
+## 1428. Leftmost Column with at Least a One｜ 8/29
+A row-sorted binary matrix means that all elements are 0 or 1 and each row of the matrix is sorted in non-decreasing order.
+
+Given a row-sorted binary matrix binaryMatrix, return the index (0-indexed) of the leftmost column with a 1 in it. If such an index does not exist, return -1.
+
+You can't access the Binary Matrix directly. You may only access the matrix using a BinaryMatrix interface:
+
+- BinaryMatrix.get(row, col) returns the element of the matrix at index (row, col) (0-indexed).
+- BinaryMatrix.dimensions() returns the dimensions of the matrix as a list of 2 elements [rows, cols], which means the matrix is rows x cols.
+- Submissions making more than 1000 calls to BinaryMatrix.get will be judged Wrong Answer. Also, any solutions that attempt to circumvent the judge will result in disqualification.
+
+For custom testing purposes, the input will be the entire binary matrix mat. You will not have access to the binary matrix directly.
+
+Example 1:
+
+![](assets/markdown-img-paste-20211101214854618.png)
+
+- Input: mat = [[0,0],[1,1]]
+- Output: 0
+
+Example 2:
+
+- Input: mat = [[0,0],[0,1]]
+- Output: 1
+
+Example 3:
+
+- Input: mat = [[0,0],[0,0]]
+- Output: -1
+
+Example 4:
+
+- Input: mat = [[0,0,0,1],[0,0,1,1],[0,1,1,1]]
+- Output: 1
+
+Constraints:
+
+- rows == mat.length
+- cols == mat[i].length
+- 1 <= rows, cols <= 100
+- mat[i][j] is either 0 or 1.
+- mat[i] is sorted in non-decreasing order.
+### 思路
+
+
+### Code
+
+Bisect Left 的寫法 (Recommend)
+``` py
+class Solution:
+    def leftMostColumnWithOne(self, binaryMatrix: 'BinaryMatrix') -> int:
+        row, col = binaryMatrix.dimensions()
+        min_idx = col-1
+        found = False
+        for r in range(row):
+            idx, is_found = self.get_first_1(min_idx, r, binaryMatrix, False)
+            if is_found:
+                found = True
+            if idx == 0:
+                return 0
+            elif idx < min_idx:
+                min_idx = idx
+        return min_idx if found else -1
+
+    def get_first_1(self, right, row, bm, found):
+        l, r = 0, right+1
+        while l < r:
+            mid = (l+r)//2
+            if bm.get(row, mid) == 1:
+                found = True
+                r = mid
+            else:
+                l = mid+1
+        return l, found
+```
+
+查找特定值模板的寫法 (雖然模板是直接 retrun mid, 但這邊用可以推導出 return l)
+```py
+class Solution:
+    def leftMostColumnWithOne(self, binaryMatrix: 'BinaryMatrix') -> int:
+        row, col = binaryMatrix.dimensions()
+        min_idx = col-1
+        found = False
+        for r in range(row):
+            idx, is_found = self.get_first_1(min_idx, r, binaryMatrix, False)
+            if is_found:
+                found = True
+            if idx == 0:
+                return 0
+            elif idx < min_idx:
+                min_idx = idx
+        return min_idx if found else -1
+
+    def get_first_1(self, right, row, bm, found):
+        l, r = 0, right
+        while l <= r:
+            mid = l + (r-l)//2
+            if bm.get(row, mid) == 1:
+                found = True
+                r = mid-1
+            else:
+                l = mid+1
+        return l, found
+```
+
+### Tag: #BinarySearch
+---
