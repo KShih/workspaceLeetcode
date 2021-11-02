@@ -12641,7 +12641,7 @@ class Solution(object):
 
 ```
 ---
-## 238. Product of Array Except Self｜ 9/2 | [ Review * 1 ]
+## 238. Product of Array Except Self｜ 9/2 | [ Review * 2 ]
 
 Given an array nums of n integers where n > 1,  return an array output such that output[i] is equal to the product of all the elements of nums except nums[i].
 
@@ -12693,6 +12693,33 @@ __如果要求constant space, 表示不能有除了回傳陣列外多餘的陣�
 由於最終的結果都是要乘到結果 res 中，所以可以不用單獨的數組來保存乘積，而是直接累積到結果 res 中，我們先從前面遍歷一遍，將乘積的累積存入結果 res 中，然後從後面開始遍歷，用到一個臨時變量 right，初始化為1，然後每次不斷累積
 
 ### Code
+
+Way1
+```py
+class Solution:
+    def productExceptSelf(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        left = [None for _ in range(n)]
+        right = [None for _ in range(n)]
+        left[0], right[-1] = nums[0], nums[-1]
+        for i in range(1, n):
+            left[i] = nums[i] * left[i-1]
+
+        for i in range(n-2, -1, -1):
+            right[i] = nums[i] * right[i+1]
+
+        res = [None for _ in range(n)]
+        for i in range(n):
+            if i == 0:
+                res[i] = right[i+1]
+            elif i == n-1:
+                res[i] = left[i-1]
+            else:
+                res[i] = left[i-1] * right[i+1]
+        return res
+```
+
+Way1 (Clean)
 ``` py
 """
     0 1 2 3 4 5 6 n-1
@@ -12722,7 +12749,26 @@ class Solution(object):
         return res
 ```
 
-Constant space improve:
+Way2, Optimal (Modify from Way1)
+```py
+class Solution:
+    def productExceptSelf(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        left = [None for _ in range(n)]
+
+        left[0] = 1
+        for i in range(1, n):
+            left[i] = nums[i-1] * left[i-1]
+
+        cur_r = nums[-1]
+        for i in range(n-2, -1, -1):
+            left[i] = left[i] * cur_r
+            cur_r *= nums[i]
+
+        return left
+```
+
+Way2
 ```py
 class Solution(object):
     def productExceptSelf(self, nums):
