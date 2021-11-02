@@ -45622,6 +45622,90 @@ class Solution:
 
 ### Tag: #BinarySearch
 ---
+## 498. Diagonal Traverse｜ 11/2
+Given an m x n matrix mat, return an array of all the elements of the array in a diagonal order.
+
+Example 1:
+
+![](assets/markdown-img-paste-20211102002433579.png)
+
+- Input: mat = [[1,2,3],[4,5,6],[7,8,9]]
+- Output: [1,2,4,7,5,3,6,8,9]
+
+Example 2:
+
+- Input: mat = [[1,2],[3,4]]
+- Output: [1,2,3,4]
+
+Constraints:
+
+- m == mat.length
+- n == mat[i].length
+- 1 <= m, n <= 104
+- 1 <= m * n <= 104
+- -105 <= mat[i][j] <= 105
+### 思路
+1. HashMap
+    - 2D陣列, 在同一對角線的元素他們 index(i, j) 的 sum 是一樣的
+    - 但我們需要因為不同機偶而調整順序, 因此我們只能先用 dict 存
+    - Time
+        - R*C
+        - sorted: log(R+C) * traverse R+C times
+            - k = R+C, klogk
+        - max(R*C, klogk)
+
+2. Loop traverse
+    - 找起點: 直接用 traverse 的順序去推那個值
+        - r: [0, 1, 2, n-1, n-1, n-1 ...]
+        - c: [0, 0, 0, 1, 2 ...]
+    - loop 次數, 就盡可能的位移即可, 因此只需判斷是否還在界內
+    - Time
+        - O(R+C)
+
+### Code
+Easy mlogm
+``` py
+class Solution:
+    def findDiagonalOrder(self, nums: List[List[int]]) -> List[int]:
+        dic = defaultdict(list)
+        for i in range(len(nums)):
+            for j in range(len(nums[i])):
+                dic[i+j].append(nums[i][j])
+
+        res = []
+        for i, li in sorted(dic.items()):
+            if i % 2 == 0:
+                res.extend(li[::-1])
+            else:
+                res.extend(li)
+        return res
+```
+
+O(N)
+```py
+class Solution:
+    def findDiagonalOrder(self, nums: List[List[int]]) -> List[int]:
+        R = len(nums)
+        C = len(nums[0])
+        res = []
+
+        for i in range(R+C):
+            r = i if i < R else R-1
+            c = 0 if i < R else i-R+1
+            cur_res = []
+            while r > -1 and c < C:
+                cur_res.append(nums[r][c])
+                r, c = r-1, c+1
+            if i % 2 != 0:
+                res.extend(cur_res[::-1])
+            else:
+                res.extend(cur_res)
+        return res
+```
+
+### Tag: #Array
+---
+
 ## 1424. Diagonal Traverse II｜ 11/2
 Given a list of lists of integers, nums, return all elements of nums in diagonal order as shown in the below images.
 
