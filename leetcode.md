@@ -25952,7 +25952,7 @@ class Solution:
         return s[-cnt:] + s[:-cnt]
 ```
 ---
-## 223. Rectangle Area｜ 4/10
+## 223. Rectangle Area｜ 4/10 | [ Review * 1 ]
 Find the total area covered by two rectilinear rectangles in a 2D plane.
 
 Each rectangle is defined by its bottom left corner and top right corner as shown in the figure.
@@ -25970,9 +25970,36 @@ Each rectangle is defined by its bottom left corner and top right corner as show
     - 要試下個端點的左 小於 上個端點的右 -> 重疊
 
 ### 思路
-
+1. 分析 3 種情形
+    - 部分重合
+    - 完全重合
+    - 無重合
+2. 計算重合的部分
+    - 左邊界的求法就是兩個長方形的左下點的x軸最大值
+    - 右邊界的求法就是兩個長方形的右上點的x軸最小值
+    - 有重合的情況是在右邊 > 左邊的狀況下
 
 ### Code
+Intuitive
+```py
+class Solution:
+    def computeArea(self, ax1: int, ay1: int, ax2: int, ay2: int, bx1: int, by1: int, bx2: int, by2: int) -> int:
+        a_a = self.get_area(ax1, ay1, ax2, ay2)
+        b_a = self.get_area(bx1, by1, bx2, by2)
+        ox1 = max(ax1, bx1)
+        ox2 = min(ax2, bx2)
+        oy1 = max(ay1, by1)
+        oy2 = min(ay2, by2)
+        if ox1 > ox2 or oy1 > oy2: # no overlap
+            return a_a + b_a
+        else:
+            overlap = self.get_area(ox1, oy1, ox2, oy2)
+            return a_a + b_a - overlap
+
+    def get_area(self, ax1, ay1, ax2, ay2):
+        return (ax2 - ax1) * (ay2 - ay1)
+```
+
 ``` py
 class Solution:
     def computeArea(self, A: int, B: int, C: int, D: int, E: int, F: int, G: int, H: int) -> int:
