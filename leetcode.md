@@ -18665,7 +18665,7 @@ class Solution:
 ```
 ### Tag: #TwoPointer, #Recursive
 ---
-## 31. Next Permutation｜ 11/21
+## 31. Next Permutation｜ 11/21 | [ Review * 1 ]
 
 Implement next permutation, which rearranges numbers into the lexicographically next greater permutation of numbers.
 
@@ -18680,6 +18680,14 @@ Here are some examples. Inputs are in the left-hand column and its corresponding
 3,2,1 → 1,2,3
 
 1,1,5 → 1,5,1
+
+### 解題分析
+1. 就是按照思路的步驟去做
+2. 注意 edge case
+    - [3,2,1] -> [1,2,3]
+        - 需要用一個 found 的 flag 去決定我們需不需要進行步驟二
+    - [2,3,1,3,3] -> [2,3,3,1,3]
+        - 在尋找 next greater 的時候要使用 `小於等於`, 因為我們想要盡可能地往後找
 
 ### 思路
 
@@ -18701,6 +18709,36 @@ Here are some examples. Inputs are in the left-hand column and its corresponding
 
 1　　3　　*1*　　*2*　　*4*　　*7*
 ### Code
+Step by step code
+```py
+class Solution:
+    def nextPermutation(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        if len(nums) == 1:
+            return nums
+        n = len(nums)
+        found = False
+        for i in range(n-2, -1, -1): # step1, find first lower
+            if nums[i] < nums[i+1]:
+                found = True
+                break
+        if found:
+            smallest = (-1, float("inf")) # step2, find next elem greater than lower, and near end
+            for j in range(i+1, n, 1):
+                if nums[j] > nums[i] and nums[j] <= smallest[1]: # 要用 <=, 因為我們想要盡量後面的
+                    smallest = (j, nums[j])
+            s_idx = smallest[0]
+            nums[i], nums[s_idx] = nums[s_idx], nums[i] # step2.1: swap two
+        else:
+            i = -1 # 表示完全遞減: e.g.: 3,2,1, 需要完全倒
+        l, r = i+1, n-1 # step3. swap nums[i+1:]
+        while l < r:
+            nums[l], nums[r] = nums[r], nums[l]
+            l, r = l+1, r-1
+```
+
 ``` py
 class Solution:
     def nextPermutation(self, nums: List[int]) -> None:
@@ -18726,6 +18764,7 @@ class Solution:
                 # Step3. Break
                 break
 ```
+### Tag: #Array
 ---
 ## 32. Longest Valid Parentheses｜ 11/21 | [ Review * 1 ]
 Given a string containing just the characters '(' and ')', find the length of the longest valid (well-formed) parentheses substring.
