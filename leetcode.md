@@ -32765,7 +32765,7 @@ class NestedIterator:
 ```
 ### Tag: #DFS, #Stack #Queue
 ---
-## 348. Design Tic-Tac-Toe｜ 11/10
+## 348. Design Tic-Tac-Toe｜ 11/10 | [ Review * 1 ]
 
 Assume the following rules are for the tic-tac-toe game on an n x n board between two players:
 
@@ -32795,6 +32795,8 @@ Player {player} makes a move at ({row}, {col}).
 1. Naive:
     - 針對下下去的點去對其的上下左右and對角線掃描
 2. 我們建立一個大小為n的一維數組rows和cols，還有變量對角線diag和逆對角線rev_diag，這種方法的思路是，如果玩家1在第一行某一列放了一個子，那麼rows[0]自增1，如果玩家2在第一行某一列放了一個子，則rows[0]自減1，那麼只有當rows[0]等於n或者-n的時候，表示第一行的子都是一個玩家放的，則遊戲結束返回該玩家即可，其他各行各列，對角線和逆對角線都是這種思路
+    - 對角線: row == col
+    - 逆對角線: row+col == len(board)-1
 
 ### Code
 O(1)
@@ -32805,16 +32807,16 @@ class TicTacToe:
         self.rows = [0] * n
         self.cols = [0] * n
         self.diag = 0
-        self.rev_diag = 0
+        self.adiag = 0
 
     def move(self, row: int, col: int, player: int) -> int:
-        n = len(self.rows)
         add = 1 if player == 1 else -1
+        w = len(self.rows)
         self.rows[row] += add
         self.cols[col] += add
         self.diag += add if row == col else 0
-        self.rev_diag += add if row == (n - col - 1) else 0
-        if (abs(self.rows[row]) == n or abs(self.cols[col]) == n or abs(self.diag) == n or abs(self.rev_diag) == n):
+        self.adiag += add if row+col == w-1 else 0
+        if abs(self.rows[row]) == w or abs(self.cols[col]) == w or abs(self.diag) == w or abs(self.adiag) == w:
             return player
         else:
             return 0
