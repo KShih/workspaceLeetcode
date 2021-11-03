@@ -45849,3 +45849,102 @@ class Solution:
 
 ### Tag: #Array
 ---
+## 794. Valid Tic-Tac-Toe State｜ 11/2
+Given a Tic-Tac-Toe board as a string array board, return true if and only if it is possible to reach this board position during the course of a valid tic-tac-toe game.
+
+The board is a 3 x 3 array that consists of characters ' ', 'X', and 'O'. The ' ' character represents an empty square.
+
+Here are the rules of Tic-Tac-Toe:
+
+- Players take turns placing characters into empty squares ' '.
+- The first player always places 'X' characters, while the second player always places 'O' characters.
+- 'X' and 'O' characters are always placed into empty squares, never filled ones.
+- The game ends when there are three of the same (non-empty) character filling any row, column, or diagonal.
+- The game also ends if all squares are non-empty.
+- No more moves can be played if the game is over.
+
+Example 1:
+
+
+- Input: board = ["O  ","   ","   "]
+- Output: false
+- Explanation: The first player always plays "X".
+
+Example 2:
+
+![](assets/markdown-img-paste-20211103000811195.png)
+
+- Input: board = ["XOX"," X ","   "]
+- Output: false
+- Explanation: Players take turns making moves.
+
+Example 3:
+
+
+- Input: board = ["XXX","   ","OOO"]
+- Output: false
+
+Example 4:
+
+
+- Input: board = ["XOX","O O","XOX"]
+- Output: true
+
+Constraints:
+
+- board.length == 3
+- board[i].length == 3
+- board[i][j] is either 'X', 'O', or ' '.
+
+### 解題分析
+1. 就是單純去討論棋盤的合法性, 最關鍵的點就是下棋的順序, 我們用一個變量 turns 紀錄
+    - 因此我們可以說下 X 的, turns + 1
+    - 下 O 的, turns - 1
+2. 然後還有勝利的情形, 我們只允許一個人獲勝
+3. 還有勝利時馬上結束比賽的條件, 這讓我們討論勝利的情形也還得付加結束時的 turns
+4. 需要討論的 case
+    1. 如果沒人勝利, turns 可以是 0 or 1
+    2. 不允許兩個人同時勝利
+    3. x win 時 turns = 1
+    4. o win 時 turns = 0
+
+
+### Code
+``` py
+class Solution:
+    def validTicTacToe(self, board: List[str]) -> bool:
+        xwin, owin, turns = False, False, 0
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] == 'X':
+                    turns += 1
+                elif board[i][j] == 'O':
+                    turns -= 1
+        if turns != 0 and turns != 1:
+            return False
+        xwin = self.is_win('X', board)
+        owin = self.is_win('O', board)
+        if xwin and owin:
+            return False
+        elif xwin and turns != 1:
+            return False
+        elif owin and turns != 0:
+            return False
+        return True
+
+    def is_win(self, player, board):
+        for i in range(3):
+            if board[i][0] == board[i][1] == board[i][2] == player:
+                return True
+        for i in range(3):
+            if board[0][i] == board[1][i] == board[2][i] == player:
+                return True
+        if board[0][0] == board[1][1] == board[2][2] == player:
+            return True
+        if board[0][2] == board[1][1] == board[2][0] == player:
+            return True
+        return False
+```
+
+### Tag: #
+---
