@@ -22137,7 +22137,7 @@ def solve(self, board):
 ```
 ### Tag: #Tree #DFS #BFS
 ---
-## 140. Word Break II｜ 2/5 | [Review * 1]
+## 140. Word Break II｜ 2/5 | [Review * 2]
 Given a non-empty string s and a dictionary wordDict containing a list of non-empty words, add spaces in s to construct a sentence where each word is a valid dictionary word. Return all such possible sentences.
 
 Note:
@@ -22217,6 +22217,12 @@ TLE 那個解法也挺好，比較容易想到，仍缺cache優化法。
 此層當前單字為sand，cur_comb = {"$"} ，將其組合得到res = {sand dog}回傳，
 
 以此類推直到res = {cat sand dog}，此時繼續匹配下一個單字"cats"，並繼續剛剛的步驟直到最上層走完所有字典裡的字
+
+- Time
+    - TopDown DFS:
+        - O(len(wordDict) ^ len(s / minWordLenInDict))
+    - BottomUp DP:
+        - O(len(s)^2)
 
 ### Code
 直接用上題的 Topdown 寫法改寫
