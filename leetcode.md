@@ -46075,5 +46075,18 @@ class Solution:
         return requests
 ```
 
+sort + BinarySeach 解法
+```py
+class Solution:
+    def numFriendRequests(self, ages: List[int]) -> int:
+        cnt = 0
+        ages.sort()
+        for a in ages:
+            idx1 = bisect.bisect_right(ages, a)
+            idx2 = bisect.bisect_right(ages, 0.5 * a + 7)
+            cnt += max(0, idx1 - idx2 - 1)
+        return cnt
+```
+
 ### Tag: #
 ---
