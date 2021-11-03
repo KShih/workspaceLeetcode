@@ -11358,7 +11358,7 @@ public:
 };
 ```
 ---
-## 56. Merge Intervals｜ 8/28 | [ Review * 1 ]
+## 56. Merge Intervals｜ 8/28 | [ Review * 2 ]
 Given a collection of intervals, merge all overlapping intervals.
 
 ![](assets/markdown-img-paste-20190828171623852.png)
@@ -46035,4 +46035,67 @@ class Solution:
 ```
 
 ### Tag: #Heap #BucketSort
+---
+## 825. Friends Of Appropriate Ages｜ 11/3
+There are n persons on a social media website. You are given an integer array ages where ages[i] is the age of the ith person.
+
+A Person x will not send a friend request to a person y (x != y) if any of the following conditions is true:
+
+- age[y] <= 0.5 * age[x] + 7
+- age[y] > age[x]
+- age[y] > 100 && age[x] < 100
+- Otherwise, x will send a friend request to y.
+
+Note that if x sends a request to y, y will not necessarily send a request to x. Also, a person will not send a friend request to themself.
+
+Return the total number of friend requests made.
+
+Example 1:
+
+- Input: ages = [16,16]
+- Output: 2
+- Explanation: 2 people friend request each other.
+
+Example 2:
+
+- Input: ages = [16,17,18]
+- Output: 2
+- Explanation: Friend requests are made 17 -> 16, 18 -> 17.
+
+Example 3:
+
+- Input: ages = [20,30,100,110,120]
+- Output: 3
+- Explanation: Friend requests are made 110 -> 100, 120 -> 110, 120 -> 100.
+
+Constraints:
+
+- n == ages.length
+- 1 <= n <= 2 * 104
+- 1 <= ages[i] <= 120
+### 思路
+1. 就是逐一比較, 但可以用 counter 優化, 因為 age 範圍只有 120, 但人數高達2萬
+2. 如果 is_valid(a, b), 就是 counts[a] * counts[b], 但如果 a == b 那麼就要把自己扣掉所以是 counts[a] * counts[a]-1
+3. 第三個條件可以不考慮, 因為被第二個包含
+4. 同年紀的也不一定吻合, 所以就算 a == b, 還是要檢查是否 valid
+
+### Code
+``` py
+class Solution:
+    def numFriendRequests(self, ages: List[int]) -> int:
+        def is_valid(x, y):
+            return not ((y <= 0.5 * x + 7) or (y > x))
+        requests = 0
+        counts = Counter(ages)
+        for a in counts:
+            for b in counts:
+                if is_valid(a, b):
+                    if a == b:
+                        requests += counts[a] * (counts[b]-1)
+                    else:
+                        requests += counts[a] * counts[b]
+        return requests
+```
+
+### Tag: #
 ---
