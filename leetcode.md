@@ -1,27 +1,5 @@
 Leetcode note
 ===
-1. [Backtrack problem 演算法整理](https://leetcode.com/problems/subsets/discuss/27281/A-general-approach-to-backtracking-questions-in-Java-(Subsets-Permutations-Combination-Sum-Palindrome-Partitioning))
-2. 動態規劃(DP)講解：https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-iii/solution/yi-ge-tong-yong-fang-fa-tuan-mie-6-dao-gu-piao-wen/
-4. 未解題目：
-- 943, 996, 37, 212(used tree), 126(disgust), 675, 131(DP), 93(DP), 282(Hard), 968, 979, 99(Morris Traversal螺紋二叉樹),
-- Binary Search: { 981(BS), 378(Binary Search Solution), 668(same as 378), 778, 174, 875, 719, 786, 4 }
-- $$$$$$$$$$$$$: { Array:(244, 245, )}
-
----
-## Trick
-1. two dimension array to one dimension: MxN -> A[i/N][i%N] = number i elem in array
-2. unordered_map 是 HashMap，插入和查詢的時間複雜度都是O(1)，但是裡面的映射對兒是無序的。
-3. map 是 TreeMap，插入和查詢的時間複雜度都是O(lgn)，但裡面的映射對兒可以按照key值排序，還可以自定義排序方法。 同理set, unordered_set
-4. 無條件進位 k = (k+1)/2 例題23
-5. if (k++ > 0) -> 先判斷k是否大於零, 再++; if (++k > 0) -> 先++再判斷是否大於零
-
-## 複習
-1. priority_queue 的宣告, 如何客製化比較法？
-2. string to int, int to string?
-3. how to use substr?
-4. how to initialize 2-D vector
----
-
 ## 17. Letter Combinations of a Phone Number | [Review * 1]
 Given a string containing digits from 2-9 inclusive, return all possible letter combinations that the number could represent.
 
