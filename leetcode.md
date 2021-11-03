@@ -13138,10 +13138,31 @@ class Solution(object):
 ```
 ### Tag: #HashTable
 ---
-## 336. Palindrome Pairs｜ 9/9 | [ Review * 1 ]
+## 336. Palindrome Pairs｜ 9/9 | [ Review * 2 ]
 Given a list of unique words, find all pairs of distinct indices (i, j) in the given list, so that the concatenation of the two words, i.e. words[i] + words[j] is a palindrome.
 
-![](assets/markdown-img-paste-20190909134847447.png)
+Example 1:
+
+- Input: words = ["abcd","dcba","lls","s","sssll"]
+- Output: [[0,1],[1,0],[3,2],[2,4]]
+- Explanation: The palindromes are ["dcbaabcd","abcddcba","slls","llssssll"]
+
+Example 2:
+
+- Input: words = ["bat","tab","cat"]
+- Output: [[0,1],[1,0]]
+- Explanation: The palindromes are ["battab","tabbat"]
+
+Example 3:
+
+- Input: words = ["a",""]
+- Output: [[0,1],[1,0]]
+
+Constraints:
+
+- 1 <= words.length <= 5000
+- 0 <= words[i].length <= 300
+- words[i] consists of lower-case English letters.
 
 ### 解題分析
 
@@ -13176,6 +13197,7 @@ Given a list of unique words, find all pairs of distinct indices (i, j) in the g
     3. 整體邏輯變成, **如果某部分的字有在 reverse_map 裏, 且其他部分為 palin, 那就是合法的組合** <- *超好記得解題邏輯*
 
 ### Code
+用這個寫法把, 比較好懂
 ```py
 class Solution:
     def palindromePairs(self, words: List[str]) -> List[List[int]]:
@@ -13185,7 +13207,7 @@ class Solution:
         for i, word in enumerate(words):
             rev_word = word[::-1]
             if rev_word in word_dic and word_dic[rev_word] != i: # case1
-                res.append([i, word_dic[rev_word]])
+                res.append([i, word_dic[rev_word]]) # 注意這邊做完不能接 continue, e.g.: [ab, ba, cba]
 
             for valid_prefix in self.get_valid_prefix(word):
                 rev_prefix = valid_prefix[::-1]
@@ -13209,14 +13231,14 @@ class Solution:
 
     def get_valid_suffix(self, word): # sssll -> ss + [sll]
         valids = []
-        for i in range(len(word)):
-            pre = word[:i+1]
+        for i in range(1, len(word)+1): # 注意 prefix 的取法 i 要從 1~n+1!
+            pre = word[:i]
             if pre == pre[::-1]:
-                valids.append(word[i+1:])
+                valids.append(word[i:])
         return valids
 ```
 
-極致精簡版 (Optimal) -> O(nk)
+精簡版
 ```py
 class Solution(object):
     def palindromePairs(self, words):
