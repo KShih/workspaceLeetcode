@@ -10393,7 +10393,7 @@ class Solution(object):
         return count
 ```
 ---
-## 116. Populating Next Right Pointers in Each Node｜ 8/24 | [ Review * 1 ]
+## 116. Populating Next Right Pointers in Each Node｜ 8/24 | [ Review * 2 ]
 You are given a perfect binary tree where all leaves are on the same level, and every parent has two children. The binary tree has the following definition:
 
 struct Node {
@@ -10451,19 +10451,15 @@ without queue
 ```py
 class Solution:
     def connect(self, root: 'Node') -> 'Node':
-        if not root: return None
         leftmost = root
-        parent = None
-        while leftmost.left:
+        while leftmost:
             parent = leftmost
-
             while parent:
                 if parent.left:
                     parent.left.next = parent.right
-                if parent.next:
+                if parent.right and parent.next:
                     parent.right.next = parent.next.left
                 parent = parent.next
-
             leftmost = leftmost.left
         return root
 ```
