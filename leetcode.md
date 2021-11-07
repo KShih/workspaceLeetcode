@@ -31432,7 +31432,7 @@ class Solution:
 
 ### Tag: #區間DP非常規走訪, #DP
 ---
-## 314. Binary Tree Vertical Order Traversal｜ 10/20 | [ Review * 1 ]
+## 314. Binary Tree Vertical Order Traversal｜ 10/20 | [ Review * 2 ]
 Given a binary tree, return the vertical order traversal of its nodes' values. (ie, from top to bottom, column by column).
 
 If two nodes are in the same row and column, the order should be from left to right.
@@ -31449,7 +31449,37 @@ If two nodes are in the same row and column, the order should be from left to ri
 
 層序遍歷，左節點-1，又節點+1
 
+優化:
+- 紀錄了 min_idx, max_idx 我們就可以自己用 for loop 去走訪, 就可以不用用 sort 了
+
 ### Code
+Optimal O(N)
+```py
+class Solution:
+    def verticalOrder(self, root: TreeNode) -> List[List[int]]:
+        if not root:
+            return []
+        layer = deque([(root, 0)])
+        idx_map = defaultdict(list)
+        min_col, max_col = float("inf"), float("-inf")
+
+        while layer:
+            node, idx = layer.popleft()
+            idx_map[idx].append(node.val)
+            if idx < min_col:
+                min_col = idx
+            if idx > max_col:
+                max_col = idx
+
+            if node.left:
+                layer.append((node.left, idx-1))
+            if node.right:
+                layer.append((node.right, idx+1))
+
+        return [idx_map[i] for i in range(min_col, max_col+1)]
+```
+
+O(NlogN)
 ``` py
 from collections import defaultdict
 class Solution:
