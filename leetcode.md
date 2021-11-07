@@ -35473,7 +35473,7 @@ class Solution:
 
 ### Tag: #MergeSort #divideAndConquer
 ---
-## 426. Convert Binary Search Tree to Sorted Doubly Linked List｜ 3/7 | [ Review * 2 ]
+## 426. Convert Binary Search Tree to Sorted Doubly Linked List｜ 3/7 | [ Review * 3 ]
 
 Convert a Binary Search Tree to a sorted Circular Doubly-Linked List in place.
 
@@ -35523,39 +35523,57 @@ Constraints:
 6. 當裡面的 Node 的連結好後，最後再把 last 跟 first 連一起形成一個環
 
 ### Code
-``` py
-"""
-    # Definition for a Node.
-class Node:
-    def __init__(self, val, left=None, right=None):
-        self.val = val
-        self.left = left
-        self.right = right
-"""
-
+Optimal, Space(1)
+```py
 class Solution:
     def treeToDoublyList(self, root: 'Node') -> 'Node':
         if not root:
             return None
-        self.last, self.first = None, None
-        def inorder(node):
-            if not node:
-                return
-            inorder(node.left)
-
-            if self.first == None:
-                self.first = node
+        first, prev = None, None
+        p, stack = root, []
+        
+        while p or stack:
+            if p:
+                stack.append(p)
+                p = p.left
             else:
-                self.last.right = node
-                node.left = self.last
-            self.last = node
+                node = stack.pop()
+                # dealing logic
+                if not first:
+                    first = node
+                else:
+                    prev.right = node # 在 first 設定後, prev 也一定會跟著設定, 因此可以直接 prev.right
+                    node.left = prev
+                prev = node
+                # dealing logic end
+                p = node.right
+        prev.right = first
+        first.left = prev
+        return first
+```
 
-            inorder(node.right)
-
-        inorder(root)
-        self.last.right = self.first
-        self.first.left = self.last
-        return self.first
+Naive, get postorder list
+```py
+class Solution:
+    def treeToDoublyList(self, root: 'Node') -> 'Node':
+        if not root:
+            return None
+        inorders = []
+        stack, p = [], root
+        while stack or p:
+            if p:
+                stack.append(p)
+                p = p.left
+            else:
+                p = stack.pop()
+                inorders.append(p)
+                p = p.right
+        for i in range(1, len(inorders)):
+            inorders[i-1].right = inorders[i]
+            inorders[i].left = inorders[i-1]
+        inorders[-1].right = inorders[0]
+        inorders[0].left = inorders[-1]
+        return inorders[0]
 ```
 
 ### Tag: #DFS #BST
