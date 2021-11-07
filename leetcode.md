@@ -4713,7 +4713,7 @@ public:
 };
 ```
 ---
-## 124. Binary Tree Maximum Path Sum｜ 5/1 | [ Review * 2 ]
+## 124. Binary Tree Maximum Path Sum｜ 5/1 | [ Review * 3 ]
 Given a non-empty binary tree, find the maximum path sum.
 
 For this problem, a path is defined as any sequence of nodes from some starting node to any node in the tree along the parent-child connections. The path must contain at least one node and does not need to go through the root.
@@ -4731,13 +4731,21 @@ For this problem, a path is defined as any sequence of nodes from some starting 
 2. 因此需要先求出左右，才能更新本身的作法為使用後序遍歷
 3. 需要注意的是，更新此數值並不能作為回傳值，回傳值只能左邊、右邊選一邊加上自己的值
 4. Iterative:
-    1. 因為此題必須要用 post_order, 所以我們要馬要用 two stack 做, 要馬是先取得 order 再反轉
-    2. 這邊選擇反轉的這種 post order traverse 的方法
-    3. 取得 order 後我們就逐一拜訪, 理論上就會從業結點開始往上去走, 我們必須讓父節點能取得子結點的 max 值, 所以我們用一個 hashmap 去紀錄
-    4. 再按照 recursive 的邏輯去更新 maximum 值跟 hashmap 裡的值就可以了
+    1. postOrder 作法
+        1. 因為此題必須要用 post_order, 所以我們要馬要用 two stack 做, 要馬是先取得 order 再反轉
+        2. 這邊選擇反轉的這種 post order traverse 的方法
+        3. 取得 order 後我們就逐一拜訪, 理論上就會從業結點開始往上去走, 我們必須讓父節點能取得子結點的 max 值, 所以我們用一個 hashmap 去紀錄
+        4. 再按照 recursive 的邏輯去更新 maximum 值跟 hashmap 裡的值就可以了
+    2. 與 recursive 相同概念, 多用一個 map 去存, 只在左右兩邊都完成的情況下才對此節點做處理
 
-### 5/6review
-在宣告result時要宣告成INT_MIN來防止[-3] 這種testcase
+### 複習盲點
+
+max_val[0] = max(max_val[0], left_max+right_max+node.val)
+
+這行寫成 max_val[0] = max(max_val[0], left_max, right_max, left_max+right_max+node.val)
+
+會導致 [-3] 這個 testcase 錯掉，因為我們至少要娶一個點。我們在前面把 left_max, right_max 最大值設為0了，如果按照我們錯誤的寫法意思會變成我可以選擇不取點
+
 
 ### 思路
 ![](assets/markdown-img-paste-20190630235409853.png)
@@ -4745,21 +4753,44 @@ For this problem, a path is defined as any sequence of nodes from some starting 
 ### Code
 ```py
 class Solution:
-    def maxPathSum(self, root: TreeNode) -> int:
-        self.res = float(-inf)
+    def maxPathSum(self, root: Optional[TreeNode]) -> int:
+        max_val = [float("-inf")]
+        self.recur(root, max_val)
+        return max_val[0]
 
-        def helper(node):
-            if not node:
-                return 0
+    def recur(self, node, max_val):
+        if not node:
+            return 0
 
-            left = max(helper(node.left), 0)
-            right = max(helper(node.right), 0)
+        left_max = max(self.recur(node.left, max_val), 0)
+        right_max = max(self.recur(node.right, max_val), 0)
+        max_val[0] = max(max_val[0], left_max+right_max+node.val)
+        return max(left_max, right_max)+node.val
+```
 
-            self.res = max(self.res, left+right+node.val)
-            return node.val + max(left, right)
+Iterative same idea
+```py
+class Solution:
+    def maxPathSum(self, root: Optional[TreeNode]) -> int:
+        max_val = float("-inf")
+        maps = {None:0}
+        stack = [root]
 
-        helper(root)
-        return self.res
+        while stack:
+            node = stack.pop()
+
+            if node.left in maps and node.right in maps:
+                left_val = max(maps[node.left], 0)
+                right_val = max(maps[node.right], 0)
+                max_val = max(max_val, left_val + node.val + right_val)
+                maps[node] = max(left_val, right_val) + node.val
+            else:
+                stack.append(node)
+                if node.left:
+                    stack.append(node.left)
+                if node.right:
+                    stack.append(node.right)
+        return max_val
 ```
 
 Iterative
