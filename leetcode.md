@@ -23472,7 +23472,7 @@ class Solution:
         return num1, num2
 ```
 ---
-## 166. Fraction to Recurring Decimal｜ 3/11 | [ Review * 1 ]
+## 166. Fraction to Recurring Decimal｜ 3/11 | [ Review * 2 ]
 Given two integers representing the numerator and denominator of a fraction, return the fraction in string format.
 
 If the fractional part is repeating, enclose the repeating part in parentheses.
@@ -23495,6 +23495,14 @@ Input: numerator = 2, denominator = 3
 
 Output: "0.(6)"
 
+### 解題分析
+1. 在做 divmod 的時候要用 abs
+    - 因為我們要直接 append 整數部位進去 res, 如果不取 abs 會導致把 sign 也 append 進去這樣就沒辦法 str.join 了
+2. appeard 要用 dict 而不是 set
+    - e.g.: 1/6 = 0.1(6)
+    - 因此我們需要紀錄重複的位置
+3. appeard 裡紀錄的是餘數出現的位置, 我們長除法循環的判定應該是要在餘數
+
 ### 技巧
 
 - 取代最後面的特定文字: rstrip('char')
@@ -23504,6 +23512,28 @@ Output: "0.(6)"
 1. 小數點後的算法：我們要算出小數每一位，採取的方法是每次把餘數乘10，再除以除數，得到的商即為小數的下一位數字。
 
 ### Code
+自己寫的
+```py
+class Solution:
+    def fractionToDecimal(self, numerator: int, denominator: int) -> str:
+        appeard = dict()
+        n, r = divmod(abs(numerator),abs(denominator))
+        sign = '-' if numerator*denominator < 0 else ""
+        res = []
+        while r != 0 and r not in appeard:
+            appeard[r] = len(res)
+            i, r = divmod(r*10, abs(denominator))
+            res.append(str(i))
+
+        if len(res) != 0:
+            if r == 0:
+                return f'{sign}{str(n)}.{"".join(res)}'
+            else:
+                return f'{sign}{str(n)}.{"".join(res[:appeard[r]])}({"".join(res[appeard[r]:])})'
+        else:
+            return sign + str(n)
+```
+
 ``` py
 class Solution:
     def fractionToDecimal(self, numerator: int, denominator: int) -> str:
@@ -35531,7 +35561,7 @@ class Solution:
             return None
         first, prev = None, None
         p, stack = root, []
-        
+
         while p or stack:
             if p:
                 stack.append(p)
