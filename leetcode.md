@@ -27794,40 +27794,54 @@ class Solution:
 
 ### Tag: #TwoPointer #BinarySeach
 ---
-## 249. Group Shifted Strings｜ 7/11 | [ Review * 1 ]
-![](assets/markdown-img-paste-20200711104414446.png)
+## 249. Group Shifted Strings｜ 7/11 | [ Review * 2 ]
+We can shift a string by shifting each of its letters to its successive letter.
 
-計算每個字串的偏移量
+- For example, "abc" can be shifted to be "bcd".
+- We can keep shifting the string to form a sequence.
 
-### 思路
+- For example, we can keep shifting "abc" to form the sequence: "abc" -> "bcd" -> ... -> "xyz".
+- Given an array of strings strings, group all strings[i] that belong to the same shifting sequence. - You may return the answer in any order.
 
-相同偏移量的字串相當於跟首字母差距一樣的字串
+Example 1:
 
-deal with ["abc","am"] -> 在每個字母差值背後加上一個分隔號
+- Input: strings = ["abc","bcd","acef","xyz","az","ba","a","z"]
+- Output: [["acef"],["a","z"],["abc","bcd","xyz"],["az","ba"]]
 
-deal with ["az", "ba"] -> 把每個負數的偏移量加上26
+Example 2:
+
+- Input: strings = ["a"]
+- Output: [["a"]]
+
+Constraints:
+
+- 1 <= strings.length <= 200
+- 1 <= strings[i].length <= 50
+- strings[i] consists of lowercase English letters.
+
+### 解題分析
+1. 就是 patternize 前一值的偏移量
+2. 關鍵在 < 0 時的處理, 我們可以直接 +26 是因為往前數 1 其實就是往後數 25
+    - b -> a, -1 == b ---... -> z -> a, 25
+    - -1 + 26 = 25
+    - e.g.: bz == ay
 
 ### Code
 ``` py
 class Solution:
     def groupStrings(self, strings: List[str]) -> List[List[str]]:
-        dic = dict()
-        for s in strings:
-            thisDelta = self.getDif(s)
-            if thisDelta not in dic:
-                dic[thisDelta] = [s]
-            else:
-                dic[thisDelta].append(s)
-        return [val for val in dic.values()]
+        pattern = defaultdict(list)
+        ord_diff = lambda i, s: ord(s[i]) - ord(s[0])
+        for string in strings:
+            diffs = []
+            for i in range(1, len(string)):
+                diff = ord_diff(i, string)
+                if diff < 0:
+                    diff += 26
+                diffs.append(diff)
+            pattern[tuple(diffs)].append(string)
 
-    def getDif(self, s):
-        base = ord(s[0])
-        delta = ""
-        for c in s:
-            diff = ord(c) - base
-            delta += str(diff) if diff > 0 else str(diff+26)
-            delta += ','
-        return delta
+        return [li for li in pattern.values()]
 ```
 ### Tag: #HashTable
 ---
