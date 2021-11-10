@@ -9534,17 +9534,53 @@ public:
 ```
 ### Tag: #LinkedList
 ---
-## 67. Add Binary｜ 8/13
+## 67. Add Binary｜ 8/13 | [ Review * 1 ]
 Given two binary strings, return their sum (also a binary string).
 
 The input strings are both non-empty and contains only characters 1 or 0.
 ![](assets/markdown-img-paste-20190813183833272.png)
-### 思路
-1. should be the same Length
-2. insert from front
-3. deal with the carry
+### 解題分析
+1. Naive 的 bit by bit comparison
+2. Byte 操作
+    1. 經典的兩數相加 without add parameter
+        - 用 xor 算出 without carry
+        - 用 and + 左移 1 算出 carry
+        - 然後把兩者`相加`直到 carry 為零
+            - 相加: 也就是重複上述步驟直到 carry 為零
 
 ### Code
+```py
+class Solution:
+    def addBinary(self, a: str, b: str) -> str:
+        i, j = len(a)-1, len(b)-1
+        res, carry = [], 0
+        while i >= 0 or j >= 0:
+            numa = int(a[i]) if i >= 0 else 0
+            numb = int(b[j]) if j >= 0 else 0
+            _sum = numa+numb+carry
+            if _sum == 2:
+                _sum, carry = 0, 1
+            elif _sum == 3:
+                _sum, carry = 1, 1
+            else:
+                carry = 0
+            res.append(str(_sum))
+            i, j = i-1, j-1
+        if carry != 0:
+            res.append(str(carry))
+        return "".join(res[::-1])
+```
+
+```py
+class Solution:
+    def addBinary(self, a: str, b: str) -> str:
+        a, b = int(a, 2), int(b, 2)
+        wo_carry, carry = a^b, (a&b) << 1
+        while carry != 0:
+            wo_carry, carry = wo_carry^carry, (wo_carry&carry) << 1
+        return bin(wo_carry)[2:]
+```
+
 ``` c
 class Solution {
 public:
@@ -9591,6 +9627,7 @@ public:
     }
 };
 ```
+### Tag: #BitManupulate
 ---
 ## 76. Minimum Window Substring｜ 8/15 | [ Review * 2 ]
 Given a string S and a string T, find the minimum window in S which will contain all the characters in T in complexity O(n).
