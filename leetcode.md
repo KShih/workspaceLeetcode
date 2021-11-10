@@ -27241,7 +27241,7 @@ class Solution:
         return True
 ```
 ---
-## 247. Strobogrammatic Number II｜ 6/15
+## 247. Strobogrammatic Number II｜ 6/15 | [ Review * 1 ]
 A strobogrammatic number is a number that looks the same when rotated 180 degrees (looked at upside down).
 
 Find all strobogrammatic numbers that are of length = n.
@@ -27272,6 +27272,12 @@ n = 4 時是在 n = 2 的元素的左右側加上 [0 0] [1 1] [8 8] [6 9] [9 6]
 
 因此我們可以用遞迴來解，因為必須控制最後一層不加上 0 0，因此我們需要多傳一個本來的 n 作為flag，m 作為增減的標的
 
+### 複習
+1. 直覺就是用 dp 做, 但這題比較特殊一點是 (0, 0) 這個左右邊該不該加
+2. 答案是肯定的, 除了最後一個位置
+3. 也就是說中間都是得加的, 不然會漏掉, 因此我們 adds 要宣告成包含 0 0
+4. 但當遇到最後面的位置時, 就必許忽略 0 0 這個add, 所以我們最後那步才需要單獨拿出來循環
+
 ### Code
 ``` py
 class Solution:
@@ -27293,6 +27299,52 @@ class Solution:
             res.append("8" + num + "8")
             res.append("6" + num + "9")
             res.append("9" + num + "6")
+        return res
+```
+
+Optimal Iterative
+```py
+class Solution:
+    def findStrobogrammatic(self, n: int) -> List[str]:
+        dp = [[""], ["0", "1", "8"]]
+        if n == 1:
+            return dp[1]
+
+        adds = [("0", "0"), ("1", "1"), ("8", "8"), ("6", "9"), ("9", "6")]
+        for i in range(2, n):
+            new = []
+            for old in dp[i-2]:
+                for x, y in adds:
+                    new.append(x+old+y)
+            dp.append(new)
+
+        res = []
+        for old in dp[-2]:
+            for x, y in adds[1:]: # 最後一步不能在周圍加 (0, 0), 所以要抽出來做
+                res.append(x+old+y)
+        return res
+```
+
+Space 優化
+```py
+class Solution:
+    def findStrobogrammatic(self, n: int) -> List[str]:
+        prev2, prev1 = [""], ["0", "1", "8"]
+        if n == 1:
+            return prev1
+
+        adds = [("0", "0"), ("1", "1"), ("8", "8"), ("6", "9"), ("9", "6")]
+        for i in range(2, n):
+            new = []
+            for old in prev2:
+                for x, y in adds:
+                    new.append(x+old+y)
+            prev2, prev1 = prev1, new
+
+        res = []
+        for old in prev2:
+            for x, y in adds[1:]: # 最後一步不能在周圍加 (0, 0), 所以要抽出來做
+                res.append(x+old+y)
         return res
 ```
 ---
