@@ -46574,3 +46574,95 @@ class Solution:
 
 ### Tag: #
 ---
+## 1032. Stream of Characters｜ 11/11
+Design an algorithm that accepts a stream of characters and checks if a suffix of these characters is a string of a given array of strings words.
+
+For example, if words = ["abc", "xyz"] and the stream added the four characters (one by one) 'a', 'x', 'y', and 'z', your algorithm should detect that the suffix "xyz" of the characters "axyz" matches "xyz" from words.
+
+Implement the StreamChecker class:
+
+- StreamChecker(String[] words) Initializes the object with the strings array words.
+- boolean query(char letter) Accepts a new character from the stream and returns true if any non-empty suffix from the stream forms a word that is in words.
+
+Example 1:
+
+- Input
+- ["StreamChecker", "query", "query", "query", "query", "query", "query", "query", "query", "query", "query", "query", "query"]
+- [[["cd", "f", "kl"]], ["a"], ["b"], ["c"], ["d"], ["e"], ["f"], ["g"], ["h"], ["i"], ["j"], ["k"], ["l"]]
+- Output
+- [null, false, false, false, true, false, true, false, false, false, false, false, true]
+
+- Explanation
+- StreamChecker streamChecker = new StreamChecker(["cd", "f", "kl"]);
+- streamChecker.query("a"); // return False
+- streamChecker.query("b"); // return False
+- streamChecker.query("c"); // return False
+- streamChecker.query("d"); // return True, because 'cd' is in the wordlist
+- streamChecker.query("e"); // return False
+- streamChecker.query("f"); // return True, because 'f' is in the wordlist
+- streamChecker.query("g"); // return False
+- streamChecker.query("h"); // return False
+- streamChecker.query("i"); // return False
+- streamChecker.query("j"); // return False
+- streamChecker.query("k"); // return False
+- streamChecker.query("l"); // return True, because 'kl' is in the wordlist
+
+Constraints:
+
+- 1 <= words.length <= 2000
+- 1 <= words[i].length <= 2000
+- words[i] consists of lowercase English letters.
+- letter is a lowercase English letter.
+- At most 4 * 104 calls will be made to query.
+
+### 解題分析
+1. 本來是想說用 LinkedList, 把 head 放進一個 set 裡面, 但 words 有可能會有重複的 path, 如 ab, ac 然後就聯想到要用 Trie 了
+2. 第一次嘗試就很直覺的由上而下的搜尋, 類似 bfs 的方法, 但這樣複雜度有點高
+3. 解答的方法是倒著搜尋, 理由是我們只把時間花在已經出現結尾的, 把 streams 的內容存下來, 倒者搜索, 只要目前的 ch 不存在就直接 return False, 因為題目要求必須要連續.
+4. 因此在 insert 的時候也是倒著插入
+5. Time:
+    - O(M), M 為最長的 words, 也就是樹高
+
+
+### Code
+``` py
+from collections import defaultdict, deque
+from typing import List
+class TrieNode:
+    def __init__(self) -> None:
+        self.childs = defaultdict(TrieNode)
+        self.is_end = False
+
+class Trie:
+    def __init__(self) -> None:
+        self.root = TrieNode()
+
+    def insert(self, words):
+        node = self.root
+        for ch in words:
+            node = node.childs[ch]
+        node.is_end = True
+
+class StreamChecker:
+
+    def __init__(self, words: List[str]):
+        self.trie = Trie()
+        self.streams = deque([])
+        for word in words:
+            self.trie.insert(word[::-1])
+
+    def query(self, letter: str) -> bool:
+        self.streams.appendleft(letter)
+
+        node = self.trie.root
+        for ch in self.streams:
+            if ch not in node.childs:
+                return False
+            node = node.childs[ch]
+            if node.is_end:
+                return True
+        return False
+```
+
+### Tag: #Trie
+---
