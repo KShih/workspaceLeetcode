@@ -24833,7 +24833,7 @@ class Solution:
 ```
 ### Tag: #HashTable
 ---
-## 211. Add and Search Word - Data structure design｜ 3/27 | [Review * 1]
+## 211. Design Add and Search Words Data Structure｜ 3/27 | [Review * 2]
 Design a data structure that supports the following two operations:
 
 void addWord(word)
@@ -24868,10 +24868,11 @@ You may assume that all words are consist of lowercase letters a-z.
         1. add:
             - O(M)
         2. search:
+            - M = len(search_key)
             - O(M) if well-defined words without dot
-            - O(N * 26^M)
-                - case s = "....", len(s) = `M`
-                - there is `N` words being added
+            - O(TreeSize)
+                - for "...z" we'll need to traverse entire tree
+                - TreeSize = len(max_len_word) * len(words)
 2. Set of length
     1. 當今天給定的搜索目標 "長度" 是固定的即可使用此法
     2. 但此方法的局限性比較高，缺點:
@@ -24888,47 +24889,44 @@ Trie結構: 一個dict{"char": TrieNode}, 一個isWord(bool)
 Trie字典樹:
 ```py
 class TrieNode:
-        def __init__(self):
-            self.ch_list = {}
-            self.isWord = False
+    def __init__(self):
+        self.childs = defaultdict(TrieNode)
+        self.is_word = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        node = self.root
+        for ch in word:
+            node = node.childs[ch]
+        node.is_word = True
+
+    def search(self, word, idx, cur_node):
+        if idx == len(word):
+            return cur_node.is_word
+        if word[idx] != ".":
+            if word[idx] not in cur_node.childs:
+                return False
+            return self.search(word, idx+1, cur_node.childs[word[idx]])
+        else:
+            for alpha in string.ascii_lowercase:
+                if alpha in cur_node.childs and self.search(word, idx+1, cur_node.childs[alpha]):
+                    return True
+            return False
+
 
 class WordDictionary:
 
     def __init__(self):
-        """
-        Initialize your data structure here.
-        """
-        self.root = TrieNode()
+        self.trie = Trie()
 
     def addWord(self, word: str) -> None:
-        """
-        Adds a word into the data structure.
-        """
-        root = self.root
-        for ch in word:
-            if ch not in root.ch_list:
-                root.ch_list[ch] = TrieNode()
-            root = root.ch_list[ch]
-        root.isWord = True
+        self.trie.insert(word)
 
     def search(self, word: str) -> bool:
-        """
-        Returns if the word is in the data structure. A word could contain the dot character '.' to represent any one letter.
-        """
-        return self.search_word(word, self.root)
-
-    def search_word(self, word, root):
-        if not word:
-            return root.isWord:
-        elif word[0] == ".":
-            for entry in root.ch_list:
-                if self.search_word(word[1:], root.ch_list[entry]):
-                    return True
-            return False
-        elif word[0] in root.ch_list:
-            return self.search_word(word[1:], root.ch_list[word[0]])
-        else:
-            return False
+        return self.trie.search(word, 0, self.trie.root)
 ```
 
 Optimal Solution Using set:
