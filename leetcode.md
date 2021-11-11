@@ -22606,7 +22606,7 @@ class Solution:
 ```
 ### Tag: #DFS #BFS #Tree
 ---
-## 138. Copy List with Random Pointer｜ 3/2 | [Review * 1]
+## 138. Copy List with Random Pointer｜ 3/2 | [Review * 2]
 
 A linked list is given such that each node contains an additional random pointer which could point to any node in the list or null.
 
@@ -22668,42 +22668,34 @@ random_index: the index of the node (range from 0 to n-1) where random pointer p
 
 最後一個步驟就是將新的節點取出
 
+### 複習錯誤
+1. 在 set random 跟 set next 的部分, 雖然我們知道就是要 set 在節點旁邊, 但要考慮萬一節點本身是空, 他就沒有 next
+
 ### Code
 Neighbor 解法:
 ```py
 class Solution:
     def copyRandomList(self, head: 'Node') -> 'Node':
-        self.addNeighbor(head)
-        return self.connect(head)
+        if not head:
+            return None
+        self.copy(head)
+        self.set_random_and_next(head)
+        return head.next
 
-    def addNeighbor(self, head):
+    def copy(self, head):
         node = head
         while node:
-            nxt = node.next
-            newNode = Node(node.val)
-            node.next = newNode
-            newNode.next = nxt
-            node = nxt
-        return head
+            new_node = Node(node.val, node.next)
+            node.next = new_node
+            node = new_node.next
 
-    def connect(self, head):
-        if not head or not head.next:
-            return
-        newHead = head # work as dum node
-        res = newHead.next
-
-        while head and head.next:
-            temp = head.next.next
-            newHead.next = head.next
-            if head.random:
-                newHead.next.random = head.random.next
-            else:
-                newHead.next.random = None
-
-            head = temp
-            newHead = newHead.next
-
-        return res
+    def set_random_and_next(self, head):
+        node = head
+        while node:
+            new_node, next_node = node.next, node.next.next
+            new_node.random = node.random.next if node.random else None # NOTE!!
+            new_node.next = next_node.next if next_node else None # NOTE!!
+            node = next_node
 ```
 
 Dictionary 解法:
