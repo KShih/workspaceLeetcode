@@ -40401,7 +40401,7 @@ class Solution:
 
 ### Tag: #DP #HashTable
 ---
-## 588. Design In-Memory File System｜ 6/24
+## 588. Design In-Memory File System｜ 6/24 | [ Review * 1 ]
 Design a data structure that simulates an in-memory file system.
 
 Implement the FileSystem class:
@@ -40446,52 +40446,35 @@ Constraints:
 - 1 <= content.length <= 50
 - At most 300 calls will be made to ls, mkdir, addContentToFile, and readContentFromFile
 
-### 解題分析
-
-1. 應用 Trie 的模板
-    1. 修改 insert:
-        1. 多增加 word != None 去區分為單純 mkdir 還是去 addContent
-        2. 去判斷 node.isEnd 是否已經被設過了, 來判斷是要 append file 還是 new File
-    2. 修改 search:
-        1. 多增加根目錄的判斷, 並將 return 值改為找到的節點
-            2. path.split 要跳過第一個 elem, 因為會是空字元
-            3. 因此我們的 `ls "/"` 要特別判斷掉
+### 複習錯誤
+1. 在 get_node() 裡, 如果 path == "/" 要直接 return self.root, 不然 "/".split => ["", ""]
+2. ls() 根據提議要做判斷是否為 file or directory 的處理, 如果是 file 的要另外判斷掉
 
 ### Code
 ``` py
-class TrieNode(object):
+class TrieNode:
     def __init__(self):
-        self.children = collections.defaultdict(TrieNode)
-        self.isEnd = False
-        self.word = ''
+        self.childs = defaultdict(TrieNode)
+        self.content = ""
 
-class Trie(object):
+class Trie:
     def __init__(self):
         self.root = TrieNode()
 
-    def insert(self, path, word):
-        node = self.root
-        for c in path.split("/")[1:]:
-            node = node.children[c]
+    def insert(self, path, content=None):
+        node = self.get_node(path)
+        if content != None:
+            node.content += content
 
-        if word != None: # is not dir
-            if node.isEnd:
-                node.word += word
-            else:
-                node.isEnd = True
-                node.word = word
-
-    def search(self, path):
-        node = self.root
+    def get_node(self, path):
         if path == "/":
-            return node
-
-        for c in path.split("/")[1:]:
-            if c not in node.children:
-                raise "path not found"
-                return
-            node = node.children[c]
+            return self.root
+        dirs = path.split("/")
+        node = self.root
+        for dir in dirs[1:]:
+            node = node.childs[dir]
         return node
+
 
 class FileSystem:
 
@@ -40499,21 +40482,20 @@ class FileSystem:
         self.trie = Trie()
 
     def ls(self, path: str) -> List[str]:
-        node = self.trie.search(path)
-        if node.isEnd:
+        node = self.trie.get_node(path)
+        if node.content != "":
             return [path.split("/")[-1]]
-        else:
-            return sorted(node.children.keys())
-
+        return sorted(node.childs.keys())
 
     def mkdir(self, path: str) -> None:
-        self.trie.insert(path, None)
+        self.trie.insert(path)
 
     def addContentToFile(self, filePath: str, content: str) -> None:
         self.trie.insert(filePath, content)
 
     def readContentFromFile(self, filePath: str) -> str:
-        return self.trie.search(filePath).word
+        node = self.trie.get_node(filePath)
+        return node.content
 ```
 
 ### Tag: #Trie
