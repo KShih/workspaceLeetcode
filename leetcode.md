@@ -46471,3 +46471,126 @@ class Solution:
 
 ### Tag: #
 ---
+## 65. Valid Number｜ 11/10
+- A valid number can be split up into these components (in order):
+    - A decimal number or an integer.
+    - (Optional) An 'e' or 'E', followed by an integer.
+
+- A decimal number can be split up into these components (in order):
+    - (Optional) A sign character (either '+' or '-').
+    - One of the following formats:
+    - One or more digits, followed by a dot '.'.
+    - One or more digits, followed by a dot '.', followed by one or more digits.
+    - A dot '.', followed by one or more digits.
+
+- An integer can be split up into these components (in order):
+    - (Optional) A sign character (either '+' or '-').
+    One or more digits.
+    - For example, all the following are valid numbers: ["2", "0089", "-0.1", "+3.14", "4.", "-.9", "2e10", "-90E3", "3e+7", "+6e-1", "53.5e93", "-123.456e789"], while the following are not valid numbers: ["abc", "1a", "1e", "e3", "99e2.5", "--6", "-+3", "95a54e53"].
+
+Given a string s, return true if s is a valid number.
+
+Example 1:
+
+- Input: s = "0"
+- Output: true
+
+Example 2:
+
+- Input: s = "e"
+- Output: false
+
+Example 3:
+
+- Input: s = "."
+- Output: false
+
+Example 4:
+
+- Input: s = ".1"
+- Output: true
+
+Constraints:
+
+- 1 <= s.length <= 20
+- s consists of only English letters (both uppercase and lowercase), digits (0-9), plus '+', minus '-', or dot '.'.
+### 思路
+
+
+### Code
+``` py
+class Solution:
+    def isNumber(self, s: str) -> bool:
+        seen_e = seen_digit = seen_dot = False
+
+        for i, ch in enumerate(s):
+            if ch.isdigit():
+                seen_digit = True
+                continue
+            elif ch in ["+", "-"]:
+                if i > 0 and s[i-1] not in ["e", "E"]:
+                    return False
+            elif ch in ["e", "E"]:
+                if seen_e or not seen_digit:
+                    return False
+                seen_e = True
+                seen_digit = False
+            elif ch == ".":
+                if seen_dot or seen_e:
+                    return False
+                seen_dot = True
+            else:
+                return False
+        return seen_digit
+```
+
+WA, 1441/1488 pass, fail on "0e"
+```py
+class Solution:
+    def isNumber(self, s: str) -> bool:
+        front, back = self.depart_e(s)
+        if front == None and back == None:
+            return False
+        if (not front or len(front) == 0) and (not back or len(back) >= 0):
+            return False
+
+        return (self.is_decimal(front) or self.is_int(front)) and self.is_int(back)
+
+    def depart_e(self, s):
+        small_e = s.split("e")
+        big_e = s.split("E")
+        if len(small_e) >1 and len(big_e) >1:
+            return None, None
+        split_e = small_e if len(small_e) != 0 else big_e
+        if len(split_e) == 1:
+            return split_e[0], None
+        elif len(split_e) == 2:
+            return split_e[0], split_e[1]
+        else:
+            return None, None
+
+    def is_decimal(self, s):
+        if s == None or not s:
+            return True
+        if s[0] in ["+", "-"]:
+            s = s[1:]
+        split_s = s.split(".")
+        if len(split_s) > 2:
+            return False
+        len_split = 0
+        for split in split_s:
+            if split and not split.isnumeric():
+                return False
+            len_split += len(split)
+        return len_split != 0  # "."
+
+    def is_int(self, s):
+        if s == None or not s:
+            return True
+        if s[0] in ["+", "-"]:
+            s = s[1:]
+        return s.isnumeric()
+```
+
+### Tag: #
+---
