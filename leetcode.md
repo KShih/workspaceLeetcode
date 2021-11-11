@@ -7485,77 +7485,6 @@ public:
 ```
 ### Tag: #LinkedList
 ---
-## 24. Swap Nodes in Pairs｜ 7/4 | [Review * 1]
-Given a linked list, swap every two adjacent nodes and return its head.
-
-You may not modify the values in the list's nodes, only nodes itself may be changed.
-
-Example:
-
-Given 1->2->3->4, you should return the list as 2->1->4->3.
-
-### 思路
-We need to modify the head, therfore use a dummy head.
-We used pre as the cursor, pre->next and pre->next->next is the target to swap.
-
-Swap process is as below:
-![](assets/markdown-img-paste-20190704093311827.png)
-
-Plus step 5, move the cursor to next swap target.
-
-### Code
-```py
-class Solution:
-    def swapPairs(self, head: ListNode) -> ListNode:
-        dum = ListNode(-1)
-        dum.next = head
-        cur = dum
-
-        while cur.next and cur.next.next:
-            fir = cur.next
-            sec = cur.next.next
-            fir.next = sec.next
-            sec.next = fir
-            cur.next = sec
-            cur = fir
-        return dum.next
-```
-``` c
-/*
-* Definition for singly-linked list.
-* struct ListNode {
-*     int val;
-*     ListNode *next;
-*     ListNode(int x) : val(x), next(NULL) {}
-* };
-*/
-/*
-   node temp
-   temp = head -> next
-   head -> next = temp -> next
-   temp -> next = head
-   head = temp
-   ... /move the cursor
-*/
-class Solution {
-public:
-   ListNode* swapPairs(ListNode* head) {
-       ListNode* dummy = new ListNode(-1);
-       ListNode* pre = dummy; // pre->next == head
-       dummy->next = head;
-       while (pre->next && pre->next->next){
-           ListNode* temp = pre->next->next;   // temp = 2
-           pre->next->next = temp -> next;     // 1.next = 3
-           temp -> next = pre->next;           // 2.next = 1
-           pre->next = temp;                   // head = 2
-           pre = temp->next;                   // move the cursor
-       }
-       return dummy->next;
-   }
-};
-```
-### Tag: #LinkedList
----
 ## 206. Reverse Linked List｜ 8/13 | [Review * 2]
 Reverse a singly linked list.
 ![](assets/markdown-img-paste-20190813130546783.png)
@@ -7830,7 +7759,7 @@ public:
 ```
 ### Tag: #LinkedList
 ---
-## 23. Merge k Sorted Lists｜ 7/5 | [Review * 1]
+## 23. Merge k Sorted Lists｜ 7/5 | [Review * 2]
 Merge k sorted linked lists and return it as one sorted list. Analyze and describe its complexity.
 ![](assets/markdown-img-paste-20190705142804335.png)
 
@@ -17143,7 +17072,7 @@ class Solution(object):
 ```
 ### Tag: #LinkedList
 ---
-## 24. Swap Nodes in Pairs｜ 10/22 // TODO: Figure out recursive way
+## 24. Swap Nodes in Pairs｜ 10/22 | [ Review * 1 ]
 Given a linked list, swap every two adjacent nodes and return its head.
 
 You may not modify the values in the list's nodes, only nodes itself may be changed.
@@ -17215,19 +17144,18 @@ class Solution(object):
 Iterative
 ``` py
 class Solution:
-    def swapPairs(self, head: ListNode) -> ListNode:
-        dum = ListNode(0)
-        dum.next = head
-        prev = dum
-        while prev.next and prev.next.next:
-            first = prev.next
-            second = prev.next.next
-            prev.next = second
-            first.next = second.next
-            second.next = first
-
-            prev = prev.next.next
-        return dum.next
+    def swapPairs(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        ptr = ListNode()
+        ptr.next = head
+        new_head = ptr
+        while head and head.next:
+            fst, scd = head, head.next
+            fst.next = scd.next
+            scd.next = fst
+            ptr.next = scd
+            ptr = fst
+            head = ptr.next
+        return new_head.next
 ```
 ---
 ## 30. Substring with Concatenation of All Words｜ 10/22 | [ Review * 1 ]
