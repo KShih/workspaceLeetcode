@@ -11507,7 +11507,7 @@ public:
 ---
 ## ***[Start to Leetcode with Python]***
 ---
-## 146. LRU Cache｜ 8/29 | [Review * 1]
+## 146. LRU Cache｜ 8/29 | [Review * 2]
 Design and implement a data structure for Least Recently Used (LRU) cache. It should support the following operations: get and put.
 
 get(key) - Get the value (will always be positive) of the key if the key exists in the cache, otherwise return -1.
@@ -11522,118 +11522,108 @@ Example:
 ![](assets/markdown-img-paste-2019082922284299.png)
 
 ### 解題分析
-1. 用LinkedList來實作 cache 的機制，但為了使新增與刪除更加快速，選擇使用雙頭LinkedList
-2. 實作 put:
-    1. Put 已存在
-        1. 為了 O(1) 找到該資料在LinkedList的位置來`更新值`與`移動到頭`，使用 map 來存 {key: Node}
-    2. Put 不存在
-        1. 為了讓過舊的資料再刪除時(pop_tail)能一並更新 map(del cache[key]) ，所以 Node 的資料結構要加入 key, value
+1. DoublyLinkedList
+    1. 用LinkedList來實作 cache 的機制，但為了使新增與刪除更加快速，選擇使用雙頭LinkedList
+        - 注意雙指針的修改
+            - append: 4個操作
+                - 新 node 跟 tail 間: 2個
+                - 新 node 跟 root 間: 2個
+            - move2tail: 6個操作
+                - 移除本來的位置: 2個
+                - 移到尾端 call append
+
+2. HashMap + Queue
+    1. 用一個 queue 紀錄 operations, 加上 cache 裡面除了儲存 value 外 我們還多存了一個 cur_ts, 每次操作我們都強行插入 cur_ts 到 queue 裡面, 並去更新 cache 裡面的 cur_ts
+    2. 當 put 新的點進 cache 時, 我們要是發現 cache 超過 cap 了, 我們就要從 queue 裡面 pop 出來, 但 pop 出來要去檢查他是舊的值還是新的, 檢查就是去 cache 裡面查此值的 cur_ts 對比 operations 的 ts
 
 ### 思路
 
-- 用 head 和 tail 去指向linklist的頭尾, 以方便插入新結點以及移除過舊的節點
-    - head -> entry -> entry -> entry -> tail
-- 用雙向指針去刪除特定節點
-
 ### Code
+HashMap + Queue 解法
 ```py
-class DLinkedNode():
-    def __init__(self):
-        self.key = 0
-        self.value = 0
-        self.prev = None
-        self.next = None
+class LRUCache:
 
-class LRUCache():
-    def _add_node(self, node):
-        """
-        Always add the new node right after head.
-        """
-        node.prev = self.head
-        node.next = self.head.next
+    def __init__(self, capacity: int):
+        self.cache = dict()
+        self.ts = 0
+        self.cap = capacity
+        self.queue = deque([])
 
-        self.head.next.prev = node
-        self.head.next = node
+    def get(self, key: int) -> int:
+        if key in self.cache:
+            self.queue.append((key, self.ts))
+            self.cache[key] = (self.cache[key][0], self.ts)
+            self.ts += 1
+            return self.cache[key][0]
+        return -1
 
-    def _remove_node(self, node):
-        """
-        Remove an existing node from the linked list.
-        """
-        prev = node.prev
-        new = node.next
+    def put(self, key: int, value: int) -> None:
+        self.cache[key] = (value, self.ts)
+        self.queue.append((key, self.ts))
+        self.ts += 1
+        while len(self.cache) > self.cap:
+            pk, pt = self.queue.popleft()
+            if pt == self.cache[pk][1]:
+                del self.cache[pk]
+```
 
-        prev.next = new
-        new.prev = prev
+DoublyLinkedList
+```py
+class Node:
+    def __init__(self, key=None, value=None, next=None, prev=None) -> None:
+        self.next = next
+        self.prev = prev
+        self.key = key
+        self.value = value
 
-    def _move_to_head(self, node):
-        """
-        Move certain node in between to the head.
-        """
-        self._remove_node(node)
-        self._add_node(node)
+class DoublyLinkedList:
+    def __init__(self) -> None:
+        self.root = Node()
+        self.root.prev = self.root
+        self.root.next = self.root
 
-    def _pop_tail(self):
-        """
-        Pop the current tail.
-        """
-        res = self.tail.prev
-        self._remove_node(res)
-        return res
+    def append(self, new_node):
+        self.root.prev.next = new_node
+        new_node.prev = self.root.prev
+        new_node.next = self.root
+        self.root.prev = new_node
 
-    def __init__(self, capacity):
-        """
-        :type capacity: int
-        """
+    def move2tail(self, node:Node):
+        node.prev.next = node.next
+        node.next.prev = node.prev
+        self.append(node)
+
+    def remove_head(self):
+        head = self.root.next
+        self.root.next = head.next
+        head.next.prev = self.root
+        return head.key
+
+class LRUCache:
+
+    def __init__(self, capacity: int):
+        self.dl = DoublyLinkedList()
         self.cache = {}
-        self.size = 0
-        self.capacity = capacity
-        self.head, self.tail = DLinkedNode(), DLinkedNode()
+        self.cap = capacity
 
-        self.head.next = self.tail
-        self.tail.prev = self.head
-
-
-    def get(self, key):
-        """
-        :type key: int
-        :rtype: int
-        """
-        node = self.cache.get(key, None)
-        if not node:
+    def get(self, key: int) -> int:
+        if key not in self.cache:
             return -1
+        self.dl.move2tail(self.cache[key])
+        return self.cache[key].value
 
-        # move the accessed node to the head;
-        self._move_to_head(node)
-
-        return node.value
-
-    def put(self, key, value):
-        """
-        :type key: int
-        :type value: int
-        :rtype: void
-        """
-        node = self.cache.get(key)
-
-        if not node:
-            newNode = DLinkedNode()
-            newNode.key = key
-            newNode.value = value
-
-            self.cache[key] = newNode
-            self._add_node(newNode)
-
-            self.size += 1
-
-            if self.size > self.capacity:
-                # pop the tail
-                tail = self._pop_tail()
-                del self.cache[tail.key]
-                self.size -= 1
-        else:
-            # update the value.
+    def put(self, key: int, value: int) -> None:
+        if key in self.cache:
+            node = self.cache[key]
             node.value = value
-            self._move_to_head(node)
+            self.dl.move2tail(node)
+        else:
+            new_node = Node(key, value, self.dl.root, self.dl.root.prev)
+            self.dl.append(new_node)
+            self.cache[key] = new_node
+            if len(self.cache) > self.cap:
+                head_key = self.dl.remove_head()
+                del self.cache[head_key]
 ```
 ### Tag: #LinkedList #DoublyLinkedList
 ---
