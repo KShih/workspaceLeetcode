@@ -47134,6 +47134,8 @@ Constraints:
 
 
 ### Code
+
+log(N) 優化
 ``` py
 class Solution:
     def myPow(self, x: float, n: int) -> float:
@@ -47146,6 +47148,75 @@ class Solution:
             return half*half*x
         else:
             return half*half
+```
+
+### Tag: #
+---
+## 1137. N-th Tribonacci Number｜ 11/13
+The Tribonacci sequence Tn is defined as follows:
+
+T0 = 0, T1 = 1, T2 = 1, and Tn+3 = Tn + Tn+1 + Tn+2 for n >= 0.
+
+Given n, return the value of Tn.
+
+Example 1:
+
+- Input: n = 4
+- Output: 4
+- Explanation:
+- T_3 = 0 + 1 + 1 = 2
+- T_4 = 1 + 1 + 2 = 4
+
+Example 2:
+
+- Input: n = 25
+- Output: 1389537
+
+Constraints:
+
+- 0 <= n <= 37
+- The answer is guaranteed to fit within a 32-bit integer, ie. answer <= 2^31 - 1.
+
+### 思路
+1. n 很小時就直接使用 naive 一直累加就行
+2. 但如果 n 很大時可以用一個技巧叫做 matrix exponential
+    1. 圖解
+        - ![](assets/markdown-img-paste-20211113130531145.png)
+    2. 原理, 透過 log(N) 的 fastPow, 來快速的取得 power 值, 並透過矩陣數學表達式來優化
+    3. M0 = [T0, T1, T2], T0=0, T1=1, T2=1 (就是我們的初始值)
+    4. 我們現在要找一個矩陣運算可以使得 M1 = [T1, T2, T3]
+        - 此舉陣為 [[0,1,0], [0,0,1], [1,1,1]]
+        - 推倒詳見圖
+    5. 因此
+        1. M1 = matrix * M0
+        2. M2 = matrix * M1 = matrix * matrix * M0
+        3. ... Mn = (matrix)^n * M0
+            - matrix ^ n 可以用 fastPow 優化成 log(n)
+
+
+### Code
+
+log(N) 優化
+``` py
+import numpy as np
+class Solution:
+    def tribonacci(self, n: int) -> int:
+        if n == 0:
+            return 0
+        def fastPow(matrix, pow):
+            if pow == 1:
+                return matrix
+
+            half = fastPow(matrix, pow//2)
+            if pow % 2 == 1:
+                return np.dot(np.dot(half, half), matrix)
+            else:
+                return np.dot(half, half)
+
+        M0 = np.matrix([[0], [1], [1]])
+        matrix = np.matrix([[0,1,0], [0,0,1], [1,1,1]])
+        Mn = np.dot(fastPow(matrix, n), M0)
+        return Mn.item((0,0))
 ```
 
 ### Tag: #
