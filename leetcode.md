@@ -46743,3 +46743,133 @@ class Solution:
 
 ### Tag: #
 ---
+## 778. Swim in Rising Water｜ 11/12
+You are given an n x n integer matrix grid where each value grid[i][j] represents the elevation at that point (i, j).
+
+The rain starts to fall. At time t, the depth of the water everywhere is t. You can swim from a square to another 4-directionally adjacent square if and only if the elevation of both squares individually are at most t. You can swim infinite distances in zero time. Of course, you must stay within the boundaries of the grid during your swim.
+
+Return the least time until you can reach the bottom right square (n - 1, n - 1) if you start at the top left square (0, 0).
+
+Example 1:
+
+- Input: grid = [[0,2],[1,3]]
+- Output: 3
+- Explanation:
+- At time 0, you are in grid location (0, 0).
+- You cannot go anywhere else because 4-directionally adjacent neighbors have a higher elevation than t = 0.
+- You cannot reach point (1, 1) until time 3.
+- When the depth of water is 3, we can swim anywhere inside the grid.
+
+Example 2:
+
+![](assets/markdown-img-paste-20211112170654410.png)
+
+- Input: grid = [[0,1,2,3,4],[24,23,22,21,5],[12,13,14,15,16],[11,17,18,19,20],[10,9,8,7,6]]
+- Output: 16
+- Explanation: The final route is shown.
+- We need to wait until time 16 so that (0, 0) and (4, 4) are connected.
+
+Constraints:
+
+- n == grid.length
+- n == grid[i].length
+- 1 <= n <= 50
+- 0 <= grid[i][j] < n2
+- Each value grid[i][j] is unique.
+
+### 解題分析
+1. Greedy Heap
+    1. 從起點要做任何 move 時, 都只能上下左右, 且當中的 min_cost 就是這些 move 中最小的雨水深度
+    2. Dijkstra 的概念去找 min_cost path 到右下角那個點
+        - 我們不必存 dis, 因為此題的邊的 weight為零, 所以 relax 的時候直接 push 就可以了
+    3. 把周圍的點都放進去, 每次取 heap 中最小的 cost 出來
+    4. 同時 trace 目前遇到的最深深度, 即為所求
+    5. O(N^2 log(N))
+
+2. UnionFind (比較好理解)
+    1. 此題重要的 hint: 所有點的值介於 0 ~ n^2-1, 並且每個點都是 unique
+    2. 因此我們可以用 union find 的方法, 從深度最淺的點開始往外擴張 (union), 直到起點跟終點會合 (find 相等)
+    3. 擴張的對象是, 上下左右的點, 且它的深度比當前小, 才能 union
+        1. 以 example2 為例
+        2. depth=0, 發現四周的點都比他大, 不做任何 union
+        3. depth=1, 發現其左邊的 0 可以union, 合併 {0, 1}
+        4. depth=2, 發現其左邊的 1 可以union, 合併 {0, 1, 2}
+        5. ... 直到變成 {0,1,2,3,4,5}
+        6. depth=6, 發現四周的點都比他大, 不做任何 union
+        7. depth=7, 發現其右邊的 6 可以union, 合併 {6, 7}
+            - 此時存在兩個 group: {6,7} 跟 {0,1,2,3,4,5}
+        8. ... 然後一直做到 depth=16, 此時兩個群體變成 {6~16}, {0~5}
+        9. 最後 16 發現其周圍的 5 可以合併, 兩個 group 就合體了, 此時的 find(左上) == find(右下)
+    4. 每次都檢查當前深度下是否左上跟右下已經有共同的 root 了
+
+
+### Code
+``` py
+class Solution:
+    def swimInWater(self, grid: List[List[int]]) -> int:
+        if not grid:
+            return 0
+        def is_valid(x, y):
+            return 0 <= x < n and 0 <= y < n and grid[x][y] != -1
+        heap = [(grid[0][0], 0, 0)]
+        max_wait = float("-inf")
+        n = len(grid)
+        while heap:
+            cur_val, x, y = heappop(heap)
+            if cur_val > max_wait:
+                max_wait = cur_val
+            grid[x][y] = -1
+            if (x, y) == (n-1, n-1):
+                return max_wait
+            for dx, dy in [(0, 1), (0, -1), (-1, 0), (1, 0)]:
+                if is_valid(x+dx, y+dy):
+                    heappush(heap, (grid[x+dx][y+dy], x+dx, y+dy))
+```
+
+UnionFind, Optimal O(N^2)
+```py
+class UnionFind:
+    def __init__(self, n):
+        self.par = list(range(n))
+        self.siz = [1] * n
+
+    def union(self, x, y):
+        root_x, root_y = self.find(x), self.find(y)
+        if root_x == root_y:
+            return
+        if self.siz[root_x] < self.siz[root_y]:
+            self.par[root_x] = root_y
+            self.siz[root_y] += self.siz[root_x]
+        else:
+            self.par[root_y] = root_x
+            self.siz[root_x] += self.siz[root_y]
+
+    def find(self, x):
+        if x != self.par[x]:
+            self.par[x] = self.find(self.par[x])
+        return self.par[x]
+
+class Solution:
+    def swimInWater(self, grid: List[List[int]]) -> int:
+        if not grid:
+            return 0
+        n = len(grid)
+        uf = UnionFind(n*n)
+        pos = {}
+        for i in range(n):
+            for j in range(n):
+                pos[grid[i][j]] = (i, j)
+
+        for depth in range(n*n):
+            i, j = pos[depth]
+            for dx, dy in [(0, 1), (0, -1), (-1, 0), (1, 0)]:
+                x, y = i+dx, j+dy
+                if 0 <= x < n and 0 <= y < n and grid[x][y] <= depth: # 只跟小於當前深度的 union
+                    uf.union(grid[i][j], grid[x][y])
+
+            if uf.find(grid[0][0]) == uf.find(grid[-1][-1]):
+                return depth
+```
+
+### Tag: #UnionFind, #Heap
+---
