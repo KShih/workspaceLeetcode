@@ -46873,3 +46873,83 @@ class Solution:
 
 ### Tag: #UnionFind, #Heap
 ---
+## 1168. Optimize Water Distribution in a Village｜ 11/12
+There are n houses in a village. We want to supply water for all the houses by building wells and laying pipes.
+
+For each house i, we can either build a well inside it directly with cost wells[i - 1] (note the -1 due to 0-indexing), or pipe in water from another well to it. The costs to lay pipes between houses are given by the array pipes, where each pipes[j] = [house1j, house2j, costj] represents the cost to connect house1j and house2j together using a pipe. Connections are bidirectional.
+
+Return the minimum total cost to supply water to all houses.
+
+Example 1:
+
+![](assets/markdown-img-paste-20211112204513540.png)
+
+- Input: n = 3, wells = [1,2,2], pipes = [[1,2,1],[2,3,1]]
+- Output: 3
+- Explanation:
+- The image shows the costs of connecting houses using pipes.
+- The best strategy is to build a well in the first house with cost 1 and connect the other houses to it with cost 2 so the total cost is 3.
+
+Example 2:
+
+- Input: n = 2, wells = [1,1], pipes = [[1,2,1]]
+- Output: 2
+
+Constraints:
+
+- 2 <= n <= 104
+- wells.length == n
+- 0 <= wells[i] <= 105
+- 1 <= pipes.length <= 104
+- pipes[j].length == 3
+- 1 <= house1j, house2j <= n
+- 0 <= costj <= 105
+- house1j != house2j
+
+### 解題分析
+
+1. 就是要至少鑿一個井, 然後把所有的點串連起來, 也就是 Minimum Spaning Tree problem
+2. Trick 的地方在於, 這題不只有邊有 weight, 連點都有 weight, 解決辦法是再創一個點, 然後把每個點自己帶的值當作是這個新創的點連結過去的邊
+3. 這種做法下圖裡面就只剩下邊了, 這樣問題就轉化為 MST 問題
+4. 這邊用的做法是 Prim, 作法其實跟 Dijkstra 蠻像的(heap), 但兩者要解決的問題不同
+    1. Prim: 能夠串連所有點的最短路徑 (undirected graph)
+    2. Dijkstra: 某一個 src 到所有其他點的最短路徑 (directed graph)
+
+
+### Code
+``` py
+class Solution:
+    def minCostToSupplyWater(self, n: int, wells: List[int], pipes: List[List[int]]) -> int:
+        adj_list = self.build_adj_list(wells, pipes)
+
+        # use house0 as first node visit, but could be any node
+        todo = [(0, 0)] # (cost, house_idx)
+        total_cost = 0
+        visited = set()
+
+        while len(visited) < n+1: # +1, for house0
+            cost, cur_house = heappop(todo)
+            if cur_house not in visited:
+                visited.add(cur_house)
+                total_cost += cost
+                for new_cost, neib in adj_list[cur_house]:
+                    heappush(todo, (new_cost, neib))
+
+        return total_cost
+
+
+    def build_adj_list(self, wells, pipes):
+        adj_list = defaultdict(list)
+
+        for house, cost in enumerate(wells):
+            adj_list[0].append((cost, house+1)) # hidden_node house 0
+            # adj_list[house+1].append((cost, 0)) 這行可以省略, 如果我們之後的 mst 先從 0 開始拜訪的話
+
+        for src, dst, cost in pipes:
+            adj_list[src].append((cost, dst))
+            adj_list[dst].append((cost, src))
+        return adj_list
+```
+
+### Tag: #Graph #MST
+---
