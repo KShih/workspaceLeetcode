@@ -47320,3 +47320,101 @@ class RLEIterator:
 
 ### Tag: #
 ---
+## 792. Number of Matching Subsequences｜ 11/13
+Given a string s and an array of strings words, return the number of words[i] that is a subsequence of s.
+
+A subsequence of a string is a new string generated from the original string with some characters (can be none) deleted without changing the relative order of the remaining characters.
+
+For example, "ace" is a subsequence of "abcde".
+
+Example 1:
+
+- Input: s = "abcde", words = ["a","bb","acd","ace"]
+- Output: 3
+- Explanation: There are three strings in words that are a subsequence of s: "a", "acd", "ace".
+
+Example 2:
+
+- Input: s = "dsahjpjauf", words = ["ahjpjau","ja","ahbwzgqnuk","tnmlanowax"]
+- Output: 2
+
+Constraints:
+
+- 1 <= s.length <= 5 * 104
+- 1 <= words.length <= 5000
+- 1 <= words[i].length <= 50
+- s and words[i] consist of only lowercase English letters.
+
+### 解題分析
+1. 思考方向是我們如何只走過一遍 s 就可以知道有多少 word 符合
+2. 可以用 bucket 的概念
+3. 我們首先把 bucket init 成 word[0] -> word
+4. 然後開始掃描 s, 每個 ch 都把 buckt[ch] 裡面的字抽出來, 然後 reorg 他們去下一個 bucket
+    - heads = 'c' : ('cat', 'cop'), 'd' : ('dog',) at beginning;
+    - heads = 'c' : ('cat', 'cop'), 'o' : ('og',) after S[0] = 'd';
+    - heads = 'a' : ('at',), 'o' : ('og', 'op') after S[1] = 'c';
+
+### Code
+Naive
+``` py
+class Solution:
+    def numMatchingSubseq(self, s: str, words: List[str]) -> int:
+        dic = defaultdict(list)
+        for w in words:
+            dic[w[0]].append(w)
+
+        res = 0
+        for ch in s:
+            match_list = dic[ch]
+            dic[ch] = []
+            for match in match_list:
+                if len(match) == 1:
+                    res += 1
+                else:
+                    dic[match[1]].append(match[1:])
+        return res
+```
+
+使用 ptr 去取代 substr
+```py
+class Solution:
+    def numMatchingSubseq(self, s: str, words: List[str]) -> int:
+        dic = defaultdict(list)
+        for w in words:
+            dic[w[0]].append((0, w))
+
+        res = 0
+        for ch in s:
+            match_list = dic[ch]
+            dic[ch] = []
+            for i, match in match_list:
+                if i == len(match)-1:
+                    res += 1
+                else:
+                    dic[match[i+1]].append((i+1, match))
+        return res
+```
+
+使用 char_arr 去取代 defaultdict
+```py
+class Solution:
+    def numMatchingSubseq(self, s: str, words: List[str]) -> int:
+        dic = [[] for _ in range(26)]
+        idx = lambda ch: ord(ch) - ord('a')
+        for w in words:
+            dic[idx(w[0])].append((0, w))
+
+        res = 0
+        for ch in s:
+            match_list = dic[idx(ch)]
+            dic[idx(ch)] = []
+            for i, match in match_list:
+                if i == len(match)-1:
+                    res += 1
+                else:
+                    dic[idx(match[i+1])].append((i+1, match))
+        return res
+```
+
+### Tag: #
+---
