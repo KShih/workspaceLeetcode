@@ -47418,3 +47418,59 @@ class Solution:
 
 ### Tag: #
 ---
+## 1110. Delete Nodes And Return Forest｜ 11/14
+Given the root of a binary tree, each node in the tree has a distinct value.
+
+After deleting all nodes with a value in to_delete, we are left with a forest (a disjoint union of trees).
+
+Return the roots of the trees in the remaining forest. You may return the result in any order.
+
+Example 1:
+
+- Input: root = [1,2,3,4,5,6,7], to_delete = [3,5]
+- Output: [[1,2,null,4],[6],[7]]
+
+Example 2:
+
+- Input: root = [1,2,4,null,3], to_delete = [3]
+- Output: [[1,2,4]]
+
+Constraints:
+
+- The number of nodes in the given tree is at most 1000.
+- Each node has a distinct value between 1 and 1000.
+- to_delete.length <= 1000
+- to_delete contains distinct values between 1 and 1000.
+### 解題分析
+1. 知道要用 recursive 解, 但不知道要回傳什麼?
+2. 想想如果 root 的右邊沒了, 那麼我們在 insert root 時, 其右手要是斷掉的狀態, 因此我們必須將 root.left 修改為 dfs(root.left) 的結果
+3. return 就是區分其是否為 to_delete, 如果是的話 return None, 並且把它旗下的左右子樹都放進 res 裡; 不是的話 return 自己就可以了, 相當於跟上層說我沒有被刪掉哦～
+
+
+### Code
+``` py
+class Solution:
+    def delNodes(self, root: TreeNode, to_delete: List[int]) -> List[TreeNode]:
+        to_delete = set(to_delete)
+        res = []
+        def dfs(node):
+            if not node:
+                return None
+            node.left = dfs(node.left)
+            node.right = dfs(node.right)
+
+            if node.val in to_delete:
+                if node.left:
+                    res.append(node.left)
+                if node.right:
+                    res.append(node.right)
+                return None
+            return node
+        node = dfs(root)
+        if node:
+            res.append(node)
+        return res
+```
+
+### Tag: #
+---
