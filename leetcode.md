@@ -17913,71 +17913,6 @@ class Solution:
         return cur+1
 ```
 ---
-## 394. Decode String｜ 11/4
-
-Given an encoded string, return its decoded string.
-
-The encoding rule is: k[encoded_string], where the encoded_string inside the square brackets is being repeated exactly k times. Note that k is guaranteed to be a positive integer.
-
-You may assume that the input string is always valid; No extra white spaces, square brackets are well-formed, etc.
-
-Furthermore, you may assume that the original data does not contain any digits and that digits are only for those repeat numbers, k. For example, there won't be input like 3a or 2[4].
-
-Examples:
-
-s = "3[a]2[bc]", return "aaabcbc".
-
-s = "3[a2[c]]", return "accaccacc".
-
-s = "2[abc]3[cd]ef", return "abcabccdcdcdef".
-
-### 思路
-
-DEBUG THIS
-
-### Code
-``` py
-class Solution:
-    def decodeString(self, s: str) -> str:
-        int_stack, char_stack = [], []
-        int_hold, char_hold = 0, ""
-        reading_char = False
-
-        for c in s:
-            print(char_stack)
-            if c == "[":
-                int_stack.append(int_hold)
-                int_hold = 0
-                if reading_char:
-                    char_stack.append(char_hold)
-                    char_hold = ""
-                    reading_char = False
-                else:
-                    reading_char = True
-
-            elif c == "]":
-
-                top_int = int_stack.pop()
-
-                temp_str = char_hold * top_int
-                if char_stack:
-                    top_char = char_stack.pop()
-                    temp_str = top_char + temp_str
-                    char_hold = temp_str # TODO: DEBUG
-                char_stack.append(temp_str)
-                reading_char = False
-
-            elif c.isdigit():
-                int_hold = int_hold*10 + int(c)
-            else:
-                char_hold += c
-
-        if len(int_stack) == 0 and len(char_stack) == 1:
-            return char_stack.pop()
-        else:
-            return "WA"
-```
----
 ## Mathwork.Custom Sorted Array｜ 11/12
 
 Given an unsorted array,
@@ -35662,7 +35597,7 @@ Return:
 
 ### 解題分析
 
-1. 一開始看不懂題目，題目是指 grid coordinates 是否可以連到 both ocean
+1. 一開始看不懂題目，題目是指 grid coordinates 是否可以連到 both ocean (每一個點單獨都有路徑來通向兩大洋)
 2. 處理方式就是個別求出可以通到該 ocean 的點，然後再求出兩者的交集
 3. Trick 就是從邊界往內走，這樣就可以保證此點一定可以通到海
 
@@ -36189,7 +36124,7 @@ class Solution:
 
 ### Tag: #DFS #Graph #BFS
 ---
-## 394. Decode String｜ 4/4
+## 394. Decode String｜ 4/4 | [ Review * 1 ]
 
 Given an encoded string, return its decoded string.
 
@@ -36237,22 +36172,27 @@ Constraints:
     1. 左瓜 -> 進入子程序
     2. 右瓜 -> 結束子程序, 並將舊狀態與子程序的回傳組合生成新狀態
 
+### 類似題
+1. LC726. Number of Atoms
+    - 這題是由後往前讀, 那差別的點是 `係數` 出現的位置是在括號前還是後
+    - **我們應該要先讀到係數才去讀括號**
+
 ### Code
 ``` py
 class Solution:
     def decodeString(self, s: str) -> str:
         stack = []
-        curNum, curStr = 0, ""
+        curNum, curStr = "", ""
 
         for c in s:
             if c == "[":
                 stack.append((curNum, curStr))
-                curNum, curStr = 0, ""
+                curNum, curStr = "", ""
             elif c == "]":
                 prevNum, prevStr = stack.pop()
-                curStr = prevStr + prevNum * curStr
+                curStr = prevStr + int(prevNum) * curStr
             elif c.isnumeric():
-                curNum = curNum * 10 + int(c)
+                curNum += c
             else:
                 curStr += c
         return curStr
