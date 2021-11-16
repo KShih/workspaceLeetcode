@@ -44015,7 +44015,7 @@ class Solution:
 
 ### Tag: #Tree
 ---
-## 1249. Minimum Remove to Make Valid Parentheses｜ 10/19
+## 1249. Minimum Remove to Make Valid Parentheses｜ 10/19 | [ Review * 1 ]
 Given a string s of '(' , ')' and lowercase English characters.
 
 Your task is to remove the minimum number of parentheses ( '(' or ')', in any positions ) so that the resulting parentheses string is valid and return any valid string.
@@ -44058,6 +44058,9 @@ Constraints:
 2. 那麼下一步想的是我們該怎麼保留括號? 本來是想說只要符合就 append 上去但這樣字串的順序都亂了
 3. 那就回過頭來想, 我們該怎麼把這個括號標記成 valid 的括號呢? 記下 index 是一種方式
 4. 沒辦法一邊押入 stack 一邊組字串, 那就分成兩步驟進行
+5. 優化:
+    - 左掃一遍用 cnt 當作左瓜的數量, 然後 remove invalid right-brac
+    - 右邊掃回來用 cnt 當作右瓜的數量, 然後 remove invalid left-brac
 
 - Note: 盡量不要用 str += ch, 因為這樣時間複雜度較高 (複製字串 O(N))
 - 應該使用 list.append, 最後再一次 join 起來
@@ -44085,23 +44088,35 @@ class Solution:
         return "".join(res)
 ```
 
-Optimal
+Optimal, O(1) Space
 ```py
 class Solution:
     def minRemoveToMakeValid(self, s: str) -> str:
-        s = list(s)
-        stack = []
-        for i, char in enumerate(s):
-            if char == '(':
-                stack.append(i)
-            elif char == ')':
-                if stack:
-                    stack.pop()
+        ans = []
+
+        cnt = 0 # cnt for left-brac, to remove invalid right
+        for ch in s:
+            if ch == '(':
+                cnt += 1
+            elif ch == ')':
+                if cnt > 0:
+                    cnt -= 1
                 else:
-                    s[i] = ''
-        while stack:
-            s[stack.pop()] = ''
-        return ''.join(s)
+                    continue # do not append invalid right-brac
+            ans.append(ch)
+
+        cnt = 0 # cnt for right-brac, to remove invalid left
+        for i in range(len(ans)-1, -1, -1):
+            ch = ans[i]
+            if ch == ')':
+                cnt += 1
+            elif ch == '(':
+                if cnt > 0:
+                    cnt -= 1
+                else:
+                    ans[i] = '' # erase the invalid left-brac
+
+        return "".join(ans)
 ```
 
 ### Tag: #Stack
