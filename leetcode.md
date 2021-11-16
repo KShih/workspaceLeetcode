@@ -18598,7 +18598,7 @@ class Solution:
 ```
 ### Tag: #TwoPointer, #Recursive
 ---
-## 31. Next Permutation｜ 11/21 | [ Review * 1 ]
+## 31. Next Permutation｜ 11/21 | [ Review * 2 ]
 
 Implement next permutation, which rearranges numbers into the lexicographically next greater permutation of numbers.
 
@@ -18615,12 +18615,23 @@ Here are some examples. Inputs are in the left-hand column and its corresponding
 1,1,5 → 1,5,1
 
 ### 解題分析
-1. 就是按照思路的步驟去做
+1. 思路
+    1. 123 -> 132 -> 213 -> 231 -> 321
+        - 可以觀察到最終形態是個降序, 也就是說從最後面往前看是個升續排列
+        - 我們希望下一個數比自己大一點點, 該怎麼做呢?
+        - 再看一個例子 12543 -> 13245
+        - 從 3 開始一路往上升, 直到 2 才掉下來, 我們只要把 3 跟 2 交換, 就可以保證比較大了, 13542
+        - 但這個數還不是我們所求, 跟所求 13245 的差別就在於 542 跟 245
+        - 因此如果要讓索求最小, 我們必須再把 245 倒返一下, 但這個思路還不夠全面
+        - 我們要 swap 的點應該要是, **比此降序的點大一點點的位置**
+            - 如 12541 -> 2 應該是要跟 4 交換 而不是 1
+        - 因此三個步驟
+            1. 找到降序的那個 pivot
+            2. 找到比 pivot 大的最小點進行 swap
+            3. 把 pivot 後的位置進行 reverse
 2. 注意 edge case
     - [3,2,1] -> [1,2,3]
-        - 需要用一個 found 的 flag 去決定我們需不需要進行步驟二
-    - [2,3,1,3,3] -> [2,3,3,1,3]
-        - 在尋找 next greater 的時候要使用 `小於等於`, 因為我們想要盡可能地往後找
+        - 這種情況我們就不需要進行 swap, 直接從頭 reverse 就行
 
 ### 思路
 
@@ -18649,27 +18660,25 @@ class Solution:
         """
         Do not return anything, modify nums in-place instead.
         """
-        if len(nums) == 1:
-            return nums
+        # find the pivot
         n = len(nums)
-        found = False
-        for i in range(n-2, -1, -1): # step1, find first lower
+        idx = -1
+        for i in range(n-2, -1, -1):
             if nums[i] < nums[i+1]:
-                found = True
+                idx = i
                 break
-        if found:
-            smallest = (-1, float("inf")) # step2, find next elem greater than lower, and near end
-            for j in range(i+1, n, 1):
-                if nums[j] > nums[i] and nums[j] <= smallest[1]: # 要用 <=, 因為我們想要盡量後面的
-                    smallest = (j, nums[j])
-            s_idx = smallest[0]
-            nums[i], nums[s_idx] = nums[s_idx], nums[i] # step2.1: swap two
-        else:
-            i = -1 # 表示完全遞減: e.g.: 3,2,1, 需要完全倒
-        l, r = i+1, n-1 # step3. swap nums[i+1:]
-        while l < r:
-            nums[l], nums[r] = nums[r], nums[l]
-            l, r = l+1, r-1
+
+        # swap
+        if idx >= 0:
+            for i in range(n-1, -1, -1):
+                if nums[i] > nums[idx]:
+                    nums[i], nums[idx] = nums[idx], nums[i]
+                    break
+
+        # reverse idx's back
+        idx += 1
+        for i in range((n-idx)//2):
+            nums[idx+i], nums[n-i-1] = nums[n-i-1], nums[idx+i]
 ```
 
 ``` py
