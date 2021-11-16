@@ -5078,7 +5078,7 @@ public:
 ```
 ### Tag: #Tree #DFS
 ---
-## 236. Lowest Common Ancestor of a Binary Tree｜ 5/28 | [ Review * 2 ]
+## 236. Lowest Common Ancestor of a Binary Tree｜ 5/28 | [ Review * 3 ]
 Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
 
 According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).”
@@ -5106,6 +5106,22 @@ According to the definition of LCA on Wikipedia: “The lowest common ancestor i
 2. p q 都在左，那我們便只需要找出p和q最高的位置，也就是遞迴第一個碰到p or q的root，此時left便等於該root，且right必為空
 3. p q 都在右，(同上)，right便等於該root，且left必為空
 ### Code
+優化版解法1
+```py
+class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        def post_order(node):
+            if not node or node == p or node == q: # early return
+                return node
+            left_found = post_order(node.left)
+            right_found = post_order(node.right)
+
+            if left_found and right_found:
+                return node
+            else:
+                return left_found or right_found
+        return post_order(root)
+```
 
 Recursive by counting the True
 ```py
