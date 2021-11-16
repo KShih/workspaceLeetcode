@@ -26149,7 +26149,7 @@ class Solution:
 ```
 ### Tag: #Recursive #Stack
 ---
-## 227. Basic Calculator II｜ 4/14 | [ Review * 1 ]
+## 227. Basic Calculator II｜ 4/14 | [ Review * 2 ]
 Implement a basic calculator to evaluate a simple expression string.
 
 The expression string contains only non-negative integers, +, -, *, / operators and empty spaces . The integer division should truncate toward zero.
@@ -26265,34 +26265,31 @@ class Solution:
 General solution
 ``` py
 class Solution:
-    def __init__(self):
-        self.i = 0 # 在此處可以不用使用到 global i, 因為沒有 括號產生的 recursive call
-
     def calculate(self, s: str) -> int:
-        num, op, curSum, globalSum = 0, "+", 0, 0
-        while self.i < len(s):
-            c = s[self.i]
-            self.i += 1
-            if c.isnumeric():
-                num = num*10 + int(c)
-            if c in ["+", "-", "*", "/"]:
-                curSum = self.cal(curSum, num, op)
-                if c in ["+", "-"]:
-                    globalSum += curSum
-                    curSum = 0
-                num, op = 0, c
-        return globalSum + self.cal(curSum, num, op)
+        cur_sum, prev_num, prev_op, cur_num = 0, 0, "+", "0"
 
-    def cal(self, curSum, num, op):
-        if op == "+":
-            curSum += num
-        elif op == "-":
-            curSum -= num
-        elif op == "*":
-            curSum *= num
-        elif op == "/":
-            curSum = int(curSum / num)
-        return curSum
+        for ch in s:
+            if ch.isdigit():
+                cur_num += ch
+            elif ch in ["+", "-", "*", "/"]:
+                prev_num = self.cal(prev_num, int(cur_num), prev_op)
+                if ch in ["+", "-"]:
+                    cur_sum += prev_num
+                    prev_num = 0
+                cur_num, prev_op = "0", ch
+        return cur_sum + self.cal(prev_num, int(cur_num), prev_op)
+
+    def cal(self, prev_num, cur_num, prev_op):
+        if prev_op == "+":
+            prev_num += cur_num
+        elif prev_op == "-":
+            prev_num -= cur_num
+        elif prev_op == "*":
+            prev_num *= cur_num
+        elif prev_op == "/":
+            prev_num = int(prev_num / cur_num)
+
+        return prev_num
 ```
 ### Tag: #Recursive #Stack
 ---
