@@ -47450,3 +47450,87 @@ class Solution:
 
 ### Tag: #
 ---
+## 827. Making A Large Island｜ 11/16
+You are given an n x n binary matrix grid. You are allowed to change at most one 0 to be 1.
+
+Return the size of the largest island in grid after applying this operation.
+
+An island is a 4-directionally connected group of 1s.
+
+Example 1:
+
+- Input: grid = [[1,0],[0,1]]
+- Output: 3
+- Explanation: Change one 0 to 1 and connect two 1s, then we get an island with area = 3.
+
+Example 2:
+
+- Input: grid = [[1,1],[1,0]]
+- Output: 4
+- Explanation: Change the 0 to 1 and make the island bigger, only one island with area = 4.
+
+Example 3:
+
+- Input: grid = [[1,1],[1,1]]
+- Output: 4
+- Explanation: Can't change any 0 to 1, only one island with area = 4.
+
+Constraints:
+
+- n == grid.length
+- n == grid[i].length
+- 1 <= n <= 500
+- grid[i][j] is either 0 or 1.
+
+### 解題分析
+1. 一開始想說是不是能直接透過一次 dfs 就把所有相鄰的點標上他的面積, 後來發現只靠一輪的 dfs 根本不可能
+2. 但可以透過標上顏色, 同時 keep the size of this color 來做到
+3. 顏色從 2 開始, 因為 0 跟 1 都已經被用了
+4. max_area 要 init 成當前最大的面積, 不然沒有半個零的 testcase 過不了, 也要注意沒有半個島嶼時 color_size.values() 為空陣列 所以要 `or [0]`
+
+
+### Code
+``` py
+class Solution:
+    def largestIsland(self, grid: List[List[int]]) -> int:
+        m, n = len(grid), len(grid[0])
+        color_size = dict()
+        def is_valid_color(i, j):
+            return 0 <= i < m and 0 <= j < n and grid[i][j] >= 2
+
+        def is_valid_area(i, j):
+            return 0 <= i < m and 0 <= j < n and grid[i][j] == 1
+
+        def color_area(i, j, color):
+            grid[i][j] = color
+            color_size[color] += 1
+            for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+                ni, nj = i+dx, j+dy
+                if is_valid_area(ni, nj):
+                    color_area(ni, nj, color)
+
+        # mark color and update color size
+        color = 2
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == 1:
+                    color_size[color] = 0
+                    color_area(i, j, color)
+                    color += 1
+
+        # connect neib color to get max_area
+        max_area = max(color_size.values() or [0])
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == 0:
+                    neib_color = set()
+                    for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+                        ni, nj = i+dx, j+dy
+                        if is_valid_color(ni, nj):
+                            neib_color.add(grid[ni][nj])
+                    max_area = max(max_area, 1 + sum(color_size[color] for color in neib_color))
+        return max_area
+```
+
+### Tag: #DFS
+---
