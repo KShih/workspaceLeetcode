@@ -45278,7 +45278,7 @@ class Solution:
 
 ### Tag: #Tree
 ---
-## 415. Add Strings｜ 10/26
+## 415. Add Strings｜ 10/26 | [ Review * 1 ]
 Given two non-negative integers, num1 and num2 represented as string, return the sum of num1 and num2 as a string.
 
 You must solve the problem without using any built-in library for handling large integers (such as BigInteger). You must also not convert the inputs to integers directly.
@@ -45345,10 +45345,9 @@ class Solution:
         p1 = len(num1) - 1
         p2 = len(num2) - 1
         while p1 >= 0 or p2 >= 0:
-            x1 = ord(num1[p1]) - ord('0') if p1 >= 0 else 0
-            x2 = ord(num2[p2]) - ord('0') if p2 >= 0 else 0
-            value = (x1 + x2 + carry) % 10
-            carry = (x1 + x2 + carry) // 10
+            x1 = int(num1[p1]) if p1 >= 0 else 0
+            x2 = int(num2[p2]) if p2 >= 0 else 0
+            carry, value = divmod(x1 + x2 + carry, 10)
             res.append(str(value))
             p1 -= 1
             p2 -= 1
